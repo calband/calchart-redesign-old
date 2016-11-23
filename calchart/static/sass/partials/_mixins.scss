@@ -1,0 +1,39 @@
+@import "_vars";
+
+@mixin display-button($primary-color: $blue) {
+    $secondary-color: #fff;
+
+    margin: 5px 10px;
+    padding: 0.75em 2.5em 0.75em;
+    line-height: 1em;
+    font-family: $sans-serif;
+    font-size: inherit;
+    cursor: pointer;
+    background: $primary-color;
+    color: $secondary-color;
+    border: 0;
+    outline: 0;
+    &:hover {
+        background: lighten($primary-color, 5);
+    }
+}
+
+@mixin colored-hover($color) {
+    color: $color;
+    &:hover {
+        color: lighten($color, 10);
+    }
+}
+
+@mixin vertically-center {
+    &:before {
+        content: "";
+        display: inline-block;
+        height: 100%;
+        vertical-align: middle;
+    }
+    > * {
+        display: inline-block;
+        vertical-align: middle;
+    }
+}

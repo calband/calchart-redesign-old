@@ -1,0 +1,22 @@
+{% load staticfiles partials %}
+<html>
+    <head lang="en">
+        <meta charset="utf-8">
+        <title>Calchart Server</title>
+        <link rel="icon" type="image/png" href="{% static 'img/favicon.png' %}">
+        <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,600' rel='stylesheet' type='text/css'>
+        {% add_style "vendor/reset.css" "login.css" %}
+    </head>
+    <body>
+        <div class="content">
+            <h1>Calchart Server</h1>
+            <p>Login with your Members Only credentials</p>
+            {% create_form form %}
+                <div class="buttons">
+                    <button>Login</button>
+                </div>
+                {% get_feedback form %}
+            {% end_create_form %}
+        </div>
+    </body>
+</html>

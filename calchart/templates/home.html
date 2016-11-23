@@ -1,0 +1,117 @@
+{% load staticfiles partials %}
+<html>
+    <head lang="en">
+        <meta charset="utf-8">
+        <title>Calchart Server</title>
+        <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,600' rel='stylesheet' type='text/css'>
+        {% add_style "vendor/reset.css" "home.css" %}
+        {% add_script "vendor/jquery-1.11.2.min.js" "home.js" %}
+    </head>
+    <body>
+        <header>
+            <h1>Calchart Server</h1>
+            <a class="logout" href="{% url 'logout' %}">Logout</a>
+        </header>
+        <div class="main-buttons">
+            <button class="create">New Show</button>
+            <button class="unpublish red-button">Unpublish All</button>
+        </div>
+        {% get_feedback %}
+        <table>
+            <tr>
+                <th class="id">ID</th>
+                <th class="name">Name</th>
+                <th>Viewer</th>
+                <th>Beats</th>
+                <th>Audio</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+            {% for show in all_shows %}
+                <tr data-pk="{{ show.pk }}" data-name="{{ show.name }}">
+                    <td class="id">{{ show.pk }}</td>
+                    <td class="name">{{ show.name }} <a class="icon edit" href="#"></a></td>
+                    <td><a href="{% url 'viewer' show.slug %}" target="_blank">Open</a></td>
+                    <td><a href="{% url 'beats' show.slug %}" target="_blank">Open</a></td>
+                    <td>
+                        {% if show.audio_file %}
+                            <a href="{{ show.audio_file.url }}" target="_blank">Open</a>
+                        {% else %}
+                            --
+                        {% endif %}
+                    </td>
+                    <td>{{ show.published|yesno:"Published,Unpublished" }}</td>
+                    <td class="actions">
+                        <a class="icon edit" href="{% url 'beats-editor' show.slug %}"></a>
+                        <a class="icon {{ show.published|yesno:'unpublish,publish' }}" href="#"></a>
+                        <a class="icon delete" href="#"></a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+        <!-- Form to use for running post actions -->
+        <form class="post-action" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action">
+        </form>
+        <!-- Popups -->
+        <div class="popup new-show">
+            <div class="popup-box">
+                <div class="section name">
+                    <h2>1. Show Name</h2>
+                    <div class="content">
+                        <label for="new-show-name">Name:</label>
+                        <input id="new-show-name">
+                        <button>Next</button>
+                    </div>
+                </div>
+                <div class="section viewer file-upload">
+                    <h2>2. Viewer File</h2>
+                    <div class="content">
+                        <label for="new-show-viewer">Upload Viewer File</label>
+                        <input type="file" id="new-show-viewer">
+                    </div>
+                </div>
+                <div class="section beats file-upload">
+                    <h2>3. Beats File</h2>
+                    <div class="content">
+                        <label for="new-show-beats">Upload Beats File</label>
+                        <input type="file" id="new-show-beats">
+                        <p>or</p>
+                        <button>Create Blank Beats File</button>
+                    </div>
+                </div>
+                <div class="section audio file-upload">
+                    <h2>4. Audio File</h2>
+                    <div class="content">
+                        <label for="new-show-audio">Upload Audio File</label>
+                        <input type="file" id="new-show-audio">
+                        <p>or</p>
+                        <button>Skip</button>
+                    </div>
+                </div>
+                <button class="close red-button">Close</button>
+            </div>
+        </div>
+        <div class="popup unpublish-all">
+            <div class="popup-box">
+                <h1>Unpublish All</h1>
+                <p>Are you sure you want to unpublish all published shows?</p>
+                <div class="buttons">
+                    <button class="confirm">Confirm</button>
+                    <button class="close red-button">Cancel</button>
+                </div>
+            </div>
+        </div>
+        <div class="popup delete-show">
+            <div class="popup-box">
+                <h1>Delete Show</h1>
+                <p>Are you sure you want to delete the "<span class="name"></span>" show?</p>
+                <div class="buttons">
+                    <button class="confirm">Delete</button>
+                    <button class="close red-button">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

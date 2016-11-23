@@ -1,0 +1,83 @@
+---
+- hosts: all # which URLs to run this ansible script for, but will only be used in
+             # setting up Vagrant (not CircleCI or Heroku).
+  become: yes
+  become_method: sudo
+  gather_facts: False # don't need information about the remote computer
+
+  vars:
+    ROOT_DIR: /vagrant
+    HOME_DIR: /home/vagrant
+    dbname: calchart_db
+    dbuser: calchart_user
+    dbpassword: calbandgreat
+
+  tasks:
+
+    # APT
+
+    - name: update the apt cache
+      apt: update_cache=yes # ensure all packages are up to date before installing with apt-get
+
+    # DATABASE
+
+    - name: install PostgreSQL
+      apt: name={{ item }}
+      with_items:
+        - postgresql
+        - libpq-dev
+        - python-psycopg2
+
+    - name: ensure database is created
+      become_user: postgres
+      postgresql_db: name={{ dbname }} # will create a database with the given name
+
+    - name: ensure user has access
+      become_user: postgres
+      # create a user for the `members_only_db` database, with the username
+      # `members_only_user` and the password `calbandgreat`. Grant them all
+      # privileges and allow them to create databases
+      postgresql_user:
+        db: "{{ dbname }}"
+        name: "{{ dbuser }}"
+        password: "{{ dbpassword }}"
+        priv: ALL
+        role_attr_flags: CREATEDB
+
+    # PYTHON
+
+    - name: install python development packages
+      apt: name=python-dev # calls `apt-get install python-dev`
+
+    - name: install pip
+      apt: name=python-pip
+
+    - name: install virtualenv
+      pip: name=virtualenv
+
+    - name: install requirements.txt
+      pip:
+        requirements: "{{ ROOT_DIR }}/requirements.txt"
+        virtualenv: "{{ HOME_DIR }}/venv"
+
+    # NODE
+
+    - name: install node
+      apt: name={{ item }}
+      with_items:
+        - nodejs-legacy
+        - npm
+
+    - name: install npm packages
+      command: npm install {{ ROOT_DIR }} --no-bin-links
+
+    - name: install grunt cli
+      npm: name=grunt-cli global=yes
+
+    # SASS
+
+    - name: install ruby gems
+      apt: name=rubygems-integration
+
+    - name: install sass
+      gem: name=sass user_install=no

@@ -1,0 +1,18 @@
+.DS_Store
+*.pyc
+node_modules
+
+# SASS
+.sass-cache
+calchart/static/css/**/*.css.map
+
+# Remove all CSS files from CSS directory..
+calchart/static/css/**/*.css
+
+# ... except CSS files in the vendor/ and fonts/ directories
+!calchart/static/css/vendor/**/*.css
+!calchart/static/css/fonts/**/*.css
+
+# JS
+calchart/static/js/**/*.js
+!calchart/static/js/vendor/**/*.js

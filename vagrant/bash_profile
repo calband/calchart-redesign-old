@@ -1,0 +1,5 @@
+# Will be added to Vagrant to automatically run every time we `vagrant ssh`
+
+source venv/bin/activate
+# source /vagrant/.env
+cd /vagrant/calchart
