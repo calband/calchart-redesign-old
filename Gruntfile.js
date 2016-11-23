@@ -1,25 +1,22 @@
 var fs = require("fs");
-var path = require("path");
 
 var getEntryPoints = function() {
     var dir = "calchart/static/src";
-    var javascriptFiles = {};
-    fs.readdirSync(dir, function(e, files) {
-        if (e) {
-            throw new Error(e);
+    var files = {};
+    
+    fs.readdirSync(dir).forEach(function(file) {
+        var match = file.match(/(.*)\.js$/);
+        if (match !== null) {
+            files[match[1]] = "./" + dir + "/" + file;
         }
-        files.forEach(function(file) {
-            var match = file.match(/(.*)\.js$/);
-            if (match !== null) {
-                javascriptFiles[match[1]] = path.join(dir, file);
-            }
-        });
     });
-    return javascriptFiles;
+
+    return files;
 };
 
 module.exports = function (grunt) {
     grunt.loadNpmTasks("grunt-contrib-sass");
+    grunt.loadNpmTasks("grunt-webpack");
     grunt.loadNpmTasks("grunt-contrib-watch");
 
     var entryPoints = getEntryPoints();
