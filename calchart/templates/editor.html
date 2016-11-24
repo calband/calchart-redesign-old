@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% load utils %}
+
+{% block title %}
+    - {{ show.name }}
+{% endblock %}
+
+{% block head %}
+    {% add_style "editor.css" %}
+    {% add_script "editor.js" %}
+    <script>
+        window.show = {{ show.viewer|asjson }};
+    </script>
+{% endblock %}
+
+{% block content %}
+    <div class="toolbar">
+        <h1>{{ show.name }}</h1>
+        <ul class="menu"></ul>
+    </div>
+    <div class="tools-panel"></div>
+    <div class="details-panel"></div>
+    <div class="canvas"></div>
+{% endblock %}

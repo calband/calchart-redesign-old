@@ -1,0 +1,26 @@
+{% load staticfiles partials %}
+<html>
+    <head lang="en">
+        <meta charset="utf-8">
+        <title>Calchart{% block title %}{% endblock %}</title>
+        <link rel="icon" type="image/png" href="{% static 'img/favicon.png' %}">
+        <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,600' rel='stylesheet' type='text/css'>
+        {% add_style "vendor/reset.css" "base.css" %}
+        {% add_script "vendor/jquery-1.11.2.min.js" %}
+        {% block head %}{% endblock %}
+    </head>
+    <body>
+        {% block header %}
+            <header>
+                <h1>Calchart</h1>
+                <p class="current-user">Hello, {{ username }} &middot; <a href="{% url 'logout' %}">Logout</a></p>
+            </header>
+        {% endblock %}
+        <div class="content">{% block content %}{% endblock %}</div>
+        <!-- Form to use for running post actions -->
+        <form class="post-action" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action">
+        </form>
+    </body>
+</html>

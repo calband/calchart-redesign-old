@@ -1,97 +1,11 @@
 @import "partials/vars", "partials/mixins", "partials/fonts";
 
-html, body, div, span, h1, h2, h3, h4, h5, h6,
-p, a, ul, li, label, form, input, textarea,
-header, footer, td, th {
-    color: $blue;
-    font-family: $sans-serif;
-    box-sizing: border-box; // padding included in width
-}
-
-body {
-    padding: 20px 50px;
-    &.no-scroll {
-        overflow: hidden;
-    }
-}
-
-a {
-    color: $blue;
-    &:hover {
-        color: $gold;
-    }
-    &.icon {
-        @include colored-hover($blue);
-        margin: 0 2px;
-        text-decoration: none;
-        cursor: pointer;
-        &:before {
-            font-family: "icomoon";
-        }
-        &.edit:before {
-            content: $edit;
-        }
-        &.publish:before {
-            content: $publish;
-            font-size: 1.2em;
-        }
-        &.unpublish:before {
-            content: $unpublish;
-            font-size: 1.2em;
-        }
-        &.delete {
-            @include colored-hover($red);
-            &:before {
-                content: $delete;
-            }
-        }
-    }
-}
-
-label {
-    display: inline-block;
-    margin-right: 5px;
-}
-
-input {
-    width: 200px;
-    font-size: 16px;
-    padding-top: 4px;
-    padding-left: 4px;
-}
-
-header {
-    position: relative;
-    margin-bottom: 50px;
-    h1 {
-        font-size: 3em;
-        text-transform: uppercase;
-        font-weight: bold;
-        letter-spacing: 2px;
-    }
-    .logout {
-        position: absolute;
-        top: 0;
-        right: 0;
-        text-decoration: none;
-        font-size: 18px;
-        font-weight: bold;
-    }
-}
-
 .main-buttons {
     margin: 20px 0;
     text-align: center;
     font-size: 18px;
     button {
         width: 205px;
-    }
-}
-
-button {
-    @include display-button;
-    &.red-button {
-        @include display-button($red);
     }
 }
 
@@ -152,92 +66,59 @@ table {
     }
 }
 
-form.post-action {
-    display: none;
-}
-
-.popup {
-    @include vertically-center;
-    position: fixed;
-    z-index: 100;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(255,255,255,0.4);
-    text-align: center;
-    display: none;
-    overflow-y: auto;
-    padding: 50px 0;
-    .popup-box {
-        border-radius: 5px;
-        background: white;
-        box-shadow: $gray 0 0 10px;
-        padding: 20px 30px;
-        h1 {
-            font-size: 1.5em;
-            font-weight: bold;
-            margin-bottom: 10px;
+.popup.new-show .popup-box {
+    .section {
+        padding: 15px 0;
+        border-bottom: 1px solid $medium-gray;
+        &:first-child {
+            border-top: 1px solid $medium-gray;
         }
-        p {
-            margin: 10px 0;
+        &.name {
+            #new-show-name {
+                width: 300px;
+            }
+        }
+        &.file-upload {
+            label {
+                @include display-button;
+                cursor: pointer;
+            }
+            input[type=file] {
+                display: none;
+            }
+            .content button {
+                margin-top: 10px;
+            }
+        }
+        h2 {
+            text-align: left;
+            span {
+                float: right;
+                &.checked:before {
+                    content: $check;
+                    font-family: "icomoon";
+                }
+            }
+        }
+        .content {
+            padding-top: 20px;
+            button {
+                display: block;
+                margin: 20px auto 0;
+            }
+            .error-messages {
+                margin-top: 10px;
+                li {
+                    color: $red;
+                }
+            }
         }
     }
-    &.new-show .popup-box {
-        width: 500px;
-        .section {
-            padding: 15px 0;
-            border-bottom: 1px solid $medium-gray;
-            &:first-child {
-                border-top: 1px solid $medium-gray;
-            }
-            &.name {
-                #new-show-name {
-                    width: 300px;
-                }
-            }
-            &.file-upload {
-                label {
-                    @include display-button;
-                    cursor: pointer;
-                }
-                input[type=file] {
-                    display: none;
-                }
-                .content button {
-                    margin-top: 10px;
-                }
-            }
-            h2 {
-                text-align: left;
-                span {
-                    float: right;
-                    &.checked:before {
-                        content: $check;
-                        font-family: "icomoon";
-                    }
-                }
-            }
-            .content {
-                padding-top: 20px;
-                button {
-                    display: block;
-                    margin: 20px auto 0;
-                }
-                .error-messages {
-                    margin-top: 10px;
-                    li {
-                        color: $red;
-                    }
-                }
-            }
-        }
-        button.close {
-            margin-top: 30px;
-        }
-        p.message {
-            margin-top: 20px;
-            margin-bottom: 0;
-        }
+    button.close {
+        margin-top: 30px;
+    }
+    p.message {
+        margin-top: 20px;
+        margin-bottom: 0;
     }
 }
