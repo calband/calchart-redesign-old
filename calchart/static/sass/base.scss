@@ -126,6 +126,11 @@ header {
             background: $light-gray;
         }
     }
+    & > li {
+        span {
+            border: 1px solid transparent;
+        }
+    }
     &.active {
         & > li {
             cursor: pointer;
