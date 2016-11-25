@@ -1,3 +1,34 @@
+$sans-serif: "DIN Next", "Helvetica Neue", Helvetica, Arial, sans-serif;
+
+@font-face {
+    font-family: "DIN Next";
+    src: url("/static/css/fonts/DINNextLTPro-Regular.otf") format("opentype");
+}
+
+@font-face {
+    font-family: "DIN Next";
+    src: url("/static/css/fonts/DINNextLTPro-Bold.otf") format("opentype");
+    font-weight: bold;
+}
+
+@font-face {
+    font-family: "DIN Next";
+    src: url("/static/css/fonts/DINNextLTPro-Italic.otf") format("opentype");
+    font-style: italic;
+}
+
+@font-face {
+    font-family: "DIN Next";
+    src: url("/static/css/fonts/DINNextLTPro-BoldItalic.otf") format("opentype");
+    font-weight: bold;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: "DIN Next Medium";
+    src: url("/static/css/fonts/DINNextLTPro-Medium.otf") format("opentype");
+}
+
 @font-face {
     font-family: "icomoon";
     src: url("/static/css/fonts/icomoon.ttf") format("truetype");

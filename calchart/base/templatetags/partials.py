@@ -232,3 +232,23 @@ def make_submenu(submenu):
             menu_items
         )
     )
+
+@register.simple_tag
+def make_panel(panel):
+    """
+    Makes a panel, which is like a menu but only shows icons. HTML generated
+    will look like:
+
+    <ul class="panel">
+        # for each item
+        <li data-function="{{ function }}" data-help-text="{{ help_text }}">
+            <span>{{ icon }}</span>
+        </li>
+    </ul>
+    """
+    items = format_html_join('',
+        '<li data-function="{}" data-help-text="{}"><span>{}</span></li>',
+        [(item['function'], item['help_text'], mark_safe(item['icon'])) for item in panel]
+    )
+    return format_html('<ul class="panel">{}</ul>', items)
+

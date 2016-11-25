@@ -91,6 +91,7 @@ class EditorView(LoginRequiredMixin, ActionsMixin, TemplateView):
         context = super(EditorView, self).get_context_data(**kwargs)
         context['show'] = self.show
         context['menu'] = editor_menu
+        context['tool_panel'] = editor_tools
         return context
 
     def save_show(self):

@@ -37,3 +37,17 @@ editor_menu = [
         ],
     },
 ]
+
+# tools panel only has an icon, a help text, and a function name
+editor_tools = [
+    {
+        'icon': '&#xea0a;',
+        'help_text': 'New stuntsheet',
+        'function': 'new',
+    },
+    {
+        'icon': '&#xea0a;',
+        'help_text': 'New stuntsheet',
+        'function': 'new',
+    },
+]
