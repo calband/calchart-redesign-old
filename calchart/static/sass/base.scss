@@ -3,6 +3,7 @@
 html, body, div, span, h1, h2, h3, h4, h5, h6,
 p, a, ul, li, label, form, input, textarea,
 header, footer, td, th {
+    position: relative;
     color: $blue;
     font-family: $sans-serif;
     box-sizing: border-box; // padding included in width
@@ -105,6 +106,55 @@ header {
         font-weight: bold;
         a {
             text-decoration: none;
+        }
+    }
+}
+
+.menu {
+    @include unselectable;
+    z-index: 10;
+    li {
+        display: inline-block;
+        cursor: default;
+        span {
+            display: inline-block;
+            padding: 5px 10px;
+            color: $gray;
+            z-index: 1;
+        }
+        &:hover {
+            background: $light-gray;
+        }
+    }
+    &.active {
+        & > li {
+            cursor: pointer;
+            &.active {
+                box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+                & > span {
+                    border: 1px solid $gray;
+                    border-bottom: 1px solid $white;
+                }
+                .submenu {
+                    display: block;
+                }
+            }
+            &:hover {
+                background: $white;
+            }
+        }
+    }
+    .submenu {
+        display: none;
+        position: absolute;
+        left: 0;
+        top: 27px;
+        padding: 10px 0;
+        border: 1px solid $gray;
+        background: $white;
+        li {
+            cursor: pointer;
+            width: 100%;
         }
     }
 }

@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load utils %}
+{% load partials utils %}
 
 {% block title %}
     - {{ show.name }}
@@ -16,7 +16,7 @@
 {% block content %}
     <div class="toolbar">
         <h1>{{ show.name }}</h1>
-        <ul class="menu"></ul>
+        {% make_menu menu %}
     </div>
     <div class="tools-panel"></div>
     <div class="details-panel"></div>

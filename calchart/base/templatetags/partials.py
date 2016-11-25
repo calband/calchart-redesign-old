@@ -166,3 +166,69 @@ class CreateFormNode(template.Node):
             mark_safe(fields),
             mark_safe(rest)
         )
+
+@register.simple_tag
+def make_menu(menu):
+    """
+    Creates a menu from the given list, defined in menus.py. The HTML
+    will be of the form:
+
+    <ul class="menu">
+        <li>
+            <span>{{ name }}</span>
+            <ul class="submenu">
+                <li data-shortcut="{{ shortcut }}" data-function="{{ function }}">
+                    <span>{{ name }}</span>
+                </li>
+                # if has submenu
+                <li class="has-submenu" data-shortcut="{{ shortcut }}" data-function="{{ function }}">
+                    <span>{{ name }}</span>
+                    <ul class="submenu">
+                        ...
+                    </ul>
+                </li>
+            </ul>
+        </li>
+        ...
+    </ul>
+    """
+    menu_items = []
+    for item in menu:
+        item_submenu = item.get('submenu')
+        if item_submenu:
+            item_submenu = make_submenu(item_submenu)
+        menu_items.append((item['name'], item_submenu))
+
+    return format_html(
+        '<ul class="menu">{}</ul>',
+        format_html_join('', '<li><span>{}</span>{}</li>', menu_items)
+    )
+
+def make_submenu(submenu):
+    """
+    Make a submenu, with the format defined in make_menu
+    """
+    menu_items = []
+    for item in submenu:
+        item_submenu = item.get('submenu')
+        if item_submenu is None:
+            item_class = ''
+            item_submenu = ''
+        else:
+            item_class = 'has-submenu'
+            item_submenu = make_submenu(item_submenu)
+        menu_items.append([
+            item_class,
+            item.get('shortcut', ''),
+            item.get('function', ''),
+            item['name'],
+            item_submenu,
+        ])
+    return format_html(
+        '<ul class="submenu">{}</ul>',
+        format_html_join(
+            '',
+            '<li class="{}" data-shortcut="{}" data-function="{}"><span>{}</span>{}</li>',
+            menu_items
+        )
+    )
