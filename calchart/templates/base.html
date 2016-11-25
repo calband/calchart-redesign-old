@@ -15,6 +15,7 @@
                 <p class="current-user">Hello, {{ username }} &middot; <a href="{% url 'logout' %}">Logout</a></p>
             </header>
         {% endblock %}
+        <div class="toolbar">{% block toolbar %}{% endblock %}</div>
         <div class="content">{% block content %}{% endblock %}</div>
         <!-- Form to use for running post actions -->
         <form class="post-action" method="post">

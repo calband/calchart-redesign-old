@@ -9,6 +9,10 @@ header, footer, td, th {
     box-sizing: border-box; // padding included in width
 }
 
+html, body {
+    height: 100%;
+}
+
 body {
     padding: 20px;
     &.no-scroll {

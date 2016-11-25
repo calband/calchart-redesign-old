@@ -63,3 +63,5 @@ Show.prototype.serialize = function() {
 Show.prototype.getDotByLabel = function(label) {
     return this._dots[label];
 };
+
+module.exports = Show;
