@@ -108,21 +108,19 @@ header {
             border: 1px solid transparent;
         }
     }
-    &.active {
-        & > li {
-            &.active {
-                box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-                & > span {
-                    border: 1px solid $dark-gray;
-                    border-bottom: 1px solid $white;
-                }
-                .submenu {
-                    display: block;
-                }
+    &.active > li {
+        &.active {
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            & > span {
+                border: 1px solid $dark-gray;
+                border-bottom: 1px solid $white;
             }
-            &:hover {
-                background: $white;
+            .submenu {
+                display: block;
             }
+        }
+        &:hover {
+            background: $white;
         }
     }
     .submenu {

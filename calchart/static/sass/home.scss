@@ -1,4 +1,4 @@
-@import "partials/vars", "partials/mixins", "partials/fonts";
+@import "partials/vars", "partials/mixins";
 
 .main-buttons {
     margin: 20px 0;
@@ -92,13 +92,6 @@ table {
         }
         h2 {
             text-align: left;
-            span {
-                float: right;
-                &.checked:before {
-                    content: $check;
-                    font-family: "icomoon";
-                }
-            }
         }
         .content {
             padding-top: 20px;
