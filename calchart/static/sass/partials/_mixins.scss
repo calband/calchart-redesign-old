@@ -1,4 +1,4 @@
-@import "_vars";
+@import "vars", "fonts";
 
 @mixin display-button($primary-color: $blue) {
     $secondary-color: #fff;
@@ -43,4 +43,12 @@
     -moz-user-select: none;
     -ms-user-select: none;
     -webkit-user-select: none;
+}
+
+// Remove the small space between children caused by whitespace
+@mixin remove-children-space {
+    font-size: 0;
+    & > * {
+        font-size: $font-size;
+    }
 }

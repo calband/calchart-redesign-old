@@ -6,6 +6,7 @@ header, footer, td, th {
     position: relative;
     color: $blue;
     font-family: $sans-serif;
+    font-size: $font-size;
     box-sizing: border-box; // padding included in width
 }
 
@@ -76,7 +77,7 @@ label {
 
 input {
     width: 200px;
-    font-size: 16px;
+    font-size: $font-size;
     padding-top: 4px;
     padding-left: 4px;
 }
@@ -105,7 +106,7 @@ header {
         position: absolute;
         top: 0;
         right: 0;
-        font-size: 18px;
+        font-size: 1.1em;
         a {
             text-decoration: none;
         }
@@ -173,18 +174,20 @@ header {
         display: inline-block;
         margin-right: 5px;
         span {
-            width: 2em;
-            height: 2em;
+            width: 2.5em;
+            height: 2.5em;
             font-size: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
             color: $gray;
-            cursor: pointer;
+            cursor: default;
             border: 1px solid transparent;
             font-family: "icomoon";
             &:hover {
-                border: 1px solid $gray;
+                border: 1px solid darken($medium-gray, 10);
+                border-radius: 2px;
+                box-shadow: 0 0 1px rgba(0,0,0,0.2);
             }
         }
     }
