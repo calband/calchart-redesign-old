@@ -41,13 +41,18 @@ editor_menu = [
 # tools panel only has an icon, a help text, and a function name
 editor_tools = [
     {
-        'icon': '&#xea0a;',
+        'icon': 'fa-plus',
         'help_text': 'New stuntsheet',
         'function': 'new',
     },
     {
-        'icon': '&#xea0a;',
-        'help_text': 'New stuntsheet',
-        'function': 'new',
+        'icon': 'fa-undo',
+        'help_text': 'Undo',
+        'function': 'undo',
+    },
+    {
+        'icon': 'fa-repeat',
+        'help_text': 'Redo',
+        'function': 'redo',
     },
 ]

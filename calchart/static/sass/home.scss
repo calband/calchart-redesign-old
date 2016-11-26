@@ -56,8 +56,8 @@ table {
     }
     tr {
         &:first-child th {
-            background: $gray;
-            border-color: $gray;
+            background: $dark-gray;
+            border-color: $dark-gray;
             color: $light-gray;
         }
         &:nth-child(odd) td {
