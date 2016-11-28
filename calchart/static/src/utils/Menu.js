@@ -55,6 +55,7 @@ Menu.setup = function() {
                 $(this).addClass("active");
             }
         });
+        // TODO: functionality for hover over .has-submenu
 
     // set up click and add shortcuts to menu
     menu.find("li").each(function() {

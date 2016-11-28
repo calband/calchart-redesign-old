@@ -115,7 +115,7 @@ header {
                 border: 1px solid $dark-gray;
                 border-bottom: 1px solid $white;
             }
-            .submenu {
+            & > .submenu {
                 display: block;
             }
         }
@@ -134,6 +134,7 @@ header {
         li {
             cursor: pointer;
             width: 100%;
+            // TODO: style has-submenu
         }
     }
 }
