@@ -134,6 +134,7 @@ header {
         li {
             cursor: pointer;
             width: 100%;
+            white-space: nowrap;
             // TODO: style has-submenu
         }
     }

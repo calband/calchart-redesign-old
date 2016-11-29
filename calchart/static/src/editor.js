@@ -2,11 +2,15 @@
  * @fileOverview The main Javascript file for the editor page.
  */
 
-var EditorMenu = require("./editor/EditorMenu");
+var Menu = require("./utils/Menu");
+var Panel = require("./utils/Panel");
+var EditorActions = require("./editor/EditorActions");
 var Show = require("./calchart/Show");
 
 $(document).ready(function() {
-    EditorMenu.setup();
+    Menu.setup(EditorActions);
+    Panel.setup(EditorActions);
+
     // convert show JSON data into Show object
     window.show = new Show(window.show);
 

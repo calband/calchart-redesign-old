@@ -17,13 +17,17 @@ var Menu = {};
  *      with that name defined in this Menu object.
  *  - If a menu item has `data-shortcut` defined, typing that keyboard shortcut will
  *      run the same command.
+ *
+ * @param {object} actions -- an object mapping the name of the action to the function to call when
+ *   the menu item is clicked or the keyboard shortcut is pressed.
  */
-Menu.setup = function() {
+Menu.setup = function(actions) {
     var _this = this;
+    this._actions = actions;
+
     var menu = $(".menu");
     // maps keyboard shortcut to their function
     var shortcuts = {};
-    window.menu = menu;
 
     // set up activating menu
     menu.children("li")
@@ -98,7 +102,7 @@ Menu.setup = function() {
  * Runs the menu function with the given name.
  */
 Menu.handle = function(action) {
-    this[action]();
+    this._actions[action]();
 };
 
 module.exports = Menu;
