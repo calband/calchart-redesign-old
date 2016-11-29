@@ -44,28 +44,47 @@ CalchartUtils.doAction = function(action, params, success) {
  * Shows the popup with the given name
  *
  * @param {string} name -- the name of the popup to show
- * @param {function} init -- optional function to run before
- *   the popup is shown
+ * @param {object} options -- an object containing additional parameters, such as:
+ *   - {function} init -- optional function to run before the popup is shown
+ *   - {function} success -- optional function to run when the Save button is pressed
  */
-CalchartUtils.showPopup = function(name, init) {
+CalchartUtils.showPopup = function(name, options) {
     var popup = $(".popup-box." + name).addClass("active");
 
-    if (init !== undefined) {
-        init(popup);
+    // clear any inputs
+    popup.find("input, select, textarea").val("");
+
+    if (options.init !== undefined) {
+        options.init.call(this, popup);
+    }
+
+    if (options.success !== undefined) {
+        popup.find("button.save")
+            .off("click.popup")
+            .on("click.popup", function() {
+                options.success.call(this, popup);
+            });
     }
 
     $(".popup").show();
     $(".popup select").dropdown();
+
+    // auto focus on first input
+    popup.find("input:first").focus();
 };
 
 /**
- * Hides the popup with the given name
+ * Hides the given popup
  *
- * @param {string} name -- the name of the popup to hide
+ * @param {jQuery|string} popup -- the popup or the name of the popup to hide
  */
-CalchartUtils.hidePopup = function(name) {
+CalchartUtils.hidePopup = function(popup) {
+    if (typeof popup === "string") {
+        popup = $(".popup-box." + name);
+    }
+
     $(".popup").hide();
-    $(".popup-box." + name).removeClass("active");
+    $(popup).removeClass("active");
 };
 
 /**
@@ -120,6 +139,41 @@ CalchartUtils.showError = function(message, element) {
  */
 CalchartUtils.clearMessage = function(element) {
     $(element).next("p.message").remove();
+};
+
+/**
+ * Scroll the parent if the given element is hidden from view
+ *
+ * @param {jQuery} element -- the element to check visibility
+ */
+CalchartUtils.scrollIfHidden = function(element) {
+    var parent = element.parent();
+
+    // height of the parent
+    var height = parseInt(parent.height());
+    // distance between top of parent and top of visible edge of parent
+    var visibleTop = parent.scrollTop();
+    // distance between top of parent and bottom of visible edge of parent
+    var visibleBottom = visibleTop + height;
+
+    // distance between top of parent and top of element
+    var selectedTop = element.position().top + visibleTop;
+    // distance between top of parent and bottom of element
+    var selectedBottom = selectedTop + element.outerHeight();
+
+    // at least part of selected element is below what is visible
+    if (selectedBottom >= visibleBottom) {
+        var difference = selectedBottom - height;
+        if (difference > 0) {
+            parent.scrollTop(difference);
+        } else {
+            parent.scrollTop(0);
+        }
+    }
+    // at least part of selected element is above what is visible
+    else if (selectedTop < visibleTop) {
+        parent.scrollTop(selectedTop);
+    }
 };
 
 module.exports = CalchartUtils;

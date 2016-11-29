@@ -45,23 +45,38 @@ $sidebar-width: 300px;
         height: 100%;
         vertical-align: top;
         padding: 10px;
+        overflow: scroll;
     }
     .sidebar {
         width: $sidebar-width;
+        border-right: 3px double $medium-gray;
+        .stuntsheet {
+            margin-bottom: 10px;
+            height: 200px;
+            &:last-child {
+                margin-bottom: 0;
+            }
+            &.active {
+                svg.preview {
+                    border-color: $gold;
+                }
+            }
+            span.label {
+                position: absolute;
+                top: 10px;
+                left: 10px;
+                font-size: 32px;
+                font-family: sans-serif("DIN Next Medium");
+            }
+            svg.preview {
+                display: block;
+                width: 100%;
+                height: 100%;
+                border: 1px solid $blue;
+            }
+        }
     }
     .workspace {
         width: calc(100% - #{$sidebar-width});
-    }
-}
-
-.popup .popup-box {
-    &.setup-show {
-        .num_dots input {
-            width: 75px;
-            text-align: center;
-        }
-        .dot_format select {
-            width: 150px;
-        }
     }
 }

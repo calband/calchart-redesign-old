@@ -84,6 +84,7 @@ class EditorView(CalchartMixin, TemplateView):
     template_name = 'editor.html'
     popup_forms = [
         SetUpShowPopup,
+        AddStuntsheetPopup,
     ]
 
     def dispatch(self, request, *args, **kwargs):

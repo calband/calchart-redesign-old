@@ -72,6 +72,14 @@ input {
         box-shadow: 0 0 5px $gold;
         border-color: $semilight-gray;
     }
+    &[type=number] {
+        width: 75px;
+        text-align: center;
+    }
+}
+
+select {
+    width: 200px;
 }
 
 button {

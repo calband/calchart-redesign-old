@@ -77,3 +77,11 @@ class SetUpShowPopup(PopupForm):
 
     num_dots = forms.IntegerField(label='Number of dots')
     dot_format = forms.ChoiceField(choices=DOT_FORMATS)
+
+class AddStuntsheetPopup(PopupForm):
+    """
+    The popup to add a stuntsheet
+    """
+    name = 'add-stuntsheet'
+
+    num_beats = forms.IntegerField(label='Number of beats')

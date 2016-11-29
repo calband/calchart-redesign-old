@@ -87,6 +87,15 @@ Show.prototype.serialize = function() {
 };
 
 /**
+ * Get all dot labels
+ *
+ * @return {Array<string>} labels of all dots in show
+ */
+Show.prototype.getDotLabels = function(label) {
+    return Object.keys(this._dots);
+};
+
+/**
  * Get dot by its label
  *
  * @param {string} label -- the label of the dot to get
@@ -103,9 +112,18 @@ Show.prototype.getDotByLabel = function(label) {
  * @return {Sheet} the newly created stuntsheet
  */
 Show.prototype.addSheet = function(numBeats) {
-    var sheet = new Sheet(numBeats);
+    var sheet = Sheet.create(numBeats, this.getDotLabels());
     this._sheets.push(sheet);
     return sheet;
+};
+
+/**
+ * Get all stuntsheets in the Show
+ *
+ * @return {Array<Sheet>} the list of stuntsheets in the show
+ */
+Show.prototype.getSheets = function() {
+    return this._sheets;
 };
 
 module.exports = Show;

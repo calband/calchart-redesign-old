@@ -24,6 +24,8 @@ Panel.setup = function(actions) {
             _function();
         }
     });
+
+    // TODO: set up help text
 };
 
 module.exports = Panel;

@@ -2,6 +2,8 @@
  * @fileOverview Runs any actions for every page.
  */
 
+var CalchartUtils = require("./utils/CalchartUtils");
+
 (function($) {
     /**
     * Convert a <select> element into a fancy dropdown. We use the Chosen library
@@ -40,4 +42,9 @@
 
 $(document).ready(function() {
     $("select:visible").dropdown();
+
+    $(".popup-box button.cancel").click(function() {
+        var popup = $(this).parents(".popup-box");
+        CalchartUtils.hidePopup(popup);
+    });
 });

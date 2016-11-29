@@ -38,22 +38,23 @@ var setupShow = function() {
         return;
     }
 
-    $(".popup-box.setup-show button.save").click(function() {
-        CalchartUtils.clearMessage(this);
-        var popup = $(this).parents(".popup-box");
-        var data = CalchartUtils.getData(popup);
+    CalchartUtils.showPopup("setup-show", {
+        success: function(popup) {
+            var container = $(this).parent();
+            CalchartUtils.clearMessage(container);
+            var data = CalchartUtils.getData(popup);
 
-        // validate data
-        if (data.num_dots <= 0) {
-            CalchartUtils.showError("Need to have a positive number of dots.", this);
-            return;
-        }
+            // validate data
+            data.num_dots = parseInt(data.num_dots);
+            if (data.num_dots <= 0) {
+                CalchartUtils.showError("Need to have a positive number of dots.", container);
+                return;
+            }
 
-        window.show = Show.create(data);
-        EditorActions.save_show(function() {
-            CalchartUtils.hidePopup("setup-show");
-        });
+            window.show = Show.create(data);
+            EditorActions.save_show(function() {
+                CalchartUtils.hidePopup("setup-show");
+            });
+        },
     });
-
-    CalchartUtils.showPopup("setup-show");
 };

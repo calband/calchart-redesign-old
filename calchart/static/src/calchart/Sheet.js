@@ -1,5 +1,6 @@
 var Coordinate = require("./Coordinate");
 var Continuity = require("./Continuity");
+var DotType = require("./DotType");
 
 /**
  * A Sheet object contains all the information related to a stuntsheet,
@@ -23,13 +24,36 @@ var Sheet = function(numBeats, options) {
         label: null,
     };
     options = $.extend(defaults, options);
-    this.label = options.label;
+    this._label = options.label;
 
     // map dot labels to an object containing the dot's type (string),
     // position (Coordinate), and movements (Array<MovementCommand>)
     this._dots = {};
     // map dot type to Continuity
     this._continuities = {};
+};
+
+/**
+ * Create a stuntsheet from the given number of beats and the given
+ * dot labels.
+ *
+ * @param {int} numBeats -- the number of beats in the stuntsheet
+ * @param {Array<string>} dotLabels -- the labels for the dots in the show
+ * @return {Sheet} the newly created Sheet
+ */
+Sheet.create = function(numBeats, dotLabels) {
+    var sheet = new Sheet(numBeats);
+
+    // initialize dots as plain dots
+    dotLabels.forEach(function(dot) {
+        sheet._dots[dot] = {
+            type: DotType.PLAIN,
+            position: new Coordinate(0, 0),
+            movements: [],
+        };
+    });
+
+    return sheet;
 };
 
 /**
@@ -41,7 +65,6 @@ var Sheet = function(numBeats, options) {
 Sheet.deserialize = function(data) {
     var sheet = new Sheet(data.numBeats, data.options);
 
-    sheet._dots = {};
     $.each(data.dots, function(dot, dot_data) {
         sheet._dots[dot] = {
             type: dot_type.type,
@@ -54,7 +77,6 @@ Sheet.deserialize = function(data) {
         };
     });
 
-    sheet._continuities = {};
     $.each(data.continuities, function(dot_type, continuity_data) {
         sheet._continuities[dot_type] = Continuity.deserialize(continuity_data);
     });
@@ -69,7 +91,7 @@ Sheet.prototype.serialize = function() {
     var data = {};
 
     data.options = {
-        label: this.label,
+        label: this._label,
     };
     
     data.dots = {};
@@ -89,6 +111,30 @@ Sheet.prototype.serialize = function() {
     });
 
     return data;
+};
+
+/**
+ * Get the label for this Sheet, either the custom label or the sheet
+ * number in the given Show.
+ *
+ * @param {Show|undefined} show -- the Show this stuntsheet is a part
+ *   of. If left undefined and the stuntsheet does not have a custom
+ *   label, returns undefined.
+ */
+Sheet.prototype.getLabel = function(show) {
+    if (this._label) {
+        return this._label;
+    } else if (show === undefined) {
+        return undefined;
+    }
+
+    var sheets = show.getSheets();
+    for (var i = 0; i < sheets.length; i++) {
+        var sheet = sheets[i];
+        if (sheet === this) {
+            return i + 1;
+        }
+    }
 };
 
 module.exports = Sheet;

@@ -79,8 +79,8 @@ editor_menu = [
 editor_panel = [
     {
         'icon': 'fa-plus',
-        'help_text': 'New stuntsheet',
-        'function': 'new_stuntsheet',
+        'help_text': 'Add stuntsheet',
+        'function': 'add_stuntsheet',
     },
     {
         'icon': 'fa-undo',
