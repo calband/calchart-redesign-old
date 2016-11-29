@@ -22,18 +22,58 @@ class LoginForm(forms.Form):
 
         return self.cleaned_data
 
-def validate_show_name(name):
+class BasePopupForm(object):
     """
-    Validates the given value for a Show name. Raises a ValidationError if
-    the given value does not pass validation.
+    A popup form. A mixin to include with another Form class.
     """
-    ValidateForm = modelform_factory(
-        Show,
-        fields=['name'],
-        error_messages={
-            'name': {'required': 'Please provide the name of the show'},
-        }
-    )
-    errors = ValidateForm(data={'name': name}).errors.get('name')
-    if errors is not None:
-        raise forms.ValidationError(errors)
+    # the name of this popup -- needs to be unique to each popup
+    name = None
+    # classes to add to the popup div
+    classes = []
+    # template to load for the popup
+    template_name = 'partials/popup.html'
+    # title to show in the popup box, defaults to name
+    title = None
+    # description (as HTML) to show above the form in the popup box
+    description = None
+    # names for hidden fields
+    hidden_fields = []
+    # label for save button
+    save_label = 'Save'
+
+    def __init__(self, *args, **kwargs):
+        super(BasePopupForm, self).__init__(*args, **kwargs)
+
+        assert self.name is not None, 'Popup form needs a name'
+
+        for field in self.hidden_fields:
+            self.fields[field] = forms.CharField(widget=forms.HiddenInput)
+
+        if self.title is None:
+            # automatically generate from the name
+            self.title = self.name.replace('-', ' ').title()
+
+class PopupForm(BasePopupForm, forms.Form):
+    """
+    A form to use for any popups on the site. Can be included on a page using
+    the CalchartMixin.
+    """
+    pass
+
+### EDITOR POPUPS ###
+
+class SetUpShowPopup(PopupForm):
+    """
+    The popup to set up a show when first opening in the editor view.
+    """
+    name = 'setup-show'
+    template_name = 'partials/setup_show.html'
+    title = 'Set Up Show'
+
+    DOT_FORMATS = [
+        ('combo', 'A0, A1, A2, ...'),
+        ('number', '1, 2, 3, ...'),
+    ]
+
+    num_dots = forms.IntegerField(label='Number of dots')
+    dot_format = forms.ChoiceField(choices=DOT_FORMATS)

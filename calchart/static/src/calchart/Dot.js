@@ -22,12 +22,12 @@ Dot.deserialize = function(data) {
 /**
  * Return the JSONified version of the Dot
  *
- * @return {string} a JSON string containing this Dot's data
+ * @return {object} a JSON object containing this Dot's data
  */
 Dot.prototype.serialize = function() {
-    var data = {};
-    data.label = this.label;
-    return JSON.stringify(data);
+    return {
+        label: this.label,
+    };
 };
 
 module.exports = Dot;

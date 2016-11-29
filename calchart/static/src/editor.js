@@ -2,17 +2,18 @@
  * @fileOverview The main Javascript file for the editor page.
  */
 
+var Show = require("./calchart/Show");
+var EditorActions = require("./editor/EditorActions");
+var CalchartUtils = require("./utils/CalchartUtils");
 var Menu = require("./utils/Menu");
 var Panel = require("./utils/Panel");
-var EditorActions = require("./editor/EditorActions");
-var Show = require("./calchart/Show");
 
 $(document).ready(function() {
     Menu.setup(EditorActions);
     Panel.setup(EditorActions);
 
-    // convert show JSON data into Show object
-    window.show = new Show(window.show);
+    // convert JSON show data into Show object
+    setupShow();
 
     // adjust content so that it only takes up to the bottom of the
     // screen (and not extending below the screen)
@@ -25,3 +26,34 @@ $(document).ready(function() {
             height: "calc(100% - " + offset + "px)",
         });
 });
+
+/**
+ * Convert JSON show data into a Show object. If the Show is new,
+ * prompt user for information needed to set up the Show, including:
+ *  - number of dots
+ */
+var setupShow = function() {
+    if (window.show !== null) {
+        window.show = new Show(window.show);
+        return;
+    }
+
+    $(".popup-box.setup-show button.save").click(function() {
+        CalchartUtils.clearMessage(this);
+        var popup = $(this).parents(".popup-box");
+        var data = CalchartUtils.getData(popup);
+
+        // validate data
+        if (data.num_dots <= 0) {
+            CalchartUtils.showError("Need to have a positive number of dots.", this);
+            return;
+        }
+
+        window.show = Show.create(data);
+        EditorActions.save_show(function() {
+            CalchartUtils.hidePopup("setup-show");
+        });
+    });
+
+    CalchartUtils.showPopup("setup-show");
+};

@@ -31,3 +31,18 @@ class ActionsMixin(object):
             return response or redirect('home')
         except:
             return super(ActionsMixin, self).post(request, *args, **kwargs)
+
+class PopupMixin(object):
+    """
+    Views with this mixin can define forms in the `popup_forms` class variable
+    that will be rendered in the HTML as popup boxes.
+    """
+    popup_forms = []
+
+    def get_context_data(self, **kwargs):
+        context = super(PopupMixin, self).get_context_data(**kwargs)
+        context['popup_forms'] = [PopupForm() for PopupForm in self.popup_forms]
+        return context
+
+class CalchartMixin(LoginRequiredMixin, ActionsMixin, PopupMixin):
+    pass

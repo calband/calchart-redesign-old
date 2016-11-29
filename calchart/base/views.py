@@ -7,7 +7,7 @@ import json
 
 from base.forms import *
 from base.menus import *
-from base.mixins import LoginRequiredMixin, ActionsMixin
+from base.mixins import CalchartMixin
 from base.models import Show
 
 class LoginView(FormView):
@@ -41,7 +41,7 @@ def logout_view(request):
 
     return redirect('login')
 
-class HomeView(LoginRequiredMixin, ActionsMixin, TemplateView):
+class HomeView(CalchartMixin, TemplateView):
     """
     The home page that lists all shows created by the user and shared
     by the STUNT committee in a Google Drive-like format.
@@ -77,11 +77,14 @@ class HomeView(LoginRequiredMixin, ActionsMixin, TemplateView):
         show = Show.objects.create(**kwargs)
         return redirect('editor', slug=show.slug)
 
-class EditorView(LoginRequiredMixin, ActionsMixin, TemplateView):
+class EditorView(CalchartMixin, TemplateView):
     """
     The editor view that can edit shows
     """
     template_name = 'editor.html'
+    popup_forms = [
+        SetUpShowPopup,
+    ]
 
     def dispatch(self, request, *args, **kwargs):
         self.show = Show.objects.get(slug=kwargs['slug'])

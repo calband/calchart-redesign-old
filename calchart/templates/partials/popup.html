@@ -1,0 +1,28 @@
+{% load partials %}
+
+<div class="popup-box {{ form.name }} {{ form.classes|join:' ' }}">
+    {% block popup_content %}
+        {% block popup_title %}
+            <h1>{{ form.title }}</h1>
+        {% endblock %}
+        {% block popup_description %}
+            {% if form.description %}<p>{{ form.description|safe }}</p>{% endif %}
+        {% endblock %}
+        {% block popup_form %}
+            {% for field in form %}
+                {% if field.is_hidden %}
+                    {{ field }}
+                {% else %}
+                    {% create_field field %}
+                {% endif %}
+            {% endfor %}
+        {% endblock %}
+        <div class="buttons">
+            {% block buttons %}
+                <button class="save">{{ form.save_label }}</button>
+                <button class="cancel red-button">Cancel</button>
+            {% endblock %}
+        </div>
+    {% endblock %}
+    {% block post_popup_content %}{% endblock %}
+</div>

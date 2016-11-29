@@ -19,8 +19,10 @@ Panel.setup = function(actions) {
 
     // set up click
     $(".panel li").click(function() {
-        var _function = $(this).data("function");
-        actions[_function]();
+        var _function = actions[$(this).data("function")];
+        if (_function) {
+            _function();
+        }
     });
 };
 

@@ -3,25 +3,37 @@
  *   run on the page.
  */
 
+var CalchartUtils = require("../utils/CalchartUtils");
+
 /**
  * A collection of actions that can be executed in the editor page.
  */
 var EditorActions = {};
 
-EditorActions.edit_undo = function() {
-    alert("edit_undo called!");
-};
-
-EditorActions.edit_redo = function() {
-    alert("edit_redo called!");
-};
-
-EditorActions.file_save = function() {
-    alert("file_save called!");
-};
-
+/**
+ * Adds a new stuntsheet to the Show and workspace.
+ */
 EditorActions.new_stuntsheet = function() {
-    alert("new_stuntsheet called!");
+    var numBeats = 32;
+    window.show.newSheet(numBeats);
+};
+
+EditorActions.redo = function() {
+    alert("redo called!");
+};
+
+/**
+ * Saves the show to the server.
+ */
+EditorActions.save_show = function(callback) {
+    var params = {
+        viewer: JSON.stringify(window.show.serialize()),
+    };
+    CalchartUtils.doAction("save_show", params, callback);
+};
+
+EditorActions.undo = function() {
+    alert("undo called!");
 };
 
 module.exports = EditorActions;

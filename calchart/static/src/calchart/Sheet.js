@@ -4,7 +4,6 @@ var Continuity = require("./Continuity");
 /**
  * A Sheet object contains all the information related to a stuntsheet,
  * consisting of the following information:
- *  - the Sheet number in the show
  *  - an optional label for the Sheet
  *  - the number of beats in the stuntsheet
  *  - for each dot, its dot type
@@ -12,15 +11,13 @@ var Continuity = require("./Continuity");
  *  - for each dot, its movements
  *  - for each dot type, its continuity
  *
- * @param {int} number -- the Sheet number in the show
- * @param {int} beats -- the number of beats in the stuntsheet
+ * @param {int} numBeats -- the number of beats in the stuntsheet
  * @param {object|undefined} options -- an optional argument that can
  *   contain optional information about a stuntsheet, such as:
  *     - {string} label -- a label for the Sheet
  */
-var Sheet = function(number, beats, options) {
-    this.number = sheet_data.number;
-    this.numBeats = beats;
+var Sheet = function(numBeats, options) {
+    this.numBeats = numBeats;
 
     var defaults = {
         label: null,
@@ -42,7 +39,7 @@ var Sheet = function(number, beats, options) {
  * @return {Sheet} the Sheet reconstructed from the given data
  */
 Sheet.deserialize = function(data) {
-    var sheet = new Sheet(data.number, {label: data.label});
+    var sheet = new Sheet(data.numBeats, data.options);
 
     sheet._dots = {};
     $.each(data.dots, function(dot, dot_data) {
@@ -66,13 +63,14 @@ Sheet.deserialize = function(data) {
 /**
  * Return the JSONified version of this Sheet
  *
- * @return {string} a JSON string containing this Sheet's data
+ * @return {object} a JSON object containing this Sheet's data
  */
 Sheet.prototype.serialize = function() {
     var data = {};
 
-    data.number = this.number;
-    data.label = this.label;
+    data.options = {
+        label: this.label,
+    };
     
     data.dots = {};
     $.each(this._dots, function(dot, dot_data) {
@@ -90,7 +88,7 @@ Sheet.prototype.serialize = function() {
         data.continuities[dot_type] = continuity.serialize();
     });
 
-    return JSON.stringify(data);
+    return data;
 };
 
 module.exports = Sheet;

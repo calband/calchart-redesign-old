@@ -4,8 +4,8 @@
         <meta charset="utf-8">
         <title>Calchart{% block title %}{% endblock %}</title>
         <link rel="icon" type="image/png" href="{% static 'img/favicon.png' %}">
-        {% add_style "vendor/reset.css" "vendor/font-awesome.min.css" "base.css" %}
-        {% add_script "vendor/jquery-1.11.2.min.js" %}
+        {% add_style "vendor/reset.css" "vendor/chosen.min.css" "vendor/font-awesome.min.css" "base.css" %}
+        {% add_script "vendor/jquery-1.11.2.min.js" "vendor/chosen.jquery.min.js" "base.js" %}
         {% block head %}{% endblock %}
     </head>
     <body>
@@ -17,10 +17,13 @@
         {% endblock %}
         <div class="toolbar">{% block toolbar %}{% endblock %}</div>
         <div class="content">{% block content %}{% endblock %}</div>
-        <!-- Form to use for running post actions -->
-        <form class="post-action" method="post">
-            {% csrf_token %}
-            <input type="hidden" name="action">
-        </form>
+        <!-- CSRF token for AJAX requests -->
+        {% csrf_token %}
+        <!-- Popups -->
+        <div class="popup">
+            {% for popup in popup_forms %}
+                {% include popup.template_name with form=popup %}
+            {% endfor %}
+        </div>
     </body>
 </html>

@@ -31,7 +31,7 @@ editor_menu = [
         'submenu': [
             {
                 'name': 'Save',
-                'function': 'file_save',
+                'function': 'save_show',
                 'shortcut': 'ctrl+s',
             },
         ],
@@ -41,12 +41,12 @@ editor_menu = [
         'submenu': [
             {
                 'name': 'Undo',
-                'function': 'edit_undo',
+                'function': 'undo',
                 'shortcut': 'ctrl+z',
             },
             {
                 'name': 'Redo',
-                'function': 'edit_redo',
+                'function': 'redo',
                 'shortcut': 'ctrl+shift+z',
             },
         ],
@@ -85,11 +85,11 @@ editor_panel = [
     {
         'icon': 'fa-undo',
         'help_text': 'Undo',
-        'function': 'edit_undo',
+        'function': 'undo',
     },
     {
         'icon': 'fa-repeat',
         'help_text': 'Redo',
-        'function': 'edit_redo',
+        'function': 'redo',
     },
 ]

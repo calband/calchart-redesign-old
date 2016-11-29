@@ -61,7 +61,7 @@ table {
             color: $light-gray;
         }
         &:nth-child(odd) td {
-            background: $medium-gray;
+            background: $semilight-gray;
         }
     }
 }
@@ -69,9 +69,9 @@ table {
 .popup.new-show .popup-box {
     .section {
         padding: 15px 0;
-        border-bottom: 1px solid $medium-gray;
+        border-bottom: 1px solid $semilight-gray;
         &:first-child {
-            border-top: 1px solid $medium-gray;
+            border-top: 1px solid $semilight-gray;
         }
         &.name {
             #new-show-name {

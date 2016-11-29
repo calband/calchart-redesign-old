@@ -45,6 +45,7 @@ Menu.setup = function(actions) {
             // clicking off the menu will close the menu
             $(window).click(function(e) {
                 var possibleMenu = $(e.target).closest(menu);
+                // TODO: except .has-submenu
                 if (possibleMenu.length === 0) {
                     menu.removeClass("active")
                         .children("li.active")
@@ -102,7 +103,10 @@ Menu.setup = function(actions) {
  * Runs the menu function with the given name.
  */
 Menu.handle = function(action) {
-    this._actions[action]();
+    var _function = this._actions[action];
+    if (_function) {
+        _function();
+    }
 };
 
 module.exports = Menu;

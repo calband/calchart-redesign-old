@@ -5,7 +5,7 @@ p, a, ul, li, label, form, input, textarea,
 header, footer, td, th {
     position: relative;
     color: $blue;
-    font-family: $sans-serif;
+    font-family: sans-serif("DIN Next");
     font-size: $font-size;
     box-sizing: border-box; // padding included in width
 }
@@ -23,6 +23,7 @@ body {
 
 h1, h2, h3 {
     margin: 0.5em 0;
+    font-family: sans-serif("DIN Next Medium");
 }
 
 h1 {
@@ -35,6 +36,15 @@ h2 {
 
 h3 {
     font-size: 1.2em;
+}
+
+p {
+    &.message {
+        font-family: sans-serif("DIN Next Medium");
+        &.error {
+            color: $red;
+        }
+    }
 }
 
 a {
@@ -54,6 +64,14 @@ input {
     font-size: $font-size;
     padding-top: 4px;
     padding-left: 4px;
+    outline: none;
+    box-shadow: 0 0 5px $light-gray;
+    border: 1px solid $medium-gray;
+    border-radius: 2px;
+    &:focus {
+        box-shadow: 0 0 5px $gold;
+        border-color: $semilight-gray;
+    }
 }
 
 button {
@@ -65,6 +83,10 @@ button {
 
 form.post-action {
     display: none;
+}
+
+.field {
+    margin: 10px 0;
 }
 
 header {
@@ -152,7 +174,7 @@ header {
             cursor: default;
             border: 1px solid transparent;
             &:hover {
-                border: 1px solid darken($medium-gray, 10);
+                border: 1px solid darken($semilight-gray, 10);
                 border-radius: 2px;
                 box-shadow: 0 0 1px rgba(0,0,0,0.2);
             }
@@ -174,13 +196,20 @@ header {
     overflow-y: auto;
     padding: 50px 0;
     .popup-box {
+        display: none;
         width: 500px;
         border-radius: 5px;
         background: white;
-        box-shadow: $dark-gray 0 0 10px;
+        box-shadow: 0 0 10px $dark-gray;
         padding: 20px 30px;
+        &.active {
+            display: inline-block;
+        }
         p {
             margin: 10px 0;
+        }
+        .buttons {
+            margin-top: 20px;
         }
     }
 }

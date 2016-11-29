@@ -24,8 +24,8 @@ header {
     .panel {
         padding-left: 10px;
         background: $light-gray;
-        background: linear-gradient($light-gray, $medium-gray);
-        border-bottom: 1px solid $medium-gray;
+        background: linear-gradient($light-gray, $semilight-gray);
+        border-bottom: 1px solid $semilight-gray;
         box-shadow: 0 1px 2px rgba(0,0,0,0.2);
         li:hover {
             background: lighten($light-gray, 1);
@@ -51,5 +51,17 @@ $sidebar-width: 300px;
     }
     .workspace {
         width: calc(100% - #{$sidebar-width});
+    }
+}
+
+.popup .popup-box {
+    &.setup-show {
+        .num_dots input {
+            width: 75px;
+            text-align: center;
+        }
+        .dot_format select {
+            width: 150px;
+        }
     }
 }
