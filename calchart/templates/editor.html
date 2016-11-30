@@ -13,13 +13,14 @@
     </script>
 {% endblock %}
 
-{% block toolbar %}
-    <h1>{{ show.name }}</h1>
-    {% make_menu menu %}
-    {% make_panel panel %}
-{% endblock %}
-
-{% block content %}
-    <div class="sidebar"></div>
-    <div class="workspace"></div>
+{% block body %}
+    <div class="toolbar">
+        <h1>{{ show.name }}</h1>
+        {% make_menu menu %}
+        {% make_panel panel %}
+    </div>
+    <div class="content">
+        <div class="sidebar"></div>
+        <div class="workspace"></div>
+    </div>
 {% endblock %}

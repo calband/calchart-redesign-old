@@ -59,10 +59,11 @@ CalchartUtils.showPopup = function(name, options) {
     }
 
     if (options.success !== undefined) {
-        popup.find("button.save")
-            .off("click.popup")
-            .on("click.popup", function() {
+        popup.find("form")
+            .off("submit.popup")
+            .on("submit.popup", function() {
                 options.success.call(this, popup);
+                return false;
             });
     }
 

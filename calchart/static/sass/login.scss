@@ -1,48 +1,24 @@
 @import "partials/vars", "partials/mixins";
 
 body {
-    height: 100%;
+    @include vertically-center;
     text-align: center;
-    font-family: sans-serif("DIN Next");
-    color: $blue;
-    &:before {
-        content: "";
-        height: 100%;
-        display: inline-block;
-        vertical-align: middle;
-    }
 }
 
 .content {
-    display: inline-block;
     background: $light-gray;
     padding: 30px 50px;
-    font-size: 16px;
     h1 {
+        margin: 0;
         margin-bottom: 10px;
         font-size: 2em;
-        font-weight: bold;
         text-transform: uppercase;
     }
-    p {
-        margin-bottom: 10px;
+    label {
+        width: 90px;
     }
-    .field {
-        margin-bottom: 5px;
-        label {
-            display: inline-block;
-            width: 90px;
-        }
-        input {
-            width: 200px;
-            font-size: 16px;
-            padding-top: 4px;
-            padding-left: 4px;
-        }
-    }
-    button {
-        @include display-button;
-        margin-top: 10px;
+    input {
+        width: 200px;
     }
     .messages {
         margin-top: 10px;

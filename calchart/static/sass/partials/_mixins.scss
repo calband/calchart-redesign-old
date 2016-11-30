@@ -20,9 +20,19 @@
     }
 }
 
+// make user unable to highlight text in element
+@mixin unselectable {
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
 // make children vertically centered within the element
 @mixin vertically-center {
+    font-size: 0;
     &:before {
+        @include unselectable;
         content: "";
         display: inline-block;
         height: 100%;
@@ -32,14 +42,6 @@
         display: inline-block;
         vertical-align: middle;
     }
-}
-
-// make user unable to highlight text in element
-@mixin unselectable {
-    user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    -webkit-user-select: none;
 }
 
 // Remove the small space between children caused by whitespace

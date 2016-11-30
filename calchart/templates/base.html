@@ -15,8 +15,9 @@
                 <p class="current-user">Hello, {{ username }} &middot; <a href="{% url 'logout' %}">Logout</a></p>
             </header>
         {% endblock %}
-        <div class="toolbar">{% block toolbar %}{% endblock %}</div>
-        <div class="content">{% block content %}{% endblock %}</div>
+        {% block body %}
+            <div class="content">{% block content %}{% endblock %}</div>
+        {% endblock %}
         <!-- CSRF token for AJAX requests -->
         {% csrf_token %}
         <!-- Popups -->

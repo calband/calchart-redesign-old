@@ -33,7 +33,7 @@ header {
     }
 }
 
-$sidebar-width: 300px;
+$sidebar-width: 200px;
 .content {
     @include remove-children-space;
     position: absolute;
@@ -52,7 +52,7 @@ $sidebar-width: 300px;
         border-right: 3px double $medium-gray;
         .stuntsheet {
             margin-bottom: 10px;
-            height: 200px;
+            height: $sidebar-width * 0.6;
             &:last-child {
                 margin-bottom: 0;
             }
@@ -65,7 +65,7 @@ $sidebar-width: 300px;
                 position: absolute;
                 top: 10px;
                 left: 10px;
-                font-size: 32px;
+                font-size: 24px;
                 font-family: sans-serif("DIN Next Medium");
             }
             svg.preview {
