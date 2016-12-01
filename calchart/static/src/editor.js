@@ -3,15 +3,10 @@
  */
 
 var Show = require("./calchart/Show");
-var EditorActions = require("./editor/EditorActions");
+var EditorController = require("./editor/EditorController");
 var CalchartUtils = require("./utils/CalchartUtils");
-var Menu = require("./utils/Menu");
-var Panel = require("./utils/Panel");
 
 $(document).ready(function() {
-    Menu.setup(EditorActions);
-    Panel.setup(EditorActions);
-
     // convert JSON show data into Show object
     setupShow();
 

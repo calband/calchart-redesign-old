@@ -1,5 +1,5 @@
 /**
- * @fileOverview Defines miscellaneous utility functions.
+ * @fileOverview Defines Javascript helper functions.
  */
 
 /**
@@ -18,6 +18,15 @@ JSUtils.extends = function(ChildClass, ParentClass) {
     var Inheritor = function() {}; // dummy constructor
     Inheritor.prototype = ParentClass.prototype;
     ChildClass.prototype = new Inheritor();
+};
+
+/**
+ * Empties an array. Source: http://stackoverflow.com/a/1232046/4966649
+ *
+ * @param {Array} array -- array to be emptied
+ */
+JSUtils.empty = function(array) {
+    array.splice(0, array.length);
 };
 
 module.exports = JSUtils;

@@ -81,7 +81,7 @@ CalchartUtils.showPopup = function(name, options) {
  */
 CalchartUtils.hidePopup = function(popup) {
     if (typeof popup === "string") {
-        popup = $(".popup-box." + name);
+        popup = $(".popup-box." + popup);
     }
 
     $(".popup").hide();

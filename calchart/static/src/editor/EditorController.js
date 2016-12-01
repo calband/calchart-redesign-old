@@ -1,19 +1,27 @@
 /**
- * @fileOverview Defines the base EditorActions class that contains every action that can be
- *   run on the page.
+ * @fileOverview Defines the base EditorController class.
  */
 
+var ApplicationController = require("../utils/ApplicationController");
 var CalchartUtils = require("../utils/CalchartUtils");
 
 /**
- * A collection of actions that can be executed in the editor page.
+ * The class that stores the current state of the editor and contains all
+ * of the actions that can be run in the editor page. This is a singleton
+ * class, meaning that only one instance of this class will ever be created.
+ * As a result, don't use this constructor directly; always get the
+ * controller from EditorController.getInstance().
  */
-var EditorActions = {};
+var EditorController = function() {
+    ApplicationController.apply(this);
+};
+
+ApplicationController.makeSubClass(EditorController);
 
 /**
  * Adds a new stuntsheet to the Show and sidebar.
  */
-EditorActions.add_stuntsheet = function() {
+EditorController.prototype.addStuntsheet = function() {
     CalchartUtils.showPopup("add-stuntsheet", {
         success: function(popup) {
             var container = $(this).parent();
@@ -39,22 +47,18 @@ EditorActions.add_stuntsheet = function() {
                 .append(label)
                 .append(preview)
                 .appendTo(".sidebar");
-            EditorActions.update_sidebar(stuntsheet);
-            EditorActions.show_stuntsheet(stuntsheet);
+            EditorController.update_sidebar(stuntsheet);
+            EditorController.show_stuntsheet(stuntsheet);
 
             CalchartUtils.hidePopup(popup);
         },
     });
 };
 
-EditorActions.redo = function() {
-    alert("redo called!");
-};
-
 /**
  * Saves the show to the server.
  */
-EditorActions.save_show = function(callback) {
+EditorController.prototype.saveShow = function(callback) {
     var params = {
         viewer: JSON.stringify(window.show.serialize()),
     };
@@ -66,17 +70,13 @@ EditorActions.save_show = function(callback) {
  *
  * @param {jQuery} stuntsheet -- the stuntsheet element in the .sidebar
  */
-EditorActions.show_stuntsheet = function(stuntsheet) {
+EditorController.prototype.showStuntsheet = function(stuntsheet) {
     $(".sidebar .active").removeClass("active");
     stuntsheet.addClass("active");
     CalchartUtils.scrollIfHidden(stuntsheet);
 
     var sheet = stuntsheet.data("sheet");
     // TODO: show sheet in workspace
-};
-
-EditorActions.undo = function() {
-    alert("undo called!");
 };
 
 /**
@@ -87,7 +87,7 @@ EditorActions.undo = function() {
  *
  * @param {jQuery|undefined} stuntsheet -- the stuntsheet to update in the sidebar
  */
-EditorActions.update_sidebar = function(stuntsheet) {
+EditorController.prototype.updateSidebar = function(stuntsheet) {
     if (stuntsheet === undefined) {
         var stuntsheets = $(".sidebar .stuntsheet");
     } else {
@@ -104,4 +104,4 @@ EditorActions.update_sidebar = function(stuntsheet) {
     });
 };
 
-module.exports = EditorActions;
+module.exports = EditorController;
