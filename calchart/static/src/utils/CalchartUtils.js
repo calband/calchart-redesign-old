@@ -46,26 +46,28 @@ CalchartUtils.doAction = function(action, params, success) {
  * @param {string} name -- the name of the popup to show
  * @param {object} options -- an object containing additional parameters, such as:
  *   - {function} init -- optional function to run before the popup is shown
- *   - {function} success -- optional function to run when the Save button is pressed
+ *   - {function} onSubmit -- optional function to run when the Save button is pressed
  */
 CalchartUtils.showPopup = function(name, options) {
     var popup = $(".popup-box." + name).addClass("active");
 
-    // clear any inputs
+    // clear inputs and messages
+    CalchartUtils.clearMessages();
     popup.find("input, select, textarea").val("");
 
     if (options.init !== undefined) {
         options.init.call(this, popup);
     }
 
-    if (options.success !== undefined) {
-        popup.find("form")
-            .off("submit.popup")
-            .on("submit.popup", function() {
-                options.success.call(this, popup);
-                return false;
-            });
-    }
+    popup.find("form")
+        .off("submit.popup")
+        .on("submit.popup", function(e) {
+            e.preventDefault();
+
+            if (options.onSubmit !== undefined) {
+                options.onSubmit.call(this, popup);
+            }
+        });
 
     $(".popup").show();
     $(".popup select").dropdown();
@@ -136,10 +138,10 @@ CalchartUtils.showError = function(message, element) {
 };
 
 /**
- * Clears any messages below the given element
+ * Clears all messages on the page
  */
-CalchartUtils.clearMessage = function(element) {
-    $(element).next("p.message").remove();
+CalchartUtils.clearMessages = function() {
+    $("p.message").remove();
 };
 
 /**

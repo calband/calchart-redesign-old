@@ -20,7 +20,6 @@ Submenus are a list of menu items. The formats for the different types of menu i
 
 Panels are a list of dictionaries in the following format:
     - icon (str, required): the font-awesome icon class; e.g. "fa-plus" (http://fontawesome.io/icons/)
-    - help_text (str, optional): help text to display on hover
     - function (str, required): the name of the Javascript function (defined in the Javascript file
         to run when clicking on the item)
 """
@@ -31,7 +30,7 @@ editor_menu = [
         'submenu': [
             {
                 'name': 'Save',
-                'function': 'save_show',
+                'function': 'saveShow',
                 'shortcut': 'ctrl+s',
             },
         ],
@@ -60,15 +59,15 @@ editor_menu = [
                 'submenu': [
                     {
                         'name': 'Marching View',
-                        'function': 'view_marching',
+                        'function': 'viewMarching',
                     },
                     {
                         'name': 'Music View',
-                        'function': 'view_music',
+                        'function': 'viewMusic',
                     },
                     {
                         'name': '3D View',
-                        'function': 'view_3d',
+                        'function': 'view3d',
                     },
                 ],
             },
@@ -79,17 +78,14 @@ editor_menu = [
 editor_panel = [
     {
         'icon': 'fa-plus',
-        'help_text': 'Add stuntsheet',
-        'function': 'add_stuntsheet',
+        'function': 'addStuntsheet',
     },
     {
         'icon': 'fa-undo',
-        'help_text': 'Undo',
         'function': 'undo',
     },
     {
         'icon': 'fa-repeat',
-        'help_text': 'Redo',
         'function': 'redo',
     },
 ]

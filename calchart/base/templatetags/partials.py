@@ -241,14 +241,14 @@ def make_panel(panel):
 
     <ul class="panel">
         # for each item
-        <li data-function="{{ function }}" data-help-text="{{ help_text }}">
+        <li data-function="{{ function }}">
             <i class="fa {{ icon }}"></i>
         </li>
     </ul>
     """
     items = format_html_join('',
-        '<li data-function="{}" data-help-text="{}"><i class="fa {}"></i></li>',
-        [(item['function'], item['help_text'], item['icon']) for item in panel]
+        '<li data-function="{}"><i class="fa {}"></i></li>',
+        [(item['function'], item['icon']) for item in panel]
     )
     return format_html('<ul class="panel">{}</ul>', items)
 

@@ -5,64 +5,63 @@
 
 var JSUtils = require("./JSUtils");
 
- /**
-  * The class that stores the current state of the application and contains all
-  * of the actions that can be run in the editor page. This is a singleton
-  * class, meaning that only one instance of this class will ever be created.
-  * As a result, don't use this constructor directly; always get the
-  * controller from ApplicationController.getInstance().
-  */
-var ApplicationController = function() {
+/**
+ * The class that stores the current state of the application and contains all
+ * of the actions that can be run in the application.
+ *
+ * @param {Show} show -- the show for the controller
+ * @param {object} actions -- a dictionary of actions that this application can do,
+ *   mapping the name of the action to:
+ *    - {string} name: the verbose name of the action (used for Undo text, help text, etc.)
+ *    - {boolean} canUndo: true if the action can be undone
+ *    - {boolean} clearsRedo: true if the action clears any actions that have been undone.
+ *      Defaults to whatever canUndo is set to.
+ *    - {function} do: the function that runs the action, taking the ApplicationController
+ *      as a parameter
+ */
+var ApplicationController = function(show, actions) {
+    this._show = show;
+
+    this._actions = actions;
     this._undoHistory = [];
     this._redoHistory = [];
 };
 
 /**
- * Causes a child class to inherit from ApplicationController. Use to include
- * non-prototype functions and properties, like getInstance()
- */
-ApplicationController.makeSubClass = function(Controller) {
-    JSUtils.extends(Controller, this);
-    $.extend(Controller, this);
-};
-
-ApplicationController._instance = null;
-
-/**
- * Gets the instance of ApplicationController. Use this instead of the constructor
- * to get the controller for the application.
+ * Get the show stored in the controller
  *
- * @return {ApplicationController} the singleton instance
+ * @return {Show} the show stored in the controller
  */
-ApplicationController.getInstance = function() {
-    if (this._instance === null) {
-        this._instance = new this();
-    }
-    return this._instance
+ApplicationController.prototype.getShow = function() {
+    return this._show;
 };
 
 /**
  * Runs the method on this instance with the given name.
  *
  * @param {string} name -- the function to call
- * @param {boolean} clearRedo -- if true, clears the redo
- *   history. Defaults to true
  */
-ApplicationController.prototype.do = function(name, clearRedo) {
-    // save the current state
-    this._undoHistory.push($(".content").clone(true));
+ApplicationController.prototype.do = function(name) {
+    var action = this._actions[name];
+
+    if (action === undefined) {
+        throw new Error("No action with the name: " + name);
+    }
+
+    if (action.canUndo) {
+        // save the current state
+        this._undoHistory.push({
+            label: action.name,
+            content: $(".content").clone(true),
+        });
+    }
 
     // after doing an action, can't redo previous actions
-    if (clearRedo === false) {
+    if (action.clearsRedo || (action.clearsRedo === undefined && action.canUndo)) {
         JSUtils.empty(this._redoHistory);
     }
 
-    var _function = this[name];
-    if (_function) {
-        _function();
-    } else {
-        throw new Error(this.constructor.name + " has no function: " + name);
-    }
+    action.do(this);
 };
 
 /**
@@ -140,7 +139,7 @@ ApplicationController.prototype.setupMenu = function(menu) {
         var _function = $(this).data("function");
         if (_function) {
             $(this).click(function() {
-                _this.handle(_function);
+                _this.do(_function);
             });
             var shortcut = $(this).data("shortcut");
             if (shortcut) {

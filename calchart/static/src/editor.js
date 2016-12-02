@@ -2,41 +2,25 @@
  * @fileOverview The main Javascript file for the editor page.
  */
 
-var Show = require("./calchart/Show");
-var EditorController = require("./editor/EditorController");
 var CalchartUtils = require("./utils/CalchartUtils");
-
-$(document).ready(function() {
-    // convert JSON show data into Show object
-    setupShow();
-
-    // adjust content so that it only takes up to the bottom of the
-    // screen (and not extending below the screen)
-    var offset = parseInt($("body").css("padding-top"))
-        + $("header").outerHeight(true)
-        + $(".toolbar").outerHeight();
-    $(".content")
-        .css({
-            top: offset,
-            height: "calc(100% - " + offset + "px)",
-        });
-});
+var EditorController = require("./editor/EditorController");
+var Show = require("./calchart/Show");
 
 /**
- * Convert JSON show data into a Show object. If the Show is new,
- * prompt user for information needed to set up the Show, including:
- *  - number of dots
+ * Setup show, prompting user for show details if the show is new
  */
-var setupShow = function() {
+$(document).ready(function() {
     if (window.show !== null) {
-        window.show = new Show(window.show);
+        var show = new Show(window.show);
+        var controller = new EditorController(show);
+        onInit(controller);
         return;
     }
 
     CalchartUtils.showPopup("setup-show", {
-        success: function(popup) {
-            var container = $(this).parent();
-            CalchartUtils.clearMessage(container);
+        onSubmit: function(popup) {
+            var container = $(popup).find(".buttons");
+            CalchartUtils.clearMessages();
             var data = CalchartUtils.getData(popup);
 
             // validate data
@@ -46,10 +30,20 @@ var setupShow = function() {
                 return;
             }
 
-            window.show = Show.create(data);
-            EditorActions.save_show(function() {
+            var controller = new EditorController(Show.create(data));
+            EditorController.saveShow(function() {
                 CalchartUtils.hidePopup("setup-show");
+                onInit(controller);
             });
         },
     });
+});
+
+/**
+ * Actions to run after the show has been loaded and the EditorController
+ * has been set up.
+ */
+var onInit = function(controller) {
+    controller.setupMenu(".menu");
+    controller.setupPanel(".panel");
 };

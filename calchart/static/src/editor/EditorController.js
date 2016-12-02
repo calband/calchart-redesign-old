@@ -1,68 +1,31 @@
 /**
- * @fileOverview Defines the base EditorController class.
+ * @fileOverview Defines the EditorController class.
  */
 
 var ApplicationController = require("../utils/ApplicationController");
 var CalchartUtils = require("../utils/CalchartUtils");
+var EditorActions = require("./EditorActions");
+var JSUtils = require("../utils/JSUtils");
 
 /**
  * The class that stores the current state of the editor and contains all
- * of the actions that can be run in the editor page. This is a singleton
- * class, meaning that only one instance of this class will ever be created.
- * As a result, don't use this constructor directly; always get the
- * controller from EditorController.getInstance().
+ * of the actions that can be run in the editor page.
+ *
+ * @param {Show} show -- the show being edited in the application
  */
-var EditorController = function() {
-    ApplicationController.apply(this);
+var EditorController = function(show) {
+    ApplicationController.call(this, show, EditorActions);
 };
 
-ApplicationController.makeSubClass(EditorController);
+JSUtils.extends(EditorController, ApplicationController);
 
 /**
- * Adds a new stuntsheet to the Show and sidebar.
- */
-EditorController.prototype.addStuntsheet = function() {
-    CalchartUtils.showPopup("add-stuntsheet", {
-        success: function(popup) {
-            var container = $(this).parent();
-            CalchartUtils.clearMessage(container);
-            var data = CalchartUtils.getData(popup);
-
-            // validate data
-            data.num_beats = parseInt(data.num_beats);
-            if (data.num_beats <= 0) {
-                CalchartUtils.showError("Need to have a positive number of beats.", container);
-                return;
-            }
-
-            var sheet = window.show.addSheet(data.num_beats);
-
-            // containers for elements in sidebar
-            var label = $("<span>").addClass("label");
-            var preview = $("<svg>").addClass("preview");
-
-            var stuntsheet = $("<div>")
-                .addClass("stuntsheet")
-                .data("sheet", sheet)
-                .append(label)
-                .append(preview)
-                .appendTo(".sidebar");
-            EditorController.update_sidebar(stuntsheet);
-            EditorController.show_stuntsheet(stuntsheet);
-
-            CalchartUtils.hidePopup(popup);
-        },
-    });
-};
-
-/**
- * Saves the show to the server.
+ * Saves the show to the server
+ *
+ * @param {function|undefined} callback -- optional callback to run after saving show
  */
 EditorController.prototype.saveShow = function(callback) {
-    var params = {
-        viewer: JSON.stringify(window.show.serialize()),
-    };
-    CalchartUtils.doAction("save_show", params, callback);
+    this._actions.saveShow(this, callback);
 };
 
 /**
@@ -94,10 +57,11 @@ EditorController.prototype.updateSidebar = function(stuntsheet) {
         var stuntsheets = $(stuntsheet);
     }
 
+    var show = this._show;
     stuntsheets.each(function() {
         var sheet = $(this).data("sheet");
 
-        var label = sheet.getLabel(window.show);
+        var label = sheet.getLabel(show);
         $(this).find("span.label").text(label);
 
         // TODO: update preview
