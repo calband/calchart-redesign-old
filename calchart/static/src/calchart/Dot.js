@@ -1,12 +1,14 @@
 /**
- * A Dot object contains all the data for a marcher, containing the
+ * A Dot object contains all the data for a marcher in a Show, containing the
  * following information:
  *  - the dot label
  *
  * @param {string} label -- the label for the dot
  */
 var Dot = function(label) {
-    this.label = label;
+    this._label = label;
+
+    this._sheetInfo = null;
 };
 
 /**
@@ -26,8 +28,33 @@ Dot.deserialize = function(data) {
  */
 Dot.prototype.serialize = function() {
     return {
-        label: this.label,
+        label: this._label,
     };
 };
+
+/**
+ * Get the label for this dot
+ *
+ * @return {string} the label for the dot
+ */
+Dot.prototype.getLabel = function() {
+    return this._label;
+};
+
+/**** ANIMATION ****/
+
+/**
+ * Load the given Sheet to the Dot. This simulates a marcher "remembering"
+ * the next stuntsheet in the show. Extracts the Dot's movements from
+ * the stuntsheet and stores all necessary movements for the Dot to know
+ * how to move in the stuntsheet.
+ *
+ * @param {Sheet} sheet -- the stuntsheet to load
+ */
+Dot.prototype.loadSheet = function(sheet) {
+    this._sheetInfo = sheet.getInfoForDot(this._label);
+};
+
+// TODO: make animation functions ".getAnimationState"
 
 module.exports = Dot;

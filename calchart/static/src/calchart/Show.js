@@ -16,7 +16,7 @@ var Show = function(show_data) {
     this._dots = {};
     show_data.dots.forEach(function(dot_data) {
         var dot = Dot.deserialize(dot_data);
-        this._dots[dot.label] = dot;
+        this._dots[dot.getLabel()] = dot;
     }, this);
 
     this._sheets = show_data.sheets.map(function(sheet_data) {
@@ -92,11 +92,33 @@ Show.prototype.serialize = function() {
 };
 
 /**
+ * Get the field type of the show
+ *
+ * @return {string} the field type
+ */
+Show.prototype.getFieldType = function() {
+    return this._fieldType;
+};
+
+/**** DOTS ****/
+
+/**
+ * Get all Dots in the show
+ *
+ * @return {Array<Dot>} all Dots in the show
+ */
+Show.prototype.getDots = function() {
+    return $.map(this._dots, function(dot) {
+        return dot;
+    });
+};
+
+/**
  * Get all dot labels
  *
  * @return {Array<string>} labels of all dots in show
  */
-Show.prototype.getDotLabels = function(label) {
+Show.prototype.getDotLabels = function() {
     return Object.keys(this._dots);
 };
 
@@ -108,6 +130,17 @@ Show.prototype.getDotLabels = function(label) {
  */
 Show.prototype.getDotByLabel = function(label) {
     return this._dots[label];
+};
+
+/**** SHEETS ****/
+
+/**
+ * Get all stuntsheets in the Show
+ *
+ * @return {Array<Sheet>} the list of stuntsheets in the show
+ */
+Show.prototype.getSheets = function() {
+    return this._sheets;
 };
 
 /**
@@ -123,21 +156,17 @@ Show.prototype.addSheet = function(numBeats) {
 };
 
 /**
- * Get all stuntsheets in the Show
+ * Load the given Sheet to every Dot. See Dot.loadSheet
  *
- * @return {Array<Sheet>} the list of stuntsheets in the show
+ * @param {Sheet} sheet -- the sheet to load
  */
-Show.prototype.getSheets = function() {
-    return this._sheets;
+Show.prototype.loadSheet = function(sheet) {
+    $.each(this._dots, function(_, dot) {
+        dot.loadSheet(sheet);
+    });
 };
 
-/**
- * Get the field type of the show
- *
- * @return {string} the field type
- */
-Show.prototype.getFieldType = function() {
-    return this._fieldType;
-};
+/**** SONGS ****/
+// TODO
 
 module.exports = Show;

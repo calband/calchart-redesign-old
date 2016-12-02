@@ -36,13 +36,12 @@ BaseGrapher.prototype.FIELD_WIDTH = null;
  * Draws a moment in a field show. The moment is given as a beat of a
  * particular stuntsheet.
  *
- * @param {Stuntsheet} sheet The stuntsheet to draw.
- * @param {int} currentBeat The beat to draw, relative to the
+ * @param {Stuntsheet} sheet -- the stuntsheet to draw.
+ * @param {int} currentBeat -- the beat to draw, relative to the
  *   start of the stuntsheet.
- * @param {string} selectedDot The label of the currently selected
- *   dot, or undefined if no dot is selected.
+ * @param {Array<string>} selectedDots -- labels of selected dots
  */
-BaseGrapher.prototype.draw = function(sheet, currentBeat, selectedDot) {
+BaseGrapher.prototype.draw = function(sheet, currentBeat, selectedDots) {
     var fieldType = sheet ? sheet.getFieldType() : this._show.getFieldType();
     var field = this._drawTarget.find(".field");
 
@@ -53,7 +52,7 @@ BaseGrapher.prototype.draw = function(sheet, currentBeat, selectedDot) {
     }
 
     if (sheet) {
-        this._drawStuntsheetAtBeat(sheet, currentBeat, selectedDot);
+        this._drawDots(currentBeat, selectedDots);
     }
 };
 
@@ -77,6 +76,71 @@ BaseGrapher.prototype.clear = function() {
  */
 BaseGrapher.prototype._drawField = function() {
     throw new Error("BaseGrapher subclasses need to implement _drawField");
+};
+
+/**
+ * Given a stuntsheet, the currentBeat relative to the beginning of that sheet,
+ * and the dot labels of all selected dots, draw the dots in this stuntsheet at
+ * that beat onto the SVG context of this grapher.
+ *
+ * @param {int} currentBeat -- beat of stuntsheet to draw
+ * @param {Array<string>} selectedDots -- labels of selected dots
+ */
+BaseGrapher.prototype._drawDots = function(currentBeat, selectedDots) {
+    var dots = this._show.getDots();
+    console.log(dots);
+
+    // TODO
+
+    // var scale = this._getStepScale();
+    // var angleScale = this._getAngleScale();
+
+    // var classForDot = function (dot) {
+    //     var dotClass = "dot ";
+    //     if (dot.getLabel() === selectedDotLabel) {
+    //         dotClass += "selected";
+    //     } else {
+    //         dotClass += angleScale(dot.getAnimationState(currentBeat).angle);
+    //     }
+    //     return dotClass;
+    // };
+
+    // // pixels, represents length and width since the dots are square. Size is proportional
+    // // to the size of the field (ratio adjusted manually)
+    // var dotRectSize = this._svgWidth / 120;
+
+    // var dotsGroup = this._svg.append("g")
+    //     .attr("class", "dots");
+
+    // dotsGroup.selectAll("rect.dot")
+    //     .data(dots)
+    //     .enter()
+    //     .append("rect")
+    //         .attr("class", classForDot)
+    //         .attr("x", function (dot) { return scale.x(dot.getAnimationState(currentBeat).x) - dotRectSize / 2; })
+    //         .attr("y", function (dot) { return scale.y(dot.getAnimationState(currentBeat).y) - dotRectSize / 2; })
+    //         .attr("width", dotRectSize)
+    //         .attr("height", dotRectSize)
+    //         .style("cursor", "pointer")
+    //         .on("click", function (dot) {
+    //             var label = dot.getLabel();
+    //             $(".js-dot-labels option[data-dot-label=" + label + "]").prop("selected", true);
+    //             $(".js-dot-labels")
+    //                 .trigger("chosen:updated")
+    //                 .trigger("change", {selected: label});
+    //         });
+
+    // var selectedDot = sheet.getDotByLabel(selectedDotLabel);
+    // if (selectedDot) {
+    //     var circleSize = dotRectSize * 2;
+    //     var circleX = scale.x(selectedDot.getAnimationState(currentBeat).x);
+    //     var circleY = scale.y(selectedDot.getAnimationState(currentBeat).y);
+    //     dotsGroup.append("circle")
+    //         .attr("class", "selected-dot-highlight")
+    //         .attr("cx", circleX)
+    //         .attr("cy", circleY)
+    //         .attr("r", dotRectSize * 2);
+    // }
 };
 
 /**
@@ -143,73 +207,10 @@ BaseGrapher.prototype._getStepScale = function() {
  * the range in even steps.
  * @return {function(Number):string} function converts angle to direction string
  */
-BaseGrapher.prototype._getAngleScale = function () {
+BaseGrapher.prototype._getAngleScale = function() {
     return d3.scale.quantize()
         .domain([0, 360])
         .range(["facing-east", "facing-south", "facing-west", "facing-north"]);
 };
-
-/**
- * Given a stuntsheet, the currentBeat relative to the beginning of that sheet,
- * and the dot label of a selected dot, draw the dots in this stuntsheet at
- * that beat onto the svg context of this grapher.
- *
- * @param  {Sheet} sheet stuntsheet to draw
- * @param  {int} currentBeat beat of stuntsheet to draw
- * @param  {string} selectedDotLabel label of selected dot, if any
- */
-BaseGrapher.prototype._drawStuntsheetAtBeat = function (sheet, currentBeat, selectedDotLabel) {
-    var dots = sheet.getDots();
-    var scale = this._getStepScale();
-    var angleScale = this._getAngleScale();
-
-    var classForDot = function (dot) {
-        var dotClass = "dot ";
-        if (dot.getLabel() === selectedDotLabel) {
-            dotClass += "selected";
-        } else {
-            dotClass += angleScale(dot.getAnimationState(currentBeat).angle);
-        }
-        return dotClass;
-    };
-
-    // pixels, represents length and width since the dots are square. Size is proportional
-    // to the size of the field (ratio adjusted manually)
-    var dotRectSize = this._svgWidth / 120;
-
-    var dotsGroup = this._svg.append("g")
-        .attr("class", "dots");
-
-    dotsGroup.selectAll("rect.dot")
-        .data(dots)
-        .enter()
-        .append("rect")
-            .attr("class", classForDot)
-            .attr("x", function (dot) { return scale.x(dot.getAnimationState(currentBeat).x) - dotRectSize / 2; })
-            .attr("y", function (dot) { return scale.y(dot.getAnimationState(currentBeat).y) - dotRectSize / 2; })
-            .attr("width", dotRectSize)
-            .attr("height", dotRectSize)
-            .style("cursor", "pointer")
-            .on("click", function (dot) {
-                var label = dot.getLabel();
-                $(".js-dot-labels option[data-dot-label=" + label + "]").prop("selected", true);
-                $(".js-dot-labels")
-                    .trigger("chosen:updated")
-                    .trigger("change", {selected: label});
-            });
-
-    var selectedDot = sheet.getDotByLabel(selectedDotLabel);
-    if (selectedDot) {
-        var circleSize = dotRectSize * 2;
-        var circleX = scale.x(selectedDot.getAnimationState(currentBeat).x);
-        var circleY = scale.y(selectedDot.getAnimationState(currentBeat).y);
-        dotsGroup.append("circle")
-            .attr("class", "selected-dot-highlight")
-            .attr("cx", circleX)
-            .attr("cy", circleY)
-            .attr("r", dotRectSize * 2);
-    }
-};
-
 
 module.exports = BaseGrapher;

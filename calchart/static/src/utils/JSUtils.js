@@ -2,6 +2,15 @@
  * A collection of Javascript utility/helper functions.
  */
 var JSUtils = {};
+
+/**
+ * Empties an array. Source: http://stackoverflow.com/a/1232046/4966649
+ *
+ * @param {Array} array -- array to be emptied
+ */
+JSUtils.empty = function(array) {
+    array.splice(0, array.length);
+};
  
 /**
  * Causes a child class to inherit from a parent class.
@@ -17,12 +26,17 @@ JSUtils.extends = function(ChildClass, ParentClass) {
 };
 
 /**
- * Empties an array. Source: http://stackoverflow.com/a/1232046/4966649
+ * Convert the given string from camel case into a capitalized string.
+ * Ex. "someFunc" -> "Some Func".
+ * Source: http://stackoverflow.com/a/4149393/4966649
  *
- * @param {Array} array -- array to be emptied
+ * @param {string} s -- the string to convert
+ * @return {string} the given string capitalized and split by caps
  */
-JSUtils.empty = function(array) {
-    array.splice(0, array.length);
+JSUtils.fromCamelCase = function(s) {
+    return s.replace(/([A-Z])/g, " $1").replace(/^./, function(first) {
+        return first.toUpperCase();
+    });
 };
 
 /**

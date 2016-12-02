@@ -46,9 +46,9 @@ $(document).ready(function() {
             // save show and initialize controller
 
             var controller = new EditorController(Show.create(data));
+            controller.init();
             controller.saveShow(function() {
                 CalchartUtils.hidePopup("setup-show");
-                controller.init();
             });
         },
     });

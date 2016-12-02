@@ -4,20 +4,24 @@ var JSUtils = require("../utils/JSUtils");
  * The abstract superclass that stores the current state of a Calchart application and
  * contains all of the actions that can be run in the application.
  *
+ * Each action can define the following properties:
+ *  - {string} _name: the verbose name of the action, used for Undo text, help text, etc.
+ *     (default to name of action, capitalized and spaced out)
+ *  - {boolean} _canUndo: set true to indicate that the action can be undone (default false)
+ *  - {boolean} _clearsRedo: if true, when the action is run, clears history of actions
+ *     that have been undone (default same as canUndo)
+ *
+ * Example:
+ *
+ * MyController.prototype.addStuntsheet = function() { ... };
+ * MyController.prototype.addStuntsheet._name = "Add a Stuntsheet";
+ * MyController.prototype.addStuntsheet._canUndo = true;
+ *
  * @param {Show} show -- the show for the controller
- * @param {object} actions -- a dictionary of actions that this application can do,
- *   mapping the name of the action to:
- *    - {string} name: the verbose name of the action (used for Undo text, help text, etc.)
- *    - {boolean} canUndo: true if the action can be undone
- *    - {boolean} clearsRedo: true if the action clears any actions that have been undone.
- *      Defaults to whatever canUndo is set to.
- *    - {function} do: the function that runs the action, taking the ApplicationController
- *      as a parameter
  */
-var ApplicationController = function(show, actions) {
+var ApplicationController = function(show) {
     this._show = show;
 
-    this._actions = actions;
     this._undoHistory = [];
     this._redoHistory = [];
 };
@@ -35,28 +39,29 @@ ApplicationController.prototype.getShow = function() {
  * Runs the method on this instance with the given name.
  *
  * @param {string} name -- the function to call
+ * @param {boolean} asRedo -- true if calling from a redo action
  */
-ApplicationController.prototype.do = function(name) {
-    var action = this._actions[name];
+ApplicationController.prototype.do = function(name, asRedo) {
+    var action = this[name];
 
     if (action === undefined) {
         throw new Error("No action with the name: " + name);
     }
 
-    if (action.canUndo) {
+    if (action._canUndo) {
         // save the current state
         this._undoHistory.push({
-            label: action.name,
+            label: action._name || JSUtils.fromCamelCase(name),
             content: $(".content").clone(true),
         });
     }
 
     // after doing an action, can't redo previous actions
-    if (action.clearsRedo || (action.clearsRedo === undefined && action.canUndo)) {
+    if (!asRedo && (action._clearsRedo || (action._clearsRedo === undefined && action._canUndo))) {
         JSUtils.empty(this._redoHistory);
     }
 
-    action.do(this);
+    action.call(this);
 };
 
 /**
@@ -82,7 +87,7 @@ ApplicationController.prototype.redo = function() {
     }
 
     var name = this._redoHistory.pop();
-    this.do(name, false);
+    this.do(name, true);
 };
 
 /**

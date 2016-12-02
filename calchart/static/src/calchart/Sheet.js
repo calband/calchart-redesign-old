@@ -138,7 +138,7 @@ Sheet.prototype.getDuration = function() {
  *
  * @return {string} the field type for the stuntsheet
  */
-Sheet.prototype.getDuration = function() {
+Sheet.prototype.getFieldType = function() {
     return this._fieldType || this._show.getFieldType();
 };
 
@@ -157,6 +157,16 @@ Sheet.prototype.getLabel = function() {
             return i + 1;
         }
     }
+};
+
+/**
+ * Get the info for the given Dot for this stuntsheet
+ *
+ * @param {string} dot -- the label of the dot to retrieve info for
+ * @return {object} the dot's information for this stuntsheet
+ */
+Sheet.prototype.getInfoForDot = function(dot) {
+    return this._dots[dot];
 };
 
 module.exports = Sheet;
