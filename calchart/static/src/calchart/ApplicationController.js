@@ -3,7 +3,7 @@
  * for a Calchart application, such as the editor or the viewer.
  */
 
-var JSUtils = require("./JSUtils");
+var JSUtils = require("../utils/JSUtils");
 
 /**
  * The class that stores the current state of the application and contains all

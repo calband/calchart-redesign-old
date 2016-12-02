@@ -5,14 +5,12 @@
 var FieldTypes = require("./FieldTypes");
 
 /**
- * A Grapher can draw moments of a field show. @see Grapher.prototype.draw
+ * A Grapher can draw moments of a field show.
  * 
- * @param {string} fieldType The type of field that the show is performed on.
- *   See FieldTypes for all the possible field types
  * @param {jQuery} drawTarget The HTML element which the Grapher will draw to.
  */
-var Grapher = function(fieldType, drawTarget) {
-    this._fieldType = fieldType;
+var Grapher = function(show, drawTarget) {
+    this._show = show;
     this._drawTarget = drawTarget;
 
     this._svgWidth = this._drawTarget.width();
@@ -22,46 +20,6 @@ var Grapher = function(fieldType, drawTarget) {
         .append("svg")
         .attr("width", this._svgWidth)
         .attr("height", this._svgHeight);
-};
-
-/**
- * The aspect ratio of a college football field, given in height/width.
- * @type {float}
- */
-Grapher.COLLEGE_FIELD_ASPECT_RATIO = 0.5333;
-
-/**
- * How many steps there are horizontally across a regular college football
- * field.
- * @type {int}
- */
-Grapher.COLLEGE_FIELD_STEPS_HORIZONTAL = 160;
-
-/**
- * How many steps there are vertically across a regular college football field.
- * @type {int}
- */
-Grapher.COLLEGE_FIELD_STEPS_VERTICAL = 84;
-
-/**
- * Sets the type of field that the show will be performed on.
- *
- * @param {string} fieldType The type of field that the show will
- *   be performed on. Valid field types include:
- *   - "college" : A football field with college hashes.
- */
-Grapher.prototype.setFieldType = function(fieldType) {
-    this._fieldType = fieldType;
-};
-
-/**
- * Returns the type of field that the show will be performed on.
- *
- * @return {string} The type of field that the show will be performed on.
- *   @see Grapher.prototype.setFieldType for a list of field types.
- */
-Grapher.prototype.getFieldType = function() {
-    return this._fieldType;
 };
 
 /**

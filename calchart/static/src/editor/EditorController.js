@@ -27,7 +27,7 @@ EditorController.prototype.init = function() {
     this._setupMenu(".menu");
     this._setupPanel(".panel");
 
-    this._grapher = new Grapher(this._show.getFieldType(), $(".grapher-draw-target"));
+    this._grapher = new Grapher(this._show, $(".grapher-draw-target"));
 
     $(".content .sidebar").on("click", ".stuntsheet", function() {
         controller.showStuntsheet(this);
