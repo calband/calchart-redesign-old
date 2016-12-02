@@ -2,7 +2,7 @@
  * @fileOverview Defines the EditorController class.
  */
 
-var ApplicationController = require("../utils/ApplicationController");
+var ApplicationController = require("../calchart/ApplicationController");
 var CalchartUtils = require("../utils/CalchartUtils");
 var Grapher = require("../calchart/Grapher");
 var EditorActions = require("./EditorActions");
