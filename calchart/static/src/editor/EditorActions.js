@@ -76,7 +76,7 @@ EditorActions.saveShow = {
     name: "Save Show",
     canUndo: false,
     do: function(controller, callback) {
-        var data = controller.show.serialize();
+        var data = controller.getShow().serialize();
         var params = {
             viewer: JSON.stringify(data),
         };

@@ -75,8 +75,14 @@ class SetUpShowPopup(PopupForm):
         ('number', '1, 2, 3, ...'),
     ]
 
+    # see src/calchart/FieldTypes.js
+    FIELD_TYPES = [
+        ('college', 'College Field'),
+    ]
+
     num_dots = forms.IntegerField(label='Number of dots')
     dot_format = forms.ChoiceField(choices=DOT_FORMATS)
+    field_type = forms.ChoiceField(choices=FIELD_TYPES)
 
 class AddStuntsheetPopup(PopupForm):
     """

@@ -8,6 +8,7 @@ var Song = require("./Song");
  *  - a Dot object for each dot in the show
  *  - a Sheet object for each stuntsheet in the show
  *  - a Song object for each song in the show
+ *  - the field type for the show
  *
  * @param {object} show_data -- the JSON data to initialize the Show with
  */
@@ -24,6 +25,8 @@ var Show = function(show_data) {
     this._songs = show_data.songs.map(function(song_data) {
         return Song.deserialize(song_data);
     });
+
+    this._fieldType = show_data.field_type;
 };
 
 /**
@@ -61,6 +64,7 @@ Show.create = function(data) {
         dots: dots,
         sheets: [],
         songs: [],
+        field_type: data.field_type,
     });
 };
 
@@ -82,6 +86,7 @@ Show.prototype.serialize = function() {
     data.songs = this._songs.map(function(song) {
         return song.serialize();
     });
+    data.field_type = this._fieldType;
 
     return data;
 };
@@ -124,6 +129,15 @@ Show.prototype.addSheet = function(numBeats) {
  */
 Show.prototype.getSheets = function() {
     return this._sheets;
+};
+
+/**
+ * Get the field type of the show
+ *
+ * @return {string} the field type
+ */
+Show.prototype.getFieldType = function() {
+    return this._fieldType;
 };
 
 module.exports = Show;

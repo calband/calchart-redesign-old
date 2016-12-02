@@ -4,6 +4,7 @@
 
 var ApplicationController = require("../utils/ApplicationController");
 var CalchartUtils = require("../utils/CalchartUtils");
+var Grapher = require("../calchart/Grapher");
 var EditorActions = require("./EditorActions");
 var JSUtils = require("../utils/JSUtils");
 
@@ -20,12 +21,26 @@ var EditorController = function(show) {
 JSUtils.extends(EditorController, ApplicationController);
 
 /**
+ * Initializes the editor application
+ */
+EditorController.prototype.init = function() {
+    this._setupMenu(".menu");
+    this._setupPanel(".panel");
+
+    this._grapher = new Grapher(this._show.getFieldType(), $(".grapher-draw-target"));
+
+    $(".content .sidebar").on("click", ".stuntsheet", function() {
+        controller.showStuntsheet(this);
+    });
+};
+
+/**
  * Saves the show to the server
  *
  * @param {function|undefined} callback -- optional callback to run after saving show
  */
 EditorController.prototype.saveShow = function(callback) {
-    this._actions.saveShow(this, callback);
+    this._actions.saveShow.do(this, callback);
 };
 
 /**

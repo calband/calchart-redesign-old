@@ -95,7 +95,7 @@ ApplicationController.prototype.redo = function() {
  *
  * @param {jQuery|string} menu -- jQuery object or selector to setup
  */
-ApplicationController.prototype.setupMenu = function(menu) {
+ApplicationController.prototype._setupMenu = function(menu) {
     var _this = this;
 
     // maps keyboard shortcut to their function
@@ -176,7 +176,7 @@ ApplicationController.prototype.setupMenu = function(menu) {
  *
  * @param {jQuery|string} panel -- jQuery object or panel to setup
  */
-ApplicationController.prototype.setupPanel = function(panel) {
+ApplicationController.prototype._setupPanel = function(panel) {
     var _this = this;
 
     // set up click

@@ -74,7 +74,23 @@ $sidebar-width: 200px;
         }
     }
     .workspace {
+        @include vertically-center;
         width: calc(100% - #{$sidebar-width});
-        padding: 10px; 
+        padding: 10px;
+        .grapher-draw-target {
+            width: 100%;
+            height: 100%;
+        }
+    }
+}
+
+.popup-box {
+    &.setup-show {
+        label {
+            width: 90px;
+        }
+        .num_dots label {
+            width: initial;
+        }
     }
 }
