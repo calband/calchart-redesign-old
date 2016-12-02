@@ -1,7 +1,10 @@
 /**
- * @fileOverview Defines the DotType object that contains the possible dot types
+ * Exports an object containing all the possible dot types
+ *
+ * Usage:
+ *    var DotType = require("DotType");
+ *    var plain = DotType.PLAIN;
  */
-
 module.exports = {
     PLAIN: "plain",
     PLAIN_FSLASH: "plain-forwardslash",

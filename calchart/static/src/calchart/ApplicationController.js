@@ -1,13 +1,8 @@
-/**
- * @fileOverview Defines the abstract ApplicationController superclass, a singleton instance
- * for a Calchart application, such as the editor or the viewer.
- */
-
 var JSUtils = require("../utils/JSUtils");
 
 /**
- * The class that stores the current state of the application and contains all
- * of the actions that can be run in the application.
+ * The abstract superclass that stores the current state of a Calchart application and
+ * contains all of the actions that can be run in the application.
  *
  * @param {Show} show -- the show for the controller
  * @param {object} actions -- a dictionary of actions that this application can do,

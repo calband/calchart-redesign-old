@@ -1,7 +1,3 @@
-/**
- * @fileOverview Defines the EditorController class.
- */
-
 var ApplicationController = require("../calchart/ApplicationController");
 var CalchartUtils = require("../utils/CalchartUtils");
 var Grapher = require("../calchart/Grapher");
@@ -28,6 +24,7 @@ EditorController.prototype.init = function() {
     this._setupPanel(".panel");
 
     this._grapher = new Grapher(this._show, $(".grapher-draw-target"));
+    this._grapher.draw();
 
     $(".content .sidebar").on("click", ".stuntsheet", function() {
         controller.showStuntsheet(this);

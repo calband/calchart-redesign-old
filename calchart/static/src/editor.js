@@ -1,7 +1,3 @@
-/**
- * @fileOverview The main Javascript file for the editor page.
- */
-
 var CalchartUtils = require("./utils/CalchartUtils");
 var EditorController = require("./editor/EditorController");
 var Grapher = require("./calchart/Grapher");

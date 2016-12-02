@@ -223,3 +223,16 @@ header {
         }
     }
 }
+
+svg.graph {
+    .field-background {
+        fill: $field-green;
+    }
+    .field-border {
+        stroke: $white;
+        fill: none;
+    }
+    .hash, .yardline {
+        stroke: $white;
+    }
+}

@@ -8,7 +8,7 @@ var Song = require("./Song");
  *  - a Dot object for each dot in the show
  *  - a Sheet object for each stuntsheet in the show
  *  - a Song object for each song in the show
- *  - the field type for the show
+ *  - the field type for the show (see base/constants.py)
  *
  * @param {object} show_data -- the JSON data to initialize the Show with
  */
@@ -20,7 +20,7 @@ var Show = function(show_data) {
     }, this);
 
     this._sheets = show_data.sheets.map(function(sheet_data) {
-        return Sheet.deserialize(sheet_data);
+        return Sheet.deserialize(show, sheet_data);
     });
     this._songs = show_data.songs.map(function(song_data) {
         return Song.deserialize(song_data);
@@ -117,7 +117,7 @@ Show.prototype.getDotByLabel = function(label) {
  * @return {Sheet} the newly created stuntsheet
  */
 Show.prototype.addSheet = function(numBeats) {
-    var sheet = Sheet.create(numBeats, this.getDotLabels());
+    var sheet = Sheet.create(this, numBeats, this.getDotLabels());
     this._sheets.push(sheet);
     return sheet;
 };

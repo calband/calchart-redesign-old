@@ -1,7 +1,6 @@
 /**
- * @fileOverview Defines any website-wide utility functions.
+ * Contains all website-wide utility functions.
  */
-
 var CalchartUtils = {};
 
 /**

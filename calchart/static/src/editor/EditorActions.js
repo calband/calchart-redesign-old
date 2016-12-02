@@ -1,9 +1,8 @@
-/**
- * @fileOverview Defines all of the actions that can modify the editor application.
- */
-
 var CalchartUtils = require("../utils/CalchartUtils");
 
+/**
+ * Contains all of the actions that can modify the editor application.
+ */
 var EditorActions = {};
 
 /**

@@ -1,9 +1,5 @@
 /**
- * @fileOverview Defines Javascript helper functions.
- */
-
-/**
- * A collection of javascript utility functions.
+ * A collection of Javascript utility/helper functions.
  */
 var JSUtils = {};
  
@@ -27,6 +23,26 @@ JSUtils.extends = function(ChildClass, ParentClass) {
  */
 JSUtils.empty = function(array) {
     array.splice(0, array.length);
+};
+
+/**
+ * Generate an array that starts at the given start and increments
+ * by the given interval until the end.
+ *
+ * @param {float} start -- the start of the range (inclusive)
+ * @param {float} end -- the end of the range (exclusive)
+ * @param {float|undefined} interval -- the interval between each number
+ *   (defaults to 1)
+ * @return {Array<float>} a list of numbers in the range [start, end)
+ *   incrementing according to interval
+ */
+JSUtils.range = function(start, end, interval) {
+    var arr = [];
+    var inc = interval || 1;
+    for (var i = start; i < end; i += inc) {
+        arr.push(i);
+    }
+    return arr;
 };
 
 module.exports = JSUtils;

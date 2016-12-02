@@ -4,6 +4,7 @@ from django.conf import settings
 
 import requests
 
+from base.constants import *
 from base.models import Show
 
 class LoginForm(forms.Form):
@@ -69,16 +70,6 @@ class SetUpShowPopup(PopupForm):
     name = 'setup-show'
     template_name = 'partials/setup_show.html'
     title = 'Set Up Show'
-
-    DOT_FORMATS = [
-        ('combo', 'A0, A1, A2, ...'),
-        ('number', '1, 2, 3, ...'),
-    ]
-
-    # see src/calchart/FieldTypes.js
-    FIELD_TYPES = [
-        ('college', 'College Field'),
-    ]
 
     num_dots = forms.IntegerField(label='Number of dots')
     dot_format = forms.ChoiceField(choices=DOT_FORMATS)

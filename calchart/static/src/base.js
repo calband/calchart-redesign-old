@@ -1,7 +1,3 @@
-/**
- * @fileOverview Runs any actions for every page.
- */
-
 var CalchartUtils = require("./utils/CalchartUtils");
 
 (function($) {

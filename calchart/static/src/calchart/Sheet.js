@@ -5,6 +5,7 @@ var DotType = require("./DotType");
 /**
  * A Sheet object contains all the information related to a stuntsheet,
  * consisting of the following information:
+ *  - the Show this sheet is a part of
  *  - an optional label for the Sheet
  *  - the number of beats in the stuntsheet
  *  - for each dot, its dot type
@@ -12,19 +13,24 @@ var DotType = require("./DotType");
  *  - for each dot, its movements
  *  - for each dot type, its continuity
  *
+ * @param {Show} show -- the Show this sheet is part of
  * @param {int} numBeats -- the number of beats in the stuntsheet
  * @param {object|undefined} options -- an optional argument that can
  *   contain optional information about a stuntsheet, such as:
  *     - {string} label -- a label for the Sheet
+ *     - {string} fieldType -- the field type
  */
-var Sheet = function(numBeats, options) {
-    this.numBeats = numBeats;
+var Sheet = function(show, numBeats, options) {
+    this._show = show;
+    this._numBeats = numBeats;
 
     var defaults = {
         label: null,
+        fieldType: null,
     };
     options = $.extend(defaults, options);
     this._label = options.label;
+    this._fieldType = options.fieldType;
 
     // map dot labels to an object containing the dot's type (string),
     // position (Coordinate), and movements (Array<MovementCommand>)
@@ -37,12 +43,13 @@ var Sheet = function(numBeats, options) {
  * Create a stuntsheet from the given number of beats and the given
  * dot labels.
  *
+ * @param {Show} show -- the Show this sheet is a part of
  * @param {int} numBeats -- the number of beats in the stuntsheet
  * @param {Array<string>} dotLabels -- the labels for the dots in the show
  * @return {Sheet} the newly created Sheet
  */
-Sheet.create = function(numBeats, dotLabels) {
-    var sheet = new Sheet(numBeats);
+Sheet.create = function(show, numBeats, dotLabels) {
+    var sheet = new Sheet(show, numBeats);
 
     // initialize dots as plain dots
     dotLabels.forEach(function(dot) {
@@ -59,11 +66,12 @@ Sheet.create = function(numBeats, dotLabels) {
 /**
  * Create a Sheet from the given serialized data
  *
+ * @param {Show} show -- the Show this sheet is a part of
  * @param {object} data -- the JSON data to initialize the Sheet with
  * @return {Sheet} the Sheet reconstructed from the given data
  */
-Sheet.deserialize = function(data) {
-    var sheet = new Sheet(data.numBeats, data.options);
+Sheet.deserialize = function(show, data) {
+    var sheet = new Sheet(show, data.numBeats, data.options);
 
     $.each(data.dots, function(dot, dot_data) {
         sheet._dots[dot] = {
@@ -88,10 +96,13 @@ Sheet.deserialize = function(data) {
  * @return {object} a JSON object containing this Sheet's data
  */
 Sheet.prototype.serialize = function() {
-    var data = {};
+    var data = {
+        numBeats: this._numBeats,
+    };
 
     data.options = {
         label: this._label,
+        fieldType: this._fieldType,
     };
     
     data.dots = {};
@@ -114,24 +125,35 @@ Sheet.prototype.serialize = function() {
 };
 
 /**
+ * Get the duration of this stuntsheet
+ *
+ * @return {int} the number of beats in the stuntsheet
+ */
+Sheet.prototype.getDuration = function() {
+    return this._numBeats;
+};
+
+/**
+ * Get the field type for this stuntsheet, defaulting to the Show's field type
+ *
+ * @return {string} the field type for the stuntsheet
+ */
+Sheet.prototype.getDuration = function() {
+    return this._fieldType || this._show.getFieldType();
+};
+
+/**
  * Get the label for this Sheet, either the custom label or the sheet
  * number in the given Show.
- *
- * @param {Show|undefined} show -- the Show this stuntsheet is a part
- *   of. If left undefined and the stuntsheet does not have a custom
- *   label, returns undefined.
  */
-Sheet.prototype.getLabel = function(show) {
+Sheet.prototype.getLabel = function() {
     if (this._label) {
         return this._label;
-    } else if (show === undefined) {
-        return undefined;
     }
 
-    var sheets = show.getSheets();
+    var sheets = this._show.getSheets();
     for (var i = 0; i < sheets.length; i++) {
-        var sheet = sheets[i];
-        if (sheet === this) {
+        if (sheets[i] === this) {
             return i + 1;
         }
     }
