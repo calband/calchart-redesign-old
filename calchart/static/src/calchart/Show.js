@@ -13,6 +13,7 @@ var Song = require("./Song");
  * @param {object} show_data -- the JSON data to initialize the Show with
  */
 var Show = function(show_data) {
+    var _this = this;
     this._dots = {};
     show_data.dots.forEach(function(dot_data) {
         var dot = Dot.deserialize(dot_data);
@@ -20,7 +21,7 @@ var Show = function(show_data) {
     }, this);
 
     this._sheets = show_data.sheets.map(function(sheet_data) {
-        return Sheet.deserialize(show, sheet_data);
+        return Sheet.deserialize(_this, sheet_data);
     });
     this._songs = show_data.songs.map(function(song_data) {
         return Song.deserialize(song_data);

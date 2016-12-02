@@ -75,7 +75,7 @@ Sheet.deserialize = function(show, data) {
 
     $.each(data.dots, function(dot, dot_data) {
         sheet._dots[dot] = {
-            type: dot_type.type,
+            type: dot_data.type,
             position: Coordinate.deserialize(dot_data.position),
             movements: dot_data.movements.map(function(movement_data) {
                 switch (movement_data.type) {
@@ -88,6 +88,8 @@ Sheet.deserialize = function(show, data) {
     $.each(data.continuities, function(dot_type, continuity_data) {
         sheet._continuities[dot_type] = Continuity.deserialize(continuity_data);
     });
+
+    return sheet;
 };
 
 /**
