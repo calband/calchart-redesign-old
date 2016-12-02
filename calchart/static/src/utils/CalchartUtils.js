@@ -150,32 +150,35 @@ CalchartUtils.clearMessages = function() {
  * @param {jQuery} element -- the element to check visibility
  */
 CalchartUtils.scrollIfHidden = function(element) {
-    var parent = element.parent();
+    var parent = $(element).parent();
 
     // height of the parent
-    var height = parseInt(parent.height());
+    var height = parseInt(parent.outerHeight());
     // distance between top of parent and top of visible edge of parent
     var visibleTop = parent.scrollTop();
     // distance between top of parent and bottom of visible edge of parent
     var visibleBottom = visibleTop + height;
 
     // distance between top of parent and top of element
-    var selectedTop = element.position().top + visibleTop;
+    var selectedTop = $(element).position().top + visibleTop;
     // distance between top of parent and bottom of element
-    var selectedBottom = selectedTop + element.outerHeight();
+    var selectedBottom = selectedTop + $(element).outerHeight();
+
+    // amount of space beyond the object to scroll
+    var margin = 10;
 
     // at least part of selected element is below what is visible
     if (selectedBottom >= visibleBottom) {
         var difference = selectedBottom - height;
         if (difference > 0) {
-            parent.scrollTop(difference);
+            parent.scrollTop(difference + margin);
         } else {
             parent.scrollTop(0);
         }
     }
     // at least part of selected element is above what is visible
     else if (selectedTop < visibleTop) {
-        parent.scrollTop(selectedTop);
+        parent.scrollTop(selectedTop - margin);
     }
 };
 

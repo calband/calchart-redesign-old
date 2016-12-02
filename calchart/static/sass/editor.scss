@@ -41,11 +41,11 @@ $sidebar-width: 200px;
         display: inline-block;
         height: 100%;
         vertical-align: top;
-        padding: 10px;
         overflow: scroll;
     }
     .sidebar {
         width: $sidebar-width;
+        padding: 20px;
         border-right: 3px double $medium-gray;
         .stuntsheet {
             margin-bottom: 10px;
@@ -75,5 +75,6 @@ $sidebar-width: 200px;
     }
     .workspace {
         width: calc(100% - #{$sidebar-width});
+        padding: 10px; 
     }
 }

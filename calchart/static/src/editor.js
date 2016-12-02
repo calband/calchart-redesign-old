@@ -46,4 +46,8 @@ $(document).ready(function() {
 var onInit = function(controller) {
     controller.setupMenu(".menu");
     controller.setupPanel(".panel");
+
+    $(".content .sidebar").on("click", ".stuntsheet", function() {
+        controller.showStuntsheet(this);
+    });
 };

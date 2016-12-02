@@ -34,11 +34,15 @@ EditorController.prototype.saveShow = function(callback) {
  * @param {jQuery} stuntsheet -- the stuntsheet element in the .sidebar
  */
 EditorController.prototype.showStuntsheet = function(stuntsheet) {
+    if ($(stuntsheet).hasClass("active")) {
+        return;
+    }
+
     $(".sidebar .active").removeClass("active");
-    stuntsheet.addClass("active");
+    $(stuntsheet).addClass("active");
     CalchartUtils.scrollIfHidden(stuntsheet);
 
-    var sheet = stuntsheet.data("sheet");
+    var sheet = $(stuntsheet).data("sheet");
     // TODO: show sheet in workspace
 };
 
