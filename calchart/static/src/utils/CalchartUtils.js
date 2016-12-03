@@ -19,28 +19,42 @@ CalchartUtils.STEP_SIZES = {
  * will return a compound direction (SE,SW,NW,NE).
  *
  * @param {float} angle -- the angle, in Calchart degrees
- * @return {String} the orientation
+ * @return {string} the orientation
  */
 CalchartUtils.getOrientation = function(angle) {
-    switch (angle) {
-        case 0:
-            return "E";
-        case 90:
-            return "S";
-        case 180:
-            return "W";
-        case 270:
-            return "N";
+    var dir = "";
+    if (angle > 0 && angle < 180) {
+        dir = "S";
+    } else if (angle > 180 && angle < 360) {
+        dir = "N";
     }
 
-    if (angle < 90) {
-        return "SE";
-    } else if (angle < 180) {
-        return "SW";
-    } else if (angle < 270) {
-        return "NW";
+    if (angle < 90 || angle > 270) {
+        return dir + "E";
+    } else if (angle > 90 && angle < 270) {
+        return dir + "W";
     } else {
-        return "NE";
+        return dir;
+    }
+};
+
+/**
+ * Returns the nearest orientation of the given angle, which will be selected
+ * and colored in the CSS.
+ *
+ * @param {float} angle -- the angle, in Calchart degrees
+ * @return {string} one of: "facing-east", "facing-south", "facing-west", "facing-north"
+ */
+CalchartUtils.getNearestOrientation = function(angle) {
+    // exactly half counts as east/west
+    if (angle <= 45 || angle >= 315) {
+        return "facing-east";
+    } else if (angle < 135) {
+        return "facing-south";
+    } else if (angle <= 225) {
+        return "facing-west";
+    } else {
+        return "facing-north";
     }
 };
 

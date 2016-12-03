@@ -225,14 +225,44 @@ header {
 }
 
 svg.graph {
-    .field-background {
-        fill: $field-green;
+    .field {
+        .field-background {
+            fill: $field-green;
+        }
+        .field-border {
+            stroke: $white;
+            fill: none;
+        }
+        .hash, .yardline {
+            stroke: $white;
+        }
+        .yardline-label {
+            fill: $white;
+        }
     }
-    .field-border {
-        stroke: $white;
-        fill: none;
-    }
-    .hash, .yardline {
-        stroke: $white;
+    .dots {
+        .dot {
+            fill: $uniform-yellow;
+            &.facing-east {
+                fill: $uniform-white;
+            }
+            &.facing-west {
+                fill: $uniform-yellow;
+            }
+            &.facing-north, &.facing-south {
+                fill: $uniform-blue;
+            }
+            &.selected {
+                fill: $highlight-purple;
+            }
+        }
+        .dot-label {
+            font-size: 8px;
+        }
+        .selected-circle {
+            stroke: $highlight-purple;
+            stroke-width: 2px;
+            fill: transparent;
+        }
     }
 }

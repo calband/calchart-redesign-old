@@ -82,7 +82,7 @@ MathUtils.calcRotatedYPos = function(angle) {
  * Rotates an angle by a quarter-turn in a specified direction.
  *
  * @param {float} angle -- the angle to rotate, in radians
- * @param {bool} isCW -- true if the angle should be rotated
+ * @param {boolean} isCW -- true if the angle should be rotated
  *   clockwise; otherwise, rotate counter-clockwise
  * @return the angle rotated by a quarter turn, in radians
  */

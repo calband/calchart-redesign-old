@@ -1,5 +1,4 @@
-// the minimum amount of space between the field and the SVG
-var FIELD_PADDING = 10;
+var CalchartUtils = require("../../utils/CalchartUtils");
 
 /**
  * A BaseGrapher can draw moments of a field show. Needs to be subclassed by a
@@ -7,16 +6,21 @@ var FIELD_PADDING = 10;
  *
  * @param {Show} show -- the Show this Grapher is graphing
  * @param {jQuery} drawTarget -- the HTML element which the Grapher will draw to
+ * @param {object} options -- options for the grapher. See BaseGrapher.setOption
  */
-var BaseGrapher = function(show, drawTarget) {
+var BaseGrapher = function(show, drawTarget, options) {
     this._show = show;
     this._drawTarget = drawTarget;
+    this._options = options || {};
 
     // maps dot label to dot SVG element
     this._dots = {};
 
     this._svgWidth = this._drawTarget.width();
     this._svgHeight = this._drawTarget.height();
+    this._scale = this._getStepScale();
+    // fraction of a step in pixels
+    this._dotRadius = (this._scale.x(1) - this._scale.x(0)) * 3/4;
 
     this._svg = d3.select(this._drawTarget.get(0))
         .append("svg")
@@ -26,10 +30,13 @@ var BaseGrapher = function(show, drawTarget) {
 };
 
 /**
- * Subclasses need to define these variables, representing the number of steps
- * for the field's dimensions
+ * Subclasses need to define these variables
  */
+// the minimum amount of space between the field and the SVG
+BaseGrapher.prototype.FIELD_PADDING = 30;
+// number of steps from east to west sideline
 BaseGrapher.prototype.FIELD_HEIGHT = null;
+// number of steps from north to south endzone
 BaseGrapher.prototype.FIELD_WIDTH = null;
 
 /**
@@ -71,6 +78,17 @@ BaseGrapher.prototype.clear = function() {
 };
 
 /**
+ * Sets a Grapher option. The available options are:
+ *  - {boolean} circleSelected -- if true, circles the selected dot, or the last
+ *    selected dot, if multiple (default false)
+ *  - {boolean} showLabels -- if true, show the label next to each dot (default false)
+ *  - {boolean} labelLeft -- if true, show the label on the left of the dot (default true)
+ */
+BaseGrapher.prototype.setOption = function(name, val) {
+    this._options[name] = val;
+};
+
+/**
  * Draws the field, with a background, borders, yardlines, and hash marks. Subclasses
  * should call this function to draw common field attributes
  */
@@ -87,59 +105,67 @@ BaseGrapher.prototype._drawField = function() {
  * @param {Array<string>} selectedDots -- labels of selected dots
  */
 BaseGrapher.prototype._drawDots = function(currentBeat, selectedDots) {
-    var dots = this._show.getDots();
+    var _this = this;
+    var dotsGroup = this._svg.append("g").attr("class", "dots");
+    var dots = dotsGroup.selectAll("circle.dot").data(this._show.getDots());
 
-    // TODO
+    if (dots.empty()) {
+        dots = dots.enter()
+            .append("circle")
+            .attr("r", this._dotRadius);
+    }
+    
+    dots.each(function(dot) {
+        var label = dot.getLabel();
+        var state = dot.getAnimationState(currentBeat);
+        var x = _this._scale.x(state.x);
+        var y = _this._scale.y(state.y);
 
-    // var scale = this._getStepScale();
-    // var angleScale = this._getAngleScale();
+        if (selectedDots.indexOf(label) === -1) {
+            var dotClass = "facing-" + CalchartUtils.getNearestOrientation(state.angle);
+        } else {
+            var dotClass = "selected";
+        }
 
-    // var classForDot = function (dot) {
-    //     var dotClass = "dot ";
-    //     if (dot.getLabel() === selectedDotLabel) {
-    //         dotClass += "selected";
-    //     } else {
-    //         dotClass += angleScale(dot.getAnimationState(currentBeat).angle);
-    //     }
-    //     return dotClass;
-    // };
+        d3.select(this)
+            .attr("class", "dot " + dotClass)
+            .attr("cx", x)
+            .attr("cy", y);
 
-    // // pixels, represents length and width since the dots are square. Size is proportional
-    // // to the size of the field (ratio adjusted manually)
-    // var dotRectSize = this._svgWidth / 120;
+        if (_this._options.circleSelected) {
+            var circle = dotsGroup.selectAll("circle.selected-circle");
 
-    // var dotsGroup = this._svg.append("g")
-    //     .attr("class", "dots");
+            if (circle.empty()) {
+                circle = dotsGroup.append("circle")
+                    .attr("class", "selected-circle")
+                    .attr("r", _this._dotRadius * 2);
+            }
 
-    // dotsGroup.selectAll("rect.dot")
-    //     .data(dots)
-    //     .enter()
-    //     .append("rect")
-    //         .attr("class", classForDot)
-    //         .attr("x", function (dot) { return scale.x(dot.getAnimationState(currentBeat).x) - dotRectSize / 2; })
-    //         .attr("y", function (dot) { return scale.y(dot.getAnimationState(currentBeat).y) - dotRectSize / 2; })
-    //         .attr("width", dotRectSize)
-    //         .attr("height", dotRectSize)
-    //         .style("cursor", "pointer")
-    //         .on("click", function (dot) {
-    //             var label = dot.getLabel();
-    //             $(".js-dot-labels option[data-dot-label=" + label + "]").prop("selected", true);
-    //             $(".js-dot-labels")
-    //                 .trigger("chosen:updated")
-    //                 .trigger("change", {selected: label});
-    //         });
+            circle.attr("cx", x).attr("cy", y);
+        }
 
-    // var selectedDot = sheet.getDotByLabel(selectedDotLabel);
-    // if (selectedDot) {
-    //     var circleSize = dotRectSize * 2;
-    //     var circleX = scale.x(selectedDot.getAnimationState(currentBeat).x);
-    //     var circleY = scale.y(selectedDot.getAnimationState(currentBeat).y);
-    //     dotsGroup.append("circle")
-    //         .attr("class", "selected-dot-highlight")
-    //         .attr("cx", circleX)
-    //         .attr("cy", circleY)
-    //         .attr("r", dotRectSize * 2);
-    // }
+        if (_this._options.showLabels) {
+            var offsetX = -2.25 * _this._dotRadius;
+            var offsetY = -1 * _this._dotRadius;
+
+            if (_this._options.labelLeft === false) {
+                offsetX *= -1;
+            }
+
+            var labelId = "dot-" + label;
+            var dotLabel = dotsGroup.select("#" + labelId);
+
+            if (dotLabel.empty()) {
+                dotLabel = dotsGroup.append("text")
+                    .attr("id", labelId)
+                    .attr("class", "dot-label")
+                    .attr("font-size", _this._dotRadius * 2.5)
+                    .text(label);
+            }
+
+            dotLabel.attr("x", x + offsetX).attr("y", y + offsetY);
+        }
+    });
 };
 
 /**
@@ -151,11 +177,11 @@ BaseGrapher.prototype._drawDots = function(currentBeat, selectedDots) {
  */
 BaseGrapher.prototype._getDimensions = function() {
     // keep aspect ratio of width/height
-    var fieldWidth = this._svgWidth - 2 * FIELD_PADDING;
+    var fieldWidth = this._svgWidth - 2 * this.FIELD_PADDING;
     var fieldHeight = fieldWidth * this.FIELD_HEIGHT / this.FIELD_WIDTH;
 
     if (fieldHeight > this._svgHeight) {
-        fieldHeight = this._svgHeight - 2 * FIELD_PADDING;
+        fieldHeight = this._svgHeight - 2 * this.FIELD_PADDING;
         fieldWidth = fieldHeight * this.FIELD_WIDTH / this.FIELD_HEIGHT;
     }
 
@@ -194,22 +220,6 @@ BaseGrapher.prototype._getStepScale = function() {
         x: xScale,
         y: yScale
     };
-};
-
-/**
- * Return a d3 scale which maps an angle between 0 and 360 to the name of
- * the nearest direction, which will be selected and colored in the CSS.
- * 
- * This is a d3 quantize scale, which means that it has a continuous domain but
- * a discrete range: d3 automatically looks at the size of the range and the
- * bounds of the input domain and returns a function that maps the domain to
- * the range in even steps.
- * @return {function(Number):string} function converts angle to direction string
- */
-BaseGrapher.prototype._getAngleScale = function() {
-    return d3.scale.quantize()
-        .domain([0, 360])
-        .range(["facing-east", "facing-south", "facing-west", "facing-north"]);
 };
 
 module.exports = BaseGrapher;

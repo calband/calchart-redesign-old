@@ -7,6 +7,19 @@ var UIUtils = require("../utils/UIUtils");
  * The class that stores the current state of the editor and contains all
  * of the actions that can be run in the editor page.
  *
+ * Each action can define the following properties:
+ *  - {string} _name: the verbose name of the action, used for Undo text, help text, etc.
+ *     (default to name of action, capitalized and spaced out)
+ *  - {boolean} _canUndo: set true to indicate that the action can be undone (default false)
+ *  - {boolean} _clearsRedo: if true, when the action is run, clears history of actions
+ *     that have been undone (default same as canUndo)
+ *
+ * Example:
+ *
+ * EditorController.prototype.addStuntsheet = function() { ... };
+ * EditorController.prototype.addStuntsheet._name = "Add a Stuntsheet";
+ * EditorController.prototype.addStuntsheet._canUndo = true;
+ *
  * @param {Show} show -- the show being edited in the application
  */
 var EditorController = function(show) {
@@ -16,6 +29,9 @@ var EditorController = function(show) {
     this._selectedDots = []; // dots selected to edit
     this._activeSheet = null;
     this._currBeat = null;
+
+    this._undoHistory = [];
+    this._redoHistory = [];
 };
 
 JSUtils.extends(EditorController, ApplicationController);
@@ -78,6 +94,35 @@ EditorController.prototype._addStuntsheetToSidebar = function(sheet) {
 };
 
 /**
+ * Runs the method on this instance with the given name.
+ *
+ * @param {string} name -- the function to call
+ * @param {boolean} asRedo -- true if calling from a redo action
+ */
+EditorController.prototype.do = function(name, asRedo) {
+    var action = this[name];
+
+    if (action === undefined) {
+        throw new Error("No action with the name: " + name);
+    }
+
+    if (action._canUndo) {
+        // save the current state
+        this._undoHistory.push({
+            label: action._name || JSUtils.fromCamelCase(name),
+            content: $(".content").clone(true),
+        });
+    }
+
+    // after doing an action, can't redo previous actions
+    if (!asRedo && (action._clearsRedo || (action._clearsRedo === undefined && action._canUndo))) {
+        JSUtils.empty(this._redoHistory);
+    }
+
+    action.call(this);
+};
+
+/**
  * Initializes the editor application
  */
 EditorController.prototype.init = function() {
@@ -85,7 +130,11 @@ EditorController.prototype.init = function() {
     this._setupMenu(".menu");
     this._setupPanel(".panel");
 
-    this._grapher = new Grapher(this._show, $(".grapher-draw-target"));
+    var grapherOptions = {
+        showLabels: true,
+        drawYardlineNumbers: true,
+    };
+    this._grapher = new Grapher(this._show, $(".grapher-draw-target"), grapherOptions);
     this._grapher.draw();
 
     $(".content .sidebar").on("click", ".stuntsheet", function() {
@@ -101,6 +150,18 @@ EditorController.prototype.init = function() {
     if (sheets.length > 0) {
         this._showStuntsheet($(".sidebar .stuntsheet").first());
     }
+};
+
+/**
+ * Redoes the last undone action
+ */
+EditorController.prototype.redo = function() {
+    if (this._redoHistory.length === 0) {
+        return;
+    }
+
+    var name = this._redoHistory.pop();
+    this.do(name, true);
 };
 
 /**
@@ -135,6 +196,20 @@ EditorController.prototype._showStuntsheet = function(stuntsheet) {
 
     this._show.loadSheet(this._activeSheet);
     this._grapher.draw(this._activeSheet, this._currBeat, this._selectedDots);
+};
+
+/**
+ * Restores the state of the application to the previous state
+ */
+EditorController.prototype.undo = function() {
+    if (this._undoHistory.length === 0) {
+        return;
+    }
+
+    var content = this._undoHistory.pop();
+    $(".content")
+        .after(content)
+        .remove();
 };
 
 /**

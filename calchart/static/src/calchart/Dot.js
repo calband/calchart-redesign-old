@@ -1,3 +1,5 @@
+var AnimationState = require("./AnimationState");
+
 /**
  * A Dot object contains all the data for a marcher in a Show, containing the
  * following information:
@@ -57,23 +59,39 @@ Dot.prototype.loadSheet = function(sheet) {
 };
 
 /**
- * Returns an AnimationState object that describes the Dot's
- * position, orientation, etc. at a specific moment in the show.
+ * Returns an AnimationState object that describes the Dot's position,
+ * orientation, etc. for the currently loaded stuntsheet.
  *
  * @param {int} beatNum -- the beat of the current stuntsheet
- * @return {AnimationState|null} An AnimationState that describes the Dot at a
- *   moment of the show. If the Dot has no movement at the specified beat,
+ * @return {AnimationState|null} An AnimationState that describes the Dot at
+ *   a moment of the show. If the Dot has no movement at the specified beat,
  *   returns null.
  */
 Dot.prototype.getAnimationState = function(beatNum) {
-    for (var i = 0; i < this._movements.length; i++) {
-        var movements = this._movements[i];
+    var movements = this._sheetInfo.movements;
+    for (var i = 0; i < movements.length; i++) {
+        var movements = movements[i];
         beatNum -= movement.getBeatDuration();
         if (beatNum < 0) {
             return movement.getAnimationState(beatNum);
         }
     }
-    return null;
+
+    // if it's the zeroth beat, just return the start position
+    if (beatNum === 0) {
+        return new AnimationState(this._sheetInfo.position, 0);
+    } else {
+        return null;
+    }
+};
+
+/**
+ * Return the dot's dot type for the currently loaded stuntsheet
+ *
+ * @param {string} the dot type for the current stuntsheet
+ */
+Dot.prototype.getDotType = function() {
+    return this._sheetInfo.type;
 };
 
 module.exports = Dot;
