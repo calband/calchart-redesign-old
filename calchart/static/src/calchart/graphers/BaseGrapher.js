@@ -88,7 +88,6 @@ BaseGrapher.prototype._drawField = function() {
  */
 BaseGrapher.prototype._drawDots = function(currentBeat, selectedDots) {
     var dots = this._show.getDots();
-    console.log(dots);
 
     // TODO
 

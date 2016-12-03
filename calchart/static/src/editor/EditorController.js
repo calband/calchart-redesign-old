@@ -1,7 +1,7 @@
 var ApplicationController = require("../calchart/ApplicationController");
-var CalchartUtils = require("../utils/CalchartUtils");
 var Grapher = require("../calchart/Grapher");
 var JSUtils = require("../utils/JSUtils");
+var UIUtils = require("../utils/UIUtils");
 
 /**
  * The class that stores the current state of the editor and contains all
@@ -25,22 +25,22 @@ JSUtils.extends(EditorController, ApplicationController);
  */
 EditorController.prototype.addStuntsheet = function() {
     var _this = this;
-    CalchartUtils.showPopup("add-stuntsheet", {
+    UIUtils.showPopup("add-stuntsheet", {
         onSubmit: function(popup) {
             var container = $(popup).find(".buttons");
-            CalchartUtils.clearMessages();
-            var data = CalchartUtils.getData(popup);
+            UIUtils.clearMessages();
+            var data = UIUtils.getData(popup);
 
             // validate data
 
             if (data.num_beats == "") {
-                CalchartUtils.showError("Please provide the number of beats in the stuntsheet.", container);
+                UIUtils.showError("Please provide the number of beats in the stuntsheet.", container);
                 return;
             }
 
             data.num_beats = parseInt(data.num_beats);
             if (data.num_beats <= 0) {
-                CalchartUtils.showError("Need to have a positive number of beats.", container);
+                UIUtils.showError("Need to have a positive number of beats.", container);
                 return;
             }
 
@@ -49,7 +49,7 @@ EditorController.prototype.addStuntsheet = function() {
             var stuntsheet = _this._addStuntsheetToSidebar(sheet);
             _this._showStuntsheet(stuntsheet);
 
-            CalchartUtils.hidePopup(popup);
+            UIUtils.hidePopup(popup);
         },
     });
 };
@@ -113,7 +113,7 @@ EditorController.prototype.saveShow = function(callback) {
     var params = {
         viewer: JSON.stringify(data),
     };
-    CalchartUtils.doAction("save_show", params, callback);
+    UIUtils.doAction("save_show", params, callback);
 };
 
 /**
@@ -128,7 +128,7 @@ EditorController.prototype._showStuntsheet = function(stuntsheet) {
 
     $(".sidebar .active").removeClass("active");
     $(stuntsheet).addClass("active");
-    CalchartUtils.scrollIfHidden(stuntsheet);
+    UIUtils.scrollIfHidden(stuntsheet);
 
     this._activeSheet = $(stuntsheet).data("sheet");
     this._currBeat = 0;

@@ -1,4 +1,4 @@
-var CalchartUtils = require("./utils/CalchartUtils");
+var UIUtils = require("./utils/UIUtils");
 
 (function($) {
     /**
@@ -41,6 +41,6 @@ $(document).ready(function() {
 
     $(".popup-box button.cancel").click(function() {
         var popup = $(this).parents(".popup-box");
-        CalchartUtils.hidePopup(popup);
+        UIUtils.hidePopup(popup);
     });
 });

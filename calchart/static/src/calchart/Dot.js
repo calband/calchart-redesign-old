@@ -2,6 +2,7 @@
  * A Dot object contains all the data for a marcher in a Show, containing the
  * following information:
  *  - the dot label
+ *  - the information for marching the current Sheet (see Sheet.getInfoForDot)
  *
  * @param {string} label -- the label for the dot
  */
@@ -55,6 +56,24 @@ Dot.prototype.loadSheet = function(sheet) {
     this._sheetInfo = sheet.getInfoForDot(this._label);
 };
 
-// TODO: make animation functions ".getAnimationState"
+/**
+ * Returns an AnimationState object that describes the Dot's
+ * position, orientation, etc. at a specific moment in the show.
+ *
+ * @param {int} beatNum -- the beat of the current stuntsheet
+ * @return {AnimationState|null} An AnimationState that describes the Dot at a
+ *   moment of the show. If the Dot has no movement at the specified beat,
+ *   returns null.
+ */
+Dot.prototype.getAnimationState = function(beatNum) {
+    for (var i = 0; i < this._movements.length; i++) {
+        var movements = this._movements[i];
+        beatNum -= movement.getBeatDuration();
+        if (beatNum < 0) {
+            return movement.getAnimationState(beatNum);
+        }
+    }
+    return null;
+};
 
 module.exports = Dot;

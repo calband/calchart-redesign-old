@@ -32,8 +32,7 @@ var Sheet = function(show, numBeats, options) {
     this._label = options.label;
     this._fieldType = options.fieldType;
 
-    // map dot labels to an object containing the dot's type (string),
-    // position (Coordinate), and movements (Array<MovementCommand>)
+    // map dot labels to their info for the sheet. See Sheet.getInfoForDot
     this._dots = {};
     // map dot type to Continuity
     this._continuities = {};
@@ -165,7 +164,10 @@ Sheet.prototype.getLabel = function() {
  * Get the info for the given Dot for this stuntsheet
  *
  * @param {string} dot -- the label of the dot to retrieve info for
- * @return {object} the dot's information for this stuntsheet
+ * @return {object} the dot's information for this stuntsheet, containing:
+ *   - {DotType} type: the dot's type
+ *   - {Coordinate} position: the dot's starting position
+ *   - {Array<MovementCommand>} movements: the dot's movements in the sheet
  */
 Sheet.prototype.getInfoForDot = function(dot) {
     return this._dots[dot];
