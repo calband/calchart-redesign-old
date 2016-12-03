@@ -53,14 +53,19 @@ CollegeGrapher.prototype._drawField = function() {
         .attr("y2", scale.y(this.FIELD_HEIGHT));
 
     if (this._options.drawYardlineNumbers) {
-        var y = scale.y(this.FIELD_HEIGHT);
+        // labels for top and bottom of field
         var yardlineLabels = field
             .selectAll("text.yardline-label")
-            .data(JSUtils.range(0, 105, 5))
+            .data(JSUtils.range(0, 210, 5))
             .enter()
             .append("text")
             .attr("class", "yardline-label")
             .text(function(d) {
+                // numbers 105-210 are on the bottom of the field
+                if (d > 100) {
+                    d -= 105;
+                }
+
                 if (d > 50) {
                     return 100 - d;
                 } else {
@@ -68,12 +73,20 @@ CollegeGrapher.prototype._drawField = function() {
                 }
             })
             .each(function(d) {
-                var _this = d3.select(this);
-                var x = scale.x(d * 8/5);
-                var width = parseFloat(_this.style("width"));
-                var height = parseFloat(_this.style("height"));
+                var label = d3.select(this);
 
-                _this.attr("x", x - width/2).attr("y", y + height);
+                if (d > 100) {
+                    var height = parseFloat(label.style("height"));
+                    var y = scale.y(_this.FIELD_HEIGHT) + height;
+                    d -= 105;
+                } else {
+                    var y = scale.y(0) - 5;
+                }
+
+                var width = parseFloat(label.style("width"));
+                var x = scale.x(d * 8/5) - width/2;
+
+                label.attr("x", x).attr("y", y);
             });
     }
 
