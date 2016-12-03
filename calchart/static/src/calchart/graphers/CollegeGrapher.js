@@ -17,15 +17,15 @@ CollegeGrapher.prototype.FIELD_WIDTH = 160;
 
 CollegeGrapher.prototype._drawField = function() {
     var _this = this;
-    var dimensions = this._getDimensions();
-    var scale = this._getStepScale();
-    var field = this._svg.append("g").attr("class", "field field-college");
+    var field = this._svg.append("g").classed("field field-college", true);
 
-    // sideline coordinates
-    var EAST = scale.y(this.FIELD_HEIGHT);
-    var SOUTH = scale.x(0);
-    var WEST = scale.y(0);
-    var NORTH = scale.x(this.FIELD_WIDTH);
+    // GrapherScale aliases
+    var xScale = this._scale.xScale;
+    var yScale = this._scale.yScale;
+    var EAST = this._scale.maxY;
+    var SOUTH = this._scale.minX;
+    var WEST = this._scale.minY;
+    var NORTH = this._scale.maxX;
     
     // field background
     field.append("rect")
@@ -36,22 +36,22 @@ CollegeGrapher.prototype._drawField = function() {
     // sideline box/field border
     field.append("rect")
         .attr("class", "field-border")
-        .attr("width", dimensions.width)
-        .attr("height", dimensions.height)
+        .attr("width", this._scale.width)
+        .attr("height", this._scale.height)
         .attr("x", SOUTH)
         .attr("y", WEST);
 
     var yardlineSteps = JSUtils.range(8, 160, 8);
 
-    // append the yardlines, including the 0 yardlines
+    // append the yardlines, excluding the 0 yardlines
     field.selectAll("line.yardline")
         .data(yardlineSteps)
         .enter()
         .append("line")
-        .attr("class", "yardline")
-        .attr("x1", scale.x)
+        .classed("yardline", true)
+        .attr("x1", xScale)
         .attr("y1", WEST)
-        .attr("x2", scale.x)
+        .attr("x2", xScale)
         .attr("y2", EAST);
 
     if (this._options.drawYardlineNumbers) {
@@ -60,7 +60,7 @@ CollegeGrapher.prototype._drawField = function() {
             .data(JSUtils.range(0, 210, 5))
             .enter()
             .append("text")
-            .attr("class", "yardline-label")
+            .classed("yardline-label", true)
             .text(function(d) {
                 // numbers 105-210 are on the bottom of the field
                 if (d > 100) {
@@ -85,7 +85,7 @@ CollegeGrapher.prototype._drawField = function() {
                 }
 
                 var width = parseFloat(label.style("width"));
-                var x = scale.x(d * 8/5) - width/2;
+                var x = xScale(d * 8/5) - width/2;
 
                 label.attr("x", x).attr("y", y);
             });
@@ -99,11 +99,11 @@ CollegeGrapher.prototype._drawField = function() {
             .data(yardlineSteps)
             .enter()
             .append("line")
-            .attr("class", "hash")
-            .attr("y1", scale.y(steps))
-            .attr("y2", scale.y(steps))
+            .classed("hash", true)
+            .attr("y1", yScale(steps))
+            .attr("y2", yScale(steps))
             .each(function(d) {
-                var offsetX = scale.x(d);
+                var offsetX = xScale(d);
                 d3.select(this)
                     .attr("x1", offsetX - HASH_WIDTH / 2)
                     .attr("x2", offsetX + HASH_WIDTH / 2);
@@ -115,7 +115,7 @@ CollegeGrapher.prototype._drawField = function() {
             .data(JSUtils.range(40)) // 20 horizontal, 20 vertical
             .enter()
             .append("line")
-            .attr("class", "four-step")
+            .classed("four-step", true)
             .each(function(d) {
                 var x1 = SOUTH;
                 var x2 = NORTH;
@@ -124,11 +124,11 @@ CollegeGrapher.prototype._drawField = function() {
 
                 if (d < 20) {
                     // horizontal
-                    y1 = scale.y(d * 4 + 4);
+                    y1 = yScale(d * 4 + 4);
                     y2 = y1;
                 } else {
                     // vertical
-                    x1 = scale.x((d - 20) * 8 + 4);
+                    x1 = xScale((d - 20) * 8 + 4);
                     x2 = x1;
                 }
 

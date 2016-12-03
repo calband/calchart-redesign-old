@@ -1,4 +1,5 @@
 var CalchartUtils = require("../../utils/CalchartUtils");
+var GrapherScale = require("../GrapherScale");
 
 /**
  * A BaseGrapher can draw moments of a field show. Needs to be subclassed by a
@@ -18,9 +19,10 @@ var BaseGrapher = function(show, drawTarget, options) {
 
     this._svgWidth = this._drawTarget.width();
     this._svgHeight = this._drawTarget.height();
-    this._scale = this._getStepScale();
+    this._scale = new GrapherScale(this, this._svgWidth, this._svgHeight);
+
     // fraction of a step in pixels
-    this._dotRadius = (this._scale.x(1) - this._scale.x(0)) * 3/4;
+    this._dotRadius = this._scale.toDistance(3/4);
 
     this._svg = d3.select(this._drawTarget.get(0))
         .append("svg")
@@ -32,12 +34,19 @@ var BaseGrapher = function(show, drawTarget, options) {
 /**
  * Subclasses need to define these variables
  */
-// the minimum amount of space between the field and the SVG
-BaseGrapher.prototype.FIELD_PADDING = 30;
 // number of steps from east to west sideline
 BaseGrapher.prototype.FIELD_HEIGHT = null;
 // number of steps from north to south endzone
 BaseGrapher.prototype.FIELD_WIDTH = null;
+
+/**
+ * Get the GrapherScale this Grapher is using
+ *
+ * @return {GrapherScale} the scale of the Grapher field
+ */
+BaseGrapher.prototype.getScale = function() {
+    return this._scale;
+};
 
 /**
  * Draws a moment in a field show. The moment is given as a beat of a
@@ -108,7 +117,7 @@ BaseGrapher.prototype._drawField = function() {
  */
 BaseGrapher.prototype._drawDots = function(currentBeat, selectedDots) {
     var _this = this;
-    var dotsGroup = this._svg.append("g").attr("class", "dots");
+    var dotsGroup = this._svg.append("g").classed("dots", true);
     var dots = dotsGroup.selectAll("circle.dot").data(this._show.getDots());
 
     if (dots.empty()) {
@@ -120,8 +129,8 @@ BaseGrapher.prototype._drawDots = function(currentBeat, selectedDots) {
     dots.each(function(dot) {
         var label = dot.getLabel();
         var state = dot.getAnimationState(currentBeat);
-        var x = _this._scale.x(state.x);
-        var y = _this._scale.y(state.y);
+        var x = _this._scale.xScale(state.x);
+        var y = _this._scale.yScale(state.y);
 
         if (selectedDots.indexOf(label) === -1) {
             var dotClass = CalchartUtils.getNearestOrientation(state.angle);
@@ -130,7 +139,7 @@ BaseGrapher.prototype._drawDots = function(currentBeat, selectedDots) {
         }
 
         d3.select(this)
-            .attr("class", "dot " + dotClass)
+            .classed("dot " + dotClass, true)
             .attr("cx", x)
             .attr("cy", y);
 
@@ -139,7 +148,7 @@ BaseGrapher.prototype._drawDots = function(currentBeat, selectedDots) {
 
             if (circle.empty()) {
                 circle = dotsGroup.append("circle")
-                    .attr("class", "selected-circle")
+                    .classed("selected-circle", true)
                     .attr("r", _this._dotRadius * 2);
             }
 
@@ -160,7 +169,7 @@ BaseGrapher.prototype._drawDots = function(currentBeat, selectedDots) {
             if (dotLabel.empty()) {
                 dotLabel = dotsGroup.append("text")
                     .attr("id", labelId)
-                    .attr("class", "dot-label")
+                    .classed("dot-label", true)
                     .attr("font-size", _this._dotRadius * 2.5)
                     .text(label);
             }
@@ -168,60 +177,6 @@ BaseGrapher.prototype._drawDots = function(currentBeat, selectedDots) {
             dotLabel.attr("x", x + offsetX).attr("y", y + offsetY);
         }
     });
-};
-
-/**
- * Return the width and height of the field, keeping the aspect ratio from FIELD_HEIGHT
- * and FIELD_WIDTH.
- *
- * @return {object} an object of the form {width: <width>, height: <height>}, where
- *   <width> and <height> are the width and height of the field as floats.
- */
-BaseGrapher.prototype._getDimensions = function() {
-    // keep aspect ratio of width/height
-    var fieldWidth = this._svgWidth - 2 * this.FIELD_PADDING;
-    var fieldHeight = fieldWidth * this.FIELD_HEIGHT / this.FIELD_WIDTH;
-
-    if (fieldHeight > this._svgHeight) {
-        fieldHeight = this._svgHeight - 2 * this.FIELD_PADDING;
-        fieldWidth = fieldHeight * this.FIELD_WIDTH / this.FIELD_HEIGHT;
-    }
-
-    return {
-        width: fieldWidth,
-        height: fieldHeight
-    };
-};
-
-/**
- * Return two d3 scales mapping steps from the top/left of the field to the corresponding
- * number of pixels from the bottom/left of the SVG. The scale is determined by the values
- * set for FIELD_HEIGHT and FIELD_WIDTH.
- *
- * Note: this scale takes padding into account: its output is relative to the entire
- * svg container, not just the field area of the svg.
- *
- * @return {object} an object of the form {x: <scale>, y: <scale>}, where <scale> is a function
- *   that takes in a number from 0 to FIELD_HEIGHT/FIELD_WIDTH and returns the corresponding x/y
- *   value in the SVG
- */
-BaseGrapher.prototype._getStepScale = function() {
-    var dimensions = this._getDimensions();
-
-    var xOffset = (this._svgWidth - dimensions.width) / 2;
-    var yOffset = (this._svgHeight - dimensions.height) / 2;
-
-    var xScale = d3.scale.linear()
-        .domain([0, this.FIELD_WIDTH])
-        .range([xOffset, xOffset + dimensions.width]);
-    var yScale = d3.scale.linear()
-        .domain([0, this.FIELD_HEIGHT])
-        .range([yOffset, yOffset + dimensions.height]);
-
-    return {
-        x: xScale,
-        y: yScale
-    };
 };
 
 module.exports = BaseGrapher;

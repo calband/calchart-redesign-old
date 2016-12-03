@@ -265,6 +265,7 @@ svg.graph {
         }
         .dot-label {
             font-size: 8px;
+            fill: $medium-gray;
         }
         .selected-circle {
             stroke: $highlight-purple;
