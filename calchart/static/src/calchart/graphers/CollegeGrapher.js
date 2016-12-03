@@ -5,10 +5,6 @@ var HASH_WIDTH = 10;
 
 /**
  * A BaseGrapher that graphs a a representation of a college football field
- *
- * Can take additional options including:
- *   - {boolean} drawYardlineNumbers -- if true, draws yardline numbers
- *     (default false)
  */
 var CollegeGrapher = function(show, drawTarget, options) {
     BaseGrapher.call(this, show, drawTarget, options);
@@ -24,6 +20,12 @@ CollegeGrapher.prototype._drawField = function() {
     var dimensions = this._getDimensions();
     var scale = this._getStepScale();
     var field = this._svg.append("g").attr("class", "field field-college");
+
+    // sideline coordinates
+    var EAST = scale.y(this.FIELD_HEIGHT);
+    var SOUTH = scale.x(0);
+    var WEST = scale.y(0);
+    var NORTH = scale.x(this.FIELD_WIDTH);
     
     // field background
     field.append("rect")
@@ -36,8 +38,8 @@ CollegeGrapher.prototype._drawField = function() {
         .attr("class", "field-border")
         .attr("width", dimensions.width)
         .attr("height", dimensions.height)
-        .attr("x", scale.x(0))
-        .attr("y", scale.y(0));
+        .attr("x", SOUTH)
+        .attr("y", WEST);
 
     var yardlineSteps = JSUtils.range(8, 160, 8);
 
@@ -48,12 +50,11 @@ CollegeGrapher.prototype._drawField = function() {
         .append("line")
         .attr("class", "yardline")
         .attr("x1", scale.x)
-        .attr("y1", scale.y(0))
+        .attr("y1", WEST)
         .attr("x2", scale.x)
-        .attr("y2", scale.y(this.FIELD_HEIGHT));
+        .attr("y2", EAST);
 
     if (this._options.drawYardlineNumbers) {
-        // labels for top and bottom of field
         var yardlineLabels = field
             .selectAll("text.yardline-label")
             .data(JSUtils.range(0, 210, 5))
@@ -77,10 +78,10 @@ CollegeGrapher.prototype._drawField = function() {
 
                 if (d > 100) {
                     var height = parseFloat(label.style("height"));
-                    var y = scale.y(_this.FIELD_HEIGHT) + height;
+                    var y = EAST + height;
                     d -= 105;
                 } else {
-                    var y = scale.y(0) - 5;
+                    var y = WEST - 5;
                 }
 
                 var width = parseFloat(label.style("width"));
@@ -108,6 +109,36 @@ CollegeGrapher.prototype._drawField = function() {
                     .attr("x2", offsetX + HASH_WIDTH / 2);
             });
     });
+
+    if (this._options.draw4Step) {
+        field.selectAll("line.four-step")
+            .data(JSUtils.range(40)) // 20 horizontal, 20 vertical
+            .enter()
+            .append("line")
+            .attr("class", "four-step")
+            .each(function(d) {
+                var x1 = SOUTH;
+                var x2 = NORTH;
+                var y1 = WEST;
+                var y2 = EAST;
+
+                if (d < 20) {
+                    // horizontal
+                    y1 = scale.y(d * 4 + 4);
+                    y2 = y1;
+                } else {
+                    // vertical
+                    x1 = scale.x((d - 20) * 8 + 4);
+                    x2 = x1;
+                }
+
+                d3.select(this)
+                    .attr("x1", x1)
+                    .attr("y1", y1)
+                    .attr("x2", x2)
+                    .attr("y2", y2);
+            });
+    }
 };
 
 module.exports = CollegeGrapher;

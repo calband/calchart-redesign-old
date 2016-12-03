@@ -233,16 +233,23 @@ svg.graph {
             stroke: $white;
             fill: none;
         }
-        .hash, .yardline {
+        .yardline {
             stroke: $white;
         }
         .yardline-label {
             fill: $white;
         }
+        .hash {
+            stroke: $white;
+            stroke-width: 2px;
+        }
+        .four-step {
+            stroke: $white;
+            stroke-dasharray: 5;
+        }
     }
     .dots {
         .dot {
-            fill: $uniform-yellow;
             &.facing-east {
                 fill: $uniform-white;
             }

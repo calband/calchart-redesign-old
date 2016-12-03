@@ -133,6 +133,7 @@ EditorController.prototype.init = function() {
     var grapherOptions = {
         showLabels: true,
         drawYardlineNumbers: true,
+        draw4Step: true,
     };
     this._grapher = new Grapher(this._show, $(".grapher-draw-target"), grapherOptions);
     this._grapher.draw();

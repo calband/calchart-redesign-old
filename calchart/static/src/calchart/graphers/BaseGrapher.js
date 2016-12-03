@@ -50,10 +50,10 @@ BaseGrapher.prototype.FIELD_WIDTH = null;
  */
 BaseGrapher.prototype.draw = function(sheet, currentBeat, selectedDots) {
     var fieldType = sheet ? sheet.getFieldType() : this._show.getFieldType();
-    var field = this._drawTarget.find(".field");
+    var field = this._svg.select(".field");
 
     // draw field if no field is drawn or if the drawn field is of the wrong type
-    if (field.length === 0 || !field.hasClass("field-" + fieldType)) {
+    if (field.empty() || !field.classed("field-" + fieldType)) {
         field.remove();
         this._drawField();
     }
@@ -83,6 +83,8 @@ BaseGrapher.prototype.clear = function() {
  *    selected dot, if multiple (default false)
  *  - {boolean} showLabels -- if true, show the label next to each dot (default false)
  *  - {boolean} labelLeft -- if true, show the label on the left of the dot (default true)
+ *  - {boolean} drawYardlineNumbers -- if true, draws yardline numbers (default false)
+ *  - {boolean} draw4Step -- if true, draws 4 step lines (default false)
  */
 BaseGrapher.prototype.setOption = function(name, val) {
     this._options[name] = val;
@@ -122,7 +124,7 @@ BaseGrapher.prototype._drawDots = function(currentBeat, selectedDots) {
         var y = _this._scale.y(state.y);
 
         if (selectedDots.indexOf(label) === -1) {
-            var dotClass = "facing-" + CalchartUtils.getNearestOrientation(state.angle);
+            var dotClass = CalchartUtils.getNearestOrientation(state.angle);
         } else {
             var dotClass = "selected";
         }

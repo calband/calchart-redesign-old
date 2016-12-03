@@ -40,19 +40,28 @@ JSUtils.fromCamelCase = function(s) {
 };
 
 /**
- * Generate an array that starts at the given start and increments
- * by the given interval until the end.
+ * Generate an array containing numbers within a certain range. Like
+ * Python's range() function, can take in one to three parameters.
  *
- * @param {float} start -- the start of the range (inclusive)
+ * @param {float} start -- if one parameter, the end of the range (exclusive).
+ *   Otherwise, the start of the range (inclusive)
  * @param {float} end -- the end of the range (exclusive)
  * @param {float|undefined} interval -- the interval between each number
  *   (defaults to 1)
  * @return {Array<float>} a list of numbers in the range [start, end)
  *   incrementing according to interval
  */
-JSUtils.range = function(start, end, interval) {
+JSUtils.range = function() {
+    if (arguments.length === 1) {
+        var start = 0;
+        var end = arguments[0];
+    } else {
+        var start = arguments[0];
+        var end = arguments[1];
+    }
+
     var arr = [];
-    var inc = interval || 1;
+    var inc = arguments[2] || 1;
     for (var i = start; i < end; i += inc) {
         arr.push(i);
     }
