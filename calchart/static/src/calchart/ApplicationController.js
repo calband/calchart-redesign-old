@@ -22,6 +22,8 @@ ApplicationController.prototype.getShow = function() {
 /**
  * Sets up the given menu element.
  *
+ * TODO: Use the jQuery UI Menu widget
+ *
  * @param {jQuery|string} menu -- jQuery object or selector to setup
  */
 ApplicationController.prototype._setupMenu = function(menu) {
