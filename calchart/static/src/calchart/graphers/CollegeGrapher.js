@@ -15,7 +15,7 @@ JSUtils.extends(CollegeGrapher, BaseGrapher);
 CollegeGrapher.prototype.FIELD_HEIGHT = 84;
 CollegeGrapher.prototype.FIELD_WIDTH = 160;
 
-CollegeGrapher.prototype._drawField = function() {
+CollegeGrapher.prototype.drawField = function() {
     var _this = this;
     var field = this._svg.append("g").classed("field field-college", true);
 

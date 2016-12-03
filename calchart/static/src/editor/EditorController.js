@@ -136,7 +136,7 @@ EditorController.prototype.init = function() {
         draw4Step: true,
     };
     this._grapher = new Grapher(this._show, $(".grapher-draw-target"), grapherOptions);
-    this._grapher.draw();
+    this._grapher.drawField();
 
     $(".content .sidebar").on("click", ".stuntsheet", function() {
         _this._showStuntsheet(this);
@@ -151,6 +151,9 @@ EditorController.prototype.init = function() {
     if (sheets.length > 0) {
         this._showStuntsheet($(".sidebar .stuntsheet").first());
     }
+
+    // TODO: add draggable dots
+    console.log(this._grapher.getDots());
 };
 
 /**

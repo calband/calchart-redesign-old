@@ -49,6 +49,14 @@ BaseGrapher.prototype.getScale = function() {
 };
 
 /**
+ * Draws the field, with a background, borders, yardlines, and hash marks. Subclasses
+ * should implement this function to draw common field attributes
+ */
+BaseGrapher.prototype.drawField = function() {
+    throw new Error("BaseGrapher subclasses need to implement _drawField");
+};
+
+/**
  * Draws a moment in a field show. The moment is given as a beat of a
  * particular stuntsheet.
  *
@@ -58,18 +66,16 @@ BaseGrapher.prototype.getScale = function() {
  * @param {Array<string>} selectedDots -- labels of selected dots
  */
 BaseGrapher.prototype.draw = function(sheet, currentBeat, selectedDots) {
-    var fieldType = sheet ? sheet.getFieldType() : this._show.getFieldType();
+    var fieldType = sheet.getFieldType();
     var field = this._svg.select(".field");
 
-    // draw field if no field is drawn or if the drawn field is of the wrong type
+    // re-draw field if no field is drawn or if the drawn field is of the wrong type
     if (field.empty() || !field.classed("field-" + fieldType)) {
         field.remove();
-        this._drawField();
+        this.drawField();
     }
 
-    if (sheet) {
-        this._drawDots(currentBeat, selectedDots);
-    }
+    this._drawDots(currentBeat, selectedDots);
 };
 
 /**
@@ -77,6 +83,15 @@ BaseGrapher.prototype.draw = function(sheet, currentBeat, selectedDots) {
  */
 BaseGrapher.prototype.clearDots = function() {
     this._svg.find(".dots").remove();
+};
+
+/**
+ * Return the dots contained in the grapher
+ *
+ * @return {jQuery} the dots in the grapher
+ */
+BaseGrapher.prototype.getDots = function() {
+    return $(this._svg.selectAll("g.dot"));
 };
 
 /**
@@ -100,14 +115,6 @@ BaseGrapher.prototype.setOption = function(name, val) {
 };
 
 /**
- * Draws the field, with a background, borders, yardlines, and hash marks. Subclasses
- * should call this function to draw common field attributes
- */
-BaseGrapher.prototype._drawField = function() {
-    throw new Error("BaseGrapher subclasses need to implement _drawField");
-};
-
-/**
  * Given a stuntsheet, the currentBeat relative to the beginning of that sheet,
  * and the dot labels of all selected dots, draw the dots in this stuntsheet at
  * that beat onto the SVG context of this grapher.
@@ -117,16 +124,19 @@ BaseGrapher.prototype._drawField = function() {
  */
 BaseGrapher.prototype._drawDots = function(currentBeat, selectedDots) {
     var _this = this;
+    // group containing all dots
     var dotsGroup = this._svg.append("g").classed("dots", true);
-    var dots = dotsGroup.selectAll("circle.dot").data(this._show.getDots());
+    // each dot consists of a group containing all svg elements making up a dot
+    var dotGroups = dotsGroup.selectAll("g.dot").data(this._show.getDots());
 
-    if (dots.empty()) {
-        dots = dots.enter()
-            .append("circle")
-            .attr("r", this._dotRadius);
+    if (dotGroups.empty()) {
+        dotGroups = dotGroups.enter()
+            .append("g")
+            .classed("dot", true);
     }
     
-    dots.each(function(dot) {
+    dotGroups.each(function(dot) {
+        var dotGroup = d3.select(this);
         var label = dot.getLabel();
         var state = dot.getAnimationState(currentBeat);
         var x = _this._scale.xScale(state.x);
@@ -138,16 +148,24 @@ BaseGrapher.prototype._drawDots = function(currentBeat, selectedDots) {
             var dotClass = "selected";
         }
 
-        d3.select(this)
-            .classed("dot " + dotClass, true)
+        var dotMarker = dotGroup.selectAll(".dot-marker");
+
+        if (dotMarker.empty()) {
+            dotMarker = dotGroup
+                .append("circle")
+                .attr("r", _this._dotRadius);
+        }
+
+        dotMarker
+            .attr("class", "dot-marker " + dotClass)
             .attr("cx", x)
             .attr("cy", y);
 
         if (_this._options.circleSelected) {
-            var circle = dotsGroup.selectAll("circle.selected-circle");
+            var circle = dotGroup.selectAll("circle.selected-circle");
 
             if (circle.empty()) {
-                circle = dotsGroup.append("circle")
+                circle = dotGroup.append("circle")
                     .classed("selected-circle", true)
                     .attr("r", _this._dotRadius * 2);
             }
@@ -164,10 +182,10 @@ BaseGrapher.prototype._drawDots = function(currentBeat, selectedDots) {
             }
 
             var labelId = "dot-" + label;
-            var dotLabel = dotsGroup.select("#" + labelId);
+            var dotLabel = dotGroup.select("#" + labelId);
 
             if (dotLabel.empty()) {
-                dotLabel = dotsGroup.append("text")
+                dotLabel = dotGroup.append("text")
                     .attr("id", labelId)
                     .classed("dot-label", true)
                     .attr("font-size", _this._dotRadius * 2.5)
