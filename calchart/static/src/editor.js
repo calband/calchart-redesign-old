@@ -9,8 +9,7 @@ var UIUtils = require("./utils/UIUtils");
 $(document).ready(function() {
     if (window.show !== null) {
         var show = new Show(window.show);
-        var controller = new EditorController(show);
-        controller.init();
+        var controller = EditorController.init(show);
         return;
     }
 
@@ -45,8 +44,7 @@ $(document).ready(function() {
 
             // save show and initialize controller
 
-            var controller = new EditorController(Show.create(data));
-            controller.init();
+            var controller = EditorController.init(Show.create(data));
             controller.saveShow(function() {
                 UIUtils.hidePopup("setup-show");
             });

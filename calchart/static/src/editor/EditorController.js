@@ -1,7 +1,19 @@
+/**
+ * @fileOverview This file defines the EditorController, the singleton instance that
+ * controls the entire editor application. Functions defined by the EditorController
+ * are organized alphabetically in the following sections:
+ *
+ * - Constructors (including initialization functions)
+ * - Actions (see docstring in the constructor)
+ * - Helpers (prefixed with an underscore)
+ */
+
 var ApplicationController = require("../calchart/ApplicationController");
 var Grapher = require("../calchart/Grapher");
 var JSUtils = require("../utils/JSUtils");
 var UIUtils = require("../utils/UIUtils");
+
+/**** CONSTRUCTORS ****/
 
 /**
  * The class that stores the current state of the editor and contains all
@@ -34,7 +46,43 @@ var EditorController = function(show) {
     this._redoHistory = [];
 };
 
-JSUtils.extends(EditorController, ApplicationController);
+ApplicationController.extend(EditorController);
+
+/**
+ * Initializes the editor application
+ */
+EditorController.prototype.init = function() {
+    var _this = this;
+    this._setupMenu(".menu");
+    this._setupPanel(".panel");
+
+    var grapherOptions = {
+        showLabels: true,
+        drawYardlineNumbers: true,
+        draw4Step: true,
+    };
+    this._grapher = new Grapher(this._show, $(".grapher-draw-target"), grapherOptions);
+    this._grapher.drawField();
+
+    $(".content .sidebar").on("click", ".stuntsheet", function() {
+        _this._showStuntsheet(this);
+    });
+
+    var sheets = this._show.getSheets();
+    for (var i = 0; i < sheets.length; i++) {
+        this._addStuntsheetToSidebar(sheets[i]);
+    }
+
+
+    if (sheets.length > 0) {
+        this._showStuntsheet($(".sidebar .stuntsheet").first());
+    }
+
+    // TODO: initialize default context
+    console.log(this._grapher.getDots());
+};
+
+/**** ACTIONS ****/
 
 /**
  * Adds a new stuntsheet to the Show and sidebar.
@@ -72,28 +120,6 @@ EditorController.prototype.addStuntsheet = function() {
 EditorController.prototype.addStuntsheet._canUndo = true;
 
 /**
- * Add the given Sheet to the sidebar
- *
- * @param {Sheet} sheet -- the Sheet to add
- * @return {jQuery} the stuntsheet added to the sidebar
- */
-EditorController.prototype._addStuntsheetToSidebar = function(sheet) {
-    // containers for elements in sidebar
-    var label = $("<span>").addClass("label");
-    var preview = $("<svg>").addClass("preview");
-
-    var stuntsheet = $("<div>")
-        .addClass("stuntsheet")
-        .data("sheet", sheet)
-        .append(label)
-        .append(preview)
-        .appendTo(".sidebar");
-
-    this._updateSidebar(stuntsheet);
-    return stuntsheet;
-};
-
-/**
  * Runs the method on this instance with the given name.
  *
  * @param {string} name -- the function to call
@@ -123,40 +149,6 @@ EditorController.prototype.do = function(name, asRedo) {
 };
 
 /**
- * Initializes the editor application
- */
-EditorController.prototype.init = function() {
-    var _this = this;
-    this._setupMenu(".menu");
-    this._setupPanel(".panel");
-
-    var grapherOptions = {
-        showLabels: true,
-        drawYardlineNumbers: true,
-        draw4Step: true,
-    };
-    this._grapher = new Grapher(this._show, $(".grapher-draw-target"), grapherOptions);
-    this._grapher.drawField();
-
-    $(".content .sidebar").on("click", ".stuntsheet", function() {
-        _this._showStuntsheet(this);
-    });
-
-    var sheets = this._show.getSheets();
-    for (var i = 0; i < sheets.length; i++) {
-        this._addStuntsheetToSidebar(sheets[i]);
-    }
-
-
-    if (sheets.length > 0) {
-        this._showStuntsheet($(".sidebar .stuntsheet").first());
-    }
-
-    // TODO: add draggable dots
-    console.log(this._grapher.getDots());
-};
-
-/**
  * Redoes the last undone action
  */
 EditorController.prototype.redo = function() {
@@ -182,6 +174,44 @@ EditorController.prototype.saveShow = function(callback) {
 };
 
 /**
+ * Restores the state of the application to the previous state
+ */
+EditorController.prototype.undo = function() {
+    if (this._undoHistory.length === 0) {
+        return;
+    }
+
+    var content = this._undoHistory.pop();
+    $(".content")
+        .after(content)
+        .remove();
+};
+
+/**** HELPERS ****/
+
+/**
+ * Add the given Sheet to the sidebar
+ *
+ * @param {Sheet} sheet -- the Sheet to add
+ * @return {jQuery} the stuntsheet added to the sidebar
+ */
+EditorController.prototype._addStuntsheetToSidebar = function(sheet) {
+    // containers for elements in sidebar
+    var label = $("<span>").addClass("label");
+    var preview = $("<svg>").addClass("preview");
+
+    var stuntsheet = $("<div>")
+        .addClass("stuntsheet")
+        .data("sheet", sheet)
+        .append(label)
+        .append(preview)
+        .appendTo(".sidebar");
+
+    this._updateSidebar(stuntsheet);
+    return stuntsheet;
+};
+
+/**
  * Show the given stuntsheet in the sidebar and workspace.
  *
  * @param {jQuery} stuntsheet -- the stuntsheet element in the .sidebar
@@ -200,20 +230,6 @@ EditorController.prototype._showStuntsheet = function(stuntsheet) {
 
     this._show.loadSheet(this._activeSheet);
     this._grapher.draw(this._activeSheet, this._currBeat, this._selectedDots);
-};
-
-/**
- * Restores the state of the application to the previous state
- */
-EditorController.prototype.undo = function() {
-    if (this._undoHistory.length === 0) {
-        return;
-    }
-
-    var content = this._undoHistory.pop();
-    $(".content")
-        .after(content)
-        .remove();
 };
 
 /**

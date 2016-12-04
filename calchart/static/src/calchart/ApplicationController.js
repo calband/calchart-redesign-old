@@ -1,14 +1,58 @@
+/**
+ * @fileOverview This file defines the ApplicationController, the abstract superclass
+ * for application controllers: singleton instances that control an entire Calchart
+ * application. Functions in this file are organized alphabetically in the following
+ * sections:
+ *
+ * - Constructors (including initialization functions)
+ * - Instance methods
+ * - Helpers (prefixed with an underscore)
+ */
+
 var JSUtils = require("../utils/JSUtils");
+
+/**** CONSTRUCTORS ****/
 
 /**
  * The abstract superclass that stores the current state of a Calchart application and
- * contains all of the actions that can be run in the application.
+ * contains all of the actions that can be run in the application. This class is
+ * a singleton, meaning that only one instance of this class will ever be initialized.
+ * To maintain this property, never use the constructor directly; instead, use
+ * ApplicationController.init()
  *
  * @param {Show} show -- the show for the controller
  */
 var ApplicationController = function(show) {
     this._show = show;
 };
+
+// The singleton instance of the ApplicationController
+window.controller = null;
+
+/**
+ * Initialize an ApplicationController if one has not already been initialized.
+ *
+ * @param {Show} show -- the show for the controller
+ */
+ApplicationController.init = function(show) {
+    if (!window.controller) {
+        window.controller = new this(show);
+        window.controller.init();
+    }
+
+    return window.controller;
+};
+
+/**
+ * Use this class to subclass instead of JSUtils.extends in order to inherit
+ * the ApplicationController.init function.
+ */
+ApplicationController.extend = function(ChildClass) {
+    JSUtils.extends(ChildClass, this);
+    $.extend(ChildClass, this);
+};
+
+/**** INSTANCE METHODS ****/
 
 /**
  * Get the show stored in the controller
@@ -18,6 +62,8 @@ var ApplicationController = function(show) {
 ApplicationController.prototype.getShow = function() {
     return this._show;
 };
+
+/**** HELPERS ****/
 
 /**
  * Sets up the given menu element.
