@@ -4,7 +4,7 @@
  * are organized alphabetically in the following sections:
  *
  * - Constructors (including initialization functions)
- * - Actions (see docstring in the constructor)
+ * - Actions
  * - Helpers (prefixed with an underscore)
  */
 
@@ -17,20 +17,8 @@ var UIUtils = require("../utils/UIUtils");
 
 /**
  * The class that stores the current state of the editor and contains all
- * of the actions that can be run in the editor page.
- *
- * Each action can define the following properties:
- *  - {string} _name: the verbose name of the action, used for Undo text, help text, etc.
- *     (default to name of action, capitalized and spaced out)
- *  - {boolean} _canUndo: set true to indicate that the action can be undone (default false)
- *  - {boolean} _clearsRedo: if true, when the action is run, clears history of actions
- *     that have been undone (default same as canUndo)
- *
- * Example:
- *
- * EditorController.prototype.addStuntsheet = function() { ... };
- * EditorController.prototype.addStuntsheet._name = "Add a Stuntsheet";
- * EditorController.prototype.addStuntsheet._canUndo = true;
+ * of the actions that can be run in the editor page. (details in the
+ * actions section below)
  *
  * @param {Show} show -- the show being edited in the application
  */
@@ -82,7 +70,22 @@ EditorController.prototype.init = function() {
     console.log(this._grapher.getDots());
 };
 
-/**** ACTIONS ****/
+/**** ACTIONS
+ *
+ * Each action can define the following properties:
+ *  - {string} _name: the verbose name of the action, used for Undo text, help text, etc.
+ *     (default to name of action, capitalized and spaced out)
+ *  - {boolean} _canUndo: set true to indicate that the action can be undone (default false)
+ *  - {boolean} _clearsRedo: if true, when the action is run, clears history of actions
+ *     that have been undone (default same as canUndo)
+ *
+ * Example:
+ *
+ * EditorController.prototype.addStuntsheet = function() { ... };
+ * EditorController.prototype.addStuntsheet._name = "Add a Stuntsheet";
+ * EditorController.prototype.addStuntsheet._canUndo = true;
+ *
+ ****/
 
 /**
  * Adds a new stuntsheet to the Show and sidebar.
