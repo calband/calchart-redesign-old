@@ -1,4 +1,4 @@
-var EditorController = require("./editor/EditorController");
+var EditorController = require("./calchart/controllers/EditorController");
 var Grapher = require("./calchart/Grapher");
 var Show = require("./calchart/Show");
 var UIUtils = require("./utils/UIUtils");

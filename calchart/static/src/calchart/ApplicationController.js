@@ -9,6 +9,7 @@
  * - Helpers (prefixed with an underscore)
  */
 
+var Context = require("./Context");
 var JSUtils = require("../utils/JSUtils");
 
 /**** CONSTRUCTORS ****/
@@ -24,6 +25,7 @@ var JSUtils = require("../utils/JSUtils");
  */
 var ApplicationController = function(show) {
     this._show = show;
+    this._context = null;
 };
 
 // The singleton instance of the ApplicationController
@@ -61,6 +63,21 @@ ApplicationController.extend = function(ChildClass) {
  */
 ApplicationController.prototype.getShow = function() {
     return this._show;
+};
+
+/**
+ * Loads the Context with the given name
+ *
+ * @param {string} name -- the name of the context to load of the format
+ *   "<app>:<name>", e.g. "editor:default"
+ */
+ApplicationController.prototype.loadContext = function(name) {
+    if (this._context) {
+        this._context.unload();
+    }
+
+    $("body").addClass("context-" + name.replace(":", "-"));
+    this._context = Context.load(name);
 };
 
 /**** HELPERS ****/

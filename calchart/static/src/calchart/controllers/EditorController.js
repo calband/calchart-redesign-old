@@ -8,10 +8,10 @@
  * - Helpers (prefixed with an underscore)
  */
 
-var ApplicationController = require("../calchart/ApplicationController");
-var Grapher = require("../calchart/Grapher");
-var JSUtils = require("../utils/JSUtils");
-var UIUtils = require("../utils/UIUtils");
+var ApplicationController = require("../ApplicationController");
+var Grapher = require("../Grapher");
+var JSUtils = require("../../utils/JSUtils");
+var UIUtils = require("../../utils/UIUtils");
 
 /**** CONSTRUCTORS ****/
 
@@ -66,8 +66,7 @@ EditorController.prototype.init = function() {
         this._showStuntsheet($(".sidebar .stuntsheet").first());
     }
 
-    // TODO: initialize default context
-    console.log(this._grapher.getDots());
+    this.loadContext("editor:default");
 };
 
 /**** ACTIONS
@@ -149,6 +148,13 @@ EditorController.prototype.do = function(name, asRedo) {
     }
 
     action.call(this);
+};
+
+/**
+ * TODO
+ */
+EditorController.prototype.getGrapher = function() {
+    return this._grapher;
 };
 
 /**
