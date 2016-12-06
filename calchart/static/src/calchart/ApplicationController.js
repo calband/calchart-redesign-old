@@ -9,7 +9,6 @@
  * - Helpers (prefixed with an underscore)
  */
 
-var Context = require("./Context");
 var JSUtils = require("../utils/JSUtils");
 
 /**** CONSTRUCTORS ****/
@@ -25,7 +24,6 @@ var JSUtils = require("../utils/JSUtils");
  */
 var ApplicationController = function(show) {
     this._show = show;
-    this._context = null;
 };
 
 // The singleton instance of the ApplicationController
@@ -57,6 +55,39 @@ ApplicationController.extend = function(ChildClass) {
 /**** INSTANCE METHODS ****/
 
 /**
+ * Holds all keyboard shortcuts for the controller, mapping keyboard shortcut
+ * to the name of the ApplicationController function. Separate keys with "+".
+ * e.g. "ctrl+s" or "ctrl+shift+s". Meta keys need to be in this order:
+ * ctrl (alias for cmd on Mac), alt, shift.
+ */
+ApplicationController.prototype.shortcuts = {};
+
+/**
+ * Runs the method on this instance with the given name.
+ *
+ * @param {string} name -- the function to call
+ */
+ApplicationController.prototype.do = function(name) {
+    var action = this[name];
+
+    if (action === undefined) {
+        throw new Error("No action with the name: " + name);
+    } else {
+        action.call(this);
+    }
+};
+
+/**
+ * Get the shortcut function for the given shortcut key binding
+ *
+ * @param {string} shortcut -- the shortcut keys, e.g. "ctrl+z"
+ * @return {function|undefined} the shortcut function, if there is one
+ */
+ApplicationController.prototype.getShortcut = function(shortcut) {
+    return this.shortcuts[shortcut];
+};
+
+/**
  * Get the show stored in the controller
  *
  * @return {Show} the show stored in the controller
@@ -66,18 +97,33 @@ ApplicationController.prototype.getShow = function() {
 };
 
 /**
- * Loads the Context with the given name
- *
- * @param {string} name -- the name of the context to load of the format
- *   "<app>:<name>", e.g. "editor:default"
+ * Initialize this controller
  */
-ApplicationController.prototype.loadContext = function(name) {
-    if (this._context) {
-        this._context.unload();
-    }
+ApplicationController.prototype.init = function() {
+    var _this = this;
 
-    $("body").addClass("context-" + name.replace(":", "-"));
-    this._context = Context.load(name);
+    // set up keyboard shortcuts
+    $(window).keydown(function(e) {
+        // convert keydown event into string
+        var pressedKeys = [];
+        if (e.metaKey || e.ctrlKey) {
+            pressedKeys.push("ctrl");
+        }
+        if (e.altKey) {
+            pressedKeys.push("alt");
+        }
+        if (e.shiftKey) {
+            pressedKeys.push("shift");
+        }
+        var character = String.fromCharCode(e.keyCode).toLowerCase();
+        pressedKeys.push(character);
+
+        var _function = _this.getShortcut(pressedKeys.join("+"));
+        if (_function) {
+            _this.do(_function);
+            e.preventDefault();
+        }
+    });
 };
 
 /**** HELPERS ****/
@@ -91,9 +137,6 @@ ApplicationController.prototype.loadContext = function(name) {
  */
 ApplicationController.prototype._setupMenu = function(menu) {
     var _this = this;
-
-    // maps keyboard shortcut to their function
-    var shortcuts = {};
 
     // set up activating menu
     $(menu).children("li")
@@ -135,32 +178,6 @@ ApplicationController.prototype._setupMenu = function(menu) {
             $(this).click(function() {
                 _this.do(_function);
             });
-            var shortcut = $(this).data("shortcut");
-            if (shortcut) {
-                shortcuts[shortcut] = _function;
-            }
-        }
-    });
-
-    // set up keyboard shortcuts
-    $(window).keydown(function(e) {
-        // convert keydown event into string
-        var pressedKeys = [];
-        if (e.metaKey || e.ctrlKey) {
-            pressedKeys.push("ctrl");
-        }
-        if (e.altKey) {
-            pressedKeys.push("alt");
-        }
-        if (e.shiftKey) {
-            pressedKeys.push("shift");
-        }
-        var character = String.fromCharCode(e.keyCode).toLowerCase();
-        pressedKeys.push(character);
-        var _function = shortcuts[pressedKeys.join("+")];
-        if (_function) {
-            _this.do(_function);
-            e.preventDefault();
         }
     });
 };

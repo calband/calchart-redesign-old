@@ -1,18 +1,18 @@
-var CONTEXTS = {
-    editor: require("./contexts/EditorContexts"),
-};
+var DefaultContext = require("./contexts/DefaultContext");
 
 module.exports = {
     /**
-     * Return an instance of a subclass of BaseContext. We can do this in a constructor; source:
-     * https://www.bennadel.com/blog/2522-providing-a-return-value-in-a-javascript-constructor.htm
+     * Return an instance of BaseContext to load into the editor application
      *
-     * @param {string} name -- the name of the context to load of the format "<app>:<name>", e.g.
-     *   "editor:default"
+     * @param {string} name -- the name of the context to load
+     * @param {Grapher} grapher -- the editor grapher
      */
-    load: function(name) {
-        name = name.split(":");
-        var Context = CONTEXTS[name[0]][name[1]];
-        return new Context();
+    load: function(name, grapher) {
+        switch (name) {
+            case "default":
+                return new DefaultContext(grapher);
+            default:
+                throw new Error("No context named: " + name);
+        }
     },
 };

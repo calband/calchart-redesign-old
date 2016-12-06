@@ -9,6 +9,7 @@
  */
 
 var ApplicationController = require("../ApplicationController");
+var Context = require("../Context");
 var Grapher = require("../Grapher");
 var JSUtils = require("../../utils/JSUtils");
 var UIUtils = require("../../utils/UIUtils");
@@ -26,6 +27,7 @@ var EditorController = function(show) {
     ApplicationController.call(this, show);
 
     this._grapher = null;
+    this._context = null;
     this._selectedDots = []; // dots selected to edit
     this._activeSheet = null;
     this._currBeat = null;
@@ -36,10 +38,30 @@ var EditorController = function(show) {
 
 ApplicationController.extend(EditorController);
 
+EditorController.prototype.shortcuts = {
+    "ctrl+s": "saveShow",
+    "ctrl+z": "undo",
+    "ctrl+shift+z": "redo",
+};
+
+/**
+ * Allow retrieving shortcuts from the context also
+ */
+EditorController.prototype.getShortcut = function(shortcut) {
+    var _function = ApplicationController.prototype.getShortcut.call(this, shortcut);
+    if (_function === undefined && this._context !== null) {
+        return this._context.shortcuts[shortcut];
+    } else {
+        return _function;
+    }
+};
+
 /**
  * Initializes the editor application
  */
 EditorController.prototype.init = function() {
+    ApplicationController.prototype.init.call(this);
+
     var _this = this;
     this._setupMenu(".menu");
     this._setupPanel(".panel");
@@ -66,7 +88,7 @@ EditorController.prototype.init = function() {
         this._showStuntsheet($(".sidebar .stuntsheet").first());
     }
 
-    this.loadContext("editor:default");
+    this.loadContext("default");
 };
 
 /**** ACTIONS
@@ -151,10 +173,17 @@ EditorController.prototype.do = function(name, asRedo) {
 };
 
 /**
- * TODO
+ * Loads an editing context for the controller
+ *
+ * @param {string} name -- the name of the context to load
  */
-EditorController.prototype.getGrapher = function() {
-    return this._grapher;
+EditorController.prototype.loadContext = function(name) {
+    if (this._context) {
+        this._context.unload();
+    }
+
+    $("body").addClass("context-" + name);
+    this._context = Context.load(name, this._grapher);
 };
 
 /**

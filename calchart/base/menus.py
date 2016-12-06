@@ -11,9 +11,6 @@ Submenus are a list of menu items. The formats for the different types of menu i
         - name (str, required): label to display in the menu
         - function (str, required): the name of the Javascript function (defined in the
             Javascript file) to run when clicking on the menu.
-        - shortcut (str, optional): keyboard shortcut to run the same action. Separate keys
-            with "+". e.g. "ctrl+s" or "ctrl+shift_s". Meta keys need to be in this order:
-            ctrl (alias for cmd on Mac), alt, shift.
     - Menu item with a submenu
         - name (str, required): label to display in the menu
         - submenu (list, required): submenu to list next to the menu item
@@ -31,7 +28,6 @@ editor_menu = [
             {
                 'name': 'Save',
                 'function': 'saveShow',
-                'shortcut': 'ctrl+s',
             },
         ],
     },
@@ -41,12 +37,10 @@ editor_menu = [
             {
                 'name': 'Undo',
                 'function': 'undo',
-                'shortcut': 'ctrl+z',
             },
             {
                 'name': 'Redo',
                 'function': 'redo',
-                'shortcut': 'ctrl+shift+z',
             },
         ],
     },
