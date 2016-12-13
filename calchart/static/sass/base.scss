@@ -16,6 +16,7 @@ html, body {
 
 body {
     padding: 20px;
+    cursor: default;
     &.no-scroll {
         overflow: hidden;
     }
@@ -225,6 +226,7 @@ header {
 }
 
 svg.graph {
+    @include unselectable;
     .field {
         .field-background {
             fill: $field-green;

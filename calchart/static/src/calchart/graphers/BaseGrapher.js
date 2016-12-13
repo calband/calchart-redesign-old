@@ -136,7 +136,6 @@ BaseGrapher.prototype._drawDots = function(currentBeat, selectedDots) {
     }
     
     dotGroups.each(function(dot) {
-        var dotGroup = d3.select(this);
         var label = dot.getLabel();
         var state = dot.getAnimationState(currentBeat);
         var x = _this._scale.xScale(state.x);
@@ -148,18 +147,14 @@ BaseGrapher.prototype._drawDots = function(currentBeat, selectedDots) {
             var dotClass = "selected";
         }
 
+        var dotGroup = d3.select(this);
         var dotMarker = dotGroup.selectAll(".dot-marker");
-
         if (dotMarker.empty()) {
             dotMarker = dotGroup
                 .append("circle")
                 .attr("r", _this._dotRadius);
         }
-
-        dotMarker
-            .attr("class", "dot-marker " + dotClass)
-            .attr("cx", x)
-            .attr("cy", y);
+        dotMarker.attr("class", "dot-marker " + dotClass);
 
         if (_this._options.circleSelected) {
             var circle = dotGroup.selectAll("circle.selected-circle");
@@ -169,8 +164,6 @@ BaseGrapher.prototype._drawDots = function(currentBeat, selectedDots) {
                     .classed("selected-circle", true)
                     .attr("r", _this._dotRadius * 2);
             }
-
-            circle.attr("cx", x).attr("cy", y);
         }
 
         if (_this._options.showLabels) {
@@ -192,9 +185,32 @@ BaseGrapher.prototype._drawDots = function(currentBeat, selectedDots) {
                     .text(label);
             }
 
-            dotLabel.attr("x", x + offsetX).attr("y", y + offsetY);
+            dotLabel.attr("x", offsetX).attr("y", offsetY);
         }
+
+        _this.moveDot($(dotGroup[0]), x, y);
     });
+};
+
+/**
+ * Moves the given dot to the given coordinates, which either represent the
+ * center of the dot or the top-left corner of the dot.
+ *
+ * @param {jQuery} dot -- the dot to move
+ * @param {float} x -- the x-coordinate of the dot's position
+ * @param {float} y -- the y-coordinate of the dot's position
+ * @param {boolean|undefined} isCorner -- if true, the (x,y) coordinate represents
+ *   the top left corner of the dot, and needs to be adjusted.
+ */
+BaseGrapher.prototype.moveDot = function(dot, x, y, isCorner) {
+    if (isCorner) {
+        var dotPosition = $(dot).position();
+        var dotMarker = $(dot).find(".dot-marker").position();
+        x += dotMarker.left + (this._dotRadius / 2) - dotPosition.left;
+        y += dotMarker.top + (this._dotRadius / 2) - dotPosition.top;
+    }
+
+    $(dot).attr("transform", "translate(" + x + "," + y + ")");
 };
 
 module.exports = BaseGrapher;
