@@ -7,6 +7,9 @@ var JSUtils = require("../../utils/JSUtils");
  */
 var DefaultContext = function(grapher) {
     BaseContext.call(this, grapher);
+
+    // number of steps to snap dots to when dragging: null, 1, 2, 4
+    this._grid = 2;
 };
 
 JSUtils.extends(DefaultContext, BaseContext);
@@ -15,23 +18,28 @@ DefaultContext.prototype.shortcuts = {
 };
 
 DefaultContext.prototype.load = function() {
+    var _this = this;
     var dots = this._grapher.getDots();
+
     if (dots.draggable("instance") !== undefined) {
         dots.draggable("enable");
     } else {
-        var grapher = this._grapher;
-        var twoSteps = this._grapher.getScale().toDistance(2);
         var options = {
-            cursor: "none",
             containment: "svg.graph",
-            grid: [twoSteps, twoSteps],
+            handle: ".dot-marker",
             drag: function(e, ui) {
-                // TODO: still slightly off
-                var deltaX = ui.position.left - $("svg.graph").position().left;
-                var deltaY = ui.position.top - $("svg.graph").position().top;
-                grapher.moveDot(this, deltaX, deltaY, true);
+                var origin = $("svg.graph").position();
+                var deltaX = e.clientX - origin.left;
+                var deltaY = e.clientY - origin.top;
+                _this._grapher.moveDot(this, deltaX, deltaY, {
+                    snap: _this._grid,
+                });
+            },
+            start: function() {
+                $(".content .workspace").css("cursor", "none");
             },
             stop: function() {
+                $(".content .workspace").css("cursor", "");
                 // TODO: update stuntsheet with EditorController action (undo-able)
             },
         };

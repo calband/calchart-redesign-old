@@ -197,17 +197,23 @@ BaseGrapher.prototype._drawDots = function(currentBeat, selectedDots) {
  * center of the dot or the top-left corner of the dot.
  *
  * @param {jQuery} dot -- the dot to move
- * @param {float} x -- the x-coordinate of the dot's position
- * @param {float} y -- the y-coordinate of the dot's position
- * @param {boolean|undefined} isCorner -- if true, the (x,y) coordinate represents
- *   the top left corner of the dot, and needs to be adjusted.
+ * @param {float} x -- the x-coordinate of the dot's position, in pixels
+ * @param {float} y -- the y-coordinate of the dot's position, in pixels
+ * @param {object|undefined} options -- options for moving the dot, including
+ *   the following options:
+ *     - {null|int} snap -- number of steps to snap dot to
  */
-BaseGrapher.prototype.moveDot = function(dot, x, y, isCorner) {
-    if (isCorner) {
-        var dotPosition = $(dot).position();
-        var dotMarker = $(dot).find(".dot-marker").position();
-        x += dotMarker.left + (this._dotRadius / 2) - dotPosition.left;
-        y += dotMarker.top + (this._dotRadius / 2) - dotPosition.top;
+BaseGrapher.prototype.moveDot = function(dot, x, y, options) {
+    options = options || {};
+
+    // contain dot on screen
+    var min = this._scale.toDistance(options.snap || 0);
+    x = Math.max(min, x);
+    y = Math.max(min, y);
+
+    if (options.snap) {
+        x = this._scale.roundDistance(x - this._scale.minX, options.snap) + this._scale.minX;
+        y = this._scale.roundDistance(y - this._scale.minY, options.snap) + this._scale.minY;
     }
 
     $(dot).attr("transform", "translate(" + x + "," + y + ")");
