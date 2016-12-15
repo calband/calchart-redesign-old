@@ -131,8 +131,6 @@ ApplicationController.prototype.init = function() {
 /**
  * Sets up the given menu element.
  *
- * TODO: Use the jQuery UI Menu widget
- *
  * @param {jQuery|string} menu -- jQuery object or selector to setup
  */
 ApplicationController.prototype._setupMenu = function(menu) {
@@ -153,9 +151,8 @@ ApplicationController.prototype._setupMenu = function(menu) {
 
             // clicking off the menu will close the menu
             $(window).click(function(e) {
-                var possibleMenu = $(e.target).closest(menu);
                 // TODO: except .has-submenu
-                if (possibleMenu.length === 0) {
+                if ($(e.target).closest(menu).exists()) {
                     $(menu).removeClass("active")
                         .children("li.active")
                         .removeClass("active");

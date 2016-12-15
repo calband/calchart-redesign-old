@@ -6,8 +6,8 @@
 {% endblock %}
 
 {% block head %}
-    {% add_style "vendor/jquery-ui.min.css" "editor.css" %}
-    {% add_script "vendor/jquery-ui.min.js" "editor.js" %}
+    {% add_style "editor.css" %}
+    {% add_script "editor.js" %}
     <script>
         window.show = {{ show.viewer|asjson }};
     </script>

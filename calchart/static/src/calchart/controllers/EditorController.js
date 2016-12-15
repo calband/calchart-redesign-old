@@ -70,6 +70,7 @@ EditorController.prototype.init = function() {
         showLabels: true,
         drawYardlineNumbers: true,
         draw4Step: true,
+        colorAngle: false,
     };
     this._grapher = new Grapher(this._show, $(".grapher-draw-target"), grapherOptions);
     this._grapher.drawField();
@@ -144,6 +145,16 @@ EditorController.prototype.addStuntsheet = function() {
 EditorController.prototype.addStuntsheet._canUndo = true;
 
 /**
+ * Deselects all dots.
+ */
+EditorController.prototype.deselectDots = function() {
+    this._selectedDots.forEach(function(dot) {
+        dot.find(".dot-marker").attr("class", "dot-marker");
+    });
+    JSUtils.empty(this._selectedDots);
+};
+
+/**
  * Runs the method on this instance with the given name.
  *
  * @param {string} name -- the function to call
@@ -209,6 +220,25 @@ EditorController.prototype.saveShow = function(callback) {
         viewer: JSON.stringify(data),
     };
     UIUtils.doAction("save_show", params, callback);
+};
+
+/**
+ * Add the given dot to the list of selected dots
+ *
+ * @param {jQuery} dot -- the dot to select
+ * @param {boolean} addToSelection -- if true, add the dot to the list of selected
+ *   dots, if not already selected. If false and the dot is not already selected,
+ *   deselect all currently selected dots.
+ */
+EditorController.prototype.selectDot = function(dot, addToSelection) {
+    if (dot.find(".dot-marker").is(".selected")) {
+        return;
+    } else if (!addToSelection) {
+        this.deselectDots();
+    }
+
+    this._selectedDots.push(dot);
+    dot.find(".dot-marker").attr("class", "dot-marker selected");
 };
 
 /**

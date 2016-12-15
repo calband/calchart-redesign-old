@@ -117,7 +117,7 @@ UIUtils.getData = function(parent) {
  */
 UIUtils.showMessage = function(message, element, isError) {
     var messageElem = $(element).next("p.message");
-    if (messageElem.length === 0) {
+    if (messageElem.exists()) {
         messageElem = $("<p>")
             .addClass("message")
             .insertAfter(element);

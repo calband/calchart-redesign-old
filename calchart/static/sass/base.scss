@@ -142,7 +142,7 @@ header {
     }
     &.active > li {
         &.active {
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            box-shadow: 0 2px 4px rgba($black, 0.2);
             & > span {
                 border: 1px solid $dark-gray;
                 border-bottom: 1px solid $white;
@@ -186,7 +186,7 @@ header {
             &:hover {
                 border: 1px solid darken($semilight-gray, 10);
                 border-radius: 2px;
-                box-shadow: 0 0 1px rgba(0,0,0,0.2);
+                box-shadow: 0 0 1px rgba($black, 0.2);
             }
         }
     }
@@ -200,7 +200,7 @@ header {
     top: 0;
     width: 100%;
     height: 100%;
-    background: rgba(255,255,255,0.4);
+    background: rgba($white, 0.4);
     text-align: center;
     display: none;
     overflow-y: auto;
@@ -251,6 +251,7 @@ svg.graph {
     }
     .dots {
         .dot-marker {
+            fill: $uniform-white;
             &.facing-east {
                 fill: $uniform-white;
             }
@@ -261,7 +262,7 @@ svg.graph {
                 fill: $uniform-blue;
             }
             &.selected {
-                fill: $highlight-purple;
+                fill: $highlight-purple !important;
             }
         }
         .dot-label {

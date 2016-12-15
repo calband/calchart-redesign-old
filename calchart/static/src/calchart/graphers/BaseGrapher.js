@@ -91,7 +91,7 @@ BaseGrapher.prototype.clearDots = function() {
  * @return {jQuery} the dots in the grapher
  */
 BaseGrapher.prototype.getDots = function() {
-    return $(this._svg.selectAll("g.dot"));
+    return $(this._svg.selectAll("g.dot")[0]);
 };
 
 /**
@@ -109,6 +109,8 @@ BaseGrapher.prototype.clear = function() {
  *  - {boolean} labelLeft -- if true, show the label on the left of the dot (default true)
  *  - {boolean} drawYardlineNumbers -- if true, draws yardline numbers (default false)
  *  - {boolean} draw4Step -- if true, draws 4 step lines (default false)
+ *  - {boolean} colorAngle -- if false, colors dots differently based on their
+ *    orientation (default true)
  */
 BaseGrapher.prototype.setOption = function(name, val) {
     this._options[name] = val;
@@ -141,7 +143,9 @@ BaseGrapher.prototype._drawDots = function(currentBeat, selectedDots) {
         var x = _this._scale.xScale(state.x);
         var y = _this._scale.yScale(state.y);
 
-        if (selectedDots.indexOf(label) === -1) {
+        if (_this._options.colorAngle === false) {
+            var dotClass = "";
+        } else if (selectedDots.indexOf(label) === -1) {
             var dotClass = CalchartUtils.getNearestOrientation(state.angle);
         } else {
             var dotClass = "selected";
@@ -216,7 +220,12 @@ BaseGrapher.prototype.moveDot = function(dot, x, y, options) {
         y = this._scale.roundDistance(y - this._scale.minY, options.snap) + this._scale.minY;
     }
 
-    $(dot).attr("transform", "translate(" + x + "," + y + ")");
+    $(dot)
+        .attr("transform", "translate(" + x + "," + y + ")")
+        .data("position", {
+            x: x,
+            y: y,
+        });
 };
 
 module.exports = BaseGrapher;
