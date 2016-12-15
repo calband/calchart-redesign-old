@@ -119,6 +119,16 @@ BaseGrapher.prototype.getScale = function() {
 };
 
 /**
+ * @return {boolean} true if the dot has moved (i.e. called moveDot, but
+ *   did not call savePosition)
+ */
+BaseGrapher.prototype.hasMoved = function(dot) {
+    var oldPosition = $(dot).data("position");
+    var newPosition = this._parsePosition(dot);
+    return oldPosition.x !== newPosition.x && oldPosition.y !== newPosition.y;
+};
+
+/**
  * Moves the given dot to the given coordinates, which either represent the
  * center of the dot or the top-left corner of the dot.
  *
@@ -157,10 +167,10 @@ BaseGrapher.prototype.moveDot = function(dot, x, y, options) {
  * @param {jQuery} dot -- the dot whose position should be saved
  */
 BaseGrapher.prototype.savePosition = function(dot) {
-    var match = $(dot).attr("transform").match(/translate\(([\d\.]+),([\d\.]+)\)/);
+    var position = this._parsePosition(dot);
     $(dot).data("position", {
-        x: parseFloat(match[1]),
-        y: parseFloat(match[2]),
+        x: position.x,
+        y: position.y,
     });
 };
 
@@ -259,6 +269,19 @@ BaseGrapher.prototype._drawDots = function(currentBeat, selectedDots) {
 
         _this.moveDot($(dotGroup[0]), x, y);
     });
+};
+
+/**
+ * @param {jQuery} dot -- the dot to parse position of
+ * @return {object} position of the dot, parsed from its transform
+ *   attribute, in the form {x:x, y:y}
+ */
+BaseGrapher.prototype._parsePosition = function(dot) {
+    var match = $(dot).attr("transform").match(/translate\(([\d\.]+),([\d\.]+)\)/);
+    return {
+        x: parseFloat(match[1]),
+        y: parseFloat(match[2]),
+    };
 };
 
 module.exports = BaseGrapher;

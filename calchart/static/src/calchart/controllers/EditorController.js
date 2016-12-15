@@ -84,6 +84,13 @@ EditorController.prototype.shortcuts = {
 };
 
 /**
+ * @return {jQuery} the currently selected dots
+ */
+EditorController.prototype.getSelectedDots = function() {
+    return this._selectedDots;
+};
+
+/**
  * Allow retrieving shortcuts from the context also
  */
 EditorController.prototype.getShortcut = function(shortcut) {

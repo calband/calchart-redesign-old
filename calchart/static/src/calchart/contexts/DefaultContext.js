@@ -105,8 +105,17 @@ DefaultContext.prototype.load = function() {
         mouseup: function() {
             switch (dragState) {
                 case "drag":
-                    // TODO: skip if dots have not moved
-                    controller.do("saveSelectionPositions");
+                    var hasMoved = false;
+                    controller.getSelectedDots().each(function() {
+                        if (_this._grapher.hasMoved(this)) {
+                            hasMoved = true;
+                            // break loop
+                            return false;
+                        }
+                    });
+                    if (hasMoved) {
+                        controller.do("saveSelectionPositions");
+                    }
                     break;
                 case "select":
                     $(".selection-box").remove();
