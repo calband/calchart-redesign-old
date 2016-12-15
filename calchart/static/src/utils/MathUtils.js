@@ -92,6 +92,19 @@ MathUtils.quarterTurn = function(angle, isCW) {
 };
 
 /**
+ * Round the given number to the nearest interval, rounding up.
+ *
+ * Ex. MathUtils.round(11, 2) == 12
+ *
+ * @param {float} x -- the number to round
+ * @param {float} interval -- the number to round to
+ * @return {float} x rounded to the nearest interval
+ */
+MathUtils.round = function(x, interval) {
+    return Math.round(x / interval) * interval;
+};
+
+/**
  * Converts an angle measured in degrees to one
  * measured in radians.
  *
@@ -111,19 +124,6 @@ MathUtils.toRadians = function(angle) {
  */
 MathUtils.toDegrees = function(angle) {
     return angle * 180 / Math.PI;
-};
-
-/**
- * Round the given number to the nearest interval, rounding up.
- *
- * Ex. MathUtils.round(11, 2) == 12
- *
- * @param {float} x -- the number to round
- * @param {float} interval -- the number to round to
- * @return {float} x rounded to the nearest interval
- */
-MathUtils.round = function(x, interval) {
-    return Math.round(x / interval) * interval;
 };
 
 module.exports = MathUtils;
