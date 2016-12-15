@@ -19,7 +19,6 @@ DefaultContext.prototype.shortcuts = {
 
 DefaultContext.prototype.load = function() {
     var _this = this;
-    var dots = _this._grapher.getDots();
     var controller = window.controller;
     var origin = $("svg.graph").position();
 
@@ -60,7 +59,9 @@ DefaultContext.prototype.load = function() {
 
             switch (dragState) {
                 case "drag":
-                    // TODO: drag selected dots
+                    controller.moveSelection(deltaX, deltaY, {
+                        snap: _this._grid,
+                    });
                     break;
                 case "select":
                     // relative to page
@@ -84,7 +85,8 @@ DefaultContext.prototype.load = function() {
                     maxX -= origin.left;
                     maxY -= origin.top;
 
-                    dots.each(function() {
+                    controller.deselectDots();
+                    _this._grapher.getDots().each(function() {
                         var dot = $(this);
                         var position = dot.data("position");
                         if (
@@ -103,7 +105,8 @@ DefaultContext.prototype.load = function() {
         mouseup: function() {
             switch (dragState) {
                 case "drag":
-                    // TODO: save positions in controller (undo-able)
+                    // TODO: skip if dots have not moved
+                    controller.do("saveSelectionPositions");
                     break;
                 case "select":
                     $(".selection-box").remove();

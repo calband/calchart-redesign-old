@@ -4,6 +4,7 @@
  * are organized alphabetically in the following sections:
  *
  * - Constructors (including initialization functions)
+ * - Instance methods
  * - Actions
  * - Helpers (prefixed with an underscore)
  */
@@ -28,7 +29,7 @@ var EditorController = function(show) {
 
     this._grapher = null;
     this._context = null;
-    this._selectedDots = []; // dots selected to edit
+    this._selectedDots = $(); // dots selected to edit
     this._activeSheet = null;
     this._currBeat = null;
 
@@ -37,24 +38,6 @@ var EditorController = function(show) {
 };
 
 ApplicationController.extend(EditorController);
-
-EditorController.prototype.shortcuts = {
-    "ctrl+s": "saveShow",
-    "ctrl+z": "undo",
-    "ctrl+shift+z": "redo",
-};
-
-/**
- * Allow retrieving shortcuts from the context also
- */
-EditorController.prototype.getShortcut = function(shortcut) {
-    var _function = ApplicationController.prototype.getShortcut.call(this, shortcut);
-    if (_function === undefined && this._context !== null) {
-        return this._context.shortcuts[shortcut];
-    } else {
-        return _function;
-    }
-};
 
 /**
  * Initializes the editor application
@@ -90,6 +73,26 @@ EditorController.prototype.init = function() {
     }
 
     this.loadContext("default");
+};
+
+/**** INSTANCE METHODS ****/
+
+EditorController.prototype.shortcuts = {
+    "ctrl+s": "saveShow",
+    "ctrl+z": "undo",
+    "ctrl+shift+z": "redo",
+};
+
+/**
+ * Allow retrieving shortcuts from the context also
+ */
+EditorController.prototype.getShortcut = function(shortcut) {
+    var _function = ApplicationController.prototype.getShortcut.call(this, shortcut);
+    if (_function === undefined && this._context !== null) {
+        return this._context.shortcuts[shortcut];
+    } else {
+        return _function;
+    }
 };
 
 /**** ACTIONS
@@ -148,10 +151,10 @@ EditorController.prototype.addStuntsheet._canUndo = true;
  * Deselects all dots.
  */
 EditorController.prototype.deselectDots = function() {
-    this._selectedDots.forEach(function(dot) {
-        dot.find(".dot-marker").attr("class", "dot-marker");
+    this._selectedDots.each(function() {
+        $(this).find(".dot-marker").attr("class", "dot-marker");
     });
-    JSUtils.empty(this._selectedDots);
+    this._selectedDots = $();
 };
 
 /**
@@ -198,6 +201,22 @@ EditorController.prototype.loadContext = function(name) {
 };
 
 /**
+ * Move all selected dots the given amount
+ *
+ * @param {float} deltaX -- the amount to move in the x direction, in pixels
+ * @param {float} deltaY -- the amount to move in the y direction, in pixels
+ * @param {object} options -- options to pass to BaseGrapher.moveDot()
+ */
+EditorController.prototype.moveSelection = function(deltaX, deltaY, options) {
+    var _this = this;
+    options.transition = true;
+    this._selectedDots.each(function() {
+        var position = $(this).data("position");
+        _this._grapher.moveDot(this, position.x + deltaX, position.y + deltaY, options);
+    });
+};
+
+/**
  * Redoes the last undone action
  */
 EditorController.prototype.redo = function() {
@@ -208,6 +227,21 @@ EditorController.prototype.redo = function() {
     var name = this._redoHistory.pop();
     this.do(name, true);
 };
+
+/**
+ * Save the positions of all selected dots, both in the Grapher and in the Sheet
+ */
+EditorController.prototype.saveSelectionPositions = function() {
+    var _this = this;
+
+    this._selectedDots.each(function() {
+        _this._grapher.savePosition(this);
+    });
+
+    // TODO: save sheet position
+};
+EditorController.prototype.saveSelectionPositions._name = "Move dots";
+EditorController.prototype.saveSelectionPositions._canUndo = true;
 
 /**
  * Saves the show to the server
@@ -231,14 +265,14 @@ EditorController.prototype.saveShow = function(callback) {
  *   deselect all currently selected dots.
  */
 EditorController.prototype.selectDot = function(dot, addToSelection) {
-    if (dot.find(".dot-marker").is(".selected")) {
+    if (this._selectedDots.filter(dot).exists()) {
         return;
     } else if (!addToSelection) {
         this.deselectDots();
     }
 
-    this._selectedDots.push(dot);
-    dot.find(".dot-marker").attr("class", "dot-marker selected");
+    this._selectedDots = this._selectedDots.add(dot);
+    $(dot).find(".dot-marker").attr("class", "dot-marker selected");
 };
 
 /**
@@ -249,9 +283,10 @@ EditorController.prototype.undo = function() {
         return;
     }
 
-    var content = this._undoHistory.pop();
+    // TODO: fix
+    var data = this._undoHistory.pop();
     $(".content")
-        .after(content)
+        .after(data.content)
         .remove();
 };
 

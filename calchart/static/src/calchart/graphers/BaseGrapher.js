@@ -1,5 +1,18 @@
+/**
+ * @fileOverview This file defines the BaseGrapher, the abstract superclass for field
+ * graphers, objects that know how to graph a specific field. Functions in this file
+ * are organized alphabetically in the following sections:
+ *
+ * - Constructor
+ * - Abstract variables/methods (subclasses need to override these)
+ * - Instance methods
+ * - Helpers (prefixed with an underscore)
+ */
+
 var CalchartUtils = require("../../utils/CalchartUtils");
 var GrapherScale = require("../GrapherScale");
+
+/**** CONSTRUCTOR ****/
 
 /**
  * A BaseGrapher can draw moments of a field show. Needs to be subclassed by a
@@ -31,6 +44,8 @@ var BaseGrapher = function(show, drawTarget, options) {
         .attr("height", this._svgHeight);
 };
 
+/**** ABSTRACT VARIABLES/METHODS ****/
+
 /**
  * Subclasses need to define these variables
  */
@@ -40,20 +55,27 @@ BaseGrapher.prototype.FIELD_HEIGHT = null;
 BaseGrapher.prototype.FIELD_WIDTH = null;
 
 /**
- * Get the GrapherScale this Grapher is using
- *
- * @return {GrapherScale} the scale of the Grapher field
- */
-BaseGrapher.prototype.getScale = function() {
-    return this._scale;
-};
-
-/**
  * Draws the field, with a background, borders, yardlines, and hash marks. Subclasses
  * should implement this function to draw common field attributes
  */
 BaseGrapher.prototype.drawField = function() {
     throw new Error("BaseGrapher subclasses need to implement _drawField");
+};
+
+/**** INSTANCE METHODS ****/
+
+/**
+ * Clear the Grapher of all graphics
+ */
+BaseGrapher.prototype.clear = function() {
+    this._svg.empty();
+};
+
+/**
+ * Clear the Grapher of all the dots (i.e. keeping the field)
+ */
+BaseGrapher.prototype.clearDots = function() {
+    this._svg.find(".dots").remove();
 };
 
 /**
@@ -79,13 +101,6 @@ BaseGrapher.prototype.draw = function(sheet, currentBeat, selectedDots) {
 };
 
 /**
- * Clear the Grapher of all the dots (i.e. keeping the field)
- */
-BaseGrapher.prototype.clearDots = function() {
-    this._svg.find(".dots").remove();
-};
-
-/**
  * Return the dots contained in the grapher
  *
  * @return {jQuery} the dots in the grapher
@@ -95,10 +110,58 @@ BaseGrapher.prototype.getDots = function() {
 };
 
 /**
- * Clear the Grapher of all graphics
+ * Get the GrapherScale this Grapher is using
+ *
+ * @return {GrapherScale} the scale of the Grapher field
  */
-BaseGrapher.prototype.clear = function() {
-    this._svg.empty();
+BaseGrapher.prototype.getScale = function() {
+    return this._scale;
+};
+
+/**
+ * Moves the given dot to the given coordinates, which either represent the
+ * center of the dot or the top-left corner of the dot.
+ *
+ * @param {jQuery} dot -- the dot to move
+ * @param {float} x -- the x-coordinate of the dot's position, in pixels
+ * @param {float} y -- the y-coordinate of the dot's position, in pixels
+ * @param {object|undefined} options -- options for moving the dot, including
+ *   the following options:
+ *     - {null|int} snap -- number of steps to snap dot to
+ *     - {boolean} transition -- true if this is a transitionary movement (so
+ *       don't save position)
+ */
+BaseGrapher.prototype.moveDot = function(dot, x, y, options) {
+    options = options || {};
+
+    // contain dot on screen
+    var min = this._scale.toDistance(options.snap || 0);
+    x = Math.max(min, x);
+    y = Math.max(min, y);
+
+    if (options.snap) {
+        x = this._scale.roundDistance(x - this._scale.minX, options.snap) + this._scale.minX;
+        y = this._scale.roundDistance(y - this._scale.minY, options.snap) + this._scale.minY;
+    }
+
+    $(dot).attr("transform", "translate(" + x + "," + y + ")");
+
+    if (!options.transition) {
+        this.savePosition(dot);
+    }
+};
+
+/**
+ * Save the given dot's position
+ *
+ * @param {jQuery} dot -- the dot whose position should be saved
+ */
+BaseGrapher.prototype.savePosition = function(dot) {
+    var match = $(dot).attr("transform").match(/translate\(([\d\.]+),([\d\.]+)\)/);
+    $(dot).data("position", {
+        x: parseFloat(match[1]),
+        y: parseFloat(match[2]),
+    });
 };
 
 /**
@@ -115,6 +178,8 @@ BaseGrapher.prototype.clear = function() {
 BaseGrapher.prototype.setOption = function(name, val) {
     this._options[name] = val;
 };
+
+/**** HELPERS ****/
 
 /**
  * Given a stuntsheet, the currentBeat relative to the beginning of that sheet,
@@ -194,38 +259,6 @@ BaseGrapher.prototype._drawDots = function(currentBeat, selectedDots) {
 
         _this.moveDot($(dotGroup[0]), x, y);
     });
-};
-
-/**
- * Moves the given dot to the given coordinates, which either represent the
- * center of the dot or the top-left corner of the dot.
- *
- * @param {jQuery} dot -- the dot to move
- * @param {float} x -- the x-coordinate of the dot's position, in pixels
- * @param {float} y -- the y-coordinate of the dot's position, in pixels
- * @param {object|undefined} options -- options for moving the dot, including
- *   the following options:
- *     - {null|int} snap -- number of steps to snap dot to
- */
-BaseGrapher.prototype.moveDot = function(dot, x, y, options) {
-    options = options || {};
-
-    // contain dot on screen
-    var min = this._scale.toDistance(options.snap || 0);
-    x = Math.max(min, x);
-    y = Math.max(min, y);
-
-    if (options.snap) {
-        x = this._scale.roundDistance(x - this._scale.minX, options.snap) + this._scale.minX;
-        y = this._scale.roundDistance(y - this._scale.minY, options.snap) + this._scale.minY;
-    }
-
-    $(dot)
-        .attr("transform", "translate(" + x + "," + y + ")")
-        .data("position", {
-            x: x,
-            y: y,
-        });
 };
 
 module.exports = BaseGrapher;
