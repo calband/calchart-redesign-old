@@ -20,7 +20,7 @@ DefaultContext.prototype.shortcuts = {
 DefaultContext.prototype.load = function() {
     var _this = this;
     var controller = window.controller;
-    var origin = $("svg.graph").position();
+    var svgOrigin = $("svg.graph").position();
 
     var dragState = "none"; // none, drag, select
     var dragStart = null; // event object on mousedown
@@ -79,11 +79,11 @@ DefaultContext.prototype.load = function() {
                         height: height,
                     });
 
-                    // relative to origin
-                    minX -= origin.left;
-                    minY -= origin.top;
-                    maxX -= origin.left;
-                    maxY -= origin.top;
+                    // relative to svgOrigin
+                    minX -= svgOrigin.left;
+                    minY -= svgOrigin.top;
+                    maxX -= svgOrigin.left;
+                    maxY -= svgOrigin.top;
 
                     controller.deselectDots();
                     _this._grapher.getDots().each(function() {
