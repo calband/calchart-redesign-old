@@ -51,8 +51,10 @@ jQueryUtils.exists = function() {
  *   if necessary. Defaults to parent of this element (or the first
  *   parent if multiple elements).
  * @param {object|undefined} options -- options, including:
+ *   - {int} tolerance -- the distance from the edge needed to
+ *     trigger scrolling, in pixels (default 0).
  *   - {int} margin -- the amount of space beyond the object to
- *     scroll (default 0).
+ *     scroll (defaults to tolerance).
  */
 jQueryUtils.scrollToView = function(parent, options) {
     // in case passing in options, with default parent
@@ -63,7 +65,8 @@ jQueryUtils.scrollToView = function(parent, options) {
 
     parent = $(parent || this.parent()).first();
     options = options || {};
-    var margin = options.margin || 0;
+    var tolerance = options.tolerance || 0;
+    var margin = options.margin || tolerance;
 
     var parentOffset = parent.offset();
     var parentHeight = parent.outerHeight();
@@ -71,42 +74,55 @@ jQueryUtils.scrollToView = function(parent, options) {
 
     // track furthest distance needed to scroll
     var scroll = {
-        minX: 0,
-        maxX: 0,
-        minY: 0,
-        maxY: 0,
+        top: tolerance,
+        bottom: -tolerance,
+        left: tolerance,
+        right: -tolerance,
     };
 
     this.each(function() {
+        // relative to document; i.e. accounts for scroll
         var thisOffset = $(this).offset();
 
-        // distance from left/right/top/bottom of the parent to the
-        // corresponding edge of this element
-        var left = thisOffset.left - parentOffset.left;
-        var right = left + $(this).outerWidth() - parentWidth;
-        var top = thisOffset.top - parentOffset.top;
-        var bottom = top + $(this).outerHeight() - parentHeight;
+        // http://stackoverflow.com/a/20749186/4966649
+        if (this instanceof SVGElement) {
+            // SVG elements don't have an outerWidth or outerHeight
+            // http://stackoverflow.com/a/9131261/4966649
+            var dimensions = this.getBBox();
+        } else {
+            var dimensions = {
+                width: $(this).outerWidth(),
+                height: $(this).outerHeight(),
+            };
+        }
 
-        scroll.minX = Math.min(scroll.minX, left);
-        scroll.maxX = Math.max(scroll.maxX, right);
-        scroll.minY = Math.min(scroll.minY, top);
-        scroll.maxY = Math.max(scroll.maxY, bottom);
+        // distance from left/right/top/bottom of the visible part of
+        // the parent to the corresponding edge of this element
+        var top = thisOffset.top - parentOffset.top;
+        var bottom = top + dimensions.height - parentHeight;
+        var left = thisOffset.left - parentOffset.left;
+        var right = left + dimensions.width - parentWidth;
+
+        scroll.top = Math.min(scroll.top, top);
+        scroll.bottom = Math.max(scroll.bottom, bottom);
+        scroll.left = Math.min(scroll.left, left);
+        scroll.right = Math.max(scroll.right, right);
     });
 
-    if (scroll.minX < 0 && scroll.maxX > 0) {
-        // if elements hidden on both left and right, don't scroll
-    } else if (scroll.minX < 0) {
-        parent.scrollLeft(parent.scrollLeft() + scroll.minX - margin);
-    } else if (scroll.maxX > 0) {
-        parent.scrollLeft(parent.scrollLeft() + scroll.maxX + margin);
+    if (scroll.top < tolerance && scroll.bottom > -tolerance) {
+        // if elements hidden on both top and bottom, don't scroll
+    } else if (scroll.top < tolerance) {
+        parent.scrollTop(parent.scrollTop() + scroll.top - margin);
+    } else if (scroll.bottom > -tolerance) {
+        parent.scrollTop(parent.scrollTop() + scroll.bottom + margin);
     }
 
-    if (scroll.minY < 0 && scroll.maxY > 0) {
-        // if elements hidden on both top and bottom, don't scroll
-    } else if (scroll.minY < 0) {
-        parent.scrollTop(parent.scrollTop() + scroll.minY - margin);
-    } else if (scroll.maxY > 0) {
-        parent.scrollTop(parent.scrollTop() + scroll.maxY + margin);
+    if (scroll.left < tolerance && scroll.right > -tolerance) {
+        // if elements hidden on both left and right, don't scroll
+    } else if (scroll.left < tolerance) {
+        parent.scrollLeft(parent.scrollLeft() + scroll.left - margin);
+    } else if (scroll.right > -tolerance) {
+        parent.scrollLeft(parent.scrollLeft() + scroll.right + margin);
     }
 };
 

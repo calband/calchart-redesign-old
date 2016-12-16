@@ -15,6 +15,13 @@ var Grapher = require("../Grapher");
 var JSUtils = require("../../utils/JSUtils");
 var UIUtils = require("../../utils/UIUtils");
 
+// Global variable to track how much the workspace has scrolled
+// when moving the dots
+var scrollOffset = {
+    top: 0,
+    left: 0,
+};
+
 /**** CONSTRUCTORS ****/
 
 /**
@@ -226,12 +233,28 @@ EditorController.prototype.loadContext = function(name) {
 EditorController.prototype.moveSelection = function(deltaX, deltaY, options) {
     var _this = this;
     options.transition = true;
-    this._selectedDots.each(function() {
-        var position = $(this).data("position");
-        _this._grapher.moveDot(this, position.x + deltaX, position.y + deltaY, options);
-    })
 
-    // TODO: scroll if dots offscreen
+    var prevScroll = {
+        top: $(".workspace").scrollTop(),
+        left: $(".workspace").scrollLeft(),
+    };
+
+    this._selectedDots
+        .each(function() {
+            var position = $(this).data("position");
+            _this._grapher.moveDot(
+                this,
+                position.x + deltaX + scrollOffset.left,
+                position.y + deltaY + scrollOffset.top,
+                options
+            );
+        })
+        .scrollToView(".workspace", {
+            tolerance: 10,
+        });
+
+    scrollOffset.top += $(".workspace").scrollTop() - prevScroll.top;
+    scrollOffset.left += $(".workspace").scrollLeft() - prevScroll.left;
 };
 
 /**
@@ -266,6 +289,9 @@ EditorController.prototype.saveSelectionPositions = function() {
         _this._activeSheet.updatePosition(this, x, y);
     });
 
+    scrollOffset.top = 0;
+    scrollOffset.left = 0;
+
     return {
         dots: dots,
         sheet: this._activeSheet,
@@ -290,6 +316,7 @@ EditorController.prototype.saveSelectionPositions._undo = function(data) {
 
     this._selectedDots = selectedDots;
 };
+// TODO: _redo
 
 /**
  * Saves the show to the server

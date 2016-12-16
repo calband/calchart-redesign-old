@@ -147,10 +147,10 @@ BaseGrapher.prototype.hasMoved = function(dot) {
 BaseGrapher.prototype.moveDot = function(dot, x, y, options) {
     options = options || {};
 
-    // contain dot on screen
-    var min = this._scale.toDistance(options.snap || 0);
-    x = Math.max(min, x);
-    y = Math.max(min, y);
+    // contain dot in workspace
+    var edge = this._scale.toDistance(options.snap || 0);
+    x = Math.min(Math.max(edge, x), this._svgWidth - edge);
+    y = Math.min(Math.max(edge, y), this._svgHeight - edge);
 
     if (options.snap) {
         x = this._scale.roundDistance(x - this._scale.minX, options.snap) + this._scale.minX;
