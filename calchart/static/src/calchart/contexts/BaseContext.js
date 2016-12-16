@@ -12,11 +12,26 @@ var BaseContext = function(grapher) {
 BaseContext.prototype.shortcuts = {};
 
 /**
- * Add the given events to the context
+ * Add the given events to the workspace
  *
  * @param {object} events -- the events to add, mapping event name to handler
  */
 BaseContext.prototype.addEvents = function(events) {
+    // add namespace to each event
+    $.each(events, function(name, handler) {
+        events[name + ".app-context"] = handler;
+        delete events[name];
+    });
+
+    $(".workspace").on(events);
+};
+
+/**
+ * Add the given events to the context
+ *
+ * @param {object} events -- the events to add, mapping event name to handler
+ */
+BaseContext.prototype.addGlobalEvents = function(events) {
     // add namespace to each event
     $.each(events, function(name, handler) {
         events[name + ".app-context"] = handler;

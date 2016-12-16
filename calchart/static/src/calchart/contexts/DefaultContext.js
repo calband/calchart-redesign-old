@@ -26,16 +26,25 @@ DefaultContext.prototype.load = function() {
     var dragStart = null; // event object on mousedown
 
     this.addEvents({
+        contextmenu: function(e) {
+            e.preventDefault();
+
+            // TODO: custom context menu
+        },
         mousedown: function(e) {
             var target = $(e.target);
+            var addToSelection = false;
 
-            if (!target.closest(".workspace").exists()) {
+            if (e.shiftKey || e.ctrlKey || e.metaKey) {
+                addToSelection = true;
+            } else if (e.which === 3) {
+                // right click
                 return;
             }
 
             if (target.is(".dot-marker")) {
                 var dot = target.parent();
-                controller.selectDot(dot, false);
+                controller.selectDot(dot, addToSelection);
                 dragState = "drag";
             } else {
                 controller.deselectDots();
@@ -47,6 +56,9 @@ DefaultContext.prototype.load = function() {
 
             dragStart = e;
         },
+    });
+
+    this.addGlobalEvents({
         mousemove: function(e) {
             if (dragState === "none") {
                 return;

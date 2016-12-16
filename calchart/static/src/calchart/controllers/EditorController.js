@@ -293,7 +293,6 @@ EditorController.prototype.undo = function() {
         return;
     }
 
-    // TODO: fix
     var data = this._undoHistory.pop();
     $(".content")
         .after(data.content)
