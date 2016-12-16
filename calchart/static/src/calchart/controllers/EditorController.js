@@ -118,8 +118,10 @@ EditorController.prototype.getShortcut = function(shortcut) {
  *    if _undo is defined, otherwise false)
  *  - {boolean} _clearsRedo: if true, when the action is run, clears history of actions
  *    that have been undone (default same as _canUndo)
- *  - {function} _undo: the function to run after reverting state of the content, taking in
- *    any data returned by the action
+ *  - {function} _undo: the function to run instead of the default undo function, which
+ *    replaces the .content element with a clone saved from before the initial call
+ *  - {function} _redo: the function to run instead of the default redo function, which
+ *    simply calls the function again
  *
  * Example:
  *
@@ -178,7 +180,7 @@ EditorController.prototype.deselectDots = function() {
  * @param {string} name -- the function to call
  * @param {boolean} asRedo -- true if calling from a redo action
  */
-EditorController.prototype.do = function(name, asRedo) {
+EditorController.prototype.doAction = function(name, asRedo) {
     var action = this[name];
     var canUndo = action._canUndo || action._undo;
 
@@ -197,15 +199,17 @@ EditorController.prototype.do = function(name, asRedo) {
 
     if (canUndo) {
         var label = action._name || JSUtils.fromCamelCase(name);
-        var undoData = {
+        var actionData = {
+            name: name,
             label: label,
             content: prevContent,
             data: data,
-            callback: action._undo,
+            undo: action._undo,
+            redo: action._redo,
         };
 
         // TODO: show label in undo menu item
-        this._undoHistory.push(undoData);
+        this._undoHistory.push(actionData);
     }
 };
 
@@ -265,8 +269,15 @@ EditorController.prototype.redo = function() {
         return;
     }
 
-    var name = this._redoHistory.pop();
-    this.do(name, true);
+    var actionData = this._redoHistory.pop();
+
+    if (actionData.redo) {
+        actionData.redo.call(this, actionData.data);
+    } else {
+        this.doAction(actionData.name, true);
+    }
+
+    this._undoHistory.push(actionData);
 };
 
 /**
@@ -278,15 +289,19 @@ EditorController.prototype.saveSelectionPositions = function() {
     var dots = [];
 
     this._selectedDots.each(function() {
-        dots.push({
+        // for undo/redo-ing
+        var dotData = {
             selector: "#" + $(this).attr("id"),
-            position: $(this).data("position"),
-        });
+            before: $(this).data("position"),
+        };
 
         var position = _this._grapher.savePosition(this);
         var x = scale.toSteps(position.x - scale.minX);
         var y = scale.toSteps(position.y - scale.minY);
         _this._activeSheet.updatePosition(this, x, y);
+
+        dotData.after = $(this).data("position");
+        dots.push(dotData);
     });
 
     scrollOffset.top = 0;
@@ -299,24 +314,11 @@ EditorController.prototype.saveSelectionPositions = function() {
 };
 EditorController.prototype.saveSelectionPositions._name = "Move dots";
 EditorController.prototype.saveSelectionPositions._undo = function(data) {
-    var selectedDots = $();
-    var scale = this._grapher.getScale();
-
-    data.dots.forEach(function(dot) {
-        var elem = $(dot.selector);
-
-        this._grapher.moveDot(elem, dot.position.x, dot.position.y);
-
-        var x = scale.toSteps(dot.position.x - scale.minX);
-        var y = scale.toSteps(dot.position.y - scale.minY);
-        data.sheet.updatePosition(elem, x, y);
-
-        selectedDots = selectedDots.add(elem);
-    }, this);
-
-    this._selectedDots = selectedDots;
+    this._revertMoveDots(data, true);
 };
-// TODO: _redo
+EditorController.prototype.saveSelectionPositions._redo = function(data) {
+    this._revertMoveDots(data, false);
+};
 
 /**
  * Saves the show to the server
@@ -359,15 +361,18 @@ EditorController.prototype.undo = function() {
         return;
     }
 
-    var undoData = this._undoHistory.pop();
-    $(".content")
-        .after(undoData.content)
-        .remove();
-    this._grapher.rebindSVG();
+    var actionData = this._undoHistory.pop();
 
-    if (undoData.callback) {
-        undoData.callback.call(this, undoData.data);
+    if (actionData.undo) {
+        actionData.undo.call(this, actionData.data);
+    } else {
+        $(".content")
+            .after(actionData.content)
+            .remove();
+        this._grapher.rebindSVG();
     }
+
+    this._redoHistory.push(actionData);
 };
 
 /**** HELPERS ****/
@@ -392,6 +397,34 @@ EditorController.prototype._addStuntsheetToSidebar = function(sheet) {
 
     this._updateSidebar(stuntsheet);
     return stuntsheet;
+};
+
+/**
+ * A helper function to revert saveSelectionPositions (both for undo or redo),
+ * since undo-ing should actually also revert moving the dots (not just saving
+ * the positions).
+ *
+ * @param {object} data -- the data returned from saveSelectionPositions
+ * @param {boolean} isUndo -- true to undo the function, false to redo
+ */
+EditorController.prototype._revertMoveDots = function(data, isUndo) {
+    var selectedDots = $();
+    var scale = this._grapher.getScale();
+
+    data.dots.forEach(function(dot) {
+        var elem = $(dot.selector);
+        var position = isUndo ? dot.before : dot.after;
+
+        this._grapher.moveDot(elem, position.x, position.y);
+
+        var x = scale.toSteps(position.x - scale.minX);
+        var y = scale.toSteps(position.y - scale.minY);
+        data.sheet.updatePosition(elem, x, y);
+
+        selectedDots = selectedDots.add(elem);
+    }, this);
+
+    this._selectedDots = selectedDots;
 };
 
 /**

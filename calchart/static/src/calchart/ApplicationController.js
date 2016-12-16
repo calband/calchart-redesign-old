@@ -67,7 +67,7 @@ ApplicationController.prototype.shortcuts = {};
  *
  * @param {string} name -- the function to call
  */
-ApplicationController.prototype.do = function(name) {
+ApplicationController.prototype.doAction = function(name) {
     var action = this[name];
 
     if (action === undefined) {
@@ -120,7 +120,7 @@ ApplicationController.prototype.init = function() {
 
         var _function = _this.getShortcut(pressedKeys.join("+"));
         if (_function) {
-            _this.do(_function);
+            _this.doAction(_function);
             e.preventDefault();
         }
     });
@@ -173,7 +173,7 @@ ApplicationController.prototype._setupMenu = function(menu) {
         var _function = $(this).data("function");
         if (_function) {
             $(this).click(function() {
-                _this.do(_function);
+                _this.doAction(_function);
             });
         }
     });
@@ -190,7 +190,7 @@ ApplicationController.prototype._setupPanel = function(panel) {
     // set up click
     $(panel).find("li").click(function() {
         var name = $(this).data("function");
-        _this.do(name);
+        _this.doAction(name);
     });
 
     // TODO: set up help text

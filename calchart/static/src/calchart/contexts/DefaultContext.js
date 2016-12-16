@@ -126,7 +126,7 @@ DefaultContext.prototype.load = function() {
                         }
                     });
                     if (hasMoved) {
-                        controller.do("saveSelectionPositions");
+                        controller.doAction("saveSelectionPositions");
                     }
                     break;
                 case "select":
