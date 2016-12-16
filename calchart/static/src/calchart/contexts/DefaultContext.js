@@ -71,6 +71,7 @@ DefaultContext.prototype.load = function() {
 
             switch (dragState) {
                 case "drag":
+                    // TODO: if off screen, scroll workspace
                     controller.moveSelection(deltaX, deltaY, {
                         snap: _this._grid,
                     });

@@ -161,9 +161,7 @@ EditorController.prototype.addStuntsheet._canUndo = true;
  * Deselects all dots.
  */
 EditorController.prototype.deselectDots = function() {
-    this._selectedDots.each(function() {
-        $(this).find(".dot-marker").attr("class", "dot-marker");
-    });
+    $(".dot-marker.selected").attr("class", "dot-marker");
     this._selectedDots = $();
 };
 
@@ -266,13 +264,29 @@ EditorController.prototype.saveSelectionPositions = function() {
         _this._activeSheet.updatePosition(this, x, y);
     });
 
-    return dots;
+    return {
+        dots: dots,
+        sheet: this._activeSheet,
+    };
 };
 EditorController.prototype.saveSelectionPositions._name = "Move dots";
-EditorController.prototype.saveSelectionPositions._undo = function(dots) {
-    dots.forEach(function(dot) {
-        this._grapher.moveDot($(dot.selector), dot.position.x, dot.position.y);
+EditorController.prototype.saveSelectionPositions._undo = function(data) {
+    var selectedDots = $();
+    var scale = this._grapher.getScale();
+
+    data.dots.forEach(function(dot) {
+        var elem = $(dot.selector);
+
+        this._grapher.moveDot(elem, dot.position.x, dot.position.y);
+
+        var x = scale.toSteps(dot.position.x - scale.minX);
+        var y = scale.toSteps(dot.position.y - scale.minY);
+        data.sheet.updatePosition(elem, x, y);
+
+        selectedDots = selectedDots.add(elem);
     }, this);
+
+    this._selectedDots = selectedDots;
 };
 
 /**
@@ -281,7 +295,7 @@ EditorController.prototype.saveSelectionPositions._undo = function(dots) {
  * @param {function|undefined} callback -- optional callback to run after saving show
  */
 EditorController.prototype.saveShow = function(callback) {
-    var data = this.getShow().serialize();
+    var data = this._show.serialize();
     var params = {
         viewer: JSON.stringify(data),
     };
@@ -320,6 +334,7 @@ EditorController.prototype.undo = function() {
     $(".content")
         .after(undoData.content)
         .remove();
+    this._grapher.rebindSVG();
 
     if (undoData.callback) {
         undoData.callback.call(this, undoData.data);

@@ -191,6 +191,14 @@ BaseGrapher.prototype.setOption = function(name, val) {
     this._options[name] = val;
 };
 
+/**
+ * Rebinds this._svg to svg.graph, in the case of cloning the graph when
+ * undoing an action.
+ */
+BaseGrapher.prototype.rebindSVG = function() {
+    this._svg = d3.select("svg.graph");
+};
+
 /**** HELPERS ****/
 
 /**
