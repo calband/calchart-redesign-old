@@ -106,10 +106,13 @@ EditorController.prototype.getShortcut = function(shortcut) {
  *
  * Each action can define the following properties:
  *  - {string} _name: the verbose name of the action, used for Undo text, help text, etc.
- *     (default to name of action, capitalized and spaced out)
- *  - {boolean} _canUndo: set true to indicate that the action can be undone (default false)
+ *    (default to name of action, capitalized and spaced out)
+ *  - {boolean} _canUndo: set true to indicate that the action can be undone (default true
+ *    if _undo is defined, otherwise false)
  *  - {boolean} _clearsRedo: if true, when the action is run, clears history of actions
- *     that have been undone (default same as canUndo)
+ *    that have been undone (default same as _canUndo)
+ *  - {function} _undo: the function to run after reverting state of the content, taking in
+ *    any data returned by the action
  *
  * Example:
  *
@@ -172,25 +175,33 @@ EditorController.prototype.deselectDots = function() {
  */
 EditorController.prototype.do = function(name, asRedo) {
     var action = this[name];
+    var canUndo = action._canUndo || action._undo;
 
     if (action === undefined) {
         throw new Error("No action with the name: " + name);
     }
 
-    if (action._canUndo) {
-        // save the current state
-        this._undoHistory.push({
-            label: action._name || JSUtils.fromCamelCase(name),
-            content: $(".content").clone(true),
-        });
-    }
+    var prevContent = $(".content").clone(true);
 
     // after doing an action, can't redo previous actions
-    if (!asRedo && (action._clearsRedo || (action._clearsRedo === undefined && action._canUndo))) {
+    if (!asRedo && (action._clearsRedo || (action._clearsRedo === undefined && canUndo))) {
         JSUtils.empty(this._redoHistory);
     }
 
-    action.call(this);
+    var data = action.call(this);
+
+    if (canUndo) {
+        var label = action._name || JSUtils.fromCamelCase(name);
+        var undoData = {
+            label: label,
+            content: prevContent,
+            data: data,
+            callback: action._undo,
+        };
+
+        // TODO: show label in undo menu item
+        this._undoHistory.push(undoData);
+    }
 };
 
 /**
@@ -241,16 +252,28 @@ EditorController.prototype.redo = function() {
 EditorController.prototype.saveSelectionPositions = function() {
     var _this = this;
     var scale = this._grapher.getScale();
+    var dots = [];
 
     this._selectedDots.each(function() {
+        dots.push({
+            selector: "#" + $(this).attr("id"),
+            position: $(this).data("position"),
+        });
+
         var position = _this._grapher.savePosition(this);
         var x = scale.toSteps(position.x - scale.minX);
         var y = scale.toSteps(position.y - scale.minY);
         _this._activeSheet.updatePosition(this, x, y);
     });
+
+    return dots;
 };
 EditorController.prototype.saveSelectionPositions._name = "Move dots";
-EditorController.prototype.saveSelectionPositions._canUndo = true;
+EditorController.prototype.saveSelectionPositions._undo = function(dots) {
+    dots.forEach(function(dot) {
+        this._grapher.moveDot($(dot.selector), dot.position.x, dot.position.y);
+    }, this);
+};
 
 /**
  * Saves the show to the server
@@ -293,10 +316,14 @@ EditorController.prototype.undo = function() {
         return;
     }
 
-    var data = this._undoHistory.pop();
+    var undoData = this._undoHistory.pop();
     $(".content")
-        .after(data.content)
+        .after(undoData.content)
         .remove();
+
+    if (undoData.callback) {
+        undoData.callback.call(this, undoData.data);
+    }
 };
 
 /**** HELPERS ****/

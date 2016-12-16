@@ -220,6 +220,9 @@ BaseGrapher.prototype._drawDots = function(currentBeat, selectedDots) {
     if (dotGroups.empty()) {
         dotGroups = dotGroups.enter()
             .append("g")
+            .attr("id", function(dot) {
+                return "dot-" + dot.getLabel();
+            })
             .classed("dot", true);
     }
     
@@ -266,11 +269,9 @@ BaseGrapher.prototype._drawDots = function(currentBeat, selectedDots) {
                 offsetX *= -1;
             }
 
-            var labelId = "dot-" + label;
-            var dotLabel = dotGroup.select("#" + labelId);
+            var dotLabel = dotGroup.select(".dot-label");
             if (dotLabel.empty()) {
                 dotLabel = dotGroup.append("text")
-                    .attr("id", labelId)
                     .classed("dot-label", true)
                     .attr("font-size", _this._dotRadius * 2.5)
                     .text(label);
