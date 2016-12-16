@@ -165,13 +165,12 @@ BaseGrapher.prototype.moveDot = function(dot, x, y, options) {
  * Save the given dot's position
  *
  * @param {jQuery} dot -- the dot whose position should be saved
+ * @return {object} the position of the dot
  */
 BaseGrapher.prototype.savePosition = function(dot) {
     var position = this._parsePosition(dot);
-    $(dot).data("position", {
-        x: position.x,
-        y: position.y,
-    });
+    $(dot).data("position", position);
+    return position;
 };
 
 /**
@@ -203,8 +202,13 @@ BaseGrapher.prototype._drawDots = function(currentBeat, selectedDots) {
     var _this = this;
     // group containing all dots
     var dotsGroup = this._svg.append("g").classed("dots", true);
+    // order dots in reverse order so that lower dot values are drawn on top
+    // of higher dot values
+    var dots = this._show.getDots().sort(function(dot1, dot2) {
+        return -1 * dot1.compareTo(dot2);
+    });
     // each dot consists of a group containing all svg elements making up a dot
-    var dotGroups = dotsGroup.selectAll("g.dot").data(this._show.getDots());
+    var dotGroups = dotsGroup.selectAll("g.dot").data(dots);
 
     if (dotGroups.empty()) {
         dotGroups = dotGroups.enter()
@@ -217,6 +221,9 @@ BaseGrapher.prototype._drawDots = function(currentBeat, selectedDots) {
         var state = dot.getAnimationState(currentBeat);
         var x = _this._scale.xScale(state.x);
         var y = _this._scale.yScale(state.y);
+
+        // save dot in jQuery data also
+        $(this).data("dot", dot);
 
         if (_this._options.colorAngle === false) {
             var dotClass = "";

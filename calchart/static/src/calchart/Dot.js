@@ -36,6 +36,28 @@ Dot.prototype.serialize = function() {
 };
 
 /**
+ * Compares this dot with the other dot, according to their labels.
+ *
+ * @param {Dot} other -- the other dot
+ * @return {int} -1 if this dot's label is sorted before the other's dot,
+ *   1 if this dot's label is sorted after, or 0 if the labels are the same.
+ */
+Dot.prototype.compareTo = function(other) {
+    var label1 = this._label;
+    var label2 = other.getLabel();
+
+    // try to parse out numbers from labels
+    var num1 = parseInt(label1);
+    var num2 = parseInt(label2);
+    if (num1 && num2) {
+        label1 = num1;
+        label2 = num2;
+    }
+
+    return label1 < label2 ? -1 : label1 > label2 ? 1 : 0;
+};
+
+/**
  * Get the label for this dot
  *
  * @return {string} the label for the dot

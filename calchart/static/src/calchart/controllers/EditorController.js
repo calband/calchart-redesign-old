@@ -240,12 +240,14 @@ EditorController.prototype.redo = function() {
  */
 EditorController.prototype.saveSelectionPositions = function() {
     var _this = this;
+    var scale = this._grapher.getScale();
 
     this._selectedDots.each(function() {
-        _this._grapher.savePosition(this);
+        var position = _this._grapher.savePosition(this);
+        var x = scale.toSteps(position.x - scale.minX);
+        var y = scale.toSteps(position.y - scale.minY);
+        _this._activeSheet.updatePosition(this, x, y);
     });
-
-    // TODO: save sheet position
 };
 EditorController.prototype.saveSelectionPositions._name = "Move dots";
 EditorController.prototype.saveSelectionPositions._canUndo = true;

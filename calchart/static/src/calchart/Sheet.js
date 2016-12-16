@@ -1,6 +1,17 @@
+/**
+ * @fileOverview This file defines the Sheet class, which contains information
+ * for a stuntsheet in a show. Functions in this file are organized alphabetically
+ * in the following sections:
+ *
+ * - Constructors (including serialization functions)
+ * - Instance methods
+ */
+
 var Coordinate = require("./Coordinate");
 var Continuity = require("./Continuity");
 var DotType = require("./DotType");
+
+/**** CONSTRUCTORS ****/
 
 /**
  * A Sheet object contains all the information related to a stuntsheet,
@@ -125,6 +136,8 @@ Sheet.prototype.serialize = function() {
     return data;
 };
 
+/**** INSTANCE METHODS ****/
+
 /**
  * Get the duration of this stuntsheet
  *
@@ -141,6 +154,19 @@ Sheet.prototype.getDuration = function() {
  */
 Sheet.prototype.getFieldType = function() {
     return this._fieldType || this._show.getFieldType();
+};
+
+/**
+ * Get the info for the given Dot for this stuntsheet
+ *
+ * @param {string} dot -- the label of the dot to retrieve info for
+ * @return {object} the dot's information for this stuntsheet, containing:
+ *   - {DotType} type: the dot's type
+ *   - {Coordinate} position: the dot's starting position
+ *   - {Array<MovementCommand>} movements: the dot's movements in the sheet
+ */
+Sheet.prototype.getInfoForDot = function(dot) {
+    return this._dots[dot];
 };
 
 /**
@@ -161,16 +187,15 @@ Sheet.prototype.getLabel = function() {
 };
 
 /**
- * Get the info for the given Dot for this stuntsheet
+ * Update the position of the corresponding Dot for the given dot
  *
- * @param {string} dot -- the label of the dot to retrieve info for
- * @return {object} the dot's information for this stuntsheet, containing:
- *   - {DotType} type: the dot's type
- *   - {Coordinate} position: the dot's starting position
- *   - {Array<MovementCommand>} movements: the dot's movements in the sheet
+ * @param {jQuery} dot -- the HTML representation of the dot
  */
-Sheet.prototype.getInfoForDot = function(dot) {
-    return this._dots[dot];
+Sheet.prototype.updatePosition = function(dot, x, y) {
+    var label = $(dot).data("dot").getLabel();
+    var coordinate = this._dots[label].position;
+    coordinate.x = x;
+    coordinate.y = y;
 };
 
 module.exports = Sheet;
