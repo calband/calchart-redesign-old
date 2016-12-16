@@ -56,7 +56,7 @@ GrapherScale.prototype.toDistance = function(steps) {
  */
 GrapherScale.prototype.toSteps = function(distance) {
     return distance / this._ratio;
-}
+};
 
 /**
  * Round the given distance to the given interval

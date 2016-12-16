@@ -229,7 +229,9 @@ EditorController.prototype.moveSelection = function(deltaX, deltaY, options) {
     this._selectedDots.each(function() {
         var position = $(this).data("position");
         _this._grapher.moveDot(this, position.x + deltaX, position.y + deltaY, options);
-    });
+    })
+
+    // TODO: scroll if dots offscreen
 };
 
 /**
@@ -377,8 +379,11 @@ EditorController.prototype._showStuntsheet = function(stuntsheet) {
 
     // update sidebar
     $(".sidebar .active").removeClass("active");
-    $(stuntsheet).addClass("active");
-    UIUtils.scrollIfHidden(stuntsheet);
+    $(stuntsheet)
+        .addClass("active")
+        .scrollToView({
+            margin: 10,
+        });
 
     // update instance variables
     this._activeSheet = $(stuntsheet).data("sheet");
