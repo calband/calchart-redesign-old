@@ -152,7 +152,7 @@ ApplicationController.prototype._setupMenu = function(menu) {
             // clicking off the menu will close the menu
             $(window).click(function(e) {
                 // TODO: except .has-submenu
-                if ($(e.target).closest(menu).exists()) {
+                if (!$(e.target).closest(menu).exists()) {
                     $(menu).removeClass("active")
                         .children("li.active")
                         .removeClass("active");

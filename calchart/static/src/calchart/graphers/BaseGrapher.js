@@ -83,11 +83,14 @@ BaseGrapher.prototype.clearDots = function() {
  * particular stuntsheet.
  *
  * @param {Stuntsheet} sheet -- the stuntsheet to draw.
- * @param {int} currentBeat -- the beat to draw, relative to the
- *   start of the stuntsheet.
- * @param {Array<string>} selectedDots -- labels of selected dots
+ * @param {int|undefined} currentBeat -- the beat to draw, relative to
+ *   the start of the stuntsheet. Defaults to 0.
+ * @param {Array<string>|undefined} selectedDots -- labels of selected dots
  */
 BaseGrapher.prototype.draw = function(sheet, currentBeat, selectedDots) {
+    currentBeat = currentBeat || 0;
+    selectedDots = selectedDots || [];
+
     var fieldType = sheet.getFieldType();
     var field = this._svg.select(".field");
 
@@ -125,7 +128,7 @@ BaseGrapher.prototype.getScale = function() {
 BaseGrapher.prototype.hasMoved = function(dot) {
     var oldPosition = $(dot).data("position");
     var newPosition = this._parsePosition(dot);
-    return oldPosition.x !== newPosition.x && oldPosition.y !== newPosition.y;
+    return oldPosition.x !== newPosition.x || oldPosition.y !== newPosition.y;
 };
 
 /**
@@ -200,8 +203,13 @@ BaseGrapher.prototype.setOption = function(name, val) {
  */
 BaseGrapher.prototype._drawDots = function(currentBeat, selectedDots) {
     var _this = this;
+
     // group containing all dots
-    var dotsGroup = this._svg.append("g").classed("dots", true);
+    var dotsGroup = this._svg.select("g.dots");
+    if (dotsGroup.empty()) {
+        dotsGroup = this._svg.append("g").classed("dots", true);
+    }
+
     // order dots in reverse order so that lower dot values are drawn on top
     // of higher dot values
     var dots = this._show.getDots().sort(function(dot1, dot2) {
@@ -209,7 +217,6 @@ BaseGrapher.prototype._drawDots = function(currentBeat, selectedDots) {
     });
     // each dot consists of a group containing all svg elements making up a dot
     var dotGroups = dotsGroup.selectAll("g.dot").data(dots);
-
     if (dotGroups.empty()) {
         dotGroups = dotGroups.enter()
             .append("g")
@@ -244,7 +251,6 @@ BaseGrapher.prototype._drawDots = function(currentBeat, selectedDots) {
 
         if (_this._options.circleSelected) {
             var circle = dotGroup.selectAll("circle.selected-circle");
-
             if (circle.empty()) {
                 circle = dotGroup.append("circle")
                     .classed("selected-circle", true)
@@ -262,7 +268,6 @@ BaseGrapher.prototype._drawDots = function(currentBeat, selectedDots) {
 
             var labelId = "dot-" + label;
             var dotLabel = dotGroup.select("#" + labelId);
-
             if (dotLabel.empty()) {
                 dotLabel = dotGroup.append("text")
                     .attr("id", labelId)

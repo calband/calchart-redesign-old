@@ -262,6 +262,7 @@ EditorController.prototype.saveShow = function(callback) {
     var params = {
         viewer: JSON.stringify(data),
     };
+    // TODO: add sbowing success message to callback
     UIUtils.doAction("save_show", params, callback);
 };
 
@@ -333,15 +334,19 @@ EditorController.prototype._showStuntsheet = function(stuntsheet) {
         return;
     }
 
+    // update sidebar
     $(".sidebar .active").removeClass("active");
     $(stuntsheet).addClass("active");
     UIUtils.scrollIfHidden(stuntsheet);
 
+    // update instance variables
     this._activeSheet = $(stuntsheet).data("sheet");
     this._currBeat = 0;
+    this.deselectDots();
 
+    // load sheet into Show and Grapher
     this._show.loadSheet(this._activeSheet);
-    this._grapher.draw(this._activeSheet, this._currBeat, this._selectedDots);
+    this._grapher.draw(this._activeSheet);
 };
 
 /**
