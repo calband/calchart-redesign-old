@@ -54,7 +54,7 @@ EditorController.prototype.init = function() {
 
     var _this = this;
     this._setupMenu(".menu");
-    this._setupPanel(".panel");
+    this._setupToolbar(".toolbar");
 
     var grapherOptions = {
         showLabels: true,

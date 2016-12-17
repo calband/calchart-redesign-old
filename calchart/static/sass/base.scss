@@ -160,33 +160,42 @@ header {
         position: absolute;
         left: 0;
         top: 27px;
-        padding: 10px 0;
         border: 1px solid $dark-gray;
         background: $white;
-        li {
-            cursor: pointer;
-            width: 100%;
-            white-space: nowrap;
-            // TODO: style has-submenu
+        ul.menu-group {
+            padding: 5px 0;
+            border-bottom: 1px solid $light-gray;
+            li {
+                cursor: pointer;
+                width: 100%;
+                white-space: nowrap;
+                // TODO: style has-submenu
+            }
         }
     }
 }
 
-.panel {
+.toolbar {
     z-index: 5;
-    padding: 5px;
-    li {
+    padding: 5px 0;
+    ul.toolbar-group {
         display: inline-block;
-        margin-right: 5px;
-        i {
-            padding: 5px;
-            color: $dark-gray;
-            cursor: default;
-            border: 1px solid transparent;
-            &:hover {
-                border: 1px solid darken($semilight-gray, 10);
-                border-radius: 2px;
-                box-shadow: 0 0 1px rgba($black, 0.2);
+        padding: 0 5px;
+        &:not(:last-child) {
+            border-right: 1px solid $medium-gray;
+        }
+        li {
+            display: inline-block;
+            i {
+                padding: 5px;
+                color: $dark-gray;
+                cursor: default;
+                border: 1px solid transparent;
+                &:hover {
+                    border: 1px solid darken($semilight-gray, 10);
+                    border-radius: 2px;
+                    box-shadow: 0 0 1px rgba($black, 0.2);
+                }
             }
         }
     }

@@ -14,10 +14,10 @@
 {% endblock %}
 
 {% block body %}
-    <div class="toolbar">
+    <div class="editor-header">
         <h1>{{ show.name }}</h1>
         {% make_menu menu %}
-        {% make_panel panel %}
+        {% make_menu toolbar %}
     </div>
     <div class="content">
         <div class="sidebar"></div>

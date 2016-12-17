@@ -95,7 +95,7 @@ class EditorView(CalchartMixin, TemplateView):
         context = super(EditorView, self).get_context_data(**kwargs)
         context['show'] = self.show
         context['menu'] = editor_menu
-        context['panel'] = editor_panel
+        context['toolbar'] = editor_toolbar
         return context
 
     def save_show(self):

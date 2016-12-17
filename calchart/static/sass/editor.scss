@@ -15,10 +15,10 @@ body {
     }
 }
 
-$toolbar-height: 100px;
+$editor-header-height: 100px;
 
-.toolbar {
-    height: $toolbar-height;
+.editor-header {
+    height: $editor-header-height;
     h1 {
         margin: 0;
         padding-left: 20px;
@@ -27,7 +27,7 @@ $toolbar-height: 100px;
         margin: 5px 0;
         padding-left: 10px;
     }
-    .panel {
+    .toolbar {
         padding-left: 10px;
         background: $light-gray;
         background: linear-gradient($light-gray, $semilight-gray);
@@ -42,7 +42,7 @@ $toolbar-height: 100px;
 $sidebar-width: 200px;
 .content {
     @include remove-children-space;
-    height: calc(100% - #{$toolbar-height + $header-height + 20px});
+    height: calc(100% - #{$editor-header-height + $header-height + 20px});
     width: 100%;
     font-size: 0;
     .sidebar, .workspace {

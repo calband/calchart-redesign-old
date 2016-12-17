@@ -180,15 +180,15 @@ ApplicationController.prototype._setupMenu = function(menu) {
 };
 
 /**
- * Sets up the given panel element
+ * Sets up the given toolbar element
  *
- * @param {jQuery|string} panel -- jQuery object or panel to setup
+ * @param {jQuery|string} toolbar -- jQuery object or toolbar to setup
  */
-ApplicationController.prototype._setupPanel = function(panel) {
+ApplicationController.prototype._setupToolbar = function(toolbar) {
     var _this = this;
 
     // set up click
-    $(panel).find("li").click(function() {
+    $(toolbar).find("li").click(function() {
         var name = $(this).data("function");
         _this.doAction(name);
     });

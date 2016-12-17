@@ -1,85 +1,170 @@
 """
-Defines menus and panels used throughout the site, to be passed to templates as JSON strings in
-script tags.
+Defines menus and toolbars used throughout the site, to be passed to templates as JSON strings in
+script tags. Items in the menus/toolbars are represented by the helper classes: Menu, SubMenu,
+MenuItem, Toolbar, and ToolbarItem.
 
-Menus are a list of dictionaries of the following format:
-    - name (str, required): label to display in the menu
-    - submenu (list, required): any submenus to nest under the menu
+Menu and toolbar items are grouped into menu groups and toolbar groups, respectively. In the UI,
+these groups will be separated by a line.
 
-Submenus are a list of menu items. The formats for the different types of menu items include:
-    - Normal menu item
-        - name (str, required): label to display in the menu
-        - function (str, required): the name of the Javascript function (defined in the
-            Javascript file) to run when clicking on the menu.
-    - Menu item with a submenu
-        - name (str, required): label to display in the menu
-        - submenu (list, required): submenu to list next to the menu item
-
-Panels are a list of dictionaries in the following format:
-    - icon (str, required): the font-awesome icon class; e.g. "fa-plus" (http://fontawesome.io/icons/)
-    - function (str, required): the name of the Javascript function (defined in the Javascript file
-        to run when clicking on the item)
+Functions are strings that represent a function defined in the associated ApplicationController
+class. Functions can be of the form:
+    - '<name>': the name of the function, to be run without arguments
+    - '<name>(<args>)': the name of the function, run with the given arguments. Arguments will try
+      to be cast to a number, otherwise will be passed as a string. e.g. 'foo(bar)' runs `foo("bar")`
+      and 'foo(1)' runs `foo(1)`.
 """
 
-editor_menu = [
-    {
-        'name': 'File',
-        'submenu': [
-            {
-                'name': 'Save',
-                'function': 'saveShow',
-            },
-        ],
-    },
-    {
-        'name': 'Edit',
-        'submenu': [
-            {
-                'name': 'Undo',
-                'function': 'undo',
-            },
-            {
-                'name': 'Redo',
-                'function': 'redo',
-            },
-        ],
-    },
-    {
-        'name': 'View',
-        'submenu': [
-            {
-                'name': 'View Mode',
-                'function': 'change_workspace',
-                'submenu': [
-                    {
-                        'name': 'Marching View',
-                        'function': 'viewMarching',
-                    },
-                    {
-                        'name': 'Music View',
-                        'function': 'viewMusic',
-                    },
-                    {
-                        'name': '3D View',
-                        'function': 'view3d',
-                    },
-                ],
-            },
-        ],
-    },
-]
+from django.utils.html import format_html, format_html_join, mark_safe
 
-editor_panel = [
-    {
-        'icon': 'fa-plus',
-        'function': 'addStuntsheet',
-    },
-    {
-        'icon': 'fa-undo',
-        'function': 'undo',
-    },
-    {
-        'icon': 'fa-repeat',
-        'function': 'redo',
-    },
-]
+### MENU CLASSES ###
+
+class Menu(object):
+    """
+    A Calchart Menu, in the format
+
+    <ul class="menu">
+        # for each submenu
+        {{ SubMenu.render }}
+    </ul>
+    """
+    def __init__(self, *submenus):
+        self.submenus = submenus
+
+    def render(self):
+        return format_html(
+            '<ul class="menu">{}</ul>',
+            mark_safe(''.join(submenu.render(top_level=True) for submenu in self.submenus))
+        )
+
+class SubMenu(object):
+    """
+    A Calchart SubMenu, in the format
+
+    <li class="has-submenu"> # only include class if not top level
+        <span>{{ name }}</span>
+        <div class="submenu">
+            # for each group
+            <ul class="menu-group">
+                # for each menu item, either SubMenu or MenuItem
+                {{ item.render }}
+            </ul>
+        </div>
+    </li>
+    """
+    def __init__(self, name, *groups):
+        self.name = name
+        self.groups = groups
+
+    def render(self, top_level=False):
+        li_class = '' if top_level else 'has-submenu'
+        menu_groups = mark_safe(''.join(self.render_group(group) for group in self.groups))
+        return format_html(
+            '<li class="{}"><span>{}</span><div class="submenu">{}</div></li>',
+            li_class, self.name, menu_groups
+        )
+
+    def render_group(self, group):
+        return format_html(
+            '<ul class="menu-group">{}</ul>',
+            mark_safe(''.join(menu_item.render() for menu_item in group))
+        )
+
+class MenuItem(object):
+    """
+    A Calchart MenuItem, in the format
+
+    <li data-function="{{ function }}">
+        <span>{{ name }}</span>
+    </li>
+    """
+    def __init__(self, name, function):
+        self.name = name
+        self.function = function
+
+    def render(self):
+        return format_html(
+            '<li data-function="{}"><span>{}</span></li>',
+            self.function, self.name
+        )
+
+class Toolbar(object):
+    """
+    A Calchart Toolbar, in the format
+
+    <div class="toolbar">
+        # for each group
+        <ul class="toolbar-group">
+            # for each item
+            {{ ToolbarItem.render }}
+        </ul>
+    </div>
+    """
+    def __init__(self, *groups):
+        self.groups = groups
+
+    def render(self):
+        return format_html(
+            '<div class="toolbar">{}</div>',
+            mark_safe(''.join(self.render_group(group) for group in self.groups))
+        )
+
+    def render_group(self, group):
+        return format_html(
+            '<ul class="toolbar-group">{}</ul>',
+            mark_safe(''.join(toolbar_item.render() for toolbar_item in group))
+        )
+
+class ToolbarItem(object):
+    """
+    A Calchart ToolbarItem, in the format
+
+    <li data-function="{{ function }}">
+        <i class="fa {{ icon }}"></i>
+    </li>
+    """
+    def __init__(self, icon, function):
+        # font-awesome icon class; e.g. "fa-plus" (http://fontawesome.io/icons/)
+        self.icon = icon
+        self.function = function
+
+    def render(self):
+        return format_html(
+            '<li data-function="{}"><i class="fa {}"></i></li>',
+            self.function, self.icon
+        )
+
+### MENUS ###
+
+editor_menu = Menu(
+    SubMenu('File', [
+        MenuItem('Save', 'saveShow'),
+    ]),
+    SubMenu('Edit', [
+        MenuItem('Undo', 'undo'),
+        MenuItem('Redo', 'redo'),
+    ]),
+    SubMenu('View', [
+        SubMenu('View Mode', [
+            MenuItem('Dot Editor', 'loadContext(default)'),
+            MenuItem('Continuity Editor', 'loadContext(continuity)'),
+            # MenuItem('Music Editor', 'loadContext(default)'),
+            # MenuItem('3D View', 'loadContext(default)'),
+        ]),
+    ], [
+        SubMenu('Zoom', [
+            MenuItem('100%', ''), # TODO
+        ]),
+    ]),
+)
+
+editor_toolbar = Toolbar(
+    [
+        ToolbarItem('fa-plus', 'addStuntsheet'),
+        ToolbarItem('fa-undo', 'undo'),
+        ToolbarItem('fa-repeat', 'redo'),
+    ],
+    [
+        ToolbarItem('fa-dot-circle-o', 'loadContext(default)'),
+        ToolbarItem('fa-pencil-square-o', 'loadContext(continuity)'),
+    ],
+)
