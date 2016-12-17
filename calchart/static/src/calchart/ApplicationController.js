@@ -68,13 +68,8 @@ ApplicationController.prototype.shortcuts = {};
  * @param {string} name -- the function to call
  */
 ApplicationController.prototype.doAction = function(name) {
-    var action = this[name];
-
-    if (action === undefined) {
-        throw new Error("No action with the name: " + name);
-    } else {
-        action.call(this);
-    }
+    var action = this._getAction(name);
+    action.function.apply(this, action.args);
 };
 
 /**
@@ -127,6 +122,44 @@ ApplicationController.prototype.init = function() {
 };
 
 /**** HELPERS ****/
+
+/**
+ * Parses the given function name according to menus.py
+ *
+ * @param {string} name -- the function name, optionally with arguments
+ * @return {object} an object of the form
+ *   {
+ *       function: function,
+ *       args: Array<string|float>,
+ *   }
+ */
+ApplicationController.prototype._getAction = function(name) {
+    var match = name.match(/(\w+)(\((.+)\))?/);
+
+    if (match === null) {
+        throw new Error("Action name in an invalid format: " + name);
+    }
+
+    var actionName = match[1];
+    var actionArgs = [];
+
+    if (match[2]) {
+        // split args and try to parse numbers
+        actionArgs = $.map(match[3].split(/,\s*/), function(arg) {
+            return parseFloat(arg) || arg;
+        });
+    }
+
+    var action = this[actionName];
+    if (action === undefined) {
+        throw new Error("No action with the name: " + actionName);
+    }
+
+    return {
+        function: action,
+        args: actionArgs,
+    };
+};
 
 /**
  * Sets up the given menu element.

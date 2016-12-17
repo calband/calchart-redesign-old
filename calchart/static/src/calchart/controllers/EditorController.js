@@ -181,13 +181,10 @@ EditorController.prototype.deselectDots = function() {
  * @param {boolean} asRedo -- true if calling from a redo action
  */
 EditorController.prototype.doAction = function(name, asRedo) {
-    var action = this[name];
+    var _action = this._getAction(name);
+    var action = _action.function;
+
     var canUndo = action._canUndo || action._undo;
-
-    if (action === undefined) {
-        throw new Error("No action with the name: " + name);
-    }
-
     var prevContent = $(".content").clone(true);
 
     // after doing an action, can't redo previous actions
@@ -195,7 +192,7 @@ EditorController.prototype.doAction = function(name, asRedo) {
         JSUtils.empty(this._redoHistory);
     }
 
-    var data = action.call(this);
+    var data = action.apply(this, _action.args);
 
     if (canUndo) {
         var label = action._name || JSUtils.fromCamelCase(name);
