@@ -17,12 +17,7 @@ BaseContext.prototype.shortcuts = {};
  * @param {object} events -- the events to add, mapping event name to handler
  */
 BaseContext.prototype.addEvents = function(events) {
-    // add namespace to each event
-    $.each(events, function(name, handler) {
-        events[name + ".app-context"] = handler;
-        delete events[name];
-    });
-
+    this._namespaceEvents(events);
     $(".workspace").on(events);
 };
 
@@ -32,12 +27,7 @@ BaseContext.prototype.addEvents = function(events) {
  * @param {object} events -- the events to add, mapping event name to handler
  */
 BaseContext.prototype.addGlobalEvents = function(events) {
-    // add namespace to each event
-    $.each(events, function(name, handler) {
-        events[name + ".app-context"] = handler;
-        delete events[name];
-    });
-
+    this._namespaceEvents(events);
     $(document).on(events);
 };
 
@@ -53,12 +43,27 @@ BaseContext.prototype.load = function() {
  */
 BaseContext.prototype.removeEvents = function() {
     $(document).off(".app-context");
+    $(".workspace").off(".app-context");
 };
 
 /**
  * Runs any necessary actions to unload the context
  */
 BaseContext.prototype.unload = function() {
+};
+
+/**** HELPERS ****/
+
+/**
+ * Adds the app-context namespace to the list of events
+ *
+ * @param {object} events -- the events to add namespaces to
+ */
+BaseContext.prototype._namespaceEvents = function(events) {
+    $.each(events, function(name, handler) {
+        events[name + ".app-context"] = handler;
+        delete events[name];
+    });
 };
 
 module.exports = BaseContext;

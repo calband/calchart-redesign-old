@@ -15,13 +15,6 @@ var Grapher = require("../Grapher");
 var JSUtils = require("../../utils/JSUtils");
 var UIUtils = require("../../utils/UIUtils");
 
-// Global variable to track how much the workspace has scrolled
-// when moving the dots
-var scrollOffset = {
-    top: 0,
-    left: 0,
-};
-
 /**** CONSTRUCTORS ****/
 
 /**
@@ -36,7 +29,6 @@ var EditorController = function(show) {
 
     this._grapher = null;
     this._context = null;
-    this._selectedDots = $(); // dots selected to edit
     this._activeSheet = null;
     this._currBeat = null;
 
@@ -91,10 +83,12 @@ EditorController.prototype.shortcuts = {
 };
 
 /**
- * @return {jQuery} the currently selected dots
+ * Get the currently active Sheet
+ *
+ * @param {Sheet} the active sheet
  */
-EditorController.prototype.getSelectedDots = function() {
-    return this._selectedDots;
+EditorController.prototype.getActiveSheet = function() {
+    return this._activeSheet;
 };
 
 /**
@@ -167,20 +161,6 @@ EditorController.prototype.addStuntsheet = function() {
 EditorController.prototype.addStuntsheet._canUndo = true;
 
 /**
- * Deselects the given dots. If no dots are given, deselects all dots.
- *
- * @param {jQuery|undefined} dots -- dots to deselect (defaults to all dots)
- */
-EditorController.prototype.deselectDots = function(dots) {
-    if (dots === undefined) {
-        dots = this._selectedDots;
-    }
-
-    dots.find(".dot-marker").attr("class", "dot-marker");
-    this._selectedDots = this._selectedDots.not(dots);
-};
-
-/**
  * Runs the method on this instance with the given name.
  *
  * @param {string} name -- the function to call
@@ -198,7 +178,7 @@ EditorController.prototype.doAction = function(name, asRedo) {
         JSUtils.empty(this._redoHistory);
     }
 
-    var data = action.apply(this, _action.args);
+    var data = action.apply(_action.context, _action.args);
 
     if (canUndo) {
         var label = action._name || JSUtils.fromCamelCase(name);
@@ -231,40 +211,6 @@ EditorController.prototype.loadContext = function(name) {
 };
 
 /**
- * Move all selected dots the given amount
- *
- * @param {float} deltaX -- the amount to move in the x direction, in pixels
- * @param {float} deltaY -- the amount to move in the y direction, in pixels
- * @param {object} options -- options to pass to BaseGrapher.moveDot()
- */
-EditorController.prototype.moveSelection = function(deltaX, deltaY, options) {
-    var _this = this;
-    options.transition = true;
-
-    var prevScroll = {
-        top: $(".workspace").scrollTop(),
-        left: $(".workspace").scrollLeft(),
-    };
-
-    this._selectedDots
-        .each(function() {
-            var position = $(this).data("position");
-            _this._grapher.moveDot(
-                this,
-                position.x + deltaX + scrollOffset.left,
-                position.y + deltaY + scrollOffset.top,
-                options
-            );
-        })
-        .scrollToView(".workspace", {
-            tolerance: 10,
-        });
-
-    scrollOffset.top += $(".workspace").scrollTop() - prevScroll.top;
-    scrollOffset.left += $(".workspace").scrollLeft() - prevScroll.left;
-};
-
-/**
  * Redoes the last undone action
  */
 EditorController.prototype.redo = function() {
@@ -284,46 +230,6 @@ EditorController.prototype.redo = function() {
 };
 
 /**
- * Save the positions of all selected dots, both in the Grapher and in the Sheet
- */
-EditorController.prototype.saveSelectionPositions = function() {
-    var _this = this;
-    var scale = this._grapher.getScale();
-    var dots = [];
-
-    this._selectedDots.each(function() {
-        // for undo/redo-ing
-        var dotData = {
-            selector: "#" + $(this).attr("id"),
-            before: $(this).data("position"),
-        };
-
-        var position = _this._grapher.savePosition(this);
-        var x = scale.toSteps(position.x - scale.minX);
-        var y = scale.toSteps(position.y - scale.minY);
-        _this._activeSheet.updatePosition(this, x, y);
-
-        dotData.after = $(this).data("position");
-        dots.push(dotData);
-    });
-
-    scrollOffset.top = 0;
-    scrollOffset.left = 0;
-
-    return {
-        dots: dots,
-        sheet: this._activeSheet,
-    };
-};
-EditorController.prototype.saveSelectionPositions._name = "Move dots";
-EditorController.prototype.saveSelectionPositions._undo = function(data) {
-    this._revertMoveDots(data, true);
-};
-EditorController.prototype.saveSelectionPositions._redo = function(data) {
-    this._revertMoveDots(data, false);
-};
-
-/**
  * Saves the show to the server
  *
  * @param {function|undefined} callback -- optional callback to run after saving show
@@ -335,37 +241,6 @@ EditorController.prototype.saveShow = function(callback) {
     };
     // TODO: add sbowing success message to callback
     UIUtils.doAction("save_show", params, callback);
-};
-
-/**
- * Add the given dots to the list of selected dots
- *
- * @param {jQuery} dots -- the dots to select
- * @param {object|undefined} options -- optional dictionary with the given options:
- *   - {boolean} append -- if false, deselect all dots before selecting (default true)
- */
-EditorController.prototype.selectDots = function(dots, options) {
-    options = options || {};
-
-    if (options.append === false) {
-        this.deselectDots();
-    }
-
-    this._selectedDots = this._selectedDots.add(dots);
-    $(dots).find(".dot-marker").attr("class", "dot-marker selected");
-};
-
-/**
- * For each dot, if it's selected, deselect it; otherwise, select it.
- *
- * @param {jQuery} dots -- the dots to toggle selection
- */
-EditorController.prototype.toggleDots = function(dots, options) {
-    var select = dots.not(this._selectedDots);
-    var deselect = dots.filter(this._selectedDots);
-
-    this.selectDots(select);
-    this.deselectDots(deselect);
 };
 
 /**
@@ -423,53 +298,29 @@ EditorController.prototype._addStuntsheetToSidebar = function(sheet) {
  * @param {string} name -- the function name, optionally with arguments
  * @return {object} an object of the form
  *   {
+ *       context: object,
  *       function: function,
  *       args: Array<string|float>,
  *   }
  */
 EditorController.prototype._getAction = function(name) {
     var action = this._parseAction(name);
+    var context = this;
 
     var _function = this[action.name];
     if (_function === undefined && this._context !== null) {
         _function = this._context[action.name];
+        context = this._context;
     }
     if (_function === undefined) {
         throw new Error("No action with the name: " + action.name);
     }
 
     return {
+        context: context,
         function: _function,
         args: action.args,
     };
-};
-
-/**
- * A helper function to revert saveSelectionPositions (both for undo or redo),
- * since undo-ing should actually also revert moving the dots (not just saving
- * the positions).
- *
- * @param {object} data -- the data returned from saveSelectionPositions
- * @param {boolean} isUndo -- true to undo the function, false to redo
- */
-EditorController.prototype._revertMoveDots = function(data, isUndo) {
-    var selectedDots = $();
-    var scale = this._grapher.getScale();
-
-    data.dots.forEach(function(dot) {
-        var elem = $(dot.selector);
-        var position = isUndo ? dot.before : dot.after;
-
-        this._grapher.moveDot(elem, position.x, position.y);
-
-        var x = scale.toSteps(position.x - scale.minX);
-        var y = scale.toSteps(position.y - scale.minY);
-        data.sheet.updatePosition(elem, x, y);
-
-        selectedDots = selectedDots.add(elem);
-    }, this);
-
-    this._selectedDots = selectedDots;
 };
 
 /**
@@ -493,7 +344,6 @@ EditorController.prototype._showStuntsheet = function(stuntsheet) {
     // update instance variables
     this._activeSheet = $(stuntsheet).data("sheet");
     this._currBeat = 0;
-    this.deselectDots();
 
     // load sheet into Show and Grapher
     this._show.loadSheet(this._activeSheet);
