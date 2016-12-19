@@ -1,3 +1,4 @@
+var ContinuityContext = require("./contexts/ContinuityContext");
 var DefaultContext = require("./contexts/DefaultContext");
 
 module.exports = {
@@ -12,6 +13,9 @@ module.exports = {
      */
     load: function(name, grapher) {
         switch (name) {
+            case "continuity":
+                var context = new ContinuityContext(grapher);
+                break;
             case "default":
                 var context = new DefaultContext(grapher);
                 break;

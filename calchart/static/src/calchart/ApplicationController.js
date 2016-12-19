@@ -219,14 +219,50 @@ ApplicationController.prototype._setupMenu = function(menu) {
  */
 ApplicationController.prototype._setupToolbar = function(toolbar) {
     var _this = this;
+    var tooltipTimeout = null;
 
     // set up click
-    $(toolbar).find("li").click(function() {
-        var name = $(this).data("function");
-        _this.doAction(name);
-    });
+    $(toolbar).find("li")
+        .mousedown(function(e) {
+            e.preventDefault();
+            $(this).addClass("focus");
+        })
+        .mouseup(function() {
+            $(this).removeClass("focus");
+            var name = $(this).data("function");
+            _this.doAction(name);
+        })
+        .hover(function() {
+            // tooltip above item
+            var offset = $(this).offset();
+            var width = $(this).outerWidth();
+            var name = $(this).data("name");
 
-    // TODO: set up help text
+            tooltipTimeout = setTimeout(function() {
+                var tooltip = $("<div>")
+                    .addClass("tooltip")
+                    .text(name)
+                    .appendTo("body");
+
+                var arrow = $("<span>")
+                    .addClass("tooltip-arrow")
+                    .appendTo(tooltip);
+
+                var left = offset.left - tooltip.outerWidth() / 2 + width / 2;
+                if (left < 0) {
+                    left = 0;
+                    arrow.css("left", offset.left + width / 2);
+                }
+
+                tooltip.css({
+                    top: offset.top - tooltip.outerHeight() - arrow.outerHeight(),
+                    left: left,
+                });
+            }, 750);
+        }, function() {
+            clearTimeout(tooltipTimeout);
+            $(".tooltip").remove();
+        });
 };
 
 module.exports = ApplicationController;

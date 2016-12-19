@@ -1,7 +1,7 @@
 """
 Defines menus and toolbars used throughout the site, to be passed to templates as JSON strings in
-script tags. Items in the menus/toolbars are represented by the helper classes: Menu, SubMenu,
-MenuItem, Toolbar, and ToolbarItem.
+script tags. Items in the menus/toolbars are represented by helper classes that output the HTML
+for the menu/toolbar when rendered.
 
 Menu and toolbar items are grouped into menu groups and toolbar groups, respectively. In the UI,
 these groups will be separated by a line.
@@ -15,6 +15,7 @@ class. Functions can be of the form:
 """
 
 from django.utils.html import format_html, format_html_join, mark_safe
+from django.utils.text import slugify
 
 ### MENU CLASSES ###
 
@@ -40,7 +41,7 @@ class SubMenu(object):
     """
     A Calchart SubMenu, in the format
 
-    <li class="has-submenu"> # only include class if not top level
+    <li class="has-submenu"> # .has-submenu if not top level
         <span>{{ name }}</span>
         <div class="submenu">
             # for each group
@@ -93,10 +94,7 @@ class Toolbar(object):
 
     <div class="toolbar">
         # for each group
-        <ul class="toolbar-group">
-            # for each item
-            {{ ToolbarItem.render }}
-        </ul>
+        {{ ToolbarGroup.render }}
     </div>
     """
     def __init__(self, *groups):
@@ -105,32 +103,47 @@ class Toolbar(object):
     def render(self):
         return format_html(
             '<div class="toolbar">{}</div>',
-            mark_safe(''.join(self.render_group(group) for group in self.groups))
+            mark_safe(''.join(group.render() for group in self.groups))
         )
 
-    def render_group(self, group):
+class ToolbarGroup(object):
+    """
+    A Calchart ToolbarGroup, in the format
+
+    <ul class="toolbar-group">
+        # for each item
+        {{ ToolbarItem.render }}
+    </ul>
+    """
+    def __init__(self, *items):
+        self.items = items
+
+    def render(self):
         return format_html(
             '<ul class="toolbar-group">{}</ul>',
-            mark_safe(''.join(toolbar_item.render() for toolbar_item in group))
+            mark_safe(''.join(item.render() for item in self.items))
         )
 
 class ToolbarItem(object):
     """
     A Calchart ToolbarItem, in the format
 
-    <li data-function="{{ function }}">
+    <li class="{{ class }}" data-name="{{ name }}" data-function="{{ function }}">
         <i class="fa {{ icon }}"></i>
     </li>
+
+    where the class is the slugified name
     """
-    def __init__(self, icon, function):
+    def __init__(self, name, icon, function):
+        self.name = name
         # font-awesome icon class; e.g. "fa-plus" (http://fontawesome.io/icons/)
         self.icon = icon
         self.function = function
 
     def render(self):
         return format_html(
-            '<li data-function="{}"><i class="fa {}"></i></li>',
-            self.function, self.icon
+            '<li class="{}" data-name="{}" data-function="{}"><i class="fa {}"></i></li>',
+            slugify(self.name), self.name, self.function, self.icon
         )
 
 ### MENUS ###
@@ -158,13 +171,13 @@ editor_menu = Menu(
 )
 
 editor_toolbar = Toolbar(
-    [
-        ToolbarItem('fa-plus', 'addStuntsheet'),
-        ToolbarItem('fa-undo', 'undo'),
-        ToolbarItem('fa-repeat', 'redo'),
-    ],
-    [
-        ToolbarItem('fa-dot-circle-o', 'loadContext(default)'),
-        ToolbarItem('fa-pencil-square-o', 'loadContext(continuity)'),
-    ],
+    ToolbarGroup(
+        ToolbarItem('Add Stuntsheet', 'fa-plus', 'addStuntsheet'),
+        ToolbarItem('Undo', 'fa-undo', 'undo'),
+        ToolbarItem('Redo', 'fa-repeat', 'redo'),
+    ),
+    ToolbarGroup(
+        ToolbarItem('Edit Dots', 'fa-dot-circle-o', 'loadContext(default)'),
+        ToolbarItem('Edit Continuity', 'fa-pencil-square-o', 'loadContext(continuity)'),
+    ),
 )

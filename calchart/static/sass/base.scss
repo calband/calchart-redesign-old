@@ -186,18 +186,42 @@ header {
         }
         li {
             display: inline-block;
+            padding: 5px;
+            cursor: default;
+            border: 1px solid transparent;
+            &:not(:last-child) {
+                margin-right: 5px;
+            }
+            &:hover, &.active, &.focus:hover {
+                border: 1px solid darken($semilight-gray, 10);
+                border-radius: 2px;
+                box-shadow: 0 0 1px rgba($black, 0.2);
+            }
+            &.active, &.focus:hover {
+                background: rgba($white, 0.7);
+            }
             i {
-                padding: 5px;
                 color: $dark-gray;
                 cursor: default;
-                border: 1px solid transparent;
-                &:hover {
-                    border: 1px solid darken($semilight-gray, 10);
-                    border-radius: 2px;
-                    box-shadow: 0 0 1px rgba($black, 0.2);
-                }
             }
         }
+    }
+}
+
+.tooltip {
+    position: absolute;
+    background: $black;
+    color: $white;
+    padding: 5px 7px;
+    font-size: 0.8em;
+    z-index: 100;
+    .tooltip-arrow {
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        margin-left: -5px;
+        border: 5px solid transparent;
+        border-top-color: $black;
     }
 }
 

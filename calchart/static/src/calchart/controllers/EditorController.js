@@ -112,7 +112,7 @@ EditorController.prototype.getShortcut = function(shortcut) {
 /**** ACTIONS
  *
  * Each action can define the following properties:
- *  - {string} _name: the verbose name of the action, used for Undo text, help text, etc.
+ *  - {string} _name: the verbose name of the action, used for Undo text or other labels
  *    (default to name of action, capitalized and spaced out)
  *  - {boolean} _canUndo: set true to indicate that the action can be undone (default true
  *    if _undo is defined, otherwise false)

@@ -137,10 +137,13 @@ DefaultContext.prototype.load = function() {
             dragState = "none";
         },
     });
+
+    $(".toolbar .edit-dots").addClass("active");
 };
 
 DefaultContext.prototype.unload = function() {
     this.removeEvents();
+    $(".toolbar .edit-dots").removeClass("active");
 };
 
 module.exports = DefaultContext;
