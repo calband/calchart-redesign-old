@@ -187,6 +187,7 @@ EditorController.prototype.doAction = function(name, asRedo) {
             label: label,
             content: prevContent,
             data: data,
+            context: _action.context,
             undo: action._undo,
             redo: action._redo,
         };
@@ -221,7 +222,7 @@ EditorController.prototype.redo = function() {
     var actionData = this._redoHistory.pop();
 
     if (actionData.redo) {
-        actionData.redo.call(this, actionData.data);
+        actionData.redo.call(actionData.context, actionData.data);
     } else {
         this.doAction(actionData.name, true);
     }
@@ -254,7 +255,7 @@ EditorController.prototype.undo = function() {
     var actionData = this._undoHistory.pop();
 
     if (actionData.undo) {
-        actionData.undo.call(this, actionData.data);
+        actionData.undo.call(actionData.context, actionData.data);
     } else {
         $(".content")
             .after(actionData.content)
