@@ -15,6 +15,7 @@ var DefaultContext = function(grapher) {
 JSUtils.extends(DefaultContext, BaseContext);
 
 DefaultContext.prototype.shortcuts = {
+    "ctrl+a": "selectAll",
 };
 
 DefaultContext.prototype.load = function() {
@@ -33,18 +34,18 @@ DefaultContext.prototype.load = function() {
         },
         mousedown: function(e) {
             var target = $(e.target);
-            var addToSelection = false;
-
-            if (e.shiftKey || e.ctrlKey || e.metaKey) {
-                addToSelection = true;
-            } else if (e.which === 3) {
-                // right click
-                return;
-            }
 
             if (target.is(".dot-marker")) {
                 var dot = target.parent();
-                controller.selectDot(dot, addToSelection);
+
+                if (e.shiftKey || e.ctrlKey || e.metaKey) {
+                    controller.toggleDots(dot);
+                } else {
+                    controller.selectDots(dot, {
+                        append: false,
+                    });
+                }
+
                 dragState = "drag";
             } else {
                 controller.deselectDots();
@@ -107,7 +108,7 @@ DefaultContext.prototype.load = function() {
                             position.y >= minY &&
                             position.y <= maxY
                         ) {
-                            controller.selectDot(dot, true);
+                            controller.selectDots(dot);
                         }
                     });
 
@@ -144,6 +145,15 @@ DefaultContext.prototype.load = function() {
 DefaultContext.prototype.unload = function() {
     this.removeEvents();
     $(".toolbar .edit-dots").removeClass("active");
+};
+
+/**** ACTIONS ****/
+
+/**
+ * Select all dots in the graph
+ */
+DefaultContext.prototype.selectAll = function() {
+    window.controller.selectDots(this._grapher.getDots());
 };
 
 module.exports = DefaultContext;

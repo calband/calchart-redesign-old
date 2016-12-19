@@ -101,11 +101,11 @@ EditorController.prototype.getSelectedDots = function() {
  * Allow retrieving shortcuts from the context also
  */
 EditorController.prototype.getShortcut = function(shortcut) {
-    var _function = ApplicationController.prototype.getShortcut.call(this, shortcut);
-    if (_function === undefined && this._context !== null) {
+    var action = ApplicationController.prototype.getShortcut.call(this, shortcut);
+    if (action === undefined && this._context !== null) {
         return this._context.shortcuts[shortcut];
     } else {
-        return _function;
+        return action;
     }
 };
 
@@ -167,11 +167,17 @@ EditorController.prototype.addStuntsheet = function() {
 EditorController.prototype.addStuntsheet._canUndo = true;
 
 /**
- * Deselects all dots.
+ * Deselects the given dots. If no dots are given, deselects all dots.
+ *
+ * @param {jQuery|undefined} dots -- dots to deselect (defaults to all dots)
  */
-EditorController.prototype.deselectDots = function() {
-    $(".dot-marker.selected").attr("class", "dot-marker");
-    this._selectedDots = $();
+EditorController.prototype.deselectDots = function(dots) {
+    if (dots === undefined) {
+        dots = this._selectedDots;
+    }
+
+    dots.find(".dot-marker").attr("class", "dot-marker");
+    this._selectedDots = this._selectedDots.not(dots);
 };
 
 /**
@@ -332,22 +338,34 @@ EditorController.prototype.saveShow = function(callback) {
 };
 
 /**
- * Add the given dot to the list of selected dots
+ * Add the given dots to the list of selected dots
  *
- * @param {jQuery} dot -- the dot to select
- * @param {boolean} addToSelection -- if true, add the dot to the list of selected
- *   dots, if not already selected. If false and the dot is not already selected,
- *   deselect all currently selected dots.
+ * @param {jQuery} dots -- the dots to select
+ * @param {object|undefined} options -- optional dictionary with the given options:
+ *   - {boolean} append -- if false, deselect all dots before selecting (default true)
  */
-EditorController.prototype.selectDot = function(dot, addToSelection) {
-    if (this._selectedDots.filter(dot).exists()) {
-        return;
-    } else if (!addToSelection) {
+EditorController.prototype.selectDots = function(dots, options) {
+    options = options || {};
+
+    if (options.append === false) {
         this.deselectDots();
     }
 
-    this._selectedDots = this._selectedDots.add(dot);
-    $(dot).find(".dot-marker").attr("class", "dot-marker selected");
+    this._selectedDots = this._selectedDots.add(dots);
+    $(dots).find(".dot-marker").attr("class", "dot-marker selected");
+};
+
+/**
+ * For each dot, if it's selected, deselect it; otherwise, select it.
+ *
+ * @param {jQuery} dots -- the dots to toggle selection
+ */
+EditorController.prototype.toggleDots = function(dots, options) {
+    var select = dots.not(this._selectedDots);
+    var deselect = dots.filter(this._selectedDots);
+
+    this.selectDots(select);
+    this.deselectDots(deselect);
 };
 
 /**
@@ -394,6 +412,36 @@ EditorController.prototype._addStuntsheetToSidebar = function(sheet) {
 
     this._updateSidebar(stuntsheet);
     return stuntsheet;
+};
+
+/**
+ * Parses the given function name according to menus.py
+ *
+ * Overriding ApplicationController's _getAction to allow looking up
+ * actions in the active Context
+ *
+ * @param {string} name -- the function name, optionally with arguments
+ * @return {object} an object of the form
+ *   {
+ *       function: function,
+ *       args: Array<string|float>,
+ *   }
+ */
+EditorController.prototype._getAction = function(name) {
+    var action = this._parseAction(name);
+
+    var _function = this[action.name];
+    if (_function === undefined && this._context !== null) {
+        _function = this._context[action.name];
+    }
+    if (_function === undefined) {
+        throw new Error("No action with the name: " + action.name);
+    }
+
+    return {
+        function: _function,
+        args: action.args,
+    };
 };
 
 /**

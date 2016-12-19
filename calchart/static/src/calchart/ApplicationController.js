@@ -134,6 +134,30 @@ ApplicationController.prototype.init = function() {
  *   }
  */
 ApplicationController.prototype._getAction = function(name) {
+    var action = this._parseAction(name);
+
+    var _function = this[action.name];
+    if (_function === undefined) {
+        throw new Error("No action with the name: " + action.name);
+    }
+
+    return {
+        function: _function,
+        args: action.args,
+    };
+};
+
+/**
+ * Parses the given function name according to menus.py
+ *
+ * @param {string} name -- the function name, optionally with arguments
+ * @return {object} an object of the form
+ *   {
+ *       name: string,
+ *       args: Array<string|float>,
+ *   }
+ */
+ApplicationController.prototype._parseAction = function(name) {
     var match = name.match(/(\w+)(\((.+)\))?/);
 
     if (match === null) {
@@ -150,13 +174,8 @@ ApplicationController.prototype._getAction = function(name) {
         });
     }
 
-    var action = this[actionName];
-    if (action === undefined) {
-        throw new Error("No action with the name: " + actionName);
-    }
-
     return {
-        function: action,
+        name: actionName,
         args: actionArgs,
     };
 };
