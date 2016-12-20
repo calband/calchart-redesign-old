@@ -52,7 +52,7 @@ EditorController.prototype.init = function() {
         showLabels: true,
         drawYardlineNumbers: true,
         draw4Step: true,
-        colorAngle: false,
+        drawDotType: true,
     };
     this._grapher = new Grapher(this._show, $(".grapher-draw-target"), grapherOptions);
     this._grapher.drawField();

@@ -283,19 +283,41 @@ svg.graph {
         }
     }
     .dots {
+        .dot {
+            .fslash, .bslash {
+                display: none;
+                stroke: $uniform-white;
+                stroke-width: 2px;
+            }
+            &[class*=" plain"] .dot-marker {
+                fill: transparent;
+            }
+            &[class*="-forwardslash"], &[class*="-x"] {
+                .fslash {
+                    display: initial;
+                }
+            }
+            &[class*="-backslash"], &[class*="-x"] {
+                .bslash {
+                    display: initial;
+                }
+            }
+        }
         .dot-marker {
             fill: $uniform-white;
-            &.facing-east {
-                fill: $uniform-white;
-            }
+            stroke: $uniform-white;
+            stroke-width: 2px;
             &.facing-west {
                 fill: $uniform-yellow;
+                stroke: $uniform-yellow;
             }
             &.facing-north, &.facing-south {
                 fill: $uniform-blue;
+                stroke: $uniform-blue;
             }
             &.selected {
-                fill: $highlight-purple !important;
+                fill: $highlight-purple;
+                stroke: $highlight-purple;
             }
         }
         .dot-label {

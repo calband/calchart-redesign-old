@@ -177,8 +177,8 @@ BaseGrapher.prototype.savePosition = function(dot) {
  *  - {boolean} labelLeft -- if true, show the label on the left of the dot (default true)
  *  - {boolean} drawYardlineNumbers -- if true, draws yardline numbers (default false)
  *  - {boolean} draw4Step -- if true, draws 4 step lines (default false)
- *  - {boolean} colorAngle -- if false, colors dots differently based on their
- *    orientation (default true)
+ *  - {boolean} drawDotType -- if true, draw dots according to their dot type. If false,
+ *    colors dots differently based on their orientation (default false)
  */
 BaseGrapher.prototype.setOption = function(name, val) {
     this._options[name] = val;
@@ -224,7 +224,13 @@ BaseGrapher.prototype._drawDots = function(currentBeat, selectedDots) {
             .attr("id", function(dot) {
                 return "dot-" + dot.getLabel();
             })
-            .classed("dot", true);
+            .attr("class", function(dot) {
+                var dotClass = "dot ";
+                if (_this._options.drawDotType) {
+                    dotClass += dot.getDotType();
+                }
+                return dotClass;
+            });
     }
     
     dotGroups.each(function(dot) {
@@ -236,12 +242,12 @@ BaseGrapher.prototype._drawDots = function(currentBeat, selectedDots) {
         // save dot in jQuery data also
         $(this).data("dot", dot);
 
-        if (_this._options.colorAngle === false) {
-            var dotClass = "";
-        } else if (selectedDots.indexOf(label) === -1) {
-            var dotClass = CalchartUtils.getNearestOrientation(state.angle);
-        } else {
-            var dotClass = "selected";
+        var dotClass = "dot-marker ";
+
+        if (selectedDots.indexOf(label) !== -1) {
+            dotClass += "selected";
+        } else if (!_this._options.drawDotType) {
+            dotClass += CalchartUtils.getNearestOrientation(state.angle);
         }
 
         var dotGroup = d3.select(this);
@@ -250,7 +256,27 @@ BaseGrapher.prototype._drawDots = function(currentBeat, selectedDots) {
             dotMarker = dotGroup
                 .append("circle")
                 .attr("r", _this._dotRadius);
+
+            if (_this._options.drawDotType) {
+                var start = -1.1 * _this._dotRadius;
+                var end = 1.1 * _this._dotRadius;
+                dotGroup
+                    .append("line")
+                    .classed("fslash", true)
+                    .attr("x1", start)
+                    .attr("y1", end)
+                    .attr("x2", end)
+                    .attr("y2", start);
+                dotGroup
+                    .append("line")
+                    .classed("bslash", true)
+                    .attr("x1", start)
+                    .attr("y1", start)
+                    .attr("x2", end)
+                    .attr("y2", end);
+            }
         }
+
         dotMarker.attr("class", "dot-marker " + dotClass);
 
         if (_this._options.circleSelected) {
@@ -264,7 +290,7 @@ BaseGrapher.prototype._drawDots = function(currentBeat, selectedDots) {
 
         if (_this._options.showLabels) {
             var offsetX = -2.25 * _this._dotRadius;
-            var offsetY = -1 * _this._dotRadius;
+            var offsetY = -1.25 * _this._dotRadius;
 
             if (_this._options.labelLeft === false) {
                 offsetX *= -1;
