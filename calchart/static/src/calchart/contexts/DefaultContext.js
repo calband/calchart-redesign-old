@@ -27,6 +27,10 @@ JSUtils.extends(DefaultContext, BaseContext);
 
 DefaultContext.prototype.shortcuts = {
     "ctrl+a": "selectAll",
+    "left": "nudgeDots(-1, 0)",
+    "up": "nudgeDots(0, -1)",
+    "right": "nudgeDots(1, 0)",
+    "down": "nudgeDots(0, 1)",
 };
 
 DefaultContext.prototype.load = function() {
@@ -215,6 +219,20 @@ DefaultContext.prototype.moveSelection = function(deltaX, deltaY) {
 
     scrollOffset.top += $(".workspace").scrollTop() - prevScroll.top;
     scrollOffset.left += $(".workspace").scrollLeft() - prevScroll.left;
+};
+
+/**
+ * Nudge the selection of dots in the given direction.
+ *
+ * @param {int} deltaX -- the amount to move in the x direction, in steps
+ * @param {int} deltaY -- the amount to move in the y direction, in steps
+ */
+DefaultContext.prototype.nudgeDots = function(deltaX, deltaY) {
+    var scale = this._grapher.getScale();
+    deltaX = scale.toDistance(deltaX);
+    deltaY = scale.toDistance(deltaY);
+    this.moveSelection(deltaX, deltaY);
+    window.controller.doAction("saveSelectionPositions");
 };
 
 /**
