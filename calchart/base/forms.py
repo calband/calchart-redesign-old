@@ -68,7 +68,7 @@ class SetUpShowPopup(PopupForm):
     The popup to set up a show when first opening in the editor view.
     """
     name = 'setup-show'
-    template_name = 'partials/setup_show.html'
+    template_name = 'partials/popup_setup_show.html'
     title = 'Set Up Show'
 
     num_dots = forms.IntegerField(label='Number of dots')

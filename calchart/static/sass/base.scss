@@ -225,23 +225,6 @@ header {
     }
 }
 
-.panel {
-    position: absolute;
-    background: $dark-gray;
-    z-index: z-index(popup);
-    * {
-        color: $light-gray;
-    }
-    .panel-handle {
-        background: $medium-gray;
-        background: linear-gradient($semilight-gray, $medium-gray);
-        height: 10px;
-    }
-    .panel-content {
-        padding: 10px 20px;
-    }
-}
-
 .popup {
     @include vertically-center;
     position: fixed;

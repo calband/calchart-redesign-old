@@ -124,9 +124,9 @@ UIUtils.hidePopup = function(popup) {
 /**** PANELS ****/
 
 /**
- * Create a moveable panel with the given contents at the given position.
+ * Set up a moveable panel, if not already set up
  *
- * @param {jQuery} contents -- the contents to populate the panel, wrapped in a div
+ * @param {jQuery} panel -- the panel to set up
  * @param {object|undefined} options -- options to create a panel. Can include
  *   - {float} top -- the top of the initial position for the panel (defaults
  *     to center)
@@ -136,20 +136,17 @@ UIUtils.hidePopup = function(popup) {
  *     to center)
  *   - {float} right -- the right of the initial position for the panel (defaults
  *     to center)
- * @return {jQuery} the created panel
+ *   - {function} onInit -- a function that takes in the panel and runs additional
+ *     initialization actions. Will only be run if the panel is not already set up
  */
-UIUtils.createPanel = function(contents, options) {
+UIUtils.setupPanel = function(panel, options) {
+    if ($(panel).data("initialized")) {
+        return false;
+    }
+
     options = options || {};
 
-    var panel = $("<div>")
-        .addClass("panel")
-        .appendTo("body");
-
-    $("<div>")
-        .addClass("panel-handle")
-        .appendTo(panel);
-
-    contents.addClass("panel-content").appendTo(panel);
+    // set up initial position
 
     var position = {};
 
@@ -168,9 +165,62 @@ UIUtils.createPanel = function(contents, options) {
         position.left = $(window).width() / 2 - panel.outerWidth() / 2;
     }
 
-    panel.css(position);
+    $(panel).css(position);
 
-    return panel;
+    // make draggable
+
+    $(panel).find(".panel-handle").on({
+        mousedown: function(e) {
+            var offset = $(this).offset();
+            $(panel).data({
+                drag: true,
+                offset: {
+                    top: offset.top - e.pageY,
+                    left: offset.left - e.pageX,
+                },
+            });
+        },
+        mouseup: function() {
+            $(panel).data("drag", false);
+        },
+    });
+
+    $(window).on({
+        mousemove: function(e) {
+            var data = $(panel).data();
+            if (data.drag) {
+                e.preventDefault();
+
+                var top = e.pageY + data.offset.top;
+                var left = e.pageX + data.offset.left;
+
+                // don't go out of window
+                var maxX = $(window).width() - $(panel).outerWidth();
+                var maxY = $(window).height() - $(panel).outerHeight();
+                top = Math.min(Math.max(0, top), maxY);
+                left = Math.min(Math.max(0, left), maxX);
+
+                $(panel).css({
+                    top: top,
+                    left: left,
+                    // unset any bottom/right CSS values from initial position
+                    bottom: "",
+                    right: "",
+                });
+            }
+        },
+    });
+
+    // onInit callback
+
+    if (options.onInit) {
+        options.onInit(panel);
+    }
+
+    // indicate panel is initialized
+
+    $(panel).data("initialized", true);
+    return true;
 };
 
 /**** MESSAGES ****/

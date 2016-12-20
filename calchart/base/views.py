@@ -96,6 +96,9 @@ class EditorView(CalchartMixin, TemplateView):
         context['show'] = self.show
         context['menu'] = editor_menu
         context['toolbar'] = editor_toolbar
+        context['panels'] = [
+            ('partials/panel_edit_continuity.html', 'edit-continuity'),
+        ]
         return context
 
     def save_show(self):

@@ -25,4 +25,7 @@
             <div class="grapher-draw-target"></div>
         </div>
     </div>
+    {% for template, name in panels %}
+        {% include template with name=name only %}
+    {% endfor %}
 {% endblock %}
