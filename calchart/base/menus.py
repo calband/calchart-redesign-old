@@ -129,20 +129,20 @@ class ToolbarItem(object):
     A Calchart ToolbarItem, in the format
 
     <li class="{{ class }}" data-name="{{ name }}" data-function="{{ function }}">
-        <i class="fa {{ icon }}"></i>
+        <i class="icon-{{ icon }}"></i>
     </li>
 
     where the class is the slugified name
     """
     def __init__(self, name, icon, function):
         self.name = name
-        # font-awesome icon class; e.g. "fa-plus" (http://fontawesome.io/icons/)
+        # icon class, e.g. "plus" (see css/fonts/icons-reference.html)
         self.icon = icon
         self.function = function
 
     def render(self):
         return format_html(
-            '<li class="{}" data-name="{}" data-function="{}"><i class="fa {}"></i></li>',
+            '<li class="{}" data-name="{}" data-function="{}"><i class="icon-{}"></i></li>',
             slugify(self.name), self.name, self.function, self.icon
         )
 
@@ -172,12 +172,12 @@ editor_menu = Menu(
 
 editor_toolbar = Toolbar(
     ToolbarGroup(
-        ToolbarItem('Add Stuntsheet', 'fa-plus', 'addStuntsheet'),
-        ToolbarItem('Undo', 'fa-undo', 'undo'),
-        ToolbarItem('Redo', 'fa-repeat', 'redo'),
+        ToolbarItem('Add Stuntsheet', 'file-o', 'addStuntsheet'),
+        ToolbarItem('Undo', 'undo', 'undo'),
+        ToolbarItem('Redo', 'repeat', 'redo'),
     ),
     ToolbarGroup(
-        ToolbarItem('Edit Dots', 'fa-dot-circle-o', 'loadContext(default)'),
-        ToolbarItem('Edit Continuity', 'fa-pencil-square-o', 'loadContext(continuity)'),
+        ToolbarItem('Edit Dots', 'dot-circle-o', 'loadContext(default)'),
+        ToolbarItem('Edit Continuity', 'pencil-square-o', 'loadContext(continuity)'),
     ),
 )
