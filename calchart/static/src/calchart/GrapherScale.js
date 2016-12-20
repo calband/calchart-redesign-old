@@ -58,24 +58,4 @@ GrapherScale.prototype.toSteps = function(distance) {
     return distance / this._ratio;
 };
 
-/**
- * Round the given distance to the given interval
- *
- * @param {float} distance -- the distance to round
- * @param {float} interval -- the number of steps to round to
- */
-GrapherScale.prototype.roundDistance = function(distance, interval) {
-    return MathUtils.round(distance, this._ratio * interval);
-};
-
-/**
- * Round the given number of steps to the given interval
- *
- * @param {float} steps -- the number of steps to round
- * @param {float} interval -- the number of steps to round to
- */
-GrapherScale.prototype.roundSteps = function(steps, interval) {
-    return MathUtils.round(steps, interval);
-};
-
 module.exports = GrapherScale;

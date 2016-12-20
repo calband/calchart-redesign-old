@@ -5,8 +5,8 @@ var JSUtils = require("../../utils/JSUtils");
  * The default editor context, that allows a user to edit dot
  * continuities and step through marching
  */
-var ContinuityContext = function(grapher) {
-    BaseContext.call(this, grapher);
+var ContinuityContext = function(grapher, sheet) {
+    BaseContext.call(this, grapher, sheet);
 };
 
 JSUtils.extends(ContinuityContext, BaseContext);
@@ -21,7 +21,6 @@ ContinuityContext.prototype.load = function() {
 };
 
 ContinuityContext.prototype.unload = function() {
-    this.removeEvents();
     $(".toolbar .edit-continuity").removeClass("active");
 };
 

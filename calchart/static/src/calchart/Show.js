@@ -1,7 +1,7 @@
 /**
  * @fileOverview This file defines the Show class, which contains information
- * for a Calchart show. Functions in this file are organized alphabetically in
- * the following sections:
+ * for a Calchart show. Functions in this file are organized in the following
+ * sections:
  *
  * - Constructors (including serialization functions)
  * - General instance methods
@@ -181,6 +181,17 @@ Show.prototype.loadSheet = function(sheet) {
     $.each(this._dots, function(_, dot) {
         dot.loadSheet(sheet);
     });
+};
+
+/**
+ * Get the Sheet that follows the given sheet
+ *
+ * @param {Sheet|undefined} sheet -- the sheet to get the next sheet of
+ * @return {Sheet} the sheet after the given sheet
+ */
+Show.prototype.getNextSheet = function(sheet) {
+    var i = this._sheets.indexOf(sheet);
+    return this._sheets[i + 1];
 };
 
 /**** SONGS ****/

@@ -1,5 +1,6 @@
 var BaseContext = require("./BaseContext");
 var JSUtils = require("../../utils/JSUtils");
+var MathUtils = require("../../utils/MathUtils");
 
 // Global variable to track how much the workspace has scrolled
 // when moving the dots
@@ -12,8 +13,8 @@ var scrollOffset = {
  * The default editor context, that allows a user to select dots with a rectangular
  * selection box, and also to drag and drop dots on the grid.
  */
-var DefaultContext = function(grapher) {
-    BaseContext.call(this, grapher);
+var DefaultContext = function(grapher, sheet) {
+    BaseContext.call(this, grapher, sheet);
 
     // dots selected to edit
     this._selectedDots = $();
@@ -31,6 +32,7 @@ DefaultContext.prototype.shortcuts = {
 DefaultContext.prototype.load = function() {
     var _this = this;
     var svgOrigin = $("svg.graph").position();
+    var scale = this._grapher.getScale();
 
     var dragState = "none"; // none, drag, select
     var dragStart = null; // event object on mousedown
@@ -81,9 +83,12 @@ DefaultContext.prototype.load = function() {
 
             switch (dragState) {
                 case "drag":
-                    _this.moveSelection(deltaX, deltaY, {
-                        snap: _this._grid,
-                    });
+                    // snap deltaX and deltaY to grid; dots can themselves be off
+                    // the grid, but they move in a consistent interval
+                    var snap = scale.toDistance(_this._grid);
+                    deltaX = MathUtils.round(deltaX, snap);
+                    deltaY = MathUtils.round(deltaY, snap);
+                    _this.moveSelection(deltaX, deltaY);
                     break;
                 case "select":
                     // relative to page
@@ -151,6 +156,11 @@ DefaultContext.prototype.load = function() {
     $(".toolbar .edit-dots").addClass("active");
 };
 
+DefaultContext.prototype.loadSheet = function(sheet) {
+    BaseContext.prototype.loadSheet.call(this, sheet);
+    this.selectDots(this._selectedDots);
+};
+
 DefaultContext.prototype.unload = function() {
     this.removeEvents();
     $(".toolbar .edit-dots").removeClass("active");
@@ -177,11 +187,12 @@ DefaultContext.prototype.deselectDots = function(dots) {
  *
  * @param {float} deltaX -- the amount to move in the x direction, in pixels
  * @param {float} deltaY -- the amount to move in the y direction, in pixels
- * @param {object} options -- options to pass to BaseGrapher.moveDot()
  */
-DefaultContext.prototype.moveSelection = function(deltaX, deltaY, options) {
+DefaultContext.prototype.moveSelection = function(deltaX, deltaY) {
     var _this = this;
-    options.transition = true;
+    var options = {
+        transition: true,
+    };
 
     var prevScroll = {
         top: $(".workspace").scrollTop(),

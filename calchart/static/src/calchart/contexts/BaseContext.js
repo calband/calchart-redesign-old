@@ -1,9 +1,13 @@
 /**
  * Subclasses of this class define how the mouse cursor interacts with
  * the editor application.
+ *
+ * @param {BaseGrapher} grapher -- the grapher for the field
+ * @param {Sheet} sheet -- the currently active Sheet
  */
-var BaseContext = function(grapher) {
+var BaseContext = function(grapher, sheet) {
     this._grapher = grapher;
+    this._sheet = sheet;
 };
 
 /**
@@ -36,6 +40,15 @@ BaseContext.prototype.addGlobalEvents = function(events) {
  */
 BaseContext.prototype.load = function() {
     throw new Error(this.constructor.name + " did not define load");
+};
+
+/**
+ * Updates the active sheet
+ *
+ * @param {Sheet} sheet -- the sheet to load
+ */
+BaseContext.prototype.loadSheet = function(sheet) {
+    this._sheet = sheet;
 };
 
 /**

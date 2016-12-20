@@ -196,7 +196,7 @@ EditorController.prototype.loadContext = function(name) {
     }
 
     $("body").addClass("context-" + name);
-    this._context = Context.load(name, this._grapher);
+    this._context = Context.load(name, this._grapher, this._activeSheet);
 };
 
 /**
@@ -297,10 +297,12 @@ EditorController.prototype._getAction = function(name) {
     var context = this;
 
     var _function = this[action.name];
-    if (_function === undefined && this._context !== null) {
+    // try looking in the context
+    if (_function === undefined) {
         _function = this._context[action.name];
         context = this._context;
     }
+    // action not found in controller or context
     if (_function === undefined) {
         throw new Error("No action with the name: " + action.name);
     }
@@ -317,7 +319,7 @@ EditorController.prototype._getAction = function(name) {
  */
 EditorController.prototype._getShortcut = function(shortcut) {
     var action = ApplicationController.prototype._getShortcut.call(this, shortcut);
-    if (action === undefined && this._context !== null) {
+    if (action === undefined) {
         return this._context.shortcuts[shortcut];
     } else {
         return action;
@@ -346,9 +348,12 @@ EditorController.prototype._showStuntsheet = function(stuntsheet) {
     this._activeSheet = $(stuntsheet).data("sheet");
     this._currBeat = 0;
 
-    // load sheet into Show and Grapher
+    // load sheet into necessary objects
     this._show.loadSheet(this._activeSheet);
     this._grapher.draw(this._activeSheet);
+    if (this._context) {
+        this._context.loadSheet(this._activeSheet);
+    }
 };
 
 /**

@@ -8,16 +8,17 @@ module.exports = {
      *  - default: DefaultContext
      *
      * @param {string} name -- the name of the context to load
-     * @param {Grapher} grapher -- the editor grapher
+     * @param {BaseGrapher} grapher -- the editor grapher
+     * @param {Sheet} sheet -- the currently active sheet
      * @return {BaseContext} the context that was loaded
      */
-    load: function(name, grapher) {
+    load: function(name, grapher, sheet) {
         switch (name) {
             case "continuity":
-                var context = new ContinuityContext(grapher);
+                var context = new ContinuityContext(grapher, sheet);
                 break;
             case "default":
-                var context = new DefaultContext(grapher);
+                var context = new DefaultContext(grapher, sheet);
                 break;
             default:
                 throw new Error("No context named: " + name);

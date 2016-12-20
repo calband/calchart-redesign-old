@@ -179,11 +179,7 @@ Sheet.prototype.getLabel = function() {
     }
 
     var sheets = this._show.getSheets();
-    for (var i = 0; i < sheets.length; i++) {
-        if (sheets[i] === this) {
-            return i + 1;
-        }
-    }
+    return sheets.indexOf(this) + 1;
 };
 
 /**

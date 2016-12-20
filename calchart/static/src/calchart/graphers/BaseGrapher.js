@@ -140,7 +140,6 @@ BaseGrapher.prototype.hasMoved = function(dot) {
  * @param {float} y -- the y-coordinate of the dot's position, in pixels
  * @param {object|undefined} options -- options for moving the dot, including
  *   the following options:
- *     - {null|int} snap -- number of steps to snap dot to
  *     - {boolean} transition -- true if this is a transitionary movement (so
  *       don't save position)
  */
@@ -148,14 +147,8 @@ BaseGrapher.prototype.moveDot = function(dot, x, y, options) {
     options = options || {};
 
     // contain dot in workspace
-    var edge = this._scale.toDistance(options.snap || 0);
-    x = Math.min(Math.max(edge, x), this._svgWidth - edge);
-    y = Math.min(Math.max(edge, y), this._svgHeight - edge);
-
-    if (options.snap) {
-        x = this._scale.roundDistance(x - this._scale.minX, options.snap) + this._scale.minX;
-        y = this._scale.roundDistance(y - this._scale.minY, options.snap) + this._scale.minY;
-    }
+    x = Math.min(Math.max(0, x), this._svgWidth);
+    y = Math.min(Math.max(0, y), this._svgHeight);
 
     $(dot).attr("transform", "translate(" + x + "," + y + ")");
 
