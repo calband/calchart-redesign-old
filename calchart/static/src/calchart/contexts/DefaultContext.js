@@ -168,6 +168,7 @@ DefaultContext.prototype.loadSheet = function(sheet) {
 DefaultContext.prototype.unload = function() {
     $(document).off(".default-context");
     $(".workspace").off(".default-context");
+    this.deselectDots();
 
     $(".toolbar .edit-dots").removeClass("active");
 };
