@@ -1,0 +1,15 @@
+// z-index layers: https://www.sitepoint.com/using-sass-maps/#project-configuration
+$z-layers: (
+    toolbar: 100,
+    menu: 200,
+    popup: 300,
+);
+
+@function z-index($key) {
+    @if map-has-key($z-layers, $key) {
+        @return map-get($z-layers, $key);
+    }
+
+    @warn "Unknown `#{$key} in $z-layers.";
+    @return null;
+}

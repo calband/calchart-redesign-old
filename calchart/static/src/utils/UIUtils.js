@@ -1,8 +1,19 @@
 /**
+ * @fileOverview This file is organized in the following sections:
+ *
+ * - Form utilities
+ * - Popup utilities
+ * - Panel utilities
+ * - Message utilities
+ */
+
+/**
  * Contains all utility functions for interacting with UI elements
  * of the application
  */
 var UIUtils = {};
+
+/**** FORMS ****/
 
 /**
  * Send an AJAX POST action to the server with the given
@@ -39,6 +50,26 @@ UIUtils.doAction = function(action, params, success) {
         },
     });
 };
+
+/**
+ * Get data from any form elements that are children of the given element
+ *
+ * @param {jQuery} parent -- the parent element to start looking for form elements
+ * @return {object} key/value pairs mapping name to value
+ */
+UIUtils.getData = function(parent) {
+    var data = {};
+    $(parent).find("input, select, textarea").each(function() {
+        var name = $(this).attr("name");
+        if (name) {
+            var value = $(this).val();
+            data[name] = value;
+        }
+    });
+    return data;
+};
+
+/**** POPUPS ****/
 
 /**
  * Shows the popup with the given name
@@ -90,23 +121,59 @@ UIUtils.hidePopup = function(popup) {
     $(popup).removeClass("active");
 };
 
+/**** PANELS ****/
+
 /**
- * Get data from any form elements that are children of the given element
+ * Create a moveable panel with the given contents at the given position.
  *
- * @param {jQuery} parent -- the parent element to start looking for form elements
- * @return {object} key/value pairs mapping name to value
+ * @param {jQuery} contents -- the contents to populate the panel, wrapped in a div
+ * @param {object|undefined} options -- options to create a panel. Can include
+ *   - {float} top -- the top of the initial position for the panel (defaults
+ *     to center)
+ *   - {float} left -- the left of the initial position for the panel (defaults
+ *     to center)
+ *   - {float} bottom -- the bottom of the initial position for the panel (defaults
+ *     to center)
+ *   - {float} right -- the right of the initial position for the panel (defaults
+ *     to center)
+ * @return {jQuery} the created panel
  */
-UIUtils.getData = function(parent) {
-    var data = {};
-    $(parent).find("input, select, textarea").each(function() {
-        var name = $(this).attr("name");
-        if (name) {
-            var value = $(this).val();
-            data[name] = value;
-        }
-    });
-    return data;
+UIUtils.createPanel = function(contents, options) {
+    options = options || {};
+
+    var panel = $("<div>")
+        .addClass("panel")
+        .appendTo("body");
+
+    $("<div>")
+        .addClass("panel-handle")
+        .appendTo(panel);
+
+    contents.addClass("panel-content").appendTo(panel);
+
+    var position = {};
+
+    if (options.top) {
+        position.top = options.top;
+    } else if (options.bottom) {
+        position.bottom = options.bottom;
+    } else {
+        position.top = $(window).height() / 2 - panel.outerHeight() / 2;
+    }
+    if (options.left) {
+        position.left = options.left;
+    } else if (options.right) {
+        position.right = options.right;
+    } else {
+        position.left = $(window).width() / 2 - panel.outerWidth() / 2;
+    }
+
+    panel.css(position);
+
+    return panel;
 };
+
+/**** MESSAGES ****/
 
 /**
  * Show a message below the given element
