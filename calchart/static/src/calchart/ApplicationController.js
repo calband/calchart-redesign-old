@@ -58,7 +58,8 @@ ApplicationController.extend = function(ChildClass) {
  * Holds all keyboard shortcuts for the controller, mapping keyboard shortcut
  * to the name of the ApplicationController function. Separate keys with "+".
  * e.g. "ctrl+s" or "ctrl+shift+s". Meta keys need to be in this order:
- * ctrl (alias for cmd on Mac), alt, shift.
+ * ctrl (alias for cmd on Mac), alt, shift. Non-character keys can be mapped
+ * as: top, left, down, right, enter, tab, backspace, delete.
  */
 ApplicationController.prototype.shortcuts = {};
 
@@ -70,16 +71,6 @@ ApplicationController.prototype.shortcuts = {};
 ApplicationController.prototype.doAction = function(name) {
     var action = this._getAction(name);
     action.function.apply(this, action.args);
-};
-
-/**
- * Get the shortcut function for the given shortcut key binding
- *
- * @param {string} shortcut -- the shortcut keys, e.g. "ctrl+z"
- * @return {function|undefined} the shortcut function, if there is one
- */
-ApplicationController.prototype.getShortcut = function(shortcut) {
-    return this.shortcuts[shortcut];
 };
 
 /**
@@ -101,6 +92,7 @@ ApplicationController.prototype.init = function() {
     $(window).keydown(function(e) {
         // convert keydown event into string
         var pressedKeys = [];
+
         if (e.metaKey || e.ctrlKey) {
             pressedKeys.push("ctrl");
         }
@@ -110,10 +102,33 @@ ApplicationController.prototype.init = function() {
         if (e.shiftKey) {
             pressedKeys.push("shift");
         }
-        var character = String.fromCharCode(e.keyCode).toLowerCase();
-        pressedKeys.push(character);
 
-        var _function = _this.getShortcut(pressedKeys.join("+"));
+        // http://api.jquery.com/event.which/
+        var code = e.which;
+
+        switch (code) {
+            case 8:
+                pressedKeys.push("backspace"); break;
+            case 9:
+                pressedKeys.push("tab"); break;
+            case 13:
+                pressedKeys.push("enter"); break;
+            case 37:
+                pressedKeys.push("left"); break;
+            case 38:
+                pressedKeys.push("up"); break;
+            case 39:
+                pressedKeys.push("right"); break;
+            case 40:
+                pressedKeys.push("down"); break;
+            case 46:
+                pressedKeys.push("delete"); break;
+            default:
+                var character = String.fromCharCode(code).toLowerCase();
+                pressedKeys.push(character);
+        }
+
+        var _function = _this._getShortcut(pressedKeys.join("+"));
         if (_function) {
             _this.doAction(_function);
             e.preventDefault();
@@ -145,6 +160,16 @@ ApplicationController.prototype._getAction = function(name) {
         function: _function,
         args: action.args,
     };
+};
+
+/**
+ * Get the shortcut function for the given shortcut key binding
+ *
+ * @param {string} shortcut -- the shortcut keys, e.g. "ctrl+z"
+ * @return {function|undefined} the shortcut function, if there is one
+ */
+ApplicationController.prototype._getShortcut = function(shortcut) {
+    return this.shortcuts[shortcut];
 };
 
 /**

@@ -91,18 +91,6 @@ EditorController.prototype.getActiveSheet = function() {
     return this._activeSheet;
 };
 
-/**
- * Allow retrieving shortcuts from the context also
- */
-EditorController.prototype.getShortcut = function(shortcut) {
-    var action = ApplicationController.prototype.getShortcut.call(this, shortcut);
-    if (action === undefined && this._context !== null) {
-        return this._context.shortcuts[shortcut];
-    } else {
-        return action;
-    }
-};
-
 /**** ACTIONS
  *
  * Each action can define the following properties:
@@ -322,6 +310,18 @@ EditorController.prototype._getAction = function(name) {
         function: _function,
         args: action.args,
     };
+};
+
+/**
+ * Allow retrieving shortcuts from the context also
+ */
+EditorController.prototype._getShortcut = function(shortcut) {
+    var action = ApplicationController.prototype._getShortcut.call(this, shortcut);
+    if (action === undefined && this._context !== null) {
+        return this._context.shortcuts[shortcut];
+    } else {
+        return action;
+    }
 };
 
 /**
