@@ -41,7 +41,7 @@ DefaultContext.prototype.load = function() {
     var dragState = "none"; // none, drag, select
     var dragStart = null; // event object on mousedown
 
-    this.addEvents({
+    this._addEvents(".workspace", {
         contextmenu: function(e) {
             e.preventDefault();
 
@@ -74,7 +74,7 @@ DefaultContext.prototype.load = function() {
         },
     });
 
-    this.addGlobalEvents({
+    this._addEvents(document, {
         mousemove: function(e) {
             if (dragState === "none") {
                 return;
@@ -166,7 +166,9 @@ DefaultContext.prototype.loadSheet = function(sheet) {
 };
 
 DefaultContext.prototype.unload = function() {
-    this.removeEvents();
+    $(document).off(".default-context");
+    $(".workspace").off(".default-context");
+
     $(".toolbar .edit-dots").removeClass("active");
 };
 
@@ -315,6 +317,22 @@ DefaultContext.prototype.toggleDots = function(dots, options) {
 };
 
 /**** HELPERS ****/
+
+/**
+ * Add the given events to the given element
+ *
+ * @param {jQuery|string} element -- the element to add events to
+ * @param {object} events -- the events to add, mapping event name to handler
+ */
+BaseContext.prototype._addEvents = function(element, events) {
+    // namespace events
+    $.each(events, function(name, handler) {
+        events[name + ".default-context"] = handler;
+        delete events[name];
+    });
+
+    $(element).on(events);
+};
 
 /**
  * A helper function to revert saveSelectionPositions (both for undo or redo),
