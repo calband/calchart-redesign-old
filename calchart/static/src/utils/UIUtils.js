@@ -153,16 +153,16 @@ UIUtils.setupPanel = function(panel, options) {
     if (options.top) {
         position.top = options.top;
     } else if (options.bottom) {
-        position.bottom = options.bottom;
+        position.top = $(window).height() - $(panel).outerHeight() - options.bottom;
     } else {
-        position.top = $(window).height() / 2 - panel.outerHeight() / 2;
+        position.top = $(window).height() / 2 - $(panel).outerHeight() / 2;
     }
     if (options.left) {
         position.left = options.left;
     } else if (options.right) {
-        position.right = options.right;
+        position.left = $(window).width() - $(panel).outerWidth() - options.right;
     } else {
-        position.left = $(window).width() / 2 - panel.outerWidth() / 2;
+        position.left = $(window).width() / 2 - $(panel).outerWidth() / 2;
     }
 
     $(panel).css(position);
@@ -203,9 +203,6 @@ UIUtils.setupPanel = function(panel, options) {
                 $(panel).css({
                     top: top,
                     left: left,
-                    // unset any bottom/right CSS values from initial position
-                    bottom: "",
-                    right: "",
                 });
             }
         },
