@@ -25,7 +25,6 @@ jQueryUtils.dropdown = function(options) {
     var defaults = {
         placeholder_text_single: "------",
         disable_search_threshold: 10,
-        search_contains: true,
     };
     options = $.extend(defaults, options);
 

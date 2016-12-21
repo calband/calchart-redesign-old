@@ -1,13 +1,15 @@
 // UI colors
 $blue: #2E739B;
 $gold: #FDB515;
+$light-gold: lighten($gold, 35);
+$red: #c82020;
+
 $black: #424242;
 $dark-gray: #757776;
 $medium-gray: #aaa;
 $semilight-gray: #edeeee;
 $light-gray: #f6f6f6;
 $white: #fff;
-$red: #c82020;
 
 // graph colors
 $field-green: #269C2E;

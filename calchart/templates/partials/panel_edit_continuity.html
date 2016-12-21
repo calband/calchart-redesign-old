@@ -5,7 +5,21 @@
     <ul class="dot-types" data-path="{% static 'img/dot-DOT_TYPE.png' %}"></ul>
     <div class="continuities"></div>
     <div class="add-continuity">
-        <input>
-        <i class="icon-plus"></i>
+        <select>
+            <option></option>
+            <optgroup label="Simple">
+                <option value="EWNS">EWNS</option>
+                <option value="NSEW">NSEW</option>
+                <option value="FM">Forward March</option>
+                <option value="MT">Mark Time</option>
+                <option value="DMHS">DMHS</option>
+                <option value="HSDM">HSDM</option>
+            </optgroup>
+            <optgroup label="Flows">
+                <option value="FTL">Follow the Leader</option>
+                <option value="CM">Counter March</option>
+                <option value="TWO">2 Step</option>
+            </optgroup>
+        </select>
     </div>
 {% endblock %}

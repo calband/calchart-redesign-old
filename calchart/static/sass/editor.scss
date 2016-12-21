@@ -6,6 +6,7 @@ body {
     min-width: 800px;
     min-height: 750px;
     cursor: default;
+    overflow: hidden;
     &.context-default {
         .selection-box {
             position: absolute;
@@ -120,7 +121,7 @@ $sidebar-width: 200px;
     &.edit-continuity {
         $panel-ec-height: 200px;
         $panel-ec-content-height: $panel-ec-height - $panel-handle-height;
-        $panel-ec-tabs-height: 40px;
+        $panel-ec-tabs-height: 30px;
         $panel-ec-add-height: 45px;
         $panel-ec-add-width: 16px;
         width: 300px;
@@ -134,7 +135,6 @@ $sidebar-width: 200px;
             border-bottom: 2px solid $black;
             li {
                 display: inline-block;
-                top: 1px;
                 padding: 5px 7px;
                 background: $medium-gray;
                 border: 2px solid $black;
@@ -150,7 +150,7 @@ $sidebar-width: 200px;
                     border-bottom-color: transparent;
                 }
                 img {
-                    height: 20px;
+                    height: 14px;
                 }
             }
         }
@@ -159,6 +159,26 @@ $sidebar-width: 200px;
             background: $light-gray;
             padding: 10px;
             overflow-y: auto;
+            .continuity {
+                padding: 10px;
+                padding-right: 30px;
+                background: $light-gold;
+                &:not(:last-child) {
+                    margin-bottom: 5px;
+                }
+                .info {
+                    display: inline-block;
+                    vertical-align: middle;
+                }
+                i {
+                    position: absolute;
+                    right: 10px;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    cursor: pointer;
+                    color: $red;
+                }
+            }
         }
         .add-continuity {
             position: absolute;
@@ -168,18 +188,8 @@ $sidebar-width: 200px;
             padding: 10px;
             font-size: 0;
             background: $light-gray;
-            input {
-                width: calc(100% - #{$panel-ec-add-width + 5px});
-                height: 100%;
-                vertical-align: middle;
-            }
-            i {
-                display: inline-block;
-                font-size: initial;
-                width: $panel-ec-add-width;
-                margin-left: 5px;
-                cursor: pointer;
-                vertical-align: middle;
+            select {
+                width: 100%;
             }
         }
     }
