@@ -45,7 +45,7 @@ var Sheet = function(show, numBeats, options) {
 
     // map dot labels to their info for the sheet. See Sheet.getInfoForDot
     this._dots = {};
-    // map dot type to Continuity
+    // map dot type to Continuities
     this._continuities = {};
 };
 
@@ -69,6 +69,8 @@ Sheet.create = function(show, numBeats, dotLabels) {
             movements: [],
         };
     });
+
+    sheet._continuities[DotType.PLAIN] = [];
 
     return sheet;
 };
@@ -95,8 +97,10 @@ Sheet.deserialize = function(show, data) {
         };
     });
 
-    $.each(data.continuities, function(dot_type, continuity_data) {
-        sheet._continuities[dot_type] = Continuity.deserialize(continuity_data);
+    $.each(data.continuities, function(dot_type, continuities_data) {
+        sheet._continuities[dot_type] = $.map(continuities_data, function(data) {
+            return Continuity.deserialize(data);
+        });
     });
 
     return sheet;
@@ -129,14 +133,39 @@ Sheet.prototype.serialize = function() {
     });
 
     data.continuities = {};
-    $.each(this._continuities, function(dot_type, continuity) {
-        data.continuities[dot_type] = continuity.serialize();
+    $.each(this._continuities, function(dot_type, continuities) {
+        data.continuities[dot_type] = $.map(continuities, function(continuity) {
+            return continuity.serialize();
+        });
     });
 
     return data;
 };
 
 /**** INSTANCE METHODS ****/
+
+/**
+ * Get the continuities for the given dot type
+ *
+ * @param {string} dotType -- the dot type to get continuities for
+ * @return {Array<Continuity>} the list of continuities
+ */
+Sheet.prototype.getContinuities = function(dotType) {
+    return this._continuities[dotType];
+};
+
+/**
+ * Get the dot types in this sheet, in the order listed
+ * in DotType
+ */
+Sheet.prototype.getDotTypes = function() {
+    var continuities = this._continuities;
+    return $.map(DotType, function(dotType) {
+        if (continuities[dotType] !== undefined) {
+            return dotType;
+        }
+    });
+};
 
 /**
  * Get the duration of this stuntsheet

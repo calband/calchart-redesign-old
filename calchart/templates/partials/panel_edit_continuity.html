@@ -1,5 +1,11 @@
 {% extends "partials/panel.html" %}
+{% load staticfiles %}
 
 {% block content %}
-    HI
+    <ul class="dot-types" data-path="{% static 'img/dot-DOT_TYPE.png' %}"></ul>
+    <div class="continuities"></div>
+    <div class="add-continuity">
+        <input>
+        <i class="icon-plus"></i>
+    </div>
 {% endblock %}

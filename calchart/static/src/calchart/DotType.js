@@ -7,11 +7,11 @@
  */
 module.exports = {
     PLAIN: "plain",
-    PLAIN_FSLASH: "plain-forwardslash",
-    PLAIN_BSLASH: "plain-backslash",
-    PLAIN_X: "plain-x",
     SOLID: "solid",
+    PLAIN_FSLASH: "plain-forwardslash",
     SOLID_FSLASH: "solid-forwardslash",
+    PLAIN_BSLASH: "plain-backslash",
     SOLID_BSLASH: "solid-backslash",
+    PLAIN_X: "plain-x",
     SOLID_X: "solid-x",
 };
