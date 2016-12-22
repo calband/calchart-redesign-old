@@ -1,8 +1,8 @@
-var AnimationState = require("../AnimationState");
-var Coordinate = require("../Coordinate");
-var JSUtils = require("../../utils/JSUtils");
-var MathUtils = require("../../utils/MathUtils");
+var AnimationState = require("calchart/AnimationState");
 var BaseMovementCommand = require("./BaseMovementCommand");
+var Coordinate = require("calchart/Coordinate");
+var JSUtils = require("utils/JSUtils");
+var MathUtils = require("utils/MathUtils");
  
 /**
  * A MovementCommand which represents a constant movement in the given direction.

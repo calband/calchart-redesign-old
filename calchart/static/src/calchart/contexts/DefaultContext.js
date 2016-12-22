@@ -1,7 +1,7 @@
 var BaseContext = require("./BaseContext");
-var HTMLBuilder = require("../../utils/HTMLBuilder");
-var JSUtils = require("../../utils/JSUtils");
-var MathUtils = require("../../utils/MathUtils");
+var HTMLBuilder = require("utils/HTMLBuilder");
+var JSUtils = require("utils/JSUtils");
+var MathUtils = require("utils/MathUtils");
 
 // Global variable to track how much the workspace has scrolled
 // when moving the dots

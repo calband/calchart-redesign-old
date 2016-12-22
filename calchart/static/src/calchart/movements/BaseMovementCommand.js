@@ -1,4 +1,4 @@
-var Coordinate = require("./Coordinate");
+var Coordinate = require("calchart/Coordinate");
 
 /**
  * Represents an individual movement that a dot executes during a

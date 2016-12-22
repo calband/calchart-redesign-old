@@ -1,7 +1,7 @@
-var EditorController = require("./calchart/controllers/EditorController");
-var Grapher = require("./calchart/Grapher");
-var Show = require("./calchart/Show");
-var UIUtils = require("./utils/UIUtils");
+var EditorController = require("calchart/controllers/EditorController");
+var Grapher = require("calchart/Grapher");
+var Show = require("calchart/Show");
+var UIUtils = require("utils/UIUtils");
 
 /**
  * Setup show, prompting user for show details if the show is new

@@ -1,5 +1,5 @@
-var jQueryUtils = require("./utils/jQueryUtils");
-var UIUtils = require("./utils/UIUtils");
+var jQueryUtils = require("utils/jQueryUtils");
+var UIUtils = require("utils/UIUtils");
 
 jQueryUtils(jQuery);
 

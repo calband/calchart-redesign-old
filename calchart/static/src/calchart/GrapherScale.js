@@ -1,4 +1,4 @@
-var MathUtils = require("../utils/MathUtils");
+var MathUtils = require("utils/MathUtils");
 
 // the minimum amount of space between the field and the SVG
 var FIELD_PADDING = 30;

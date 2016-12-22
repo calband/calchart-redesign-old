@@ -1,6 +1,6 @@
 var BaseContinuity = require("./BaseContinuity");
-var HTMLBuilder = require("../../utils/HTMLBuilder");
-var JSUtils = require("../../utils/JSUtils");
+var HTMLBuilder = require("utils/HTMLBuilder");
+var JSUtils = require("utils/JSUtils");
 
 /**
  * An EWNS or NSEW continuity, where dots move as far EW or NS as possible,

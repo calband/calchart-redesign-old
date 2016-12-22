@@ -1,4 +1,5 @@
 var fs = require("fs");
+var path = require("path");
 
 var getEntryPoints = function() {
     var dir = "calchart/static/src";
@@ -42,8 +43,13 @@ module.exports = function (grunt) {
                 output: {
                     path: "calchart/static/js/",
                     filename: "[name].js"
+                },
+                resolve: {
+                    root: [
+                        path.resolve("./calchart/static/src")
+                    ]
                 }
-            }
+            },
         },
         watch: {
             sass: {

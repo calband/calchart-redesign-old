@@ -1,5 +1,5 @@
 var BaseGrapher = require("./BaseGrapher");
-var JSUtils = require("../../utils/JSUtils");
+var JSUtils = require("utils/JSUtils");
 
 var HASH_WIDTH = 10;
 

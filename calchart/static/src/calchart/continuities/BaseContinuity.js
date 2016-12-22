@@ -1,4 +1,4 @@
-var HTMLBuilder = require("../../utils/HTMLBuilder");
+var HTMLBuilder = require("utils/HTMLBuilder");
 
 /**
  * Represents a continuity for a dot type during a stuntsheet. This is

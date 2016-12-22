@@ -9,8 +9,8 @@
  * - Helpers (prefixed with an underscore)
  */
 
-var HTMLBuilder = require("../utils/HTMLBuilder");
-var JSUtils = require("../utils/JSUtils");
+var HTMLBuilder = require("utils/HTMLBuilder");
+var JSUtils = require("utils/JSUtils");
 
 /**** CONSTRUCTORS ****/
 

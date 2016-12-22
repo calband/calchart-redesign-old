@@ -9,12 +9,12 @@
  * - Helpers (prefixed with an underscore)
  */
 
-var ApplicationController = require("../ApplicationController");
-var Context = require("../Context");
-var Grapher = require("../Grapher");
-var HTMLBuilder = require("../../utils/HTMLBuilder");
-var JSUtils = require("../../utils/JSUtils");
-var UIUtils = require("../../utils/UIUtils");
+var ApplicationController = require("calchart/ApplicationController");
+var Context = require("calchart/Context");
+var Grapher = require("calchart/Grapher");
+var HTMLBuilder = require("utils/HTMLBuilder");
+var JSUtils = require("utils/JSUtils");
+var UIUtils = require("utils/UIUtils");
 
 /**** CONSTRUCTORS ****/
 

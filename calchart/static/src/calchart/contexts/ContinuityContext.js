@@ -1,8 +1,8 @@
 var BaseContext = require("./BaseContext");
-var Continuity = require("../Continuity");
-var HTMLBuilder = require("../../utils/HTMLBuilder");
-var JSUtils = require("../../utils/JSUtils");
-var UIUtils = require("../../utils/UIUtils");
+var Continuity = require("calchart/Continuity");
+var HTMLBuilder = require("utils/HTMLBuilder");
+var JSUtils = require("utils/JSUtils");
+var UIUtils = require("utils/UIUtils");
 
 /**
  * The default editor context, that allows a user to edit dot

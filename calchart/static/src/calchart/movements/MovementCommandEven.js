@@ -1,5 +1,5 @@
-var JSUtils = require("../../utils/JSUtils");
-var MathUtils = require("../../utils/MathUtils");
+var JSUtils = require("utils/JSUtils");
+var MathUtils = require("utils/MathUtils");
 var MovementCommandMove = require("./MovementCommandMove");
  
 /**

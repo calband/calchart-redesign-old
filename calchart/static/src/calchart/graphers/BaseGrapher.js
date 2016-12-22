@@ -9,8 +9,8 @@
  * - Helpers (prefixed with an underscore)
  */
 
-var CalchartUtils = require("../../utils/CalchartUtils");
-var GrapherScale = require("../GrapherScale");
+var CalchartUtils = require("utils/CalchartUtils");
+var GrapherScale = require("calchart/GrapherScale");
 
 /**** CONSTRUCTOR ****/
 
