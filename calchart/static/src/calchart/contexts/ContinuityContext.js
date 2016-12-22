@@ -103,8 +103,10 @@ ContinuityContext.prototype._changeTab = function(tab) {
     $(tab).addClass("active")
         .siblings().removeClass("active");
 
-    // TODO: show continuities
-    var continuities = $(tab).data("continuities");
+    var continuities = this._panel.find(".continuities");
+    $(tab).data("continuities").forEach(function(continuity) {
+        continuity.appendTo(continuities);
+    });
 
     // TODO: show continuity errors (dots not make their spot, not enough continuities)
 };
