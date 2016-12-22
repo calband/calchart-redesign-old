@@ -119,6 +119,7 @@ $sidebar-width: 200px;
         height: $panel-handle-height;
     }
     &.edit-continuity {
+        $panel-ec-actions-width: 32px;
         width: 300px;
         background: $light-gray;
         .add-continuity {
@@ -138,15 +139,14 @@ $sidebar-width: 200px;
             overflow-y: auto;
             .continuity {
                 padding: 10px;
-                padding-right: 30px;
                 background: $light-gold;
                 &:not(:last-child) {
                     margin-bottom: 5px;
                 }
                 .info {
                     display: inline-block;
-                    vertical-align: middle;
-                    width: 100%;
+                    width: calc(100% - #{$panel-ec-actions-width + 5px});
+                    margin-right: 5px;
                     & > span {
                         margin-right: 20px;
                     }
@@ -160,13 +160,16 @@ $sidebar-width: 200px;
                         }
                     }
                 }
-                i {
-                    position: absolute;
-                    right: 10px;
-                    top: 50%;
-                    transform: translateY(-50%);
-                    cursor: pointer;
-                    color: $red;
+                .actions {
+                    display: inline-block;
+                    vertical-align: middle;
+                    width: $panel-ec-actions-width;
+                    i {
+                        cursor: pointer;
+                        &.delete {
+                            color: $red;
+                        }
+                    }
                 }
             }
         }

@@ -43,6 +43,13 @@ ContinuityContext.prototype.load = function() {
                         .trigger("chosen:updated");
                 });
 
+            panel.on("click", ".continuity .edit", function() {
+                var continuity = $(this).parents(".continuity").data("continuity");
+
+                console.log(continuity);
+                // TODO: edit continuity popup
+            });
+
             panel.on("click", ".continuity .delete", function() {
                 var elem = $(this).parents(".continuity");
                 var continuity = elem.data("continuity");

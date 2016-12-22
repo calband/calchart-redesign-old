@@ -54,14 +54,19 @@ BaseContinuity.prototype.getMovements = function(sheet, dot) {
  *
  *   <div class="continuity {type}">
  *       <div class="info">{contents}</div>
- *       <i class="icon-times"></i>
+ *       <div class="actions">
+ *           <i class="icon-pencil"></i>
+ *           <i class="icon-times"></i>
+ *       </div>
  *   </div>
  */
 BaseContinuity.prototype._wrapHTML = function(type, contents) {
-    var icon = HTMLBuilder.icon("times", "delete");
+    var icon_edit = HTMLBuilder.icon("pencil", "edit");
+    var icon_delete = HTMLBuilder.icon("times", "delete");
+    var actions = HTMLBuilder.div("actions", [icon_edit, icon_delete]);
     var info = HTMLBuilder.div("info", contents);
 
-    return HTMLBuilder.div("continuity " + type, [info, icon])
+    return HTMLBuilder.div("continuity " + type, [info, actions])
         .data("continuity", this);
 };
 
