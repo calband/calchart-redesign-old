@@ -37,7 +37,10 @@ ContinuityContext.prototype.load = function() {
                     disable_search_threshold: false,
                 })
                 .change(function() {
-                    _this._addContinuity($(this).val());
+                    var continuity = new Continuity($(this).val());
+                    continuity.appendTo(_this._panel.find(".continuities"));
+
+                    // TODO: add to Sheet
 
                     $(this).val("")
                         .trigger("chosen:updated");
@@ -82,19 +85,6 @@ ContinuityContext.prototype.unload = function() {
 /**** HELPERS ****/
 
 /**
- * Add the continuity with the given code
- *
- * @param {string} type -- the type of Continuity to add (see Continuity)
- */
-ContinuityContext.prototype._addContinuity = function(type) {
-    var continuity = new Continuity(type);
-
-    continuity.appendTo(this._panel.find(".continuities"));
-
-    // TODO: add to Sheet
-};
-
-/**
  * Change the currently active dot type
  *
  * @param {jQuery} tab -- the tab for the dot type to select
@@ -117,8 +107,9 @@ ContinuityContext.prototype._changeTab = function(tab) {
  */
 ContinuityContext.prototype._updatePanel = function() {
     var _this = this;
-    var tabs = this._panel.find(".dot-types");
+    var tabs = this._panel.find(".dot-types").empty();
     var path = tabs.data("path");
+
     $.each(this._sheet.getDotTypes(), function(i, dotType) {
         var dot = HTMLBuilder.img(path.replace("DOT_TYPE", dotType));
 
