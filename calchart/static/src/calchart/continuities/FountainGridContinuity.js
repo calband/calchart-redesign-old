@@ -45,9 +45,14 @@ FountainGridContinuity.prototype.appendTo = function(continuities) {
     var label = HTMLBuilder.span(null, type);
 
     var endLabel = HTMLBuilder.span(null, "End:");
-    var endChoices = HTMLBuilder.select(null, {
-        MT: "Mark Time",
-        CL: "Close",
+    var endChoices = HTMLBuilder.select({
+        options: {
+            MT: "Mark Time",
+            CL: "Close",
+        },
+        change: function() {
+            // TODO: modify end
+        },
     });
     var end = HTMLBuilder.div("panel-continuity-end", [endLabel, endChoices]);
 

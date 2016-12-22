@@ -26,7 +26,7 @@ ContinuityContext.prototype.load = function() {
         bottom: 20,
         right: 20,
         onInit: function(panel) {
-            panel.on(".tab", function() {
+            panel.on("click", ".tab", function() {
                 _this._changeTab(this);
             });
 
@@ -43,7 +43,14 @@ ContinuityContext.prototype.load = function() {
                         .trigger("chosen:updated");
                 });
 
-            // TODO: delete continuity
+            panel.on("click", ".continuity .delete", function() {
+                var elem = $(this).parents(".continuity");
+                var continuity = elem.data("continuity");
+                elem.remove();
+
+                console.log(continuity);
+                // TODO: remove from Sheet
+            });
         },
     });
     this._updatePanel();

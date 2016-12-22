@@ -77,9 +77,12 @@ HTMLBuilder.div = function() {
 /**
  * Builds an <i> element, with the given parameters:
  *  - {string} name -- the name of the icon, without the "icon-" prefix
+ *  - {string} class -- the class to add to the <i>
  */
-HTMLBuilder.icon = function(name) {
-    return $("<i>").addClass("icon-" + name);
+HTMLBuilder.icon = function() {
+    var args = _parseArgs(arguments, ["name", "class"]);
+
+    return $("<i>").addClass("icon-" + args.name + " " + args.class);
 };
 
 /**
@@ -95,11 +98,12 @@ HTMLBuilder.img = function(src) {
  *  - {string} class -- the class to add to the <select>
  *  - {object} options -- the options to add to the <select>, mapping
  *    the value of the option to the name.
+ *  - {function} change -- the callback to run when an option is selected
  */
 HTMLBuilder.select = function() {
-    var args = _parseArgs(arguments, ["class", "options"]);
+    var args = _parseArgs(arguments, ["class", "options", "change"]);
 
-    var select = $("<select>").addClass(args.class);
+    var select = $("<select>").addClass(args.class).change(args.change);
 
     $.each(args.options, function(value, label) {
         $("<option>")
