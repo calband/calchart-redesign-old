@@ -1,5 +1,6 @@
 var BaseContext = require("./BaseContext");
 var Continuity = require("../Continuity");
+var HTMLBuilder = require("../../utils/HTMLBuilder");
 var JSUtils = require("../../utils/JSUtils");
 var UIUtils = require("../../utils/UIUtils");
 
@@ -74,7 +75,7 @@ ContinuityContext.prototype.unload = function() {
 ContinuityContext.prototype._addContinuity = function(type) {
     var continuity = new Continuity(type);
 
-    continuity.html().appendTo(this._panel.find(".continuities"));
+    continuity.appendTo(this._panel.find(".continuities"));
 
     // TODO: add to Sheet
 };
@@ -103,12 +104,11 @@ ContinuityContext.prototype._updatePanel = function() {
     var tabs = this._panel.find(".dot-types");
     var path = tabs.data("path");
     $.each(this._sheet.getDotTypes(), function(i, dotType) {
-        var dot = $("<img>").attr("src", path.replace("DOT_TYPE", dotType));
-        $("<li>")
-            .addClass("tab")
+        var dot = HTMLBuilder.img(path.replace("DOT_TYPE", dotType));
+
+        HTMLBuilder.make("li.tab", tabs)
             .append(dot)
-            .data("continuities", _this._sheet.getContinuities(dotType))
-            .appendTo(tabs);
+            .data("continuities", _this._sheet.getContinuities(dotType));
     });
 
     this._changeTab(this._panel.find(".dot-types li:first"));

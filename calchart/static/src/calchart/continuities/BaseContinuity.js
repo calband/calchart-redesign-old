@@ -1,3 +1,5 @@
+var HTMLBuilder = require("../../utils/HTMLBuilder");
+
 /**
  * Represents a continuity for a dot type during a stuntsheet. This is
  * distinct from MovementCommands, as those are per-dot, and describe
@@ -21,6 +23,16 @@ BaseContinuity.prototype.serialize = function() {
 /**** INSTANCE METHODS ****/
 
 /**
+ * Append this continuity to the list of continuities
+ *
+ * @param {jQuery} continuities -- the list of continuities to append this
+ *   continuity to
+ */
+BaseContinuity.prototype.appendTo = function(continuities) {
+    throw new Error(this.constructor.name + " did not define html");
+};
+
+/**
  * Get the movements for the given dot for the given stuntsheet
  *
  * @param {Sheet} sheet -- the sheet the continuity is being executed for
@@ -31,36 +43,25 @@ BaseContinuity.prototype.getMovements = function(sheet, dot) {
     throw new Error(this.constructor.name + " did not define getMovements");
 };
 
+/**** HELPERS ****/
+
 /**
- * @return {jQuery} the HTML element to add to the edit continuity panel, of
- *   the format:
+ * Wrap the given contents to add to the edit continuity panel
+ *
+ * @param {string} type -- the type of the continuity to add
+ * @param {Array<jQuery>} contents -- the jQuery contents
+ * @return {jQuery} the HTML element to add to the panel, in the format:
  *
  *   <div class="continuity {type}">
  *       <div class="info">{contents}</div>
  *       <i class="icon-times"></i>
  *   </div>
  */
-BaseContinuity.prototype.html = function() {
-    throw new Error(this.constructor.name + " did not define html");
-};
-
-/**** HELPERS ****/
-
-/**
- * Wrap the given contents to add to the edit continuity panel, in
- * the format specified in BaseContinuity.html
- *
- * @param {string} type -- the type of the continuity to add
- * @param {jQuery} contents -- the jQuery contents
- * @return {jQuery} the HTML element to add to the panel
- */
 BaseContinuity.prototype._wrapHTML = function(type, contents) {
-    var icon = $("<i>").addClass("icon-times");
-    var info = $("<div>").addClass("info").append(contents);
-    return $("<div>")
-        .addClass("continuity " + type)
-        .append(info)
-        .append(icon);
+    var icon = HTMLBuilder.icon("times");
+    var info = HTMLBuilder.div("info", contents);
+
+    return HTMLBuilder.div("continuity " + type, [info, icon]);
 };
 
 module.exports = BaseContinuity;

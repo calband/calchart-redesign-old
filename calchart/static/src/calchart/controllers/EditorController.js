@@ -12,6 +12,7 @@
 var ApplicationController = require("../ApplicationController");
 var Context = require("../Context");
 var Grapher = require("../Grapher");
+var HTMLBuilder = require("../../utils/HTMLBuilder");
 var JSUtils = require("../../utils/JSUtils");
 var UIUtils = require("../../utils/UIUtils");
 
@@ -264,15 +265,12 @@ EditorController.prototype.undo = function() {
  */
 EditorController.prototype._addStuntsheetToSidebar = function(sheet) {
     // containers for elements in sidebar
-    var label = $("<span>").addClass("label");
-    var preview = $("<svg>").addClass("preview");
+    var label = HTMLBuilder.make("span.label");
+    var preview = HTMLBuilder.make("svg.preview");
 
-    var stuntsheet = $("<div>")
-        .addClass("stuntsheet")
-        .data("sheet", sheet)
-        .append(label)
-        .append(preview)
-        .appendTo(".sidebar");
+    var stuntsheet = HTMLBuilder
+        .div("stuntsheet", [label, preview], ".sidebar")
+        .data("sheet", sheet);
 
     this._updateSidebar(stuntsheet);
     return stuntsheet;

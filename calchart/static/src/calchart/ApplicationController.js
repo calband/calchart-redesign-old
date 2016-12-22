@@ -9,6 +9,7 @@
  * - Helpers (prefixed with an underscore)
  */
 
+var HTMLBuilder = require("../utils/HTMLBuilder");
 var JSUtils = require("../utils/JSUtils");
 
 /**** CONSTRUCTORS ****/
@@ -283,13 +284,10 @@ ApplicationController.prototype._setupToolbar = function(toolbar) {
             var name = $(this).data("name");
 
             tooltipTimeout = setTimeout(function() {
-                var tooltip = $("<div>")
-                    .addClass("tooltip")
-                    .text(name)
-                    .appendTo("body");
+                var tooltip = HTMLBuilder.span("tooltip", name, "body");
 
-                var arrow = $("<span>")
-                    .addClass("tooltip-arrow")
+                var arrow = HTMLBuilder
+                    .make("span.tooltip-arrow")
                     .appendTo(tooltip);
 
                 var left = offset.left - tooltip.outerWidth() / 2 + width / 2;

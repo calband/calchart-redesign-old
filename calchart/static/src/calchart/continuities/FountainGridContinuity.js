@@ -1,4 +1,5 @@
 var BaseContinuity = require("./BaseContinuity");
+var HTMLBuilder = require("../../utils/HTMLBuilder");
 var JSUtils = require("../../utils/JSUtils");
 
 /**
@@ -38,17 +39,24 @@ FountainGridContinuity.prototype.serialize = function() {
 
 /**** INSTANCE METHODS ****/
 
-FountainGridContinuity.prototype.getMovements = function(sheet, dot) {
-    // TODO
-};
-
-FountainGridContinuity.prototype.html = function() {
+FountainGridContinuity.prototype.appendTo = function(continuities) {
     var type = this._isEWNS ? "EWNS" : "NSEW";
 
-    var contents = $("<span>").text(type);
-    // TODO: end (default mark time)
+    var label = HTMLBuilder.span(null, type);
 
-    return this._wrapHTML(type, contents);
+    var endLabel = HTMLBuilder.span(null, "End:");
+    var endChoices = HTMLBuilder.select(null, {
+        MT: "Mark Time",
+        CL: "Close",
+    });
+    var end = HTMLBuilder.div("panel-continuity-end", [endLabel, endChoices]);
+
+    continuities.append(this._wrapHTML(type, [label, end]));
+    endChoices.dropdown();
+};
+
+FountainGridContinuity.prototype.getMovements = function(sheet, dot) {
+    // TODO
 };
 
 module.exports = FountainGridContinuity;

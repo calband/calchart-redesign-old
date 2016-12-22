@@ -146,6 +146,19 @@ $sidebar-width: 200px;
                 .info {
                     display: inline-block;
                     vertical-align: middle;
+                    width: 100%;
+                    & > span {
+                        margin-right: 20px;
+                    }
+                    .panel-continuity-end {
+                        display: inline-block;
+                        & > span {
+                            margin-right: 5px;
+                        }
+                        select {
+                            width: 110px;
+                        }
+                    }
                 }
                 i {
                     position: absolute;

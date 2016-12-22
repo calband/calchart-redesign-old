@@ -1,4 +1,5 @@
 var BaseContext = require("./BaseContext");
+var HTMLBuilder = require("../../utils/HTMLBuilder");
 var JSUtils = require("../../utils/JSUtils");
 var MathUtils = require("../../utils/MathUtils");
 
@@ -64,9 +65,7 @@ DefaultContext.prototype.load = function() {
                 dragState = "drag";
             } else {
                 _this.deselectDots();
-                $("<div>")
-                    .addClass("selection-box")
-                    .appendTo("body");
+                HTMLBuilder.div("selection-box", null, "body");
                 dragState = "select";
             }
 

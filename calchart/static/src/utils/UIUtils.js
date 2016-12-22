@@ -7,6 +7,8 @@
  * - Message utilities
  */
 
+var HTMLBuilder = require("./HTMLBuilder");
+
 /**
  * Contains all utility functions for interacting with UI elements
  * of the application
@@ -232,9 +234,7 @@ UIUtils.setupPanel = function(panel, options) {
 UIUtils.showMessage = function(message, element, isError) {
     var messageElem = $(element).next("p.message");
     if (messageElem.exists()) {
-        messageElem = $("<p>")
-            .addClass("message")
-            .insertAfter(element);
+        messageElem = HTMLBuilder.make("p.message");
     }
     if (isError) {
         messageElem.addClass("error");
