@@ -22,7 +22,7 @@ ContinuityContext.prototype.load = function() {
     var _this = this;
 
     UIUtils.setupPanel(this._panel, {
-        top: "25%",
+        bottom: 20,
         right: 20,
         onInit: function(panel) {
             panel.on(".tab", function() {

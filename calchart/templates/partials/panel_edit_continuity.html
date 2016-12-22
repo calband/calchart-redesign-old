@@ -2,8 +2,6 @@
 {% load staticfiles %}
 
 {% block content %}
-    <ul class="dot-types" data-path="{% static 'img/dot-DOT_TYPE.png' %}"></ul>
-    <div class="continuities"></div>
     <div class="add-continuity">
         <select>
             <option></option>
@@ -22,4 +20,6 @@
             </optgroup>
         </select>
     </div>
+    <div class="continuities"></div>
+    <ul class="dot-types" data-path="{% static 'img/dot-DOT_TYPE.png' %}"></ul>
 {% endblock %}

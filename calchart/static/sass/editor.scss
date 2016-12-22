@@ -119,45 +119,22 @@ $sidebar-width: 200px;
         height: $panel-handle-height;
     }
     &.edit-continuity {
-        $panel-ec-height: 200px;
-        $panel-ec-content-height: $panel-ec-height - $panel-handle-height;
-        $panel-ec-tabs-height: 30px;
-        $panel-ec-add-height: 45px;
-        $panel-ec-add-width: 16px;
         width: 300px;
-        height: $panel-ec-height;
-        .panel-content {
-            height: $panel-ec-content-height;
-        }
-        .dot-types {
-            padding: 5px 10px 0;
-            height: $panel-ec-tabs-height;
-            border-bottom: 2px solid $black;
-            li {
-                display: inline-block;
-                padding: 5px 7px;
-                background: $medium-gray;
-                border: 2px solid $black;
-                cursor: pointer;
-                &:hover {
-                    background: lighten($medium-gray, 5);
-                }
-                &:not(:last-child) {
-                    border-right: none;
-                }
-                &.active {
-                    background: $light-gray;
-                    border-bottom-color: transparent;
-                }
-                img {
-                    height: 14px;
-                }
+        background: $light-gray;
+        .add-continuity {
+            padding: 0 10px;
+            margin: 10px 0;
+            select {
+                width: 100%;
+            }
+            .chosen-container .chosen-results {
+                max-height: 125px;
             }
         }
         .continuities {
-            height: $panel-ec-content-height - $panel-ec-tabs-height - $panel-ec-add-height;
-            background: $light-gray;
-            padding: 10px;
+            height: 125px;
+            padding: 0 10px;
+            margin: 10px 0;
             overflow-y: auto;
             .continuity {
                 padding: 10px;
@@ -180,16 +157,31 @@ $sidebar-width: 200px;
                 }
             }
         }
-        .add-continuity {
-            position: absolute;
-            height: $panel-ec-add-height;
-            bottom: 0;
-            width: 100%;
-            padding: 10px;
-            font-size: 0;
-            background: $light-gray;
-            select {
-                width: 100%;
+        .dot-types {
+            height: 35px;
+            padding: 0 10px;
+            border-top: 2px solid $black;
+            background: $dark-gray;
+            li {
+                display: inline-block;
+                padding: 5px 7px;
+                top: -2px;
+                background: $medium-gray;
+                border: 2px solid $black;
+                cursor: pointer;
+                &:hover {
+                    background: lighten($medium-gray, 5);
+                }
+                &:not(:last-child) {
+                    border-right: none;
+                }
+                &.active {
+                    background: $light-gray;
+                    border-top-color: transparent;
+                }
+                img {
+                    height: 14px;
+                }
             }
         }
     }
