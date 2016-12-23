@@ -30,13 +30,6 @@ $editor-header-height: 100px;
     }
     .toolbar {
         padding-left: 10px;
-        background: $light-gray;
-        background: linear-gradient($light-gray, $semilight-gray);
-        border-bottom: 1px solid $semilight-gray;
-        box-shadow: 0 1px 2px rgba($black, 0.2);
-        li:hover {
-            background: lighten($light-gray, 1);
-        }
     }
 }
 

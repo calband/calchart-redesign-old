@@ -68,6 +68,7 @@ ContinuityContext.prototype.load = function() {
     this._updatePanel();
     
     $(".toolbar .edit-continuity").addClass("active");
+    // TODO: ContinuityContext toolbar group
 };
 
 ContinuityContext.prototype.loadSheet = function(sheet) {

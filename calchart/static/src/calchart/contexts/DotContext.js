@@ -157,6 +157,7 @@ DotContext.prototype.load = function() {
     });
 
     $(".toolbar .edit-dots").addClass("active");
+    // TODO: DotContext toolbar group
 };
 
 DotContext.prototype.loadSheet = function(sheet) {

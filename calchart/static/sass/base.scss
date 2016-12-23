@@ -178,27 +178,35 @@ header {
 .toolbar {
     z-index: z-index(toolbar);
     padding: 5px 0;
+    background: $light-gray;
+    background: linear-gradient($light-gray, $semilight-gray);
+    border-bottom: 1px solid $semilight-gray;
+    box-shadow: 0 1px 2px rgba($black, 0.2);
     ul.toolbar-group {
         display: inline-block;
         padding: 0 5px;
-        &:not(:last-child) {
-            border-right: 1px solid $medium-gray;
+        &.hide {
+            display: none;
+        }
+        &:not(:first-child) {
+            border-left: 1px solid $medium-gray;
         }
         li {
             display: inline-block;
             padding: 5px;
+            margin: 0 1px;
             cursor: default;
-            border: 1px solid transparent;
-            &:not(:last-child) {
-                margin-right: 5px;
-            }
-            &:hover, &.active, &.focus:hover {
-                border: 1px solid darken($semilight-gray, 10);
-                border-radius: 2px;
-                box-shadow: 0 0 1px rgba($black, 0.2);
-            }
-            &.active, &.focus:hover {
-                background: rgba($white, 0.7);
+            &.toolbar-item {
+                border: 1px solid transparent;
+                &:hover, &.active, &.focus:hover {
+                    border: 1px solid darken($semilight-gray, 10);
+                    border-radius: 2px;
+                    box-shadow: 0 0 1px rgba($black, 0.2);
+                    background: rgba($white, 0.5);
+                }
+                &.active, &.focus:hover {
+                    background: rgba($white, 0.7);
+                }
             }
             i {
                 color: $dark-gray;

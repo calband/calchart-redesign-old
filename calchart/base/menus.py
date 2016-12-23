@@ -120,15 +120,35 @@ class ToolbarGroup(object):
 
     def render(self):
         return format_html(
-            '<ul class="toolbar-group">{}</ul>',
-            mark_safe(''.join(item.render() for item in self.items))
+            '<ul class="{}">{}</ul>',
+            self._get_classes(), mark_safe(''.join(item.render() for item in self.items))
         )
+
+    def _get_classes(self):
+        return 'toolbar-group'
+
+class ToolbarContextGroup(ToolbarGroup):
+    """
+    A Calchart ToolbarContextGroup, in the format
+
+    <ul class="toolbar-group hide {{ name }}-group">
+        # for each item
+        {{ ToolbarItem.render }}
+    </ul>
+    """
+    def __init__(self, name, *items):
+        super(ToolbarContextGroup, self).__init__(*items)
+        self.name = name
+
+    def _get_classes(self):
+        classes = super(ToolbarContextGroup, self)._get_classes()
+        return '%s hide %s-group' % (classes, self.name)
 
 class ToolbarItem(object):
     """
     A Calchart ToolbarItem, in the format
 
-    <li class="{{ class }}" data-name="{{ name }}" data-function="{{ function }}">
+    <li class="toolbar-item {{ class }}" data-name="{{ name }}" data-function="{{ function }}">
         <i class="icon-{{ icon }}"></i>
     </li>
 
@@ -142,8 +162,26 @@ class ToolbarItem(object):
 
     def render(self):
         return format_html(
-            '<li class="{}" data-name="{}" data-function="{}"><i class="icon-{}"></i></li>',
+            '<li class="toolbar-item {}" data-name="{}" data-function="{}"><i class="icon-{}"></i></li>',
             slugify(self.name), self.name, self.function, self.icon
+        )
+
+class CustomToolbarItem(object):
+    """
+    A Calchart ToolbarItem, with custom HTML contents, in the format
+
+    <li class="{{ name }}">
+        {{ contents }}
+    </li>
+    """
+    def __init__(self, name, contents):
+        self.name = name
+        self.contents = contents
+
+    def render(self):
+        return format_html(
+            '<li class="{}">{}</li>',
+            slugify(self.name), mark_safe(self.contents)
         )
 
 ### MENUS ###
@@ -177,7 +215,18 @@ editor_toolbar = Toolbar(
         ToolbarItem('Redo', 'repeat', 'redo'),
     ),
     ToolbarGroup(
-        ToolbarItem('Edit Dots', 'dot-circle-o', 'loadContext(default)'),
+        ToolbarItem('Edit Dots', 'dot-circle-o', 'loadContext(dot)'),
         ToolbarItem('Edit Continuity', 'pencil-square-o', 'loadContext(continuity)'),
+    ),
+    ToolbarContextGroup(
+        'edit-dots',
+        ToolbarItem('Selection', 'selection', 'TODO'),
+        ToolbarItem('Lasso', 'lasso', 'TODO'),
+    ),
+    ToolbarContextGroup(
+        'edit-continuity',
+        ToolbarItem('Previous Beat', 'chevron-left', 'TODO'),
+        CustomToolbarItem('Seek', '<span>TODO</span>'), # TODO: seek bar
+        ToolbarItem('Next Beat', 'chevron-right', 'TODO'),
     ),
 )
