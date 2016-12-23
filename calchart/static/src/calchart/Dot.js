@@ -86,34 +86,43 @@ Dot.prototype.loadSheet = function(sheet) {
  *
  * @param {int} beatNum -- the beat of the current stuntsheet
  * @return {AnimationState|null} An AnimationState that describes the Dot at
- *   a moment of the show. If the Dot has no movement at the specified beat,
+ *   a moment of the show. If the Dot has no position at the specified beat,
  *   returns null.
  */
 Dot.prototype.getAnimationState = function(beatNum) {
     var movements = this._sheetInfo.movements;
+
+    var remaining = beatNum;
+
     for (var i = 0; i < movements.length; i++) {
-        var movements = movements[i];
-        beatNum -= movement.getBeatDuration();
-        if (beatNum < 0) {
-            return movement.getAnimationState(beatNum);
+        var movement = movements[i];
+        var duration = movement.getDuration();
+        if (remaining < duration) {
+            return movement.getAnimationState(remaining);
+        } else {
+            remaining -= duration;
         }
     }
 
-    // if it's the zeroth beat, just return the start position
-    if (beatNum === 0) {
-        return new AnimationState(this._sheetInfo.position, 0);
-    } else {
-        return null;
-    }
+    return null;
 };
 
 /**
  * Return the dot's dot type for the currently loaded stuntsheet
  *
- * @param {string} the dot type for the current stuntsheet
+ * @return {string} the dot type for the current stuntsheet
  */
 Dot.prototype.getDotType = function() {
     return this._sheetInfo.type;
 };
+
+/**
+ * Get the position of the dot at the beginning of the currently loaded stuntsheet
+ *
+ * @return {Coordinate} the initial position of the dot
+ */
+Dot.prototype.getPosition = function() {
+    return this._sheetInfo.position;
+}
 
 module.exports = Dot;

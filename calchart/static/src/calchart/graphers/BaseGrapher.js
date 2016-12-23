@@ -235,7 +235,12 @@ BaseGrapher.prototype._drawDots = function(currentBeat, selectedDots) {
     
     dotGroups.each(function(dot) {
         var label = dot.getLabel();
-        var state = dot.getAnimationState(currentBeat);
+        // special case in case dots are positioned without having movements
+        if (currentBeat === 0) {
+            var state = dot.getPosition();
+        } else {
+            var state = dot.getAnimationState(currentBeat);
+        }
         var x = _this._scale.xScale(state.x);
         var y = _this._scale.yScale(state.y);
 

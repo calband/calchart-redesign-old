@@ -33,7 +33,7 @@ var MovementCommandMove = function(startX, startY, stepSize, direction, orientat
 
     var end = this._getPosition(duration);
 
-    MovementCommand.call(this, startX, startY, end.x, end.y, duration);
+    BaseMovementCommand.call(this, startX, startY, end.x, end.y, duration);
 };
 
 JSUtils.extends(MovementCommandMove, BaseMovementCommand);
@@ -54,7 +54,7 @@ MovementCommandMove.deserialize = function(data) {
         data.direction,
         data.orientation,
         data.duration,
-        data.beatsPerStep,
+        data.beatsPerStep
     );
 };
 
@@ -95,7 +95,7 @@ MovementCommandMove.prototype._getPosition = function(beatNum) {
 };
 
 /**
- * @return {String} the continuity text in the form "Move 4 E"
+ * @return {string} the continuity text in the form "Move 4 E"
  */
 MovementCommandMove.prototype.getContinuityText = function() {
     var deltaX = this._endX - this._startX;

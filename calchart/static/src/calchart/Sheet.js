@@ -10,6 +10,7 @@
 var Coordinate = require("./Coordinate");
 var Continuity = require("./Continuity");
 var DotType = require("./DotType");
+var MovementCommand = require("./MovementCommand");
 
 /**** CONSTRUCTORS ****/
 
@@ -90,9 +91,7 @@ Sheet.deserialize = function(show, data) {
             type: dot_data.type,
             position: Coordinate.deserialize(dot_data.position),
             movements: dot_data.movements.map(function(movement_data) {
-                switch (movement_data.type) {
-                    // TODO
-                }
+                return MovementCommand.deserialize(movement_data);
             }),
         };
     });
@@ -152,6 +151,7 @@ Sheet.prototype.serialize = function() {
  */
 Sheet.prototype.addContinuity = function(dotType, continuity) {
     this._continuities[dotType].push(continuity);
+    this._updateMovements(dotType);
 };
 
 /**
@@ -162,6 +162,25 @@ Sheet.prototype.addContinuity = function(dotType, continuity) {
  */
 Sheet.prototype.getContinuities = function(dotType) {
     return this._continuities[dotType];
+};
+
+/**
+ * Get all dots of the given dot type
+ *
+ * @param {string} dotType -- the dot type to get dots for
+ * @return {Array<Dot>} all dots of the given type
+ */
+Sheet.prototype.getDotType = function(dotType) {
+    var dots = this._show.getDotMapping();
+    var dotTypeDots = [];
+
+    $.each(this._dots, function(label, info) {
+        if (info.type === dotType) {
+            dotTypeDots.push(dots[label]);
+        }
+    });
+
+    return dotTypeDots;
 };
 
 /**
@@ -222,6 +241,15 @@ Sheet.prototype.getLabel = function() {
 };
 
 /**
+ * Get the sheet that follows this sheet
+ *
+ * @return {Sheet} the sheet after this sheet in the show
+ */
+Sheet.prototype.getNextSheet = function() {
+    return this._show.getNextSheet(this);
+};
+
+/**
  * Remove the given continuity to the given dot type
  *
  * @param {string} dotType -- the dot type to remove the continuity from
@@ -231,6 +259,7 @@ Sheet.prototype.removeContinuity = function(dotType, continuity) {
     var continuities = this._continuities[dotType];
     var index = continuities.indexOf(continuity);
     continuities.splice(index, 1);
+    this._updateMovements(dotType);
 };
 
 /**
@@ -243,6 +272,29 @@ Sheet.prototype.updatePosition = function(dot, x, y) {
     var coordinate = this._dots[label].position;
     coordinate.x = x;
     coordinate.y = y;
+};
+
+/**** HELPERS ****/
+
+/**
+ * Update the movements for the given dot type
+ *
+ * @param {string} dotType -- the dot type to update movements for
+ */
+Sheet.prototype._updateMovements = function(dotType) {
+    var continuities = this._continuities[dotType];
+
+    this.getDotType(dotType).forEach(function(dot) {
+        var info = this._dots[dot.getLabel()];
+        var position = info.position;
+        var movements = [];
+        continuities.forEach(function(continuity, i, arr) {
+            var moves = continuity.getMovements(this, dot, position);
+            movements = movements.concat(moves);
+            position = movements[movements.length - 1].getEndPosition();
+        }, this);
+        info.movements = movements;
+    }, this);
 };
 
 module.exports = Sheet;

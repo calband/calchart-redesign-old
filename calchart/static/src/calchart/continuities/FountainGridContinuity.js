@@ -1,6 +1,9 @@
 var BaseContinuity = require("./BaseContinuity");
+var CalchartUtils = require("utils/CalchartUtils");
 var HTMLBuilder = require("utils/HTMLBuilder");
 var JSUtils = require("utils/JSUtils");
+var MovementCommandMove = require("calchart/movements/MovementCommandMove");
+var MovementCommandStop = require("calchart/movements/MovementCommandStop");
 
 /**
  * An EWNS or NSEW continuity, where dots move as far EW or NS as possible,
@@ -61,7 +64,53 @@ FountainGridContinuity.prototype.appendTo = function(continuities) {
 };
 
 FountainGridContinuity.prototype.getMovements = function(sheet, dot, start) {
-    // TODO
+    var end = sheet.getNextSheet().getInfoForDot(dot.getLabel()).position;
+
+    var deltaX = end.x - start.x;
+    var deltaY = end.y - start.y;
+    var dirX = deltaX < 0 ? 90 : deltaX > 0 ? 270 : -1;
+    var dirY = deltaY < 0 ? 180 : deltaY > 0 ? 0 : -1;
+
+    var movements = [];
+    var addMovement = function(x, y, dir, duration) {
+        var movement = new MovementCommandMove(
+            x,
+            y,
+            CalchartUtils.STEP_SIZES.STANDARD,
+            dir,
+            dir,
+            Math.abs(duration),
+            1
+        );
+        movements.push(movement);
+    };
+    var addStop = function() {
+        // TODO: customize marktime/close and orientation
+        var movement = new MovementCommandStop(start.x, start.y, 0, sheet.getDuration(), true);
+        movements.push(movement);
+    };
+
+    if (this._isEWNS) {
+        if (dirY !== -1) {
+            addMovement(start.x, start.y, dirY, deltaY);
+        }
+        if (dirX === -1) {
+            addStop();
+        } else {
+            addMovement(start.x, end.y, dirX, deltaX);
+        }
+    } else {
+        if (dirX !== -1) {
+            addMovement(start.x, start.y, dirX, deltaX);
+        }
+        if (dirY === -1) {
+            addStop();
+        } else {
+            addMovement(end.x, start.y, dirY, deltaY);
+        }
+    }
+
+    return movements;
 };
 
 module.exports = FountainGridContinuity;

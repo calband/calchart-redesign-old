@@ -1,5 +1,6 @@
 var MovementCommandMove = require("./movements/MovementCommandMove");
 var MovementCommandEven = require("./movements/MovementCommandEven");
+var MovementCommandStop = require("./movements/MovementCommandStop");
 
 module.exports = {
     /**
@@ -15,6 +16,8 @@ module.exports = {
                 return MovementCommandMove.deserialize(data);
             case "MovementCommandEven":
                 return MovementCommandEven.deserialize(data);
+            case "MovementCommandStop":
+                return MovementCommandStop.deserialize(data);
         }
     },
 };

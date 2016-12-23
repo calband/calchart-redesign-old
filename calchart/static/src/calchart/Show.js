@@ -140,6 +140,15 @@ Show.prototype.getDotLabels = function() {
 };
 
 /**
+ * Get the object mapping dot labels to the dot
+ *
+ * @return {object} dictionary mapping dot labels to Dot
+ */
+Show.prototype.getDotMapping = function() {
+    return this._dots;
+};
+
+/**
  * Get dot by its label
  *
  * @param {string} label -- the label of the dot to get

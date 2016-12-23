@@ -42,7 +42,7 @@ MovementCommandEven.deserialize = function(data) {
         data.endY,
         data.orientation,
         data.duration,
-        data.beatsPerStep,
+        data.beatsPerStep
     );
 };
 
