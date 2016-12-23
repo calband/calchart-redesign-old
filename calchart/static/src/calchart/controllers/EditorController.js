@@ -72,7 +72,7 @@ EditorController.prototype.init = function() {
         this._showStuntsheet($(".sidebar .stuntsheet").first());
     }
 
-    this.loadContext("default");
+    this.loadContext("dot");
 };
 
 /**** INSTANCE METHODS ****/

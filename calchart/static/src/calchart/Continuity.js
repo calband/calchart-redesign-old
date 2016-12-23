@@ -23,9 +23,6 @@ var Continuity = function(type) {
         case "MTRM":
             return null;
             break;
-        case "CL":
-            return null;
-            break;
         default:
             throw new Error("No continuity of the type: " + type);
     }
@@ -53,9 +50,6 @@ Continuity.deserialize = function(data) {
             return null;
             break;
         case "MTRM":
-            return null;
-            break;
-        case "CL":
             return null;
             break;
         default:

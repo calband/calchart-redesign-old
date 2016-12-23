@@ -14,7 +14,7 @@ var scrollOffset = {
  * The default editor context, that allows a user to select dots with a rectangular
  * selection box, and also to drag and drop dots on the grid.
  */
-var DefaultContext = function(grapher, sheet) {
+var DotContext = function(grapher, sheet) {
     BaseContext.call(this, grapher, sheet);
 
     // dots selected to edit
@@ -24,9 +24,9 @@ var DefaultContext = function(grapher, sheet) {
     this._grid = 2;
 };
 
-JSUtils.extends(DefaultContext, BaseContext);
+JSUtils.extends(DotContext, BaseContext);
 
-DefaultContext.prototype.shortcuts = {
+DotContext.prototype.shortcuts = {
     "ctrl+a": "selectAll",
     "left": "nudgeDots(-1, 0)",
     "up": "nudgeDots(0, -1)",
@@ -34,7 +34,7 @@ DefaultContext.prototype.shortcuts = {
     "down": "nudgeDots(0, 1)",
 };
 
-DefaultContext.prototype.load = function() {
+DotContext.prototype.load = function() {
     var _this = this;
     var svgOrigin = $("svg.graph").position();
     var scale = this._grapher.getScale();
@@ -159,14 +159,14 @@ DefaultContext.prototype.load = function() {
     $(".toolbar .edit-dots").addClass("active");
 };
 
-DefaultContext.prototype.loadSheet = function(sheet) {
+DotContext.prototype.loadSheet = function(sheet) {
     BaseContext.prototype.loadSheet.call(this, sheet);
     this.selectDots(this._selectedDots);
 };
 
-DefaultContext.prototype.unload = function() {
-    $(document).off(".default-context");
-    $(".workspace").off(".default-context");
+DotContext.prototype.unload = function() {
+    $(document).off(".dot-context");
+    $(".workspace").off(".dot-context");
     this.deselectDots();
 
     $(".toolbar .edit-dots").removeClass("active");
@@ -179,7 +179,7 @@ DefaultContext.prototype.unload = function() {
  *
  * @param {jQuery|undefined} dots -- dots to deselect (defaults to all dots)
  */
-DefaultContext.prototype.deselectDots = function(dots) {
+DotContext.prototype.deselectDots = function(dots) {
     if (dots === undefined) {
         dots = this._selectedDots;
     }
@@ -194,7 +194,7 @@ DefaultContext.prototype.deselectDots = function(dots) {
  * @param {float} deltaX -- the amount to move in the x direction, in pixels
  * @param {float} deltaY -- the amount to move in the y direction, in pixels
  */
-DefaultContext.prototype.moveSelection = function(deltaX, deltaY) {
+DotContext.prototype.moveSelection = function(deltaX, deltaY) {
     var _this = this;
     var options = {
         transition: true,
@@ -229,7 +229,7 @@ DefaultContext.prototype.moveSelection = function(deltaX, deltaY) {
  * @param {int} deltaX -- the amount to move in the x direction, in steps
  * @param {int} deltaY -- the amount to move in the y direction, in steps
  */
-DefaultContext.prototype.nudgeDots = function(deltaX, deltaY) {
+DotContext.prototype.nudgeDots = function(deltaX, deltaY) {
     var scale = this._grapher.getScale();
     deltaX = scale.toDistance(deltaX);
     deltaY = scale.toDistance(deltaY);
@@ -240,7 +240,7 @@ DefaultContext.prototype.nudgeDots = function(deltaX, deltaY) {
 /**
  * Save the positions of all selected dots, both in the Grapher and in the Sheet
  */
-DefaultContext.prototype.saveSelectionPositions = function() {
+DotContext.prototype.saveSelectionPositions = function() {
     var _this = this;
     var scale = this._grapher.getScale();
     var activeSheet = window.controller.getActiveSheet();
@@ -270,18 +270,18 @@ DefaultContext.prototype.saveSelectionPositions = function() {
         sheet: activeSheet,
     };
 };
-DefaultContext.prototype.saveSelectionPositions._name = "Move dots";
-DefaultContext.prototype.saveSelectionPositions._undo = function(data) {
+DotContext.prototype.saveSelectionPositions._name = "Move dots";
+DotContext.prototype.saveSelectionPositions._undo = function(data) {
     this._revertMoveDots(data, true);
 };
-DefaultContext.prototype.saveSelectionPositions._redo = function(data) {
+DotContext.prototype.saveSelectionPositions._redo = function(data) {
     this._revertMoveDots(data, false);
 };
 
 /**
  * Select all dots in the graph
  */
-DefaultContext.prototype.selectAll = function() {
+DotContext.prototype.selectAll = function() {
     this.selectDots(this._grapher.getDots());
 };
 
@@ -292,7 +292,7 @@ DefaultContext.prototype.selectAll = function() {
  * @param {object|undefined} options -- optional dictionary with the given options:
  *   - {boolean} append -- if false, deselect all dots before selecting (default true)
  */
-DefaultContext.prototype.selectDots = function(dots, options) {
+DotContext.prototype.selectDots = function(dots, options) {
     options = options || {};
 
     if (options.append === false) {
@@ -308,7 +308,7 @@ DefaultContext.prototype.selectDots = function(dots, options) {
  *
  * @param {jQuery} dots -- the dots to toggle selection
  */
-DefaultContext.prototype.toggleDots = function(dots, options) {
+DotContext.prototype.toggleDots = function(dots, options) {
     var select = dots.not(this._selectedDots);
     var deselect = dots.filter(this._selectedDots);
 
@@ -327,7 +327,7 @@ DefaultContext.prototype.toggleDots = function(dots, options) {
 BaseContext.prototype._addEvents = function(element, events) {
     // namespace events
     $.each(events, function(name, handler) {
-        events[name + ".default-context"] = handler;
+        events[name + ".dot-context"] = handler;
         delete events[name];
     });
 
@@ -342,7 +342,7 @@ BaseContext.prototype._addEvents = function(element, events) {
  * @param {object} data -- the data returned from saveSelectionPositions
  * @param {boolean} isUndo -- true to undo the function, false to redo
  */
-DefaultContext.prototype._revertMoveDots = function(data, isUndo) {
+DotContext.prototype._revertMoveDots = function(data, isUndo) {
     var selectedDots = $();
     var scale = this._grapher.getScale();
 
@@ -362,4 +362,4 @@ DefaultContext.prototype._revertMoveDots = function(data, isUndo) {
     this._selectedDots = selectedDots;
 };
 
-module.exports = DefaultContext;
+module.exports = DotContext;

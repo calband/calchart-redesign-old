@@ -1,11 +1,12 @@
 var ContinuityContext = require("./contexts/ContinuityContext");
-var DefaultContext = require("./contexts/DefaultContext");
+var DotContext = require("./contexts/DotContext");
 
 module.exports = {
     /**
      * Return an instance of BaseContext to load into the editor
      * application. Contexts available:
-     *  - default: DefaultContext
+     *  - dot: DotContext
+     *  - continuity: ContinuityContext
      *
      * @param {string} name -- the name of the context to load
      * @param {BaseGrapher} grapher -- the editor grapher
@@ -17,8 +18,8 @@ module.exports = {
             case "continuity":
                 var context = new ContinuityContext(grapher, sheet);
                 break;
-            case "default":
-                var context = new DefaultContext(grapher, sheet);
+            case "dot":
+                var context = new DotContext(grapher, sheet);
                 break;
             default:
                 throw new Error("No context named: " + name);

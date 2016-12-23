@@ -7,7 +7,7 @@ body {
     min-height: 750px;
     cursor: default;
     overflow: hidden;
-    &.context-default {
+    &.context-dot {
         .selection-box {
             position: absolute;
             border: 2px solid rgba($white, 0.8);
