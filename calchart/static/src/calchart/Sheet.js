@@ -145,6 +145,16 @@ Sheet.prototype.serialize = function() {
 /**** INSTANCE METHODS ****/
 
 /**
+ * Add the given continuity to the given dot type
+ *
+ * @param {string} dotType -- the dot type to add the continuity to
+ * @param {BaseContinuity} continuity -- the continuity to add
+ */
+Sheet.prototype.addContinuity = function(dotType, continuity) {
+    this._continuities[dotType].push(continuity);
+};
+
+/**
  * Get the continuities for the given dot type
  *
  * @param {string} dotType -- the dot type to get continuities for
@@ -209,6 +219,18 @@ Sheet.prototype.getLabel = function() {
 
     var sheets = this._show.getSheets();
     return sheets.indexOf(this) + 1;
+};
+
+/**
+ * Remove the given continuity to the given dot type
+ *
+ * @param {string} dotType -- the dot type to remove the continuity from
+ * @param {BaseContinuity} continuity -- the continuity to remove
+ */
+Sheet.prototype.removeContinuity = function(dotType, continuity) {
+    var continuities = this._continuities[dotType];
+    var index = continuities.indexOf(continuity);
+    continuities.splice(index, 1);
 };
 
 /**

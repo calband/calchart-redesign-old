@@ -37,9 +37,10 @@ BaseContinuity.prototype.appendTo = function(continuities) {
  *
  * @param {Sheet} sheet -- the sheet the continuity is being executed for
  * @param {Dot} dot -- the dot the continuity is assigned to
+ * @param {Coordinate} start -- the starting position of the movement
  * @return {Array<MovementCommand>} the movements to do for the dot
  */
-BaseContinuity.prototype.getMovements = function(sheet, dot) {
+BaseContinuity.prototype.getMovements = function(sheet, dot, start) {
     throw new Error(this.constructor.name + " did not define getMovements");
 };
 

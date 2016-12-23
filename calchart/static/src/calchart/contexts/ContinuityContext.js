@@ -38,9 +38,10 @@ ContinuityContext.prototype.load = function() {
                 })
                 .change(function() {
                     var continuity = new Continuity($(this).val());
-                    continuity.appendTo(_this._panel.find(".continuities"));
+                    continuity.appendTo(panel.find(".continuities"));
 
-                    // TODO: add to Sheet
+                    var dotType = panel.find(".dot-types li.active").data("dotType");
+                    _this._sheet.addContinuity(dotType, continuity);
 
                     $(this).val("")
                         .trigger("chosen:updated");
@@ -58,13 +59,13 @@ ContinuityContext.prototype.load = function() {
                 var continuity = elem.data("continuity");
                 elem.remove();
 
-                console.log(continuity);
-                // TODO: remove from Sheet
+                    var dotType = panel.find(".dot-types li.active").data("dotType");
+                _this._sheet.removeContinuity(dotType, continuity);
             });
         },
     });
-    this._updatePanel();
     this._panel.show();
+    this._updatePanel();
     
     $(".toolbar .edit-continuity").addClass("active");
 };
@@ -93,8 +94,9 @@ ContinuityContext.prototype._changeTab = function(tab) {
     $(tab).addClass("active")
         .siblings().removeClass("active");
 
-    var continuities = this._panel.find(".continuities");
-    $(tab).data("continuities").forEach(function(continuity) {
+    var continuities = this._panel.find(".continuities").empty();
+    var dotType = $(tab).data("dotType");
+    this._sheet.getContinuities(dotType).forEach(function(continuity) {
         continuity.appendTo(continuities);
     });
 
@@ -115,7 +117,7 @@ ContinuityContext.prototype._updatePanel = function() {
 
         HTMLBuilder.make("li.tab", tabs)
             .append(dot)
-            .data("continuities", _this._sheet.getContinuities(dotType));
+            .data("dotType", dotType);
     });
 
     this._changeTab(this._panel.find(".dot-types li:first"));

@@ -60,7 +60,7 @@ FountainGridContinuity.prototype.appendTo = function(continuities) {
     endChoices.dropdown();
 };
 
-FountainGridContinuity.prototype.getMovements = function(sheet, dot) {
+FountainGridContinuity.prototype.getMovements = function(sheet, dot, start) {
     // TODO
 };
 
