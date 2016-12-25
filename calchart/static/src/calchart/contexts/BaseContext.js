@@ -10,9 +10,7 @@ var BaseContext = function(grapher, sheet) {
     this._sheet = sheet;
 };
 
-/**
- * Shortcuts that the user can press to run actions in the EditorController
- */
+// Shortcuts that the user can press to run actions in the EditorController
 BaseContext.prototype.shortcuts = {};
 
 /**
@@ -35,6 +33,35 @@ BaseContext.prototype.loadSheet = function(sheet) {
  * Runs any necessary actions to unload the context
  */
 BaseContext.prototype.unload = function() {
+};
+
+/**** HELPERS ****/
+
+/**
+ * Add the given events to the given element
+ *
+ * @param {jQuery|string} element -- the element to add events to
+ * @param {object} events -- the events to add, mapping event name to handler
+ */
+BaseContext.prototype._addEvents = function(element, events) {
+    // namespace events
+    $.each(events, function(name, handler) {
+        events[name + ".app-context"] = handler;
+        delete events[name];
+    });
+
+    $(element).on(events);
+};
+
+/**
+ * Remove all namespaced events on the given elements. Usage:
+ *
+ * this._removeEvents(document, ".workspace");
+ */
+BaseContext.prototype._removeEvents = function() {
+    $.each(arguments, function(i, element) {
+        $(element).off(".app-context");
+    });
 };
 
 module.exports = BaseContext;

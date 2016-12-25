@@ -11,6 +11,7 @@
 
 var CalchartUtils = require("utils/CalchartUtils");
 var GrapherScale = require("calchart/GrapherScale");
+var MathUtils = require("utils/MathUtils");
 
 /**** CONSTRUCTOR ****/
 
@@ -147,8 +148,8 @@ BaseGrapher.prototype.moveDot = function(dot, x, y, options) {
     options = options || {};
 
     // contain dot in workspace
-    x = Math.min(Math.max(0, x), this._svgWidth);
-    y = Math.min(Math.max(0, y), this._svgHeight);
+    x = MathUtils.bound(x, 0, this._svgWidth);
+    y = MathUtils.bound(y, 0, this._svgHeight);
 
     $(dot).attr("transform", "translate(" + x + "," + y + ")");
 

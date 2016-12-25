@@ -196,6 +196,7 @@ header {
             padding: 5px;
             margin: 0 1px;
             cursor: default;
+            vertical-align: middle;
             &.toolbar-item {
                 border: 1px solid transparent;
                 &:hover, &.active, &.focus:hover {

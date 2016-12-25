@@ -275,13 +275,19 @@ ApplicationController.prototype._setupToolbar = function(toolbar) {
         .mouseup(function() {
             $(this).removeClass("focus");
             var name = $(this).data("function");
-            _this.doAction(name);
+            if (name !== undefined) {
+                _this.doAction(name);
+            }
         })
         .hover(function() {
             // tooltip above item
             var offset = $(this).offset();
             var width = $(this).outerWidth();
             var name = $(this).data("name");
+
+            if (name === undefined) {
+                return;
+            }
 
             tooltipTimeout = setTimeout(function() {
                 var tooltip = HTMLBuilder.span("tooltip", name, "body");

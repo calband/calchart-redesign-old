@@ -157,7 +157,7 @@ DotContext.prototype.load = function() {
     });
 
     $(".toolbar .edit-dots").addClass("active");
-    // TODO: DotContext toolbar group
+    $(".toolbar .edit-dots-group").removeClass("hide");
 };
 
 DotContext.prototype.loadSheet = function(sheet) {
@@ -166,11 +166,11 @@ DotContext.prototype.loadSheet = function(sheet) {
 };
 
 DotContext.prototype.unload = function() {
-    $(document).off(".dot-context");
-    $(".workspace").off(".dot-context");
+    this._removeEvents(document, ".workspace");
     this.deselectDots();
 
     $(".toolbar .edit-dots").removeClass("active");
+    $(".toolbar .edit-dots-group").addClass("hide");
 };
 
 /**** ACTIONS ****/
@@ -318,22 +318,6 @@ DotContext.prototype.toggleDots = function(dots, options) {
 };
 
 /**** HELPERS ****/
-
-/**
- * Add the given events to the given element
- *
- * @param {jQuery|string} element -- the element to add events to
- * @param {object} events -- the events to add, mapping event name to handler
- */
-BaseContext.prototype._addEvents = function(element, events) {
-    // namespace events
-    $.each(events, function(name, handler) {
-        events[name + ".dot-context"] = handler;
-        delete events[name];
-    });
-
-    $(element).on(events);
-};
 
 /**
  * A helper function to revert saveSelectionPositions (both for undo or redo),

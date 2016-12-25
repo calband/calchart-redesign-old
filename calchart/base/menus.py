@@ -226,7 +226,7 @@ editor_toolbar = Toolbar(
     ToolbarContextGroup(
         'edit-continuity',
         ToolbarItem('Previous Beat', 'chevron-left', 'TODO'),
-        CustomToolbarItem('Seek', '<span>TODO</span>'), # TODO: seek bar
+        CustomToolbarItem('Seek', '<span class="bar"></span><span class="marker"></span>'),
         ToolbarItem('Next Beat', 'chevron-right', 'TODO'),
     ),
 )

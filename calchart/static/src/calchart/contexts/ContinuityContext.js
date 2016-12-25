@@ -2,6 +2,7 @@ var BaseContext = require("./BaseContext");
 var Continuity = require("calchart/Continuity");
 var HTMLBuilder = require("utils/HTMLBuilder");
 var JSUtils = require("utils/JSUtils");
+var MathUtils = require("utils/MathUtils");
 var UIUtils = require("utils/UIUtils");
 
 /**
@@ -68,7 +69,9 @@ ContinuityContext.prototype.load = function() {
     this._updatePanel();
     
     $(".toolbar .edit-continuity").addClass("active");
-    // TODO: ContinuityContext toolbar group
+    $(".toolbar .edit-continuity-group").removeClass("hide");
+
+    this._setupSeek(".toolbar .seek");
 };
 
 ContinuityContext.prototype.loadSheet = function(sheet) {
@@ -79,9 +82,12 @@ ContinuityContext.prototype.loadSheet = function(sheet) {
 
 ContinuityContext.prototype.unload = function() {
     this._panel.hide();
-    // this.removeEvents();
+    this._removeEvents(document, ".toolbar .seek .marker");
+
+    // TODO: set beats to 0
 
     $(".toolbar .edit-continuity").removeClass("active");
+    $(".toolbar .edit-continuity-group").addClass("hide");
 };
 
 /**** HELPERS ****/
@@ -102,6 +108,46 @@ ContinuityContext.prototype._changeTab = function(tab) {
     });
 
     // TODO: show continuity errors (dots not make their spot, not enough continuities)
+};
+
+/**
+ * Sets up the seek interface in the toolbar
+ *
+ * @param {jQuery} seek -- the seek interface
+ */
+ContinuityContext.prototype._setupSeek = function(seek) {
+    var isDrag = false;
+    var marker = $(seek).find(".marker");
+    var seekLeft = $(seek).offset().left;
+    var seekWidth = $(seek).width();
+    var offset = null;
+
+    this._addEvents(marker, {
+        mousedown: function(e) {
+            isDrag = true;
+            offset = e.pageX - marker.offset().left;
+        },
+    });
+    this._addEvents(document, {
+        mousemove: function(e) {
+            if (!isDrag) {
+                return;
+            }
+
+            var prev = marker.offset().left;
+
+            // TODO: snap marker to beats
+            var x = MathUtils.bound(e.pageX - seekLeft - offset, 0, seekWidth);
+            marker.css("transform", "translateX(" + x + "px)");
+
+            if (x !== prev) {
+                // TODO: update beat
+            }
+        },
+        mouseup: function(e) {
+            isDrag = false;
+        },
+    });
 };
 
 /**

@@ -18,6 +18,18 @@ MathUtils.PI_OVER_TWO = Math.PI / 2;
 MathUtils.TWO_PI = Math.PI * 2;
 
 /**
+ * Bounds the given value to be at least low and at most high.
+ *
+ * @param {float} x -- the value to bound
+ * @param {float} low -- the lower bound
+ * @param {float} high -- the higher bound
+ * @return {float} low if x < low, high if x > high, else x
+ */
+MathUtils.bound = function(x, low, high) {
+    return Math.min(Math.max(x, low), high);
+};
+
+/**
  * Calculates the distance between two points
  *
  * @param {float} x1 -- the x coordinate of the first point

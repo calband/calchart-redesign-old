@@ -30,6 +30,27 @@ $editor-header-height: 100px;
     }
     .toolbar {
         padding-left: 10px;
+        .edit-continuity-group .seek {
+            @include vertically-center;
+            $marker-size: 16px;
+            height: $marker-size;
+            padding: 0 #{$marker-size/2};
+            .marker {
+                position: absolute;
+                width: $marker-size;
+                height: $marker-size;
+                top: 0;
+                left: 0;
+                border-radius: 50%;
+                background: $blue;
+                cursor: pointer;
+            }
+            .bar {
+                width: 150px;
+                height: 3px;
+                background: $medium-gray;
+            }
+        }
     }
 }
 
