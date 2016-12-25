@@ -82,7 +82,7 @@ ContinuityContext.prototype.loadSheet = function(sheet) {
 
 ContinuityContext.prototype.unload = function() {
     this._panel.hide();
-    this._removeEvents(document, ".toolbar .seek .marker");
+    this._removeEvents(document, ".toolbar .seek");
 
     // TODO: set beats to 0
 
@@ -116,16 +116,37 @@ ContinuityContext.prototype._changeTab = function(tab) {
  * @param {jQuery} seek -- the seek interface
  */
 ContinuityContext.prototype._setupSeek = function(seek) {
+    seek = $(seek);
     var isDrag = false;
-    var marker = $(seek).find(".marker");
-    var seekLeft = $(seek).offset().left;
-    var seekWidth = $(seek).width();
-    var offset = null;
+    var marker = seek.find(".marker");
+    var markerWidth = marker.width();
+    var seekLeft = seek.offset().left;
+    var seekWidth = seek.width();
+    var offset = 0;
 
-    this._addEvents(marker, {
+    var moveMarker = function(pageX) {
+        var prev = marker.offset().left;
+
+        // TODO: snap marker to beats
+        var x = MathUtils.bound(pageX - seekLeft - offset, 0, seekWidth);
+        marker.css("transform", "translateX(" + x + "px)");
+
+        if (x !== prev) {
+            // TODO: update beat
+        }
+    };
+
+    this._addEvents(seek, {
         mousedown: function(e) {
             isDrag = true;
-            offset = e.pageX - marker.offset().left;
+
+            if ($(e.target).is(marker)) {
+                offset = e.pageX - marker.offset().left;
+            } else {
+                // clicking on the seek bar moves the marker there initially
+                offset = markerWidth / 2;
+                moveMarker(e.pageX);
+            }
         },
     });
     this._addEvents(document, {
@@ -133,16 +154,7 @@ ContinuityContext.prototype._setupSeek = function(seek) {
             if (!isDrag) {
                 return;
             }
-
-            var prev = marker.offset().left;
-
-            // TODO: snap marker to beats
-            var x = MathUtils.bound(e.pageX - seekLeft - offset, 0, seekWidth);
-            marker.css("transform", "translateX(" + x + "px)");
-
-            if (x !== prev) {
-                // TODO: update beat
-            }
+            moveMarker(e.pageX);
         },
         mouseup: function(e) {
             isDrag = false;
