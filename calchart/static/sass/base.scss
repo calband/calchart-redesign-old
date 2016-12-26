@@ -41,15 +41,6 @@ h3 {
     font-size: 1.2em;
 }
 
-p {
-    &.message {
-        font-family: sans-serif("DIN Next Medium");
-        &.error {
-            color: $red;
-        }
-    }
-}
-
 a {
     color: $blue;
     &:hover {
@@ -98,6 +89,35 @@ form.post-action {
 
 .field {
     margin: 10px 0;
+}
+
+ul.messages {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 10px;
+    li.message {
+        background: rgba($light-gray, 0.8);
+        padding: 10px 30px;
+        border-radius: 4px;
+        text-align: center;
+        color: $blue;
+        &:not(:last-child) {
+            margin-bottom: 5px;
+        }
+        &.error {
+            color: $red;
+        }
+        .close-message {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: $gold;
+            cursor: pointer;
+        }
+    }
 }
 
 header {

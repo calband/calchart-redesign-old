@@ -130,20 +130,18 @@ EditorController.prototype.addStuntsheet = function() {
     var _this = this;
     UIUtils.showPopup("add-stuntsheet", {
         onSubmit: function(popup) {
-            var container = $(popup).find(".buttons");
-            UIUtils.clearMessages();
             var data = UIUtils.getData(popup);
 
             // validate data
 
             if (data.num_beats == "") {
-                UIUtils.showError("Please provide the number of beats in the stuntsheet.", container);
+                UIUtils.showError("Please provide the number of beats in the stuntsheet.");
                 return;
             }
 
             data.num_beats = parseInt(data.num_beats);
             if (data.num_beats <= 0) {
-                UIUtils.showError("Need to have a positive number of beats.", container);
+                UIUtils.showError("Need to have a positive number of beats.");
                 return;
             }
 

@@ -123,6 +123,19 @@ HTMLBuilder.img = function(src) {
 };
 
 /**
+ * Builds an <li> element, with the given parameters:
+ *  - {string} text -- the text to show in the element
+ *  - {string} class -- the class to add to the element
+ */
+HTMLBuilder.li = function() {
+    var args = _parseArgs(arguments, ["text", "class"]);
+
+    return $("<li>")
+        .text(args.text)
+        .addClass(args.class);
+};
+
+/**
  * Builds a <select> element, with the given parameters:
  *  - {object} options -- the options to add to the <select>, mapping
  *    the value of the option to the name.

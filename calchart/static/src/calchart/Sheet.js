@@ -11,6 +11,7 @@ var Coordinate = require("./Coordinate");
 var Continuity = require("./Continuity");
 var DotType = require("./DotType");
 var MovementCommand = require("./MovementCommand");
+var UIUtils = require("utils/UIUtils");
 
 /**** CONSTRUCTORS ****/
 
@@ -269,6 +270,13 @@ Sheet.prototype.removeContinuity = function(dotType, continuity) {
  */
 Sheet.prototype.updateMovements = function(dotType) {
     var continuities = this._continuities[dotType];
+    var duration = this._numBeats;
+    var nextSheet = this.getNextSheet();
+
+    var errors = {
+        lackMoves: [],
+        wrongPosition: [],
+    };
 
     this.getDotType(dotType).forEach(function(dot) {
         var info = this._dots[dot.getLabel()];
@@ -280,7 +288,25 @@ Sheet.prototype.updateMovements = function(dotType) {
             position = movements[movements.length - 1].getEndPosition();
         }, this);
         info.movements = movements;
+
+        // check errors
+        try {
+            var final = dot.getAnimationState(duration);
+            var position = nextSheet.getInfoForDot(dot).position;
+            if (final.x !== position.x || final.y !== position.y) {
+                errors.lackMoves.push(dot.getLabel());
+            }
+        } catch (e) {
+            errors.wrongPosition.push(dot.getLabel());
+        }
     }, this);
+
+    if (errors.lackMoves.length > 0) {
+        UIUtils.showError("Dots did not have enough to do: " + errors.lackMoves.join(", "));
+    }
+    if (errors.wrongPosition.length > 0) {
+        UIUtils.showError("Dots did not make it to their next spot: " + errors.wrongPosition.join(", "));
+    }
 };
 
 /**

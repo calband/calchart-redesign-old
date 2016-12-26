@@ -215,37 +215,38 @@ UIUtils.setupPanel = function(panel, options) {
 /**** MESSAGES ****/
 
 /**
- * Show a message below the given element
+ * Show a message at the top of the screen
  *
  * @param {string} message -- the message to show
- * @param {jQuery} element -- the element to add message after
  * @param {boolean} isError -- true if message is an error message
  */
-UIUtils.showMessage = function(message, element, isError) {
-    var messageElem = $(element).next("p.message");
-    if (messageElem.exists()) {
-        messageElem = HTMLBuilder.make("p.message");
+UIUtils.showMessage = function(message, isError) {
+    var container = $("ul.messages");
+    if (!container.exists()) {
+        container = HTMLBuilder.make("ul.messages").appendTo("body");
     }
+
+    var li = HTMLBuilder.li(message, "message").appendTo(container);
     if (isError) {
-        messageElem.addClass("error");
-    } else {
-        messageElem.removeClass("error");
+        li.addClass("error");
     }
-    messageElem.text(message);
+
+    HTMLBuilder.icon("times", "close-message")
+        .click(function() {
+            li.fadeOut(function() {
+                if (!container.children(":visible").exists()) {
+                    container.remove();
+                }
+            });
+        })
+        .appendTo(li);
 };
 
 /**
- * Helper function to show an error message below the given element
+ * Helper function to show an error message at the top of the screen
  */
-UIUtils.showError = function(message, element) {
-    UIUtils.showMessage(message, element, true);
-};
-
-/**
- * Clears all messages on the page
- */
-UIUtils.clearMessages = function() {
-    $("p.message").remove();
+UIUtils.showError = function(message) {
+    UIUtils.showMessage(message, true);
 };
 
 module.exports = UIUtils;

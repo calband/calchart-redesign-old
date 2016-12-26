@@ -15,30 +15,28 @@ $(document).ready(function() {
 
     UIUtils.showPopup("setup-show", {
         onSubmit: function(popup) {
-            var container = $(popup).find(".buttons");
-            UIUtils.clearMessages();
             var data = UIUtils.getData(popup);
 
             // validate data
 
             if (data.num_dots === "") {
-                UIUtils.showError("Please provide the number of dots in the show.", container);
+                UIUtils.showError("Please provide the number of dots in the show.");
                 return;
             }
 
             data.num_dots = parseInt(data.num_dots);
             if (data.num_dots <= 0) {
-                UIUtils.showError("Need to have a positive number of dots.", container);
+                UIUtils.showError("Need to have a positive number of dots.");
                 return;
             }
 
             if (data.dot_format === null) {
-                UIUtils.showError("Please provide the format of the dot labels.", container);
+                UIUtils.showError("Please provide the format of the dot labels.");
                 return;
             }
 
             if (data.field_type === null) {
-                UIUtils.showError("Please provide the field type.", container);
+                UIUtils.showError("Please provide the field type.");
                 return;
             }
 
