@@ -126,7 +126,7 @@ UIUtils.hidePopup = function(popup) {
 /**** PANELS ****/
 
 /**
- * Set up a moveable panel, if not already set up
+ * Set up a moveable panel
  *
  * @param {jQuery} panel -- the panel to set up
  * @param {object|undefined} options -- options to create a panel. Can include
@@ -138,14 +138,8 @@ UIUtils.hidePopup = function(popup) {
  *     to center)
  *   - {float} right -- the right of the initial position for the panel (defaults
  *     to center)
- *   - {function} onInit -- a function that takes in the panel and runs additional
- *     initialization actions. Will only be run if the panel is not already set up
  */
 UIUtils.setupPanel = function(panel, options) {
-    if ($(panel).data("initialized")) {
-        return false;
-    }
-
     options = options || {};
 
     // set up initial position
@@ -209,17 +203,6 @@ UIUtils.setupPanel = function(panel, options) {
             }
         },
     });
-
-    // onInit callback
-
-    if (options.onInit) {
-        options.onInit(panel);
-    }
-
-    // indicate panel is initialized
-
-    $(panel).data("initialized", true);
-    return true;
 };
 
 /**** MESSAGES ****/

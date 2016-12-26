@@ -10,9 +10,9 @@ var UIUtils = require("utils/UIUtils");
  * continuities and step through marching
  */
 var ContinuityContext = function(grapher, sheet) {
-    BaseContext.call(this, grapher, sheet);
-
     this._panel = $(".panel.edit-continuity");
+
+    BaseContext.call(this, grapher, sheet);
 };
 
 JSUtils.extends(ContinuityContext, BaseContext);
@@ -23,48 +23,6 @@ ContinuityContext.prototype.shortcuts = {
 ContinuityContext.prototype.load = function() {
     var _this = this;
 
-    UIUtils.setupPanel(this._panel, {
-        bottom: 20,
-        right: 20,
-        onInit: function(panel) {
-            panel.on("click", ".tab", function() {
-                _this._changeTab(this);
-            });
-
-            panel.show()
-                .find(".add-continuity select")
-                .dropdown({
-                    placeholder_text_single: "Add continuity...",
-                    disable_search_threshold: false,
-                })
-                .change(function() {
-                    var continuity = new Continuity($(this).val());
-                    continuity.appendTo(panel.find(".continuities"));
-
-                    var dotType = panel.find(".dot-types li.active").data("dotType");
-                    _this._sheet.addContinuity(dotType, continuity);
-
-                    $(this).val("")
-                        .trigger("chosen:updated");
-                });
-
-            panel.on("click", ".continuity .edit", function() {
-                var continuity = $(this).parents(".continuity").data("continuity");
-
-                console.log(continuity);
-                // TODO: edit continuity popup
-            });
-
-            panel.on("click", ".continuity .delete", function() {
-                var elem = $(this).parents(".continuity");
-                var continuity = elem.data("continuity");
-                elem.remove();
-
-                    var dotType = panel.find(".dot-types li.active").data("dotType");
-                _this._sheet.removeContinuity(dotType, continuity);
-            });
-        },
-    });
     this._panel.show();
     this._updatePanel();
 
@@ -129,6 +87,56 @@ ContinuityContext.prototype._changeTab = function(tab) {
     });
 
     // TODO: show continuity errors (dots not make their spot, not enough continuities)
+};
+
+/**
+ * Initialize the continuity panel and toolbar
+ */
+ContinuityContext.prototype._init = function() {
+    var _this = this;
+
+    UIUtils.setupPanel(this._panel, {
+        bottom: 20,
+        right: 20,
+    });
+
+    this._panel.on("click", ".tab", function() {
+        _this._changeTab(this);
+    });
+
+    this._panel
+        .find(".add-continuity select")
+        .dropdown({
+            placeholder_text_single: "Add continuity...",
+            disable_search_threshold: false,
+            width: "100%",
+        })
+        .change(function() {
+            var continuity = new Continuity($(this).val());
+            continuity.appendTo(_this._panel.find(".continuities"));
+
+            var dotType = _this._panel.find(".dot-types li.active").data("dotType");
+            _this._sheet.addContinuity(dotType, continuity);
+
+            $(this).val("")
+                .trigger("chosen:updated");
+        });
+
+    this._panel.on("click", ".continuity .edit", function() {
+        var continuity = $(this).parents(".continuity").data("continuity");
+
+        console.log(continuity);
+        // TODO: edit continuity popup
+    });
+
+    this._panel.on("click", ".continuity .delete", function() {
+        var elem = $(this).parents(".continuity");
+        var continuity = elem.data("continuity");
+        elem.remove();
+
+            var dotType = _this._panel.find(".dot-types li.active").data("dotType");
+        _this._sheet.removeContinuity(dotType, continuity);
+    });
 };
 
 /**

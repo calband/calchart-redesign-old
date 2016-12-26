@@ -8,7 +8,15 @@
 var BaseContext = function(grapher, sheet) {
     this._grapher = grapher;
     this._sheet = sheet;
+
+    if (!this._initialized[this.constructor.name]) {
+        this._init();
+        this._initialized[this.constructor.name] = true;
+    }
 };
+
+// Maps BaseContext constructor names to whether they've been initialized yet
+BaseContext.prototype._initialized = {};
 
 // Shortcuts that the user can press to run actions in the EditorController
 BaseContext.prototype.shortcuts = {};
@@ -51,6 +59,12 @@ BaseContext.prototype._addEvents = function(element, events) {
     });
 
     $(element).on(events);
+};
+
+/**
+ * Any actions to run when the context is initialized the first time.
+ */
+BaseContext.prototype._init = function() {
 };
 
 /**

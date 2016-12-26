@@ -23,6 +23,7 @@ JSUtils.extends = function(ChildClass, ParentClass) {
     var Inheritor = function() {}; // dummy constructor
     Inheritor.prototype = ParentClass.prototype;
     ChildClass.prototype = new Inheritor();
+    ChildClass.prototype.constructor = ChildClass;
 };
 
 /**
