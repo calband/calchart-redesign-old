@@ -67,6 +67,27 @@ ContinuityContext.prototype.load = function() {
     });
     this._panel.show();
     this._updatePanel();
+
+    this._addEvents(window, {
+        // always keep panel on screen
+        resize: function() {
+            var panelOffset = _this._panel.offset();
+            var panelWidth = _this._panel.outerWidth();
+            var panelHeight = _this._panel.outerHeight();
+            var panelRight = panelOffset.left + panelWidth;
+            var panelBottom = panelOffset.top + panelHeight;
+
+            var windowWidth = $(window).width();
+            var windowHeight = $(window).height();
+
+            if (panelRight > windowWidth) {
+                _this._panel.css("left", windowWidth - panelWidth);
+            }
+            if (panelBottom > windowHeight) {
+                _this._panel.css("top", windowHeight - panelHeight);
+            }
+        },
+    });
     
     $(".toolbar .edit-continuity").addClass("active");
     $(".toolbar .edit-continuity-group").removeClass("hide");
@@ -82,7 +103,7 @@ ContinuityContext.prototype.loadSheet = function(sheet) {
 
 ContinuityContext.prototype.unload = function() {
     this._panel.hide();
-    this._removeEvents(document, ".toolbar .seek");
+    this._removeEvents(window, document, ".toolbar .seek");
 
     // TODO: set beats to 0
 
