@@ -151,7 +151,7 @@ Sheet.prototype.serialize = function() {
  */
 Sheet.prototype.addContinuity = function(dotType, continuity) {
     this._continuities[dotType].push(continuity);
-    this._updateMovements(dotType);
+    this.updateMovements(dotType);
 };
 
 /**
@@ -259,29 +259,15 @@ Sheet.prototype.removeContinuity = function(dotType, continuity) {
     var continuities = this._continuities[dotType];
     var index = continuities.indexOf(continuity);
     continuities.splice(index, 1);
-    this._updateMovements(dotType);
+    this.updateMovements(dotType);
 };
-
-/**
- * Update the position of the corresponding Dot for the given dot
- *
- * @param {jQuery} dot -- the HTML representation of the dot
- */
-Sheet.prototype.updatePosition = function(dot, x, y) {
-    var label = $(dot).data("dot").getLabel();
-    var coordinate = this._dots[label].position;
-    coordinate.x = x;
-    coordinate.y = y;
-};
-
-/**** HELPERS ****/
 
 /**
  * Update the movements for the given dot type
  *
  * @param {string} dotType -- the dot type to update movements for
  */
-Sheet.prototype._updateMovements = function(dotType) {
+Sheet.prototype.updateMovements = function(dotType) {
     var continuities = this._continuities[dotType];
 
     this.getDotType(dotType).forEach(function(dot) {
@@ -295,6 +281,18 @@ Sheet.prototype._updateMovements = function(dotType) {
         }, this);
         info.movements = movements;
     }, this);
+};
+
+/**
+ * Update the position of the corresponding Dot for the given dot
+ *
+ * @param {jQuery} dot -- the HTML representation of the dot
+ */
+Sheet.prototype.updatePosition = function(dot, x, y) {
+    var label = $(dot).data("dot").getLabel();
+    var coordinate = this._dots[label].position;
+    coordinate.x = x;
+    coordinate.y = y;
 };
 
 module.exports = Sheet;

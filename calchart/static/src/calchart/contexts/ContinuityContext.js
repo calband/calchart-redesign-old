@@ -165,6 +165,8 @@ ContinuityContext.prototype._init = function() {
                     callback($continuity);
                 }
 
+                var dotType = _this._panel.find(".dot-types li.active").data("dotType");
+                _this._sheet.updateMovements(dotType);
                 UIUtils.hidePopup(popup);
             },
         });

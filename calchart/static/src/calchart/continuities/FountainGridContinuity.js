@@ -58,8 +58,8 @@ FountainGridContinuity.prototype.getMovements = function(sheet, dot, start) {
 
     var deltaX = end.x - start.x;
     var deltaY = end.y - start.y;
-    var dirX = deltaX < 0 ? 90 : deltaX > 0 ? 270 : -1;
-    var dirY = deltaY < 0 ? 180 : deltaY > 0 ? 0 : -1;
+    var dirX = deltaX < 0 ? 90 : 270;
+    var dirY = deltaY < 0 ? 180 : 0;
 
     var movements = [];
     var addMovement = function(x, y, dir, duration) {
@@ -74,30 +74,29 @@ FountainGridContinuity.prototype.getMovements = function(sheet, dot, start) {
         );
         movements.push(movement);
     };
-    var addStop = function() {
-        // TODO: customize marktime/close and orientation
-        var movement = new MovementCommandStop(start.x, start.y, 0, sheet.getDuration(), true);
-        movements.push(movement);
-    };
 
     if (this._isEWNS) {
-        if (dirY !== -1) {
+        if (deltaY !== 0) {
             addMovement(start.x, start.y, dirY, deltaY);
         }
-        if (dirX === -1) {
-            addStop();
-        } else {
+        if (deltaX !== 0) {
             addMovement(start.x, end.y, dirX, deltaX);
         }
     } else {
-        if (dirX !== -1) {
+        if (deltaX !== 0) {
             addMovement(start.x, start.y, dirX, deltaX);
         }
-        if (dirY === -1) {
-            addStop();
-        } else {
+        if (deltaY !== 0) {
             addMovement(end.x, start.y, dirY, deltaY);
         }
+    }
+
+    var remaining = sheet.getDuration() - deltaX - deltaY;
+    if (remaining > 0) {
+        var orientation = this._orientation === "east" ? 0 : 90;
+        var marktime = this._end === "MT";
+        var stop = new MovementCommandStop(end.x, end.y, orientation, remaining, marktime);
+        movements.push(stop);
     }
 
     return movements;
@@ -118,6 +117,8 @@ FountainGridContinuity.prototype.panelHTML = function() {
             },
             change: function() {
                 _this._end = $(this).val();
+                var dotType = $(".panel.edit-continuity .dot-types li.active").data("dotType");
+                window.controller.getActiveSheet().updateMovements(dotType);
             },
             selected: this._end,
         });
