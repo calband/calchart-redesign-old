@@ -13,6 +13,10 @@ var MovementCommandStop = require("calchart/movements/MovementCommandStop");
  */
 var FountainGridContinuity = function(isEWNS) {
     this._isEWNS = isEWNS;
+
+    this._end = "MT";
+    this._step = "default";
+    this._orientation = "default";
 };
 
 JSUtils.extends(FountainGridContinuity, BaseContinuity);
@@ -26,7 +30,11 @@ JSUtils.extends(FountainGridContinuity, BaseContinuity);
  *   from the given data
  */
 FountainGridContinuity.deserialize = function(isEWNS, data) {
-    return new FountainGridContinuity(isEWNS);
+    var continuity = new FountainGridContinuity(isEWNS);
+    continuity._end = data.end;
+    continuity._step = data.step;
+    continuity._orientation = data.orientation;
+    return continuity;
 };
 
 /**
@@ -37,6 +45,9 @@ FountainGridContinuity.deserialize = function(isEWNS, data) {
 FountainGridContinuity.prototype.serialize = function() {
     return {
         type: this._isEWNS ? "EWNS" : "NSEW",
+        end: this._end,
+        step: this._step,
+        orientation: this._orientation,
     };
 };
 
@@ -93,6 +104,7 @@ FountainGridContinuity.prototype.getMovements = function(sheet, dot, start) {
 };
 
 FountainGridContinuity.prototype.panelHTML = function() {
+    var _this = this;
     var type = this._isEWNS ? "EWNS" : "NSEW";
 
     var label = HTMLBuilder.span(null, type);
@@ -105,8 +117,9 @@ FountainGridContinuity.prototype.panelHTML = function() {
                 CL: "Close",
             },
             change: function() {
-                // TODO: modify end
+                _this._end = $(this).val();
             },
+            selected: this._end,
         });
     var end = HTMLBuilder.div("panel-continuity-end", [endLabel, endChoices]);
     endChoices.dropdown({
@@ -122,26 +135,43 @@ FountainGridContinuity.prototype.popupHTML = function() {
             MT: "Mark Time",
             CL: "Close",
         },
+        selected: this._end,
     }));
     var step = HTMLBuilder.formfield("Step Type", HTMLBuilder.select({
         options: {
+            default: "Default",
             HS: "High Step",
             MM: "Mini Military",
             FF: "Full Field",
             SH: "Show High",
             JS: "Jerky Step",
         },
+        selected: this._step,
     }));
     var orientation = HTMLBuilder.formfield("Final Orientation", HTMLBuilder.select({
         options: {
-            E: "East",
-            W: "West",
+            default: "Default",
+            east: "East",
+            west: "West",
         },
+        selected: this._orientation,
     }), "orientation");
 
     return {
         name: this._isEWNS ? "EWNS" : "NSEW",
         fields: [end, step, orientation],
+    };
+};
+
+FountainGridContinuity.prototype.savePopup = function(data) {
+    this._end = data.end;
+    this._step = data.step_type;
+    this._orientation = data.orientation;
+
+    return function($continuity) {
+        $continuity.find("select")
+            .val(data.end)
+            .trigger("chosen:updated");
     };
 };
 

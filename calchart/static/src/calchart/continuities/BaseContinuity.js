@@ -50,6 +50,17 @@ BaseContinuity.prototype.popupHTML = function() {
     throw new Error(this.constructor.name + " did not define popupHTML");
 };
 
+/**
+ * Update this continuity when saving the Edit Continuity popup
+ *
+ * @param {object} data -- the popup data
+ * @return {function|undefined} an optional callback function to run any actions
+ *   on the continuity in the Edit Continuity panel
+ */
+BaseContinuity.prototype.savePopup = function(data) {
+    throw new Error(this.constructor.name + " did not define savePopup");
+};
+
 /**** HELPERS ****/
 
 /**

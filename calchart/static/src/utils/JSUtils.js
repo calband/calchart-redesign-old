@@ -76,7 +76,7 @@ JSUtils.range = function() {
  * @return {string} the slugified value
  */
 JSUtils.slugify = function(value) {
-    return value.toLowerCase().replace(/ /g, "-");
+    return value.toLowerCase().replace(/ /g, "_");
 };
 
 module.exports = JSUtils;

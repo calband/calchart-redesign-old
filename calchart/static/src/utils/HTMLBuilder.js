@@ -84,23 +84,23 @@ HTMLBuilder.div = function() {
  *  - {string} name -- the name attribute for the field (defaults to label slugified)
  */
 HTMLBuilder.formfield = function() {
-    var args = _parseArgs(arguments, ["name", "field"]);
-    var label = args.name || JSUtils.slugify(args.label);
+    var args = _parseArgs(arguments, ["label", "field", "name"]);
+    var name = args.name || JSUtils.slugify(args.label);
 
     if (typeof args.field === "string") {
         args.field = this.make(args.field);
     }
     args.field
-        .attr("name", args.name)
-        .attr("id", args.name);
+        .attr("name", name)
+        .attr("id", name);
 
-    var $label = $("<label>")
-        .attr("for", args.name)
-        .text(label + ":");
+    var label = $("<label>")
+        .attr("for", name)
+        .text(args.label + ":");
 
     return $("<div>")
-        .addClass("field " + args.name)
-        .append([$label, args.field]);
+        .addClass("field " + name)
+        .append([label, args.field]);
 };
 
 /**
@@ -124,19 +124,21 @@ HTMLBuilder.img = function(src) {
 
 /**
  * Builds a <select> element, with the given parameters:
- *  - {string} class -- the class to add to the <select>
  *  - {object} options -- the options to add to the <select>, mapping
  *    the value of the option to the name.
+ *  - {string} class -- the class to add to the <select>
  *  - {function} change -- the callback to run when an option is selected
+ *  - {string} selected -- the value of the option to mark selected
  */
 HTMLBuilder.select = function() {
-    var args = _parseArgs(arguments, ["class", "options", "change"]);
+    var args = _parseArgs(arguments, ["options", "class", "change", "selected"]);
 
     var select = $("<select>").addClass(args.class).change(args.change);
 
     $.each(args.options, function(value, label) {
         $("<option>")
             .attr("value", value)
+            .prop("selected", value === args.selected)
             .text(label)
             .appendTo(select);
     });

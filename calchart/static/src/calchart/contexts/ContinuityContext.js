@@ -144,7 +144,8 @@ ContinuityContext.prototype._init = function() {
         });
 
     this._panel.on("click", ".continuity .edit", function() {
-        var continuity = $(this).parents(".continuity").data("continuity");
+        var $continuity = $(this).parents(".continuity");
+        var continuity = $continuity.data("continuity");
         var html = continuity.popupHTML();
 
         UIUtils.showPopup("edit-continuity", {
@@ -155,6 +156,16 @@ ContinuityContext.prototype._init = function() {
             },
             onHide: function(popup) {
                 popup.find("form .field").remove();
+            },
+            onSubmit: function(popup) {
+                var data = UIUtils.getData(popup);
+                var callback = continuity.savePopup(data);
+
+                if (callback) {
+                    callback($continuity);
+                }
+
+                UIUtils.hidePopup(popup);
             },
         });
     });
