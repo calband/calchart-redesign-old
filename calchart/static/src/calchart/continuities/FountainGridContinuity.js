@@ -93,13 +93,21 @@ FountainGridContinuity.prototype.getMovements = function(sheet, dot, start) {
 
     var remaining = sheet.getDuration() - deltaX - deltaY;
     if (remaining > 0) {
-        var orientation = this._orientation === "east" ? 0 : 90;
+        var orientation = this.getOrientation() === "east" ? 0 : 90;
         var marktime = this._end === "MT";
         var stop = new MovementCommandStop(end.x, end.y, orientation, remaining, marktime);
         movements.push(stop);
     }
 
     return movements;
+};
+
+/**
+ * Get the final orientation for the final mark time, resolving default.
+ */
+FountainGridContinuity.prototype.getOrientation = function() {
+    // TODO: resolve default
+    return this._orientation === "default" ? "east" : this._orientation;
 };
 
 FountainGridContinuity.prototype.panelHTML = function() {
