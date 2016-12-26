@@ -64,7 +64,8 @@ ContinuityContext.prototype.unload = function() {
     this._panel.hide();
     this._removeEvents(window, document, ".toolbar .seek");
 
-    // TODO: set beats to 0
+    window.controller.setBeat(0);
+    this._updateSeek();
 
     $(".toolbar .edit-continuity").removeClass("active");
     $(".toolbar .edit-continuity-group").addClass("hide");
@@ -180,12 +181,14 @@ ContinuityContext.prototype._setupSeek = function(seek) {
         var numBeats = _this._sheet.getDuration();
         var interval = seekWidth / (numBeats - 1);
 
+        // snap to beat
         var x = MathUtils.bound(pageX - seekLeft - offset, 0, seekWidth);
-        x = MathUtils.round(x, interval);
-        marker.css("transform", "translateX(" + x + "px)");
+        var beat = MathUtils.round(x, interval) / interval;
 
+        // don't redraw screen if the beat didn't change
         if (x !== prev) {
-            // TODO: update beat
+            window.controller.setBeat(beat);
+            _this._updateSeek();
         }
     };
 
