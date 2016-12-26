@@ -138,6 +138,7 @@ ContinuityContext.prototype._changeTab = function(tab) {
  */
 ContinuityContext.prototype._setupSeek = function(seek) {
     seek = $(seek);
+    var _this = this;
     var isDrag = false;
     var marker = seek.find(".marker");
     var markerWidth = marker.width();
@@ -147,9 +148,11 @@ ContinuityContext.prototype._setupSeek = function(seek) {
 
     var moveMarker = function(pageX) {
         var prev = marker.offset().left;
+        var numBeats = _this._sheet.getDuration();
+        var interval = seekWidth / (numBeats - 1);
 
-        // TODO: snap marker to beats
         var x = MathUtils.bound(pageX - seekLeft - offset, 0, seekWidth);
+        x = MathUtils.round(x, interval);
         marker.css("transform", "translateX(" + x + "px)");
 
         if (x !== prev) {
