@@ -24,6 +24,9 @@ body {
 h1, h2, h3 {
     margin: 0.5em 0;
     font-family: sans-serif("DIN Next Medium");
+    * {
+        font: inherit;
+    }
 }
 
 h1 {

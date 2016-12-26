@@ -28,7 +28,7 @@ BaseContinuity.prototype.serialize = function() {
  * @param {jQuery} continuities -- the list of continuities to append this
  *   continuity to
  */
-BaseContinuity.prototype.appendTo = function(continuities) {
+BaseContinuity.prototype.appendToPanel = function(continuities) {
     throw new Error(this.constructor.name + " did not define html");
 };
 
@@ -42,6 +42,15 @@ BaseContinuity.prototype.appendTo = function(continuities) {
  */
 BaseContinuity.prototype.getMovements = function(sheet, dot, start) {
     throw new Error(this.constructor.name + " did not define getMovements");
+};
+
+/**
+ * @return {object} data to populate the Edit Continuity popup, with the values:
+ *   - {string} name -- the name of the continuity
+ *   - {Array<jQuery>} fields -- the fields to add to the form
+ */
+BaseContinuity.prototype.popupHTML = function() {
+    throw new Error(this.constructor.name + " did not define popupHTML");
 };
 
 /**** HELPERS ****/
@@ -61,7 +70,7 @@ BaseContinuity.prototype.getMovements = function(sheet, dot, start) {
  *       </div>
  *   </div>
  */
-BaseContinuity.prototype._wrapHTML = function(type, contents) {
+BaseContinuity.prototype._wrapPanel = function(type, contents) {
     var icon_edit = HTMLBuilder.icon("pencil", "edit");
     var icon_delete = HTMLBuilder.icon("times", "delete");
     var actions = HTMLBuilder.div("actions", [icon_edit, icon_delete]);

@@ -103,7 +103,7 @@ ContinuityContext.prototype._changeTab = function(tab) {
     var continuities = this._panel.find(".continuities").empty();
     var dotType = $(tab).data("dotType");
     this._sheet.getContinuities(dotType).forEach(function(continuity) {
-        continuity.appendTo(continuities);
+        continuity.appendToPanel(continuities);
     });
 
     // TODO: show continuity errors (dots not make their spot, not enough continuities)
@@ -135,7 +135,7 @@ ContinuityContext.prototype._init = function() {
         })
         .change(function() {
             var continuity = new Continuity($(this).val());
-            continuity.appendTo(_this._panel.find(".continuities"));
+            continuity.appendToPanel(_this._panel.find(".continuities"));
 
             var dotType = _this._panel.find(".dot-types li.active").data("dotType");
             _this._sheet.addContinuity(dotType, continuity);
@@ -146,9 +146,14 @@ ContinuityContext.prototype._init = function() {
 
     this._panel.on("click", ".continuity .edit", function() {
         var continuity = $(this).parents(".continuity").data("continuity");
+        var html = continuity.popupHTML();
 
-        console.log(continuity);
-        // TODO: edit continuity popup
+        UIUtils.showPopup("edit-continuity", {
+            init: function(popup) {
+                popup.find(".continuity-title").text(html.name);
+                popup.find("form").prepend(html.fields);
+            },
+        });
     });
 
     this._panel.on("click", ".continuity .delete", function() {

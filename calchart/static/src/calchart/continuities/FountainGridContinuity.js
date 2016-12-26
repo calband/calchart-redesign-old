@@ -42,7 +42,7 @@ FountainGridContinuity.prototype.serialize = function() {
 
 /**** INSTANCE METHODS ****/
 
-FountainGridContinuity.prototype.appendTo = function(continuities) {
+FountainGridContinuity.prototype.appendToPanel = function(continuities) {
     var type = this._isEWNS ? "EWNS" : "NSEW";
 
     var label = HTMLBuilder.span(null, type);
@@ -59,7 +59,7 @@ FountainGridContinuity.prototype.appendTo = function(continuities) {
     });
     var end = HTMLBuilder.div("panel-continuity-end", [endLabel, endChoices]);
 
-    continuities.append(this._wrapHTML(type, [label, end]));
+    continuities.append(this._wrapPanel(type, [label, end]));
     endChoices.dropdown();
 };
 
@@ -111,6 +111,13 @@ FountainGridContinuity.prototype.getMovements = function(sheet, dot, start) {
     }
 
     return movements;
+};
+
+FountainGridContinuity.prototype.popupHTML = function() {
+    return {
+        name: this._isEWNS ? "EWNS" : "NSEW",
+        fields: [],
+    };
 };
 
 module.exports = FountainGridContinuity;

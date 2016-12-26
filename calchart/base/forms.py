@@ -82,3 +82,10 @@ class AddStuntsheetPopup(PopupForm):
     name = 'add-stuntsheet'
 
     num_beats = forms.IntegerField(label='Number of beats')
+
+class EditContinuityPopup(PopupForm):
+    """
+    The popup to edit a continuity
+    """
+    name = 'edit-continuity'
+    template_name = 'partials/popup_edit_continuity.html'
