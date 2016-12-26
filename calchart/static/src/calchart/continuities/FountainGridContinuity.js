@@ -117,9 +117,31 @@ FountainGridContinuity.prototype.panelHTML = function() {
 };
 
 FountainGridContinuity.prototype.popupHTML = function() {
+    var end = HTMLBuilder.formfield("End", HTMLBuilder.select({
+        options: {
+            MT: "Mark Time",
+            CL: "Close",
+        },
+    }));
+    var step = HTMLBuilder.formfield("Step Type", HTMLBuilder.select({
+        options: {
+            HS: "High Step",
+            MM: "Mini Military",
+            FF: "Full Field",
+            SH: "Show High",
+            JS: "Jerky Step",
+        },
+    }));
+    var orientation = HTMLBuilder.formfield("Final Orientation", HTMLBuilder.select({
+        options: {
+            E: "East",
+            W: "West",
+        },
+    }), "orientation");
+
     return {
         name: this._isEWNS ? "EWNS" : "NSEW",
-        fields: [],
+        fields: [end, step, orientation],
     };
 };
 

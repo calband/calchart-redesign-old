@@ -80,6 +80,7 @@ UIUtils.getData = function(parent) {
  * @param {object} options -- an object containing additional parameters, such as:
  *   - {function} init -- optional function to run before the popup is shown
  *   - {function} onSubmit -- optional function to run when the Save button is pressed
+ *   - {function} onHide -- optional function to run after the popup is hidden
  */
 UIUtils.showPopup = function(name, options) {
     var popup = $(".popup-box." + name).addClass("active");
@@ -89,7 +90,7 @@ UIUtils.showPopup = function(name, options) {
     popup.find("input, select, textarea").val("");
 
     if (options.init !== undefined) {
-        options.init.call(this, popup);
+        options.init(popup);
     }
 
     popup.find("form")
@@ -98,9 +99,11 @@ UIUtils.showPopup = function(name, options) {
             e.preventDefault();
 
             if (options.onSubmit !== undefined) {
-                options.onSubmit.call(this, popup);
+                options.onSubmit(popup);
             }
         });
+
+    popup.data("onHide", options.onHide);
 
     $(".popup").show();
 
@@ -120,6 +123,11 @@ UIUtils.hidePopup = function(popup) {
 
     $(".popup").hide();
     $(popup).removeClass("active");
+
+    var onHide = $(popup).data("onHide");
+    if (onHide) {
+        onHide(popup);
+    }
 };
 
 /**** PANELS ****/

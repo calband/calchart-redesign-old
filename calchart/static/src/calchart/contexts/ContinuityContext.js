@@ -151,6 +151,10 @@ ContinuityContext.prototype._init = function() {
             init: function(popup) {
                 popup.find(".continuity-title").text(html.name);
                 popup.find("form").prepend(html.fields);
+                popup.find("select").dropdown();
+            },
+            onHide: function(popup) {
+                popup.find("form .field").remove();
             },
         });
     });

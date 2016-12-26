@@ -119,6 +119,11 @@ $sidebar-width: 200px;
             width: initial;
         }
     }
+    &.edit-continuity {
+        label {
+            width: 125px;
+        }
+    }
 }
 
 .panel {

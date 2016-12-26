@@ -1,3 +1,5 @@
+var JSUtils = require("./JSUtils");
+
 /**
  * A collection of helper functions that simplify creating HTML elements.
  * Every function's arguments are optional, so can either be called with
@@ -43,7 +45,7 @@ HTMLBuilder.make = function(elem, appendTo) {
     var match = elem.match(/^(\w+)(?:#([\w-]+))?((?:\.[\w-]+)+)?$/);
     var tag = "<" + match[1] + ">";
     var id = match[2];
-    var classes = match[3].slice(1).replace(".", " ");
+    var classes = (match[3] || "").slice(1).replace(".", " ");
 
     var element = $(tag).attr("id", id).addClass(classes);
     if (appendTo) {
@@ -72,6 +74,33 @@ HTMLBuilder.div = function() {
     }
 
     return div;
+};
+
+/**
+ * Builds a <div> element for a form field, with the given parameters:
+ *  - {string} label -- the label for the field
+ *  - {jQuery|string} field -- the field to wrap in the form field, either
+ *    the HTML element itself or a string to pass to HTMLBuilder.make
+ *  - {string} name -- the name attribute for the field (defaults to label slugified)
+ */
+HTMLBuilder.formfield = function() {
+    var args = _parseArgs(arguments, ["name", "field"]);
+    var label = args.name || JSUtils.slugify(args.label);
+
+    if (typeof args.field === "string") {
+        args.field = this.make(args.field);
+    }
+    args.field
+        .attr("name", args.name)
+        .attr("id", args.name);
+
+    var $label = $("<label>")
+        .attr("for", args.name)
+        .text(label + ":");
+
+    return $("<div>")
+        .addClass("field " + args.name)
+        .append([$label, args.field]);
 };
 
 /**
