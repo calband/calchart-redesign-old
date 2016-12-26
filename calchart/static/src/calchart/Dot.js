@@ -90,6 +90,10 @@ Dot.prototype.loadSheet = function(sheet) {
  *   returns null.
  */
 Dot.prototype.getAnimationState = function(beatNum) {
+    if (!this._sheetInfo) {
+        return;
+    }
+
     var movements = this._sheetInfo.movements;
 
     var remaining = beatNum;
@@ -113,7 +117,9 @@ Dot.prototype.getAnimationState = function(beatNum) {
  * @return {string} the dot type for the current stuntsheet
  */
 Dot.prototype.getDotType = function() {
-    return this._sheetInfo.type;
+    if (this._sheetInfo) {
+        return this._sheetInfo.type;
+    }
 };
 
 /**
@@ -121,8 +127,28 @@ Dot.prototype.getDotType = function() {
  *
  * @return {Coordinate} the initial position of the dot
  */
-Dot.prototype.getPosition = function() {
-    return this._sheetInfo.position;
+Dot.prototype.getFirstPosition = function() {
+    if (this._sheetInfo) {
+        return this._sheetInfo.position;
+    }
+}
+
+/**
+ * Get the position of the dot at the end of the currently loaded stuntsheet
+ *
+ * @return {Coordinate} the final position of the dot
+ */
+Dot.prototype.getLastPosition = function() {
+    if (!this._sheetInfo) {
+        return;
+    }
+
+    var movements = this._sheetInfo.movements;
+    if (movements.length === 0) {
+        return this._sheetInfo.position;
+    } else {
+        return movements[movements.length - 1].getEndPosition();
+    }
 }
 
 module.exports = Dot;

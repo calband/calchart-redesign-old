@@ -238,13 +238,13 @@ BaseGrapher.prototype._drawDots = function(currentBeat, selectedDots) {
         var label = dot.getLabel();
         // special case in case dots are positioned without having movements
         if (currentBeat === 0) {
-            var state = dot.getPosition();
+            var state = dot.getFirstPosition();
         } else {
             try {
                 var state = dot.getAnimationState(currentBeat);
             } catch (e) {
-                // ran out of movements; just stay in the same spot
-                return;
+                // ran out of movements
+                var state = dot.getLastPosition();
             }
         }
         var x = _this._scale.xScale(state.x);
