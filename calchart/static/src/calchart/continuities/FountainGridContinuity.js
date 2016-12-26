@@ -42,27 +42,6 @@ FountainGridContinuity.prototype.serialize = function() {
 
 /**** INSTANCE METHODS ****/
 
-FountainGridContinuity.prototype.appendToPanel = function(continuities) {
-    var type = this._isEWNS ? "EWNS" : "NSEW";
-
-    var label = HTMLBuilder.span(null, type);
-
-    var endLabel = HTMLBuilder.span(null, "End:");
-    var endChoices = HTMLBuilder.select({
-        options: {
-            MT: "Mark Time",
-            CL: "Close",
-        },
-        change: function() {
-            // TODO: modify end
-        },
-    });
-    var end = HTMLBuilder.div("panel-continuity-end", [endLabel, endChoices]);
-
-    continuities.append(this._wrapPanel(type, [label, end]));
-    endChoices.dropdown();
-};
-
 FountainGridContinuity.prototype.getMovements = function(sheet, dot, start) {
     var end = sheet.getNextSheet().getInfoForDot(dot.getLabel()).position;
 
@@ -111,6 +90,30 @@ FountainGridContinuity.prototype.getMovements = function(sheet, dot, start) {
     }
 
     return movements;
+};
+
+FountainGridContinuity.prototype.panelHTML = function() {
+    var type = this._isEWNS ? "EWNS" : "NSEW";
+
+    var label = HTMLBuilder.span(null, type);
+
+    var endLabel = HTMLBuilder.span(null, "End:");
+    var endChoices = HTMLBuilder
+        .select({
+            options: {
+                MT: "Mark Time",
+                CL: "Close",
+            },
+            change: function() {
+                // TODO: modify end
+            },
+        });
+    var end = HTMLBuilder.div("panel-continuity-end", [endLabel, endChoices]);
+    endChoices.dropdown({
+        width: 110,
+    });
+
+    return this._wrapPanel(type, [label, end]);
 };
 
 FountainGridContinuity.prototype.popupHTML = function() {

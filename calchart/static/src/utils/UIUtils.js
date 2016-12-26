@@ -103,7 +103,6 @@ UIUtils.showPopup = function(name, options) {
         });
 
     $(".popup").show();
-    $(".popup select").dropdown();
 
     // auto focus on first input
     popup.find("input:first").focus();

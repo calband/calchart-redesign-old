@@ -23,16 +23,6 @@ BaseContinuity.prototype.serialize = function() {
 /**** INSTANCE METHODS ****/
 
 /**
- * Append this continuity to the list of continuities
- *
- * @param {jQuery} continuities -- the list of continuities to append this
- *   continuity to
- */
-BaseContinuity.prototype.appendToPanel = function(continuities) {
-    throw new Error(this.constructor.name + " did not define html");
-};
-
-/**
  * Get the movements for the given dot for the given stuntsheet
  *
  * @param {Sheet} sheet -- the sheet the continuity is being executed for
@@ -42,6 +32,13 @@ BaseContinuity.prototype.appendToPanel = function(continuities) {
  */
 BaseContinuity.prototype.getMovements = function(sheet, dot, start) {
     throw new Error(this.constructor.name + " did not define getMovements");
+};
+
+/**
+ * @return {jQuery} the HTML element to add to the Edit Continuity panel
+ */
+BaseContinuity.prototype.panelHTML = function() {
+    throw new Error(this.constructor.name + " did not define panelHTML");
 };
 
 /**

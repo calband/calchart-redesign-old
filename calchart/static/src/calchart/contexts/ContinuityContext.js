@@ -103,7 +103,7 @@ ContinuityContext.prototype._changeTab = function(tab) {
     var continuities = this._panel.find(".continuities").empty();
     var dotType = $(tab).data("dotType");
     this._sheet.getContinuities(dotType).forEach(function(continuity) {
-        continuity.appendToPanel(continuities);
+        continuities.append(continuity.panelHTML());
     });
 
     // TODO: show continuity errors (dots not make their spot, not enough continuities)
@@ -131,11 +131,10 @@ ContinuityContext.prototype._init = function() {
         .dropdown({
             placeholder_text_single: "Add continuity...",
             disable_search_threshold: false,
-            width: "100%",
         })
         .change(function() {
             var continuity = new Continuity($(this).val());
-            continuity.appendToPanel(_this._panel.find(".continuities"));
+            _this._panel.find(".continuities").append(continuity.panelHTML());
 
             var dotType = _this._panel.find(".dot-types li.active").data("dotType");
             _this._sheet.addContinuity(dotType, continuity);

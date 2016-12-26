@@ -21,11 +21,16 @@ jQueryUtils.dropdown = function(options) {
             $(this).dropdown(options);
         });
     }
+
     // set default options
     var defaults = {
         placeholder_text_single: "------",
         disable_search_threshold: 10,
     };
+    // until https://github.com/harvesthq/chosen/issues/92 is resolved
+    if (!this.is(":visible")) {
+        defaults.width = this.css("width");
+    }
     options = $.extend(defaults, options);
 
     // destroy Chosen if exists

@@ -4,7 +4,7 @@ var UIUtils = require("utils/UIUtils");
 jQueryUtils(jQuery);
 
 $(document).ready(function() {
-    $("select:visible").dropdown();
+    $("select").dropdown();
 
     $(".popup-box button.cancel").click(function() {
         var popup = $(this).parents(".popup-box");
