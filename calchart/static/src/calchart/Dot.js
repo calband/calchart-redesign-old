@@ -97,14 +97,14 @@ Dot.prototype.getAnimationState = function(beatNum) {
     for (var i = 0; i < movements.length; i++) {
         var movement = movements[i];
         var duration = movement.getDuration();
-        if (remaining < duration) {
+        if (remaining <= duration) {
             return movement.getAnimationState(remaining);
         } else {
             remaining -= duration;
         }
     }
 
-    return null;
+    throw new Error("Ran out of movements for " + this._label + ": " + remaining + " beats remaining");
 };
 
 /**

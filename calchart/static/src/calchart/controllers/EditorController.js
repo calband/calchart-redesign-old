@@ -92,6 +92,15 @@ EditorController.prototype.getActiveSheet = function() {
     return this._activeSheet;
 };
 
+/**
+ * Get the current beat number
+ *
+ * @param {int} the current beat
+ */
+EditorController.prototype.getCurrentBeat = function() {
+    return this._currBeat;
+};
+
 /**** ACTIONS
  *
  * Each action can define the following properties:
@@ -201,6 +210,33 @@ EditorController.prototype.loadContext = function(name) {
 };
 
 /**
+ * Increment the current beat
+ */
+EditorController.prototype.nextBeat = function() {
+    this._currBeat++;
+    var max = this._activeSheet.getDuration() - 1;
+
+    if (this._currBeat > max) {
+        this._currBeat = max;
+    } else {
+        this._grapher.draw(this._activeSheet, this._currBeat);
+    }
+};
+
+/**
+ * Decrement the current beat
+ */
+EditorController.prototype.prevBeat = function() {
+    this._currBeat--;
+
+    if (this._currBeat < 0) {
+        this._currBeat = 0;
+    } else {
+        this._grapher.draw(this._activeSheet, this._currBeat);
+    }
+};
+
+/**
  * Redoes the last undone action
  */
 EditorController.prototype.redo = function() {
@@ -231,6 +267,16 @@ EditorController.prototype.saveShow = function(callback) {
     };
     // TODO: add sbowing success message to callback
     UIUtils.doAction("save_show", params, callback);
+};
+
+/**
+ * Set the current beat to the given beat
+ *
+ * @param {int} beat -- the beat to set to
+ */
+EditorController.prototype.setBeat = function(beat) {
+    this._currBeat = beat;
+    this._grapher.draw(this._activeSheet, this._currBeat);
 };
 
 /**

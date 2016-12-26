@@ -240,7 +240,12 @@ BaseGrapher.prototype._drawDots = function(currentBeat, selectedDots) {
         if (currentBeat === 0) {
             var state = dot.getPosition();
         } else {
-            var state = dot.getAnimationState(currentBeat);
+            try {
+                var state = dot.getAnimationState(currentBeat);
+            } catch (e) {
+                // ran out of movements; just stay in the same spot
+                return;
+            }
         }
         var x = _this._scale.xScale(state.x);
         var y = _this._scale.yScale(state.y);

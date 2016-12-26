@@ -57,6 +57,7 @@ ContinuityContext.prototype.loadSheet = function(sheet) {
     BaseContext.prototype.loadSheet.call(this, sheet);
 
     this._updatePanel();
+    this._updateSeek();
 };
 
 ContinuityContext.prototype.unload = function() {
@@ -67,6 +68,24 @@ ContinuityContext.prototype.unload = function() {
 
     $(".toolbar .edit-continuity").removeClass("active");
     $(".toolbar .edit-continuity-group").addClass("hide");
+};
+
+/**** ACTIONS ****/
+
+/**
+ * Increments the beat and updates the seek bar
+ */
+ContinuityContext.prototype.nextContinuityBeat = function() {
+    window.controller.nextBeat();
+    this._updateSeek();
+};
+
+/**
+ * Decrements the beat and updates the seek bar
+ */
+ContinuityContext.prototype.prevContinuityBeat = function() {
+    window.controller.prevBeat();
+    this._updateSeek();
 };
 
 /**** HELPERS ****/
@@ -94,6 +113,8 @@ ContinuityContext.prototype._changeTab = function(tab) {
  */
 ContinuityContext.prototype._init = function() {
     var _this = this;
+
+    // Continuity panel
 
     UIUtils.setupPanel(this._panel, {
         bottom: 20,
@@ -212,6 +233,17 @@ ContinuityContext.prototype._updatePanel = function() {
     });
 
     this._changeTab(this._panel.find(".dot-types li:first"));
+};
+
+/**
+ * Update the seek bar with the current beat
+ */
+ContinuityContext.prototype._updateSeek = function() {
+    var beat = window.controller.getCurrentBeat();
+    var numBeats = this._sheet.getDuration();
+    var interval = $(".toolbar .seek").width() / (numBeats - 1);
+
+    $(".toolbar .seek .marker").css("transform", "translateX(" + (interval * beat) + "px)");
 };
 
 module.exports = ContinuityContext;
