@@ -97,6 +97,7 @@ ul.messages {
     left: 0;
     width: 100%;
     padding: 10px;
+    z-index: z-index(messages);
     li.message {
         background: rgba($light-gray, 0.8);
         padding: 10px 30px;

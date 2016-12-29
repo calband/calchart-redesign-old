@@ -86,7 +86,6 @@ UIUtils.showPopup = function(name, options) {
     var popup = $(".popup-box." + name).addClass("active");
 
     // clear inputs and messages
-    UIUtils.clearMessages();
     popup.find("input, select, textarea").val("");
 
     if (options.init !== undefined) {
