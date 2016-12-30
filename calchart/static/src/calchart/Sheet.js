@@ -20,6 +20,7 @@ var UIUtils = require("utils/UIUtils");
  * A Sheet object contains all the information related to a stuntsheet,
  * consisting of the following information:
  *  - the Show this sheet is a part of
+ *  - the index of the Sheet in the Show
  *  - an optional label for the Sheet
  *  - the number of beats in the stuntsheet
  *  - for each dot, its dot type
@@ -28,14 +29,16 @@ var UIUtils = require("utils/UIUtils");
  *  - for each dot type, its continuity
  *
  * @param {Show} show -- the Show this sheet is part of
+ * @param {int} index -- the index of this Sheet in the Show
  * @param {int} numBeats -- the number of beats in the stuntsheet
  * @param {object|undefined} options -- an optional argument that can
  *   contain optional information about a stuntsheet, such as:
  *     - {string} label -- a label for the Sheet
  *     - {string} fieldType -- the field type
  */
-var Sheet = function(show, numBeats, options) {
+var Sheet = function(show, index, numBeats, options) {
     this._show = show;
+    this._index = index;
     this._numBeats = numBeats;
 
     var defaults = {
@@ -57,12 +60,13 @@ var Sheet = function(show, numBeats, options) {
  * dot labels.
  *
  * @param {Show} show -- the Show this sheet is a part of
+ * @param {int} index -- the index of this Sheet in the Show
  * @param {int} numBeats -- the number of beats in the stuntsheet
  * @param {Array<string>} dotLabels -- the labels for the dots in the show
  * @return {Sheet} the newly created Sheet
  */
-Sheet.create = function(show, numBeats, dotLabels) {
-    var sheet = new Sheet(show, numBeats);
+Sheet.create = function(show, index, numBeats, dotLabels) {
+    var sheet = new Sheet(show, index, numBeats);
 
     // initialize dots as plain dots
     dotLabels.forEach(function(dot) {
@@ -86,7 +90,7 @@ Sheet.create = function(show, numBeats, dotLabels) {
  * @return {Sheet} the Sheet reconstructed from the given data
  */
 Sheet.deserialize = function(show, data) {
-    var sheet = new Sheet(show, data.numBeats, data.options);
+    var sheet = new Sheet(show, data.index, data.numBeats, data.options);
 
     $.each(data.dots, function(dot, dot_data) {
         sheet._dots[dot] = {
@@ -115,6 +119,7 @@ Sheet.deserialize = function(show, data) {
 Sheet.prototype.serialize = function() {
     var data = {
         numBeats: this._numBeats,
+        index: this._index,
     };
 
     data.options = {
@@ -241,8 +246,7 @@ Sheet.prototype.getLabel = function() {
         return this._label;
     }
 
-    var sheets = this._show.getSheets();
-    return sheets.indexOf(this) + 1;
+    return this._index + 1;
 };
 
 /**
@@ -251,7 +255,16 @@ Sheet.prototype.getLabel = function() {
  * @return {Sheet} the sheet after this sheet in the show
  */
 Sheet.prototype.getNextSheet = function() {
-    return this._show.getNextSheet(this);
+    return this._show.getSheets()[this._index + 1];
+};
+
+/**
+ * Get the sheet that precedes this sheet
+ *
+ * @return {Sheet} the sheet before this sheet in the show
+ */
+Sheet.prototype.getPrevSheet = function() {
+    return this._show.getSheets()[this._index - 1];
 };
 
 /**

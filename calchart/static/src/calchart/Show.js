@@ -176,7 +176,8 @@ Show.prototype.getSheets = function() {
  * @return {Sheet} the newly created stuntsheet
  */
 Show.prototype.addSheet = function(numBeats) {
-    var sheet = Sheet.create(this, numBeats, this.getDotLabels());
+    var index = this._sheets.length;
+    var sheet = Sheet.create(this, index, numBeats, this.getDotLabels());
     this._sheets.push(sheet);
     return sheet;
 };
@@ -190,17 +191,6 @@ Show.prototype.loadSheet = function(sheet) {
     $.each(this._dots, function(_, dot) {
         dot.loadSheet(sheet);
     });
-};
-
-/**
- * Get the Sheet that follows the given sheet
- *
- * @param {Sheet|undefined} sheet -- the sheet to get the next sheet of
- * @return {Sheet} the sheet after the given sheet
- */
-Show.prototype.getNextSheet = function(sheet) {
-    var i = this._sheets.indexOf(sheet);
-    return this._sheets[i + 1];
 };
 
 /**** SONGS ****/
