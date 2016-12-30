@@ -228,5 +228,6 @@ editor_toolbar = Toolbar(
         ToolbarItem('Previous Beat', 'chevron-left', 'prevContinuityBeat'),
         CustomToolbarItem('Seek', '<span class="bar"></span><span class="marker"></span>'),
         ToolbarItem('Next Beat', 'chevron-right', 'nextContinuityBeat'),
+        ToolbarItem('Check Continuities', 'check', 'checkContinuities'),
     ),
 )

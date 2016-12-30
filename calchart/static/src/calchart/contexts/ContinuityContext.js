@@ -55,7 +55,7 @@ ContinuityContext.prototype.load = function() {
 
 ContinuityContext.prototype.loadSheet = function(sheet) {
     if (sheet.isLastSheet()) {
-        window.controller.loadContext("dot");
+        this._controller.loadContext("dot");
     }
 
     BaseContext.prototype.loadSheet.call(this, sheet);
@@ -68,7 +68,7 @@ ContinuityContext.prototype.unload = function() {
     this._panel.hide();
     this._removeEvents(window, document, ".toolbar .seek");
 
-    window.controller.setBeat(0);
+    this._controller.setBeat(0);
     this._updateSeek();
 
     $(".toolbar .edit-continuity").removeClass("active");
@@ -78,10 +78,52 @@ ContinuityContext.prototype.unload = function() {
 /**** ACTIONS ****/
 
 /**
+ * Check if any dots have continuity errors, showing a UI error
+ * if so.
+ */
+ContinuityContext.prototype.checkContinuities = function() {
+    var errors = {
+        lackMoves: [],
+        wrongPosition: [],
+    };
+
+    var duration = this._sheet.getDuration();
+    var nextSheet = this._sheet.getNextSheet();
+
+    this._controller.getShow().getDots().forEach(function(dot) {
+        try {
+            var final = dot.getAnimationState(duration);
+        } catch (e) {
+            errors.wrongPosition.push(dot.getLabel());
+            return;
+        }
+
+        var position = nextSheet.getInfoForDot(dot).position;
+        if (final.x !== position.x || final.y !== position.y) {
+            errors.lackMoves.push(dot.getLabel());
+        }
+    });
+
+    var hasError = false;
+    if (errors.lackMoves.length > 0) {
+        UIUtils.showError("Dots did not have enough to do: " + errors.lackMoves.join(", "));
+        hasError = true;
+    }
+    if (errors.wrongPosition.length > 0) {
+        UIUtils.showError("Dots did not make it to their next spot: " + errors.wrongPosition.join(", "));
+        hasError = true;
+    }
+
+    if (!hasError) {
+        UIUtils.showMessage("Continuities valid!");
+    }
+};
+
+/**
  * Increments the beat and updates the seek bar
  */
 ContinuityContext.prototype.nextContinuityBeat = function() {
-    window.controller.nextBeat();
+    this._controller.nextBeat();
     this._updateSeek();
 };
 
@@ -89,7 +131,7 @@ ContinuityContext.prototype.nextContinuityBeat = function() {
  * Decrements the beat and updates the seek bar
  */
 ContinuityContext.prototype.prevContinuityBeat = function() {
-    window.controller.prevBeat();
+    this._controller.prevBeat();
     this._updateSeek();
 };
 
@@ -212,7 +254,7 @@ ContinuityContext.prototype._setupSeek = function(seek) {
 
         // don't redraw screen if the beat didn't change
         if (x !== prev) {
-            window.controller.setBeat(beat);
+            _this._controller.setBeat(beat);
             _this._updateSeek();
         }
     };
@@ -267,7 +309,7 @@ ContinuityContext.prototype._updatePanel = function() {
  * Update the seek bar with the current beat
  */
 ContinuityContext.prototype._updateSeek = function() {
-    var beat = window.controller.getCurrentBeat();
+    var beat = this._controller.getCurrentBeat();
     var numBeats = this._sheet.getDuration();
     var interval = $(".toolbar .seek").width() / (numBeats - 1);
 

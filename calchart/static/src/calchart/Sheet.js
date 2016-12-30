@@ -288,19 +288,20 @@ Sheet.prototype.removeContinuity = function(dotType, continuity) {
 };
 
 /**
- * Update the movements for the given dot type
+ * Update the movements for the given dots
  *
- * @param {string} dotType -- the dot type to update movements for
+ * @param {string|Dot|Array<Dot>} dots -- the dots to update movements for, as either
+ *   the dot type, the Dot, or a list of Dots.
  */
-Sheet.prototype.updateMovements = function(dotType) {
+Sheet.prototype.updateMovements = function(dots) {
+    if (typeof dots === "string") {
+        dots = this.getDotType(dots);
+    } else if (dots instanceof Dot) {
+        dots = [dots];
+    }
+
     var continuities = this._continuities[dotType];
     var duration = this._numBeats;
-    var nextSheet = this.getNextSheet();
-
-    var errors = {
-        lackMoves: [],
-        wrongPosition: [],
-    };
 
     this.getDotType(dotType).forEach(function(dot) {
         var info = this._dots[dot.getLabel()];
@@ -312,27 +313,7 @@ Sheet.prototype.updateMovements = function(dotType) {
             position = movements[movements.length - 1].getEndPosition();
         }, this);
         info.movements = movements;
-
-        // check errors
-        try {
-            var final = dot.getAnimationState(duration);
-        } catch (e) {
-            errors.wrongPosition.push(dot.getLabel());
-            return;
-        }
-
-        var position = nextSheet.getInfoForDot(dot).position;
-        if (final.x !== position.x || final.y !== position.y) {
-            errors.lackMoves.push(dot.getLabel());
-        }
     }, this);
-
-    if (errors.lackMoves.length > 0) {
-        UIUtils.showError("Dots did not have enough to do: " + errors.lackMoves.join(", "));
-    }
-    if (errors.wrongPosition.length > 0) {
-        UIUtils.showError("Dots did not make it to their next spot: " + errors.wrongPosition.join(", "));
-    }
 };
 
 /**

@@ -99,13 +99,16 @@ ul.messages {
     padding: 10px;
     z-index: z-index(messages);
     li.message {
-        background: rgba($light-gray, 0.8);
+        background: rgba($light-gray, 0.9);
         padding: 10px 30px;
         border-radius: 4px;
         text-align: center;
         color: $blue;
         &:not(:last-child) {
             margin-bottom: 5px;
+        }
+        &:hover {
+            background: $light-gray;
         }
         &.error {
             color: $red;

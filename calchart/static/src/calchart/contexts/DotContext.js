@@ -146,7 +146,7 @@ DotContext.prototype.load = function() {
                         }
                     });
                     if (hasMoved) {
-                        window.controller.doAction("saveSelectionPositions");
+                        _this._controller.doAction("saveSelectionPositions");
                     }
                     break;
                 case "select":
@@ -237,7 +237,7 @@ DotContext.prototype.nudgeDots = function(deltaX, deltaY) {
     deltaX = scale.toDistance(deltaX);
     deltaY = scale.toDistance(deltaY);
     this.moveSelection(deltaX, deltaY);
-    window.controller.doAction("saveSelectionPositions");
+    this._controller.doAction("saveSelectionPositions");
 };
 
 /**
@@ -246,7 +246,7 @@ DotContext.prototype.nudgeDots = function(deltaX, deltaY) {
 DotContext.prototype.saveSelectionPositions = function() {
     var _this = this;
     var scale = this._grapher.getScale();
-    var activeSheet = window.controller.getActiveSheet();
+    var activeSheet = this._controller.getActiveSheet();
     var dots = [];
 
     this._selectedDots.each(function() {
