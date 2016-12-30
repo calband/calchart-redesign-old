@@ -31,13 +31,11 @@ $(document).ready(function() {
             }
 
             if (data.dot_format === null) {
-                UIUtils.showError("Please provide the format of the dot labels.");
-                return;
+                data.dot_format = popup.find(".dot_format select option:first").val();
             }
 
             if (data.field_type === null) {
-                UIUtils.showError("Please provide the field type.");
-                return;
+                data.field_type = popup.find(".field_type select option:first").val();
             }
 
             // save show and initialize controller

@@ -91,7 +91,7 @@ FountainGridContinuity.prototype.getMovements = function(sheet, dot, start) {
         }
     }
 
-    var remaining = sheet.getDuration() - deltaX - deltaY;
+    var remaining = sheet.getDuration() - Math.abs(deltaX) - Math.abs(deltaY);
     if (remaining > 0) {
         var orientation = this.getOrientation() === "east" ? 0 : 90;
         var marktime = this._end === "MT";

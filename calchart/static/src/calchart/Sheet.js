@@ -9,6 +9,7 @@
 
 var Coordinate = require("./Coordinate");
 var Continuity = require("./Continuity");
+var Dot = require("./Dot");
 var DotType = require("./DotType");
 var MovementCommand = require("./MovementCommand");
 var UIUtils = require("utils/UIUtils");
@@ -218,13 +219,16 @@ Sheet.prototype.getFieldType = function() {
 /**
  * Get the info for the given Dot for this stuntsheet
  *
- * @param {string} dot -- the label of the dot to retrieve info for
+ * @param {string|Dot} dot -- the dot to retrieve info for
  * @return {object} the dot's information for this stuntsheet, containing:
  *   - {DotType} type: the dot's type
  *   - {Coordinate} position: the dot's starting position
  *   - {Array<MovementCommand>} movements: the dot's movements in the sheet
  */
 Sheet.prototype.getInfoForDot = function(dot) {
+    if (dot instanceof Dot) {
+        dot = dot.getLabel();
+    }
     return this._dots[dot];
 };
 
@@ -292,12 +296,14 @@ Sheet.prototype.updateMovements = function(dotType) {
         // check errors
         try {
             var final = dot.getAnimationState(duration);
-            var position = nextSheet.getInfoForDot(dot).position;
-            if (final.x !== position.x || final.y !== position.y) {
-                errors.lackMoves.push(dot.getLabel());
-            }
         } catch (e) {
             errors.wrongPosition.push(dot.getLabel());
+            return;
+        }
+
+        var position = nextSheet.getInfoForDot(dot).position;
+        if (final.x !== position.x || final.y !== position.y) {
+            errors.lackMoves.push(dot.getLabel());
         }
     }, this);
 
