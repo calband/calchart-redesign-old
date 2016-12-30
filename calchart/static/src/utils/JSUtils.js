@@ -41,6 +41,40 @@ JSUtils.fromCamelCase = function(s) {
 };
 
 /**
+ * Parse the arguments passed to a function as either positional arguments
+ * or as keyword arguments, passed as an object.
+ *
+ * @param {Array} args -- the arguments passed to the original function, with
+ *   either an object passed as the only argument (to be used as all the
+ *   arguments), or the arguments in order as defined by labels.
+ * @param {Array<string>} labels -- the names of each argument, in order
+ * @return {object} the arguments passed in, with the keys specified by
+ *   labels and the values either undefined or the parsed argument
+ */
+JSUtils.parseArgs = function(args, labels) {
+    if (args.length === 1 && args[0] !== null) {
+        var _checkArg = function(arg) {
+            for (var key in arg) {
+                if (labels.indexOf(key) === -1) {
+                    return;
+                }
+            }
+            return arg;
+        };
+        var kwargs = _checkArg(args[0]);
+        if (kwargs !== undefined) {
+            return kwargs;
+        }
+    }
+
+    var _args = {};
+    $.each(labels, function(i, label) {
+        _args[label] = args[i];
+    });
+    return _args;
+};
+
+/**
  * Generate an array containing numbers within a certain range. Like
  * Python's range() function, can take in one to three parameters.
  *

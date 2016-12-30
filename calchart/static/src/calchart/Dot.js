@@ -82,19 +82,25 @@ Dot.prototype.loadSheet = function(sheet) {
 
 /**
  * Returns an AnimationState object that describes the Dot's position,
- * orientation, etc. for the currently loaded stuntsheet.
+ * orientation, etc. for the give stuntsheet
  *
  * @param {int} beatNum -- the beat of the current stuntsheet
- * @return {AnimationState|null} An AnimationState that describes the Dot at
+ * @param {Sheet|undefined} sheet -- the sheet to get animation state in,
+ *   defaulting to the currently loaded stuntsheet
+ * @return {AnimationState} An AnimationState that describes the Dot at
  *   a moment of the show. If the Dot has no position at the specified beat,
  *   returns null.
  */
-Dot.prototype.getAnimationState = function(beatNum) {
-    if (!this._sheetInfo) {
-        return;
+Dot.prototype.getAnimationState = function(beatNum, sheet) {
+    if (sheet === undefined) {
+        if (this._sheetInfo) {
+            var movements = this._sheetInfo.movements;
+        } else {
+            return;
+        }
+    } else {
+        var movements = sheet.getInfoForDot(this._label).movements;
     }
-
-    var movements = this._sheetInfo.movements;
 
     var remaining = beatNum;
 

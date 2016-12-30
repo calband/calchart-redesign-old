@@ -9,30 +9,6 @@ var JSUtils = require("./JSUtils");
 var HTMLBuilder = {};
 
 /**
- * Helper function to parse arbitrary arguments
- *
- * @param {Array} args -- the arguments passed to the original function, with
- *   either an object passed as the only argument (to be used as all the
- *   arguments), or the arguments in order as defined by labels.
- * @param {Array<string>} labels -- the names of each argument, in order
- * @return {object} the arguments passed in
- */
-var _parseArgs = function(args, labels) {
-    if (args.length === 1) {
-        var arg = args[0];
-        if (arg !== null && typeof arg === "object") {
-            return arg;
-        }
-    }
-
-    var _args = {};
-    $.each(labels, function(i, label) {
-        _args[label] = args[i];
-    });
-    return _args;
-};
-
-/**
  * Make an HTML element as specified
  *
  * @param {string} elem -- the HTML element to make of the format
@@ -57,13 +33,14 @@ HTMLBuilder.make = function(elem, appendTo) {
 /**** TAG SPECIFIC ****/
 
 /**
- * Builds a <div> element, with the given parameters:
- *  - {string} class -- the class to add to the <div>
- *  - {jQuery|Array<jQuery>} append -- the contents to append to the <div>
- *  - {jQuery} appendTo -- the element to append the <div> to
+ * Builds a <div> element
+ *
+ *  @param {string} class -- the class to add to the <div>
+ *  @param {jQuery|Array<jQuery>} append -- the contents to append to the <div>
+ *  @param {jQuery} appendTo -- the element to append the <div> to
  */
 HTMLBuilder.div = function() {
-    var args = _parseArgs(arguments, ["class", "append", "appendTo"]);
+    var args = JSUtils.parseArgs(arguments, ["class", "append", "appendTo"]);
 
     var div = $("<div>")
         .addClass(args.class)
@@ -77,14 +54,15 @@ HTMLBuilder.div = function() {
 };
 
 /**
- * Builds a <div> element for a form field, with the given parameters:
- *  - {string} label -- the label for the field
- *  - {jQuery|string} field -- the field to wrap in the form field, either
+ * Builds a <div> element for a form field
+ *
+ *  @param {string} label -- the label for the field
+ *  @param {jQuery|string} field -- the field to wrap in the form field, either
  *    the HTML element itself or a string to pass to HTMLBuilder.make
- *  - {string} name -- the name attribute for the field (defaults to label slugified)
+ *  @param {string} name -- the name attribute for the field (defaults to label slugified)
  */
 HTMLBuilder.formfield = function() {
-    var args = _parseArgs(arguments, ["label", "field", "name"]);
+    var args = JSUtils.parseArgs(arguments, ["label", "field", "name"]);
     var name = args.name || JSUtils.slugify(args.label);
 
     if (typeof args.field === "string") {
@@ -104,31 +82,34 @@ HTMLBuilder.formfield = function() {
 };
 
 /**
- * Builds an <i> element, with the given parameters:
- *  - {string} name -- the name of the icon, without the "icon-" prefix
- *  - {string} class -- the class to add to the <i>
+ * Builds an <i> element
+ *
+ *  @param {string} name -- the name of the icon, without the "icon-" prefix
+ *  @param {string} class -- the class to add to the <i>
  */
 HTMLBuilder.icon = function() {
-    var args = _parseArgs(arguments, ["name", "class"]);
+    var args = JSUtils.parseArgs(arguments, ["name", "class"]);
 
     return $("<i>").addClass("icon-" + args.name + " " + args.class);
 };
 
 /**
- * Builds an <img> element, with the given parameters:
- *  - {string} src -- the image source
+ * Builds an <img> element
+ *
+ *  @param {string} src -- the image source
  */
 HTMLBuilder.img = function(src) {
     return $("<img>").attr("src", src);
 };
 
 /**
- * Builds an <li> element, with the given parameters:
- *  - {string} text -- the text to show in the element
- *  - {string} class -- the class to add to the element
+ * Builds an <li> element
+ *
+ *  @param {string} text -- the text to show in the element
+ *  @param {string} class -- the class to add to the element
  */
 HTMLBuilder.li = function() {
-    var args = _parseArgs(arguments, ["text", "class"]);
+    var args = JSUtils.parseArgs(arguments, ["text", "class"]);
 
     return $("<li>")
         .text(args.text)
@@ -136,15 +117,16 @@ HTMLBuilder.li = function() {
 };
 
 /**
- * Builds a <select> element, with the given parameters:
- *  - {object} options -- the options to add to the <select>, mapping
+ * Builds a <select> element
+ *
+ *  @param {object} options -- the options to add to the <select>, mapping
  *    the value of the option to the name.
- *  - {string} class -- the class to add to the <select>
- *  - {function} change -- the callback to run when an option is selected
- *  - {string} selected -- the value of the option to mark selected
+ *  @param {string} class -- the class to add to the <select>
+ *  @param {function} change -- the callback to run when an option is selected
+ *  @param {string} selected -- the value of the option to mark selected
  */
 HTMLBuilder.select = function() {
-    var args = _parseArgs(arguments, ["options", "class", "change", "selected"]);
+    var args = JSUtils.parseArgs(arguments, ["options", "class", "change", "selected"]);
 
     var select = $("<select>").addClass(args.class).change(args.change);
 
@@ -160,13 +142,14 @@ HTMLBuilder.select = function() {
 };
 
 /**
- * Builds a <span> element, with the given parameters:
- *  - {string} class -- the class to add to the <span>
- *  - {string} text -- the text to put in the span
- *  - {jQuery} appendTo -- the element to append the <span> to
+ * Builds a <span> element
+ *
+ *  @param {string} class -- the class to add to the <span>
+ *  @param {string} text -- the text to put in the span
+ *  @param {jQuery} appendTo -- the element to append the <span> to
  */
 HTMLBuilder.span = function() {
-    var args = _parseArgs(arguments, ["class", "text", "appendTo"]);
+    var args = JSUtils.parseArgs(arguments, ["class", "text", "appendTo"]);
 
     var span = $("<span>")
         .addClass(args.class)

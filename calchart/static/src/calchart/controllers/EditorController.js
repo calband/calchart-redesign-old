@@ -171,16 +171,23 @@ EditorController.prototype.addStuntsheet._canUndo = true;
  * @param {string|Array<Dot>|Dot|undefined} dots -- the dots to check
  *   continuities of, the dot type of the dots to check, or all the
  *   dots by default
+ * @param {Sheet|undefined} sheet -- the Sheet to check continuities for (default
+ *   currently active Sheet)
  * @param {boolean|undefined} quiet -- if true, don't show a success message
  *   if there are no errors (default false)
+ * @return {boolean} true if no errors in checking continuities
  */
-EditorController.prototype.checkContinuities = function(dots, quiet) {
-    if (dots === undefined) {
-        dots = this._show.getDots();
-    } else if (typeof dots === "string") {
-        dots = this._activeSheet.getDotType(dots);
-    } else if (dots instanceof Dot) {
-        dots = [dots];
+EditorController.prototype.checkContinuities = function() {
+    var args = JSUtils.parseArgs(arguments, ["dots", "sheet", "quiet"]);
+
+    if (args.dots === undefined) {
+        var dots = this._show.getDots();
+    } else if (typeof args.dots === "string") {
+        var dots = this._activeSheet.getDotType(args.dots);
+    } else if (args.dots instanceof Dot) {
+        var dots = [args.dots];
+    } else {
+        var dots = args.dots;
     }
 
     var errors = {
@@ -188,35 +195,44 @@ EditorController.prototype.checkContinuities = function(dots, quiet) {
         wrongPosition: [],
     };
 
-    var duration = this._activeSheet.getDuration();
-    var nextSheet = this._activeSheet.getNextSheet();
+    var sheet = args.sheet || this._activeSheet;
+    var duration = sheet.getDuration();
+    var nextSheet = sheet.getNextSheet();
 
     dots.forEach(function(dot) {
         try {
-            var final = dot.getAnimationState(duration);
+            var final = dot.getAnimationState(duration, sheet);
         } catch (e) {
-            errors.wrongPosition.push(dot.getLabel());
+            // ignore if no movements
+            if (sheet.getInfoForDot(dot).movements.length !== 0) {
+                errors.lackMoves.push(dot.getLabel());
+            }
             return;
         }
 
         var position = nextSheet.getInfoForDot(dot).position;
         if (final.x !== position.x || final.y !== position.y) {
-            errors.lackMoves.push(dot.getLabel());
+            errors.wrongPosition.push(dot.getLabel());
         }
     });
 
-    var hasError = false;
+    var errorMessages = [];
     if (errors.lackMoves.length > 0) {
-        UIUtils.showError("Dots did not have enough to do: " + errors.lackMoves.join(", "));
-        hasError = true;
+        errorMessages.push("Dots did not have enough to do: " + errors.lackMoves.join(", "));
     }
     if (errors.wrongPosition.length > 0) {
-        UIUtils.showError("Dots did not make it to their next spot: " + errors.wrongPosition.join(", "));
-        hasError = true;
+        errorMessages.push("Dots did not make it to their next spot: " + errors.wrongPosition.join(", "));
     }
 
-    if (!hasError && !quiet) {
+    if (errorMessages.length > 0) {
+        var sheetInfo = " (SS " + sheet.getLabel() + ")";
+        errorMessages.forEach(function(msg) {
+            UIUtils.showError(msg + sheetInfo);
+        });
+        return false;
+    } else if (!args.quiet) {
         UIUtils.showMessage("Continuities valid!");
+        return true;
     }
 };
 

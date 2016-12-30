@@ -252,7 +252,8 @@ Sheet.prototype.getLabel = function() {
 /**
  * Get the sheet that follows this sheet
  *
- * @return {Sheet} the sheet after this sheet in the show
+ * @return {Sheet|undefined} the sheet after this sheet in the
+ *   show, or undefined if this is the last sheet
  */
 Sheet.prototype.getNextSheet = function() {
     return this._show.getSheets()[this._index + 1];
@@ -261,7 +262,8 @@ Sheet.prototype.getNextSheet = function() {
 /**
  * Get the sheet that precedes this sheet
  *
- * @return {Sheet} the sheet before this sheet in the show
+ * @return {Sheet|undefined} the sheet before this sheet in the
+ *   show, or undefined if this is the first sheet
  */
 Sheet.prototype.getPrevSheet = function() {
     return this._show.getSheets()[this._index - 1];

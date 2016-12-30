@@ -241,13 +241,16 @@ DotContext.prototype.nudgeDots = function(deltaX, deltaY) {
 };
 
 /**
- * Save the positions of all selected dots, both in the Grapher and in the Sheet
+ * Save the positions of all selected dots, both in the Grapher and in the
+ * Sheet, and updates the movements for the dots in both this Sheet and
+ * the previous Sheet.
  */
 DotContext.prototype.saveSelectionPositions = function() {
     var _this = this;
     var scale = this._grapher.getScale();
-    var activeSheet = this._controller.getActiveSheet();
-    var dots = [];
+    var dotsData = [];
+
+    // save positions
 
     this._selectedDots.each(function() {
         // for undo/redo-ing
@@ -259,18 +262,40 @@ DotContext.prototype.saveSelectionPositions = function() {
         var position = _this._grapher.savePosition(this);
         var x = scale.toSteps(position.x - scale.minX);
         var y = scale.toSteps(position.y - scale.minY);
-        activeSheet.updatePosition(this, x, y);
+        _this._sheet.updatePosition(this, x, y);
 
         dotData.after = $(this).data("position");
-        dots.push(dotData);
+        dotsData.push(dotData);
     });
 
     scrollOffset.top = 0;
     scrollOffset.left = 0;
 
-    return {
+    // update movements
+
+    var dots = this._selectedDots.map(function() {
+        return $(this).data("dot");
+    }).toArray();
+    this._sheet.updateMovements(dots);
+    this._controller.checkContinuities({
         dots: dots,
-        sheet: activeSheet,
+        sheet: this._sheet,
+        quiet: true,
+    });
+
+    var prevSheet = this._sheet.getPrevSheet();
+    if (prevSheet) {
+        prevSheet.updateMovements(dots);
+        this._controller.checkContinuities({
+            dots: dots,
+            sheet: prevSheet,
+            quiet: true,
+        });
+    }
+
+    return {
+        dots: dotsData,
+        sheet: this._sheet,
     };
 };
 DotContext.prototype.saveSelectionPositions._name = "Move dots";
