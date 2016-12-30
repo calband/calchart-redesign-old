@@ -78,48 +78,6 @@ ContinuityContext.prototype.unload = function() {
 /**** ACTIONS ****/
 
 /**
- * Check if any dots have continuity errors, showing a UI error
- * if so.
- */
-ContinuityContext.prototype.checkContinuities = function() {
-    var errors = {
-        lackMoves: [],
-        wrongPosition: [],
-    };
-
-    var duration = this._sheet.getDuration();
-    var nextSheet = this._sheet.getNextSheet();
-
-    this._controller.getShow().getDots().forEach(function(dot) {
-        try {
-            var final = dot.getAnimationState(duration);
-        } catch (e) {
-            errors.wrongPosition.push(dot.getLabel());
-            return;
-        }
-
-        var position = nextSheet.getInfoForDot(dot).position;
-        if (final.x !== position.x || final.y !== position.y) {
-            errors.lackMoves.push(dot.getLabel());
-        }
-    });
-
-    var hasError = false;
-    if (errors.lackMoves.length > 0) {
-        UIUtils.showError("Dots did not have enough to do: " + errors.lackMoves.join(", "));
-        hasError = true;
-    }
-    if (errors.wrongPosition.length > 0) {
-        UIUtils.showError("Dots did not make it to their next spot: " + errors.wrongPosition.join(", "));
-        hasError = true;
-    }
-
-    if (!hasError) {
-        UIUtils.showMessage("Continuities valid!");
-    }
-};
-
-/**
  * Increments the beat and updates the seek bar
  */
 ContinuityContext.prototype.nextContinuityBeat = function() {
@@ -213,6 +171,7 @@ ContinuityContext.prototype._init = function() {
 
                 var dotType = _this._panel.find(".dot-types li.active").data("dotType");
                 _this._sheet.updateMovements(dotType);
+                _this._controller.checkContinuities(dotType, true);
                 UIUtils.hidePopup(popup);
             },
         });

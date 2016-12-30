@@ -300,10 +300,11 @@ Sheet.prototype.updateMovements = function(dots) {
         dots = [dots];
     }
 
-    var continuities = this._continuities[dotType];
+    var _this = this;
     var duration = this._numBeats;
 
-    this.getDotType(dotType).forEach(function(dot) {
+    dots.forEach(function(dot) {
+        var continuities = _this._continuities[dot.getDotType()];
         var info = this._dots[dot.getLabel()];
         var position = info.position;
         var movements = [];

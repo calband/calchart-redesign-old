@@ -11,6 +11,7 @@
 
 var ApplicationController = require("calchart/ApplicationController");
 var Context = require("calchart/Context");
+var Dot = require("calchart/Dot");
 var Grapher = require("calchart/Grapher");
 var HTMLBuilder = require("utils/HTMLBuilder");
 var JSUtils = require("utils/JSUtils");
@@ -162,6 +163,62 @@ EditorController.prototype.addStuntsheet = function() {
     });
 };
 EditorController.prototype.addStuntsheet._canUndo = true;
+
+/**
+ * Check if any of the given dots have continuity errors in the currently
+ * active sheet, showing a UI error if so.
+ *
+ * @param {string|Array<Dot>|Dot|undefined} dots -- the dots to check
+ *   continuities of, the dot type of the dots to check, or all the
+ *   dots by default
+ * @param {boolean|undefined} quiet -- if true, don't show a success message
+ *   if there are no errors (default false)
+ */
+EditorController.prototype.checkContinuities = function(dots, quiet) {
+    if (dots === undefined) {
+        dots = this._show.getDots();
+    } else if (typeof dots === "string") {
+        dots = this._activeSheet.getDotType(dots);
+    } else if (dots instanceof Dot) {
+        dots = [dots];
+    }
+
+    var errors = {
+        lackMoves: [],
+        wrongPosition: [],
+    };
+
+    var duration = this._activeSheet.getDuration();
+    var nextSheet = this._activeSheet.getNextSheet();
+
+    dots.forEach(function(dot) {
+        try {
+            var final = dot.getAnimationState(duration);
+        } catch (e) {
+            errors.wrongPosition.push(dot.getLabel());
+            return;
+        }
+
+        var position = nextSheet.getInfoForDot(dot).position;
+        if (final.x !== position.x || final.y !== position.y) {
+            errors.lackMoves.push(dot.getLabel());
+        }
+    });
+
+    var hasError = false;
+    if (errors.lackMoves.length > 0) {
+        UIUtils.showError("Dots did not have enough to do: " + errors.lackMoves.join(", "));
+        hasError = true;
+    }
+    if (errors.wrongPosition.length > 0) {
+        UIUtils.showError("Dots did not make it to their next spot: " + errors.wrongPosition.join(", "));
+        hasError = true;
+    }
+
+    if (!hasError && !quiet) {
+        UIUtils.showMessage("Continuities valid!");
+    }
+};
 
 /**
  * Runs the method on this instance with the given name.
