@@ -15,6 +15,7 @@ var Dot = require("calchart/Dot");
 var Grapher = require("calchart/Grapher");
 var HTMLBuilder = require("utils/HTMLBuilder");
 var JSUtils = require("utils/JSUtils");
+var Sheet = require("calchart/Sheet");
 var UIUtils = require("utils/UIUtils");
 
 /**** CONSTRUCTORS ****/
@@ -60,7 +61,7 @@ EditorController.prototype.init = function() {
     this._grapher.drawField();
 
     $(".content .sidebar").on("click", ".stuntsheet", function() {
-        _this._showStuntsheet(this);
+        _this.loadSheet(this);
     });
 
     var sheets = this._show.getSheets();
@@ -70,7 +71,7 @@ EditorController.prototype.init = function() {
 
 
     if (sheets.length > 0) {
-        this._showStuntsheet($(".sidebar .stuntsheet").first());
+        this.loadSheet($(".sidebar .stuntsheet").first());
     }
 
     this.loadContext("dot");
@@ -156,7 +157,7 @@ EditorController.prototype.addStuntsheet = function() {
             // add sheet
             var sheet = _this._show.addSheet(data.num_beats);
             var stuntsheet = _this._addStuntsheetToSidebar(sheet);
-            _this._showStuntsheet(stuntsheet);
+            _this.loadSheet(stuntsheet);
 
             UIUtils.hidePopup(popup);
         },
@@ -285,6 +286,58 @@ EditorController.prototype.loadContext = function(name) {
 
     $("body").addClass("context-" + name);
     this._context = Context.load(name, this);
+};
+
+/**
+ * Load the given stuntsheet, either a stuntsheet in the sidebar
+ * or a Sheet object
+ *
+ * @param {Sheet|jQuery} sheet -- the sheet to load
+ */
+EditorController.prototype.loadSheet = function(sheet) {
+    var $sheet = $(sheet);
+    if (sheet instanceof Sheet) {
+        $(".sidebar .stuntsheet").each(function() {
+            var _sheet = $(this).data("sheet");
+            if (_sheet === sheet) {
+                $sheet = $(this);
+                return false;
+            }
+        });
+    } else {
+        sheet = $sheet.data("sheet");
+    }
+
+    // only load if the sheet isn't already loaded
+    if (sheet === this._activeSheet) {
+        return;
+    }
+
+    // update sidebar
+    $(".sidebar .active").removeClass("active");
+    $sheet
+        .addClass("active")
+        .scrollToView({
+            margin: 10,
+        });
+
+    // update instance variables
+    this._activeSheet = sheet;
+    this._currBeat = 0;
+
+    // load sheet into necessary objects
+    this._show.loadSheet(sheet);
+    this._grapher.draw(sheet);
+    if (this._context) {
+        this._context.loadSheet(sheet);
+    }
+
+    // disable continuity context if sheet is the last sheet
+    if (sheet.isLastSheet()) {
+        $(".toolbar .edit-continuity").addClass("disabled");
+    } else {
+        $(".toolbar .edit-continuity").removeClass("disabled");
+    }
 };
 
 /**
@@ -445,42 +498,6 @@ EditorController.prototype._getShortcut = function(shortcut) {
         return this._context.shortcuts[shortcut];
     } else {
         return action;
-    }
-};
-
-/**
- * Show the given stuntsheet in the sidebar and workspace.
- *
- * @param {jQuery} stuntsheet -- the stuntsheet element in the .sidebar
- */
-EditorController.prototype._showStuntsheet = function(stuntsheet) {
-    if ($(stuntsheet).hasClass("active")) {
-        return;
-    }
-
-    // update sidebar
-    $(".sidebar .active").removeClass("active");
-    $(stuntsheet)
-        .addClass("active")
-        .scrollToView({
-            margin: 10,
-        });
-
-    // update instance variables
-    this._activeSheet = $(stuntsheet).data("sheet");
-    this._currBeat = 0;
-
-    // load sheet into necessary objects
-    this._show.loadSheet(this._activeSheet);
-    this._grapher.draw(this._activeSheet);
-    if (this._context) {
-        this._context.loadSheet(this._activeSheet);
-    }
-
-    if (this._activeSheet.isLastSheet()) {
-        $(".toolbar .edit-continuity").addClass("disabled");
-    } else {
-        $(".toolbar .edit-continuity").removeClass("disabled");
     }
 };
 

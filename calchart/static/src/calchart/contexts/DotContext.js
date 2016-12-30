@@ -357,6 +357,7 @@ DotContext.prototype.toggleDots = function(dots, options) {
 DotContext.prototype._revertMoveDots = function(data, isUndo) {
     var selectedDots = $();
     var scale = this._grapher.getScale();
+    this._controller.loadSheet(data.sheet);
 
     data.dots.forEach(function(dot) {
         var elem = $(dot.selector);
@@ -371,6 +372,15 @@ DotContext.prototype._revertMoveDots = function(data, isUndo) {
         selectedDots = selectedDots.add(elem);
     }, this);
 
+    var dots = this._selectedDots.map(function() {
+        return $(this).data("dot");
+    }).toArray();
+    this._sheet.updateMovements(dots);
+    var prevSheet = this._sheet.getPrevSheet();
+    if (prevSheet) {
+        prevSheet.updateMovements(dots);
+    }
+    
     this._selectedDots = selectedDots;
 };
 
