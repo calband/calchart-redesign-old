@@ -9,17 +9,16 @@ module.exports = {
      *  - continuity: ContinuityContext
      *
      * @param {string} name -- the name of the context to load
-     * @param {BaseGrapher} grapher -- the editor grapher
-     * @param {Sheet} sheet -- the currently active sheet
+     * @param {EditorController} controller -- the editor controller
      * @return {BaseContext} the context that was loaded
      */
-    load: function(name, grapher, sheet) {
+    load: function(name, controller) {
         switch (name) {
             case "continuity":
-                var context = new ContinuityContext(grapher, sheet);
+                var context = new ContinuityContext(controller);
                 break;
             case "dot":
-                var context = new DotContext(grapher, sheet);
+                var context = new DotContext(controller);
                 break;
             default:
                 throw new Error("No context named: " + name);

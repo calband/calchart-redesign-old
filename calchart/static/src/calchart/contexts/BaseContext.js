@@ -2,12 +2,11 @@
  * Subclasses of this class define how the mouse cursor interacts with
  * the editor application.
  *
- * @param {BaseGrapher} grapher -- the grapher for the field
- * @param {Sheet} sheet -- the currently active Sheet
+ * @param {EditorController} controller -- the Editor Controller
  */
-var BaseContext = function(grapher, sheet) {
-    this._grapher = grapher;
-    this._sheet = sheet;
+var BaseContext = function(controller) {
+    this._controller = controller;
+    this._sheet = controller.getActiveSheet();
 
     if (!this._initialized[this.constructor.name]) {
         this._init();

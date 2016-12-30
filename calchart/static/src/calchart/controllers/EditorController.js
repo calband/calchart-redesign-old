@@ -101,6 +101,13 @@ EditorController.prototype.getCurrentBeat = function() {
     return this._currBeat;
 };
 
+/**
+ * @return {Grapher} the grapher for the workspace
+ */
+EditorController.prototype.getGrapher = function() {
+    return this._grapher;
+};
+
 /**** ACTIONS
  *
  * Each action can define the following properties:
@@ -204,7 +211,7 @@ EditorController.prototype.loadContext = function(name) {
     }
 
     $("body").addClass("context-" + name);
-    this._context = Context.load(name, this._grapher, this._activeSheet);
+    this._context = Context.load(name, this);
 };
 
 /**

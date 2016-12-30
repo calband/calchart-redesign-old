@@ -9,10 +9,10 @@ var UIUtils = require("utils/UIUtils");
  * The default editor context, that allows a user to edit dot
  * continuities and step through marching
  */
-var ContinuityContext = function(grapher, sheet) {
+var ContinuityContext = function(controller) {
     this._panel = $(".panel.edit-continuity");
 
-    BaseContext.call(this, grapher, sheet);
+    BaseContext.call(this, controller);
 };
 
 JSUtils.extends(ContinuityContext, BaseContext);
@@ -101,16 +101,16 @@ ContinuityContext.prototype.prevContinuityBeat = function() {
  * @param {jQuery} tab -- the tab for the dot type to select
  */
 ContinuityContext.prototype._changeTab = function(tab) {
+    var _this = this;
+
     $(tab).addClass("active")
         .siblings().removeClass("active");
 
     var continuities = this._panel.find(".continuities").empty();
     var dotType = $(tab).data("dotType");
     this._sheet.getContinuities(dotType).forEach(function(continuity) {
-        continuities.append(continuity.panelHTML());
+        continuities.append(continuity.panelHTML(_this._sheet));
     });
-
-    // TODO: show continuity errors (dots not make their spot, not enough continuities)
 };
 
 /**
@@ -138,7 +138,7 @@ ContinuityContext.prototype._init = function() {
         })
         .change(function() {
             var continuity = new Continuity($(this).val());
-            _this._panel.find(".continuities").append(continuity.panelHTML());
+            _this._panel.find(".continuities").append(continuity.panelHTML(_this._sheet));
 
             var dotType = _this._panel.find(".dot-types li.active").data("dotType");
             _this._sheet.addContinuity(dotType, continuity);

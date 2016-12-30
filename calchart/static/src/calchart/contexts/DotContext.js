@@ -14,8 +14,10 @@ var scrollOffset = {
  * The default editor context, that allows a user to select dots with a rectangular
  * selection box, and also to drag and drop dots on the grid.
  */
-var DotContext = function(grapher, sheet) {
-    BaseContext.call(this, grapher, sheet);
+var DotContext = function(controller) {
+    BaseContext.call(this, controller);
+
+    this._grapher = controller.getGrapher();
 
     // dots selected to edit
     this._selectedDots = $();

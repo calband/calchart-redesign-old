@@ -110,7 +110,7 @@ FountainGridContinuity.prototype.getOrientation = function() {
     return this._orientation === "default" ? "east" : this._orientation;
 };
 
-FountainGridContinuity.prototype.panelHTML = function() {
+FountainGridContinuity.prototype.panelHTML = function(sheet) {
     var _this = this;
     var type = this._isEWNS ? "EWNS" : "NSEW";
 
@@ -126,7 +126,7 @@ FountainGridContinuity.prototype.panelHTML = function() {
             change: function() {
                 _this._end = $(this).val();
                 var dotType = $(".panel.edit-continuity .dot-types li.active").data("dotType");
-                window.controller.getActiveSheet().updateMovements(dotType);
+                sheet.updateMovements(dotType);
             },
             selected: this._end,
         });

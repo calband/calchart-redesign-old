@@ -35,9 +35,10 @@ BaseContinuity.prototype.getMovements = function(sheet, dot, start) {
 };
 
 /**
+ * @param {Sheet} sheet -- the currently active Sheet
  * @return {jQuery} the HTML element to add to the Edit Continuity panel
  */
-BaseContinuity.prototype.panelHTML = function() {
+BaseContinuity.prototype.panelHTML = function(sheet) {
     throw new Error(this.constructor.name + " did not define panelHTML");
 };
 
