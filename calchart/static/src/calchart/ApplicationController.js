@@ -269,10 +269,17 @@ ApplicationController.prototype._setupToolbar = function(toolbar) {
     // set up click
     $(toolbar).find("li")
         .mousedown(function(e) {
+            // don't highlight text
             e.preventDefault();
-            $(this).addClass("focus");
+            if (!$(this).hasClass("disabled")) {
+                $(this).addClass("focus");
+            }
         })
         .mouseup(function() {
+            if ($(this).hasClass("disabled")) {
+                return;
+            }
+
             $(this).removeClass("focus");
             var name = $(this).data("function");
             if (name !== undefined) {

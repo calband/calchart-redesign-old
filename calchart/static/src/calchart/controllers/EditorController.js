@@ -396,6 +396,12 @@ EditorController.prototype._showStuntsheet = function(stuntsheet) {
     if (this._context) {
         this._context.loadSheet(this._activeSheet);
     }
+
+    if (this._activeSheet.isLastSheet()) {
+        $(".toolbar .edit-continuity").addClass("disabled");
+    } else {
+        $(".toolbar .edit-continuity").removeClass("disabled");
+    }
 };
 
 /**

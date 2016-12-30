@@ -223,14 +223,24 @@ header {
             vertical-align: middle;
             &.toolbar-item {
                 border: 1px solid transparent;
+                border-radius: 2px;
                 &:hover, &.active, &.focus:hover {
-                    border: 1px solid darken($semilight-gray, 10);
-                    border-radius: 2px;
+                    border-color: darken($semilight-gray, 10);
                     box-shadow: 0 0 1px rgba($black, 0.2);
                     background: rgba($white, 0.5);
                 }
                 &.active, &.focus:hover {
                     background: rgba($white, 0.7);
+                }
+                &.disabled {
+                    &:hover {
+                        border-color: transparent;
+                        box-shadow: none;
+                        background: none;
+                    }
+                    i {
+                        color: $medium-gray;
+                    }
                 }
             }
             i {

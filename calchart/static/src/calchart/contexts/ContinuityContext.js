@@ -54,6 +54,10 @@ ContinuityContext.prototype.load = function() {
 };
 
 ContinuityContext.prototype.loadSheet = function(sheet) {
+    if (sheet.isLastSheet()) {
+        window.controller.loadContext("dot");
+    }
+
     BaseContext.prototype.loadSheet.call(this, sheet);
 
     this._updatePanel();

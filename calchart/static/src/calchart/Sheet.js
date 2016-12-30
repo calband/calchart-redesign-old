@@ -268,6 +268,13 @@ Sheet.prototype.getPrevSheet = function() {
 };
 
 /**
+ * @return {boolean} true if this Sheet is the last sheet in the Show
+ */
+Sheet.prototype.isLastSheet = function() {
+    return this._index === this._show.getSheets().length - 1;
+}
+
+/**
  * Remove the given continuity to the given dot type
  *
  * @param {string} dotType -- the dot type to remove the continuity from
