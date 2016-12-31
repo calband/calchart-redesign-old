@@ -1,5 +1,6 @@
 var FountainGridContinuity = require("./continuities/FountainGridContinuity");
 var ForwardContinuity = require("./continuities/ForwardContinuity");
+var StopContinuity = require("./continuities/StopContinuity");
 
 /**
  * Return a subclass of BaseContinuity . We can do this in a constructor; source:
@@ -17,6 +18,12 @@ var Continuity = function(type, sheet, dotType) {
             return new FountainGridContinuity(false, sheet, dotType);
         case "FM":
             return new ForwardContinuity(sheet, dotType, 0, 0);
+        case "MT":
+            return new StopContinuity(sheet, dotType, true, 0);
+        case "MTRM":
+            return new StopContinuity(sheet, dotType, true, null);
+        case "CL":
+            return new StopContinuity(sheet, dotType, false, null);
         default:
             throw new Error("No continuity of the type: " + type);
     }
@@ -39,6 +46,8 @@ Continuity.deserialize = function(sheet, dotType, data) {
             return FountainGridContinuity.deserialize(false, sheet, dotType, data);
         case "FM":
             return ForwardContinuity.deserialize(sheet, dotType, data);
+        case "STOP":
+            return StopContinuity.deserialize(sheet, dotType, data);
         default:
             throw new Error("No continuity of the type: " + data.type);
     }

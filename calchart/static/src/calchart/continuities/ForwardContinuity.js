@@ -13,7 +13,7 @@ var MovementCommandMove = require("calchart/movements/MovementCommandMove");
  * @param {int} steps -- the number of steps
  * @param {int} direction -- the direction to march, in Calchart degrees
  * @param {object|undefined} options -- options for the continuity, including:
- *   - TODO
+ *   - {string} stepType -- the step type to march, like high step, show high
  */
 var ForwardContinuity = function(sheet, dotType, steps, direction, options) {
     BaseContinuity.call(this, sheet, dotType);
