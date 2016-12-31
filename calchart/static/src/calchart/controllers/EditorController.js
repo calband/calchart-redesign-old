@@ -181,10 +181,14 @@ EditorController.prototype.addStuntsheet._canUndo = true;
 EditorController.prototype.checkContinuities = function() {
     var args = JSUtils.parseArgs(arguments, ["dots", "sheet", "quiet"]);
 
+    var sheet = args.sheet || this._activeSheet;
+    var duration = sheet.getDuration();
+    var nextSheet = sheet.getNextSheet();
+
     if (args.dots === undefined) {
         var dots = this._show.getDots();
     } else if (typeof args.dots === "string") {
-        var dots = this._activeSheet.getDotType(args.dots);
+        var dots = sheet.getDotType(args.dots);
     } else if (args.dots instanceof Dot) {
         var dots = [args.dots];
     } else {
@@ -195,10 +199,6 @@ EditorController.prototype.checkContinuities = function() {
         lackMoves: [],
         wrongPosition: [],
     };
-
-    var sheet = args.sheet || this._activeSheet;
-    var duration = sheet.getDuration();
-    var nextSheet = sheet.getNextSheet();
 
     dots.forEach(function(dot) {
         try {
@@ -279,7 +279,7 @@ EditorController.prototype.doAction = function(name, asRedo) {
  */
 EditorController.prototype.firstBeat = function() {
     this._currBeat = 0;
-    this._grapher.draw(this._activeSheet, this._currBeat);
+    this.refreshGrapher();
 };
 
 /**
@@ -287,7 +287,7 @@ EditorController.prototype.firstBeat = function() {
  */
 EditorController.prototype.lastBeat = function() {
     this._currBeat = this._activeSheet.getDuration();
-    this._grapher.draw(this._activeSheet, this._currBeat);
+    this.refreshGrapher();
 };
 
 /**
@@ -366,7 +366,7 @@ EditorController.prototype.nextBeat = function() {
     if (this._currBeat > max) {
         this._currBeat = max;
     } else {
-        this._grapher.draw(this._activeSheet, this._currBeat);
+        this.refreshGrapher();
     }
 };
 
@@ -379,7 +379,7 @@ EditorController.prototype.prevBeat = function() {
     if (this._currBeat < 0) {
         this._currBeat = 0;
     } else {
-        this._grapher.draw(this._activeSheet, this._currBeat);
+        this.refreshGrapher();
     }
 };
 
@@ -403,6 +403,14 @@ EditorController.prototype.redo = function() {
 };
 
 /**
+ * Redraw the Grapher with the currently active stuntsheet and
+ * current beat
+ */
+EditorController.prototype.refreshGrapher = function() {
+    this._grapher.draw(this._activeSheet, this._currBeat);
+};
+
+/**
  * Saves the show to the server
  *
  * @param {function|undefined} callback -- optional callback to run after saving show
@@ -423,7 +431,7 @@ EditorController.prototype.saveShow = function(callback) {
  */
 EditorController.prototype.setBeat = function(beat) {
     this._currBeat = beat;
-    this._grapher.draw(this._activeSheet, this._currBeat);
+    this.refreshGrapher();
 };
 
 /**

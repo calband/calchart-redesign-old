@@ -118,25 +118,21 @@ FountainGridContinuity.prototype.getOrientation = function() {
     return this._orientation === "default" ? "east" : this._orientation;
 };
 
-FountainGridContinuity.prototype.panelHTML = function() {
+FountainGridContinuity.prototype.panelHTML = function(controller) {
     var _this = this;
     var type = this._isEWNS ? "EWNS" : "NSEW";
 
     var label = HTMLBuilder.span(null, type);
 
     var endLabel = HTMLBuilder.span(null, "End:");
-    var endChoices = HTMLBuilder
-        .select({
-            options: {
-                MT: "Mark Time",
-                CL: "Close",
-            },
-            change: function() {
-                _this._end = $(this).val();
-                _this._updateMovements();
-            },
-            selected: this._end,
-        });
+    var endChoices = HTMLBuilder.select({
+        options: CalchartUtils.ENDINGS,
+        change: function() {
+            _this._end = $(this).val();
+            _this._updateMovements(controller);
+        },
+        initial: this._end,
+    });
     var end = HTMLBuilder.div("panel-continuity-end", [endLabel, endChoices]);
     endChoices.dropdown({
         width: 110,
@@ -147,30 +143,22 @@ FountainGridContinuity.prototype.panelHTML = function() {
 
 FountainGridContinuity.prototype.popupHTML = function() {
     var end = HTMLBuilder.formfield("End", HTMLBuilder.select({
-        options: {
-            MT: "Mark Time",
-            CL: "Close",
-        },
-        selected: this._end,
+        options: CalchartUtils.ENDINGS,
+        initial: this._end,
     }));
+
     var step = HTMLBuilder.formfield("Step Type", HTMLBuilder.select({
-        options: {
-            default: "Default",
-            HS: "High Step",
-            MM: "Mini Military",
-            FF: "Full Field",
-            SH: "Show High",
-            JS: "Jerky Step",
-        },
-        selected: this._step,
+        options: CalchartUtils.STEP_TYPES,
+        initial: this._step,
     }));
+
     var orientation = HTMLBuilder.formfield("Final Orientation", HTMLBuilder.select({
         options: {
             default: "Default",
             east: "East",
             west: "West",
         },
-        selected: this._orientation,
+        initial: this._orientation,
     }), "orientation");
 
     return {

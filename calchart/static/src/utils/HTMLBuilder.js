@@ -141,17 +141,17 @@ HTMLBuilder.li = function() {
  *    the value of the option to the name.
  * @param {string} class -- the class to add to the <select>
  * @param {function} change -- the callback to run when an option is selected
- * @param {string} selected -- the value of the option to mark selected
+ * @param {string} initial -- the value of the option to initially mark selected
  */
 HTMLBuilder.select = function() {
-    var args = JSUtils.parseArgs(arguments, ["options", "class", "change", "selected"]);
+    var args = JSUtils.parseArgs(arguments, ["options", "class", "change", "initial"]);
 
     var select = $("<select>").addClass(args.class).change(args.change);
 
     $.each(args.options, function(value, label) {
         $("<option>")
             .attr("value", value)
-            .prop("selected", value === args.selected)
+            .prop("selected", value === args.initial)
             .text(label)
             .appendTo(select);
     });

@@ -132,7 +132,7 @@ ContinuityContext.prototype._changeTab = function(tab) {
     var continuities = this._panel.find(".continuities").empty();
     var dotType = $(tab).data("dotType");
     this._sheet.getContinuities(dotType).forEach(function(continuity) {
-        continuities.append(continuity.panelHTML());
+        continuities.append(continuity.panelHTML(_this._controller));
     });
 
     this._dotType = dotType;
@@ -166,7 +166,7 @@ ContinuityContext.prototype._init = function() {
             var dotType = _this._panel.find(".dot-types li.active").data("dotType");
 
             _this._sheet.addContinuity(dotType, continuity);
-            _this._panel.find(".continuities").append(continuity.panelHTML());
+            _this._panel.find(".continuities").append(continuity.panelHTML(_this._controller));
 
             $(this).val("").trigger("chosen:updated");
         });
@@ -195,7 +195,10 @@ ContinuityContext.prototype._init = function() {
 
                 var dotType = _this._panel.find(".dot-types li.active").data("dotType");
                 _this._sheet.updateMovements(dotType);
-                _this._controller.checkContinuities(dotType, true);
+                _this._controller.checkContinuities({
+                    dots: dotType,
+                    quiet: true,
+                });
                 UIUtils.hidePopup(popup);
             },
         });

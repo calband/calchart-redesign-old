@@ -3,15 +3,40 @@
  */
 var CalchartUtils = {};
 
-/**
- * The multiplier for converting steps into standard step sizes.
- * @type {float}
- */
+/**** CONSTANTS ****/
+
+/* Options for direction */
+CalchartUtils.DIRECTIONS = {
+    0: "E",
+    90: "S",
+    180: "W",
+    270: "N",
+};
+
+/* Options for ending a move */
+CalchartUtils.ENDINGS = {
+    MT: "Mark Time",
+    CL: "Close",
+};
+
+/* Multipliers for converting steps into standard step sizes */
 CalchartUtils.STEP_SIZES = {
     STANDARD: 8/8,
     TUNNEL: 8/6,
     DIAGONAL: Math.SQRT2,
 };
+
+/* Options for step types */
+CalchartUtils.STEP_TYPES = {
+    default: "Default",
+    HS: "High Step",
+    MM: "Mini Military",
+    FF: "Full Field",
+    SH: "Show High",
+    JS: "Jerky Step",
+};
+
+/**** UTILITIES ****/
 
 /**
  * Returns the orientation of the given angle. Will return a single

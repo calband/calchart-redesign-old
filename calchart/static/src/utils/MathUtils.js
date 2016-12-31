@@ -4,18 +4,16 @@
  * system, see docs/Coordinate_System.md
  */
 var MathUtils = {};
+
+/**** CONSTANTS ****/
  
-/**
- * π/2
- * @type {float}
- */
+/* π/2 */
 MathUtils.PI_OVER_TWO = Math.PI / 2;
 
-/**
- * 2π
- * @type {float}
- */
+/* 2π */
 MathUtils.TWO_PI = Math.PI * 2;
+
+/**** UTILITIES ****/
 
 /**
  * Bounds the given value to be at least low and at most high.

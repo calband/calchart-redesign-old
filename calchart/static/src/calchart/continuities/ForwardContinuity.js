@@ -22,7 +22,7 @@ var ForwardContinuity = function(sheet, dotType, steps, direction, options) {
     this._direction = direction;
 
     options = options || {};
-    // TODO
+    this._stepType = options.stepType || "default";
 };
 
 JSUtils.extends(ForwardContinuity, BaseContinuity);
@@ -51,7 +51,7 @@ ForwardContinuity.prototype.serialize = function() {
         type: "FM",
         steps: this._numSteps,
         direction: this._direction,
-        // TODO
+        stepType: this._stepType,
     };
 };
 
@@ -70,7 +70,7 @@ ForwardContinuity.prototype.getMovements = function(dot, start) {
     return [move];
 };
 
-ForwardContinuity.prototype.panelHTML = function() {
+ForwardContinuity.prototype.panelHTML = function(controller) {
     var _this = this;
 
     var label = HTMLBuilder.span(null, "Move");
@@ -88,21 +88,16 @@ ForwardContinuity.prototype.panelHTML = function() {
                 _this._numSteps = duration;
             }
 
-            _this._updateMovements();
+            _this._updateMovements(controller);
         },
     });
 
     var direction = HTMLBuilder.select({
-        options: {
-            0: "E",
-            90: "S",
-            180: "W",
-            270: "N",
-        },
-        selected: this._direction,
+        options: CalchartUtils.DIRECTIONS,
+        initial: this._direction,
         change: function() {
             _this._direction = $(this).val();
-            _this._updateMovements();
+            _this._updateMovements(controller);
         },
     });
 
@@ -116,49 +111,38 @@ ForwardContinuity.prototype.panelHTML = function() {
 };
 
 ForwardContinuity.prototype.popupHTML = function() {
-    // var end = HTMLBuilder.formfield("End", HTMLBuilder.select({
-    //     options: {
-    //         MT: "Mark Time",
-    //         CL: "Close",
-    //     },
-    //     selected: this._end,
-    // }));
-    // var step = HTMLBuilder.formfield("Step Type", HTMLBuilder.select({
-    //     options: {
-    //         default: "Default",
-    //         HS: "High Step",
-    //         MM: "Mini Military",
-    //         FF: "Full Field",
-    //         SH: "Show High",
-    //         JS: "Jerky Step",
-    //     },
-    //     selected: this._step,
-    // }));
-    // var orientation = HTMLBuilder.formfield("Final Orientation", HTMLBuilder.select({
-    //     options: {
-    //         default: "Default",
-    //         east: "East",
-    //         west: "West",
-    //     },
-    //     selected: this._orientation,
-    // }), "orientation");
+    var steps = HTMLBuilder.formfield("Number of steps", HTMLBuilder.input({
+        type: "number",
+        initial: this._numSteps,
+    }), "steps");
+
+    var direction = HTMLBuilder.formfield("Direction", HTMLBuilder.select({
+        options: CalchartUtils.DIRECTIONS,
+        initial: this._direction,
+    }));
+
+    var stepType = HTMLBuilder.formfield("Step Type", HTMLBuilder.select({
+        options: CalchartUtils.STEP_TYPES,
+        initial: this._stepType,
+    }));
 
     return {
         name: "Forward March",
-        // fields: [end, step, orientation],
+        fields: [steps, direction, stepType],
     };
 };
 
 ForwardContinuity.prototype.savePopup = function(data) {
-    // this._end = data.end;
-    // this._step = data.step_type;
-    // this._orientation = data.orientation;
+    this._numSteps = data.steps;
+    this._direction = data.direction;
+    this._stepType = data.stepType;
 
-    // return function($continuity) {
-    //     $continuity.find("select")
-    //         .val(data.end)
-    //         .trigger("chosen:updated");
-    // };
+    return function($continuity) {
+        $continuity.find("input").val(data.steps);
+        $continuity.find("select")
+            .val(data.direction)
+            .trigger("chosen:updated");
+    };
 };
 
 module.exports = ForwardContinuity;

@@ -39,10 +39,10 @@ BaseContinuity.prototype.getMovements = function(dot, start) {
 };
 
 /**
- * @param {string} dotType -- the type of dot 
+ * @param {EditorController} controller -- the controller for the editor application
  * @return {jQuery} the HTML element to add to the Edit Continuity panel
  */
-BaseContinuity.prototype.panelHTML = function(dotType) {
+BaseContinuity.prototype.panelHTML = function(controller) {
     throw new Error(this.constructor.name + " did not define panelHTML");
 };
 
@@ -69,10 +69,14 @@ BaseContinuity.prototype.savePopup = function(data) {
 /**** HELPERS ****/
 
 /**
- * Update the movements for dots that use this continuity
+ * Update the movements for dots that use this continuity. Used in the
+ * edit continuity context.
+ *
+ * @param {EditorController} controller -- the controller for the editor application
  */
-BaseContinuity.prototype._updateMovements = function() {
+BaseContinuity.prototype._updateMovements = function(controller) {
     this._sheet.updateMovements(this._dotType);
+    controller.refreshGrapher();
 };
 
 /**
