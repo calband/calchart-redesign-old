@@ -247,11 +247,12 @@ BaseGrapher.prototype._drawDots = function(currentBeat, selectedDots) {
         $(this).data("dot", dot);
 
         var dotClass = "dot ";
-        if (selectedDots.indexOf(label) !== -1) {
-            dotClass += "selected";
-        } else if (_this._options.drawDotType) {
+        if (_this._options.drawDotType) {
             dotClass += dot.getDotType();
-        } else {
+        }
+        if (selectedDots.indexOf(label) !== -1) {
+            dotClass += " selected";
+        } else if (!_this._options.drawDotType) {
             dotClass += CalchartUtils.getNearestOrientation(state.angle);
         }
 

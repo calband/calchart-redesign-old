@@ -172,6 +172,12 @@ Sheet.prototype.changeDotTypes = function(dots, dotType) {
         var label = dot.getLabel();
         this._dots[label].type = dotType;
     }, this);
+
+    if (this._continuities[dotType] === undefined) {
+        this._continuities[dotType] = [];
+    }
+
+    this.updateMovements(dots);
 };
 
 /**
@@ -208,12 +214,11 @@ Sheet.prototype.getDotType = function(dotType) {
  * in DotType
  */
 Sheet.prototype.getDotTypes = function() {
-    var continuities = this._continuities;
-    return $.map(DotType, function(dotType) {
-        if (continuities[dotType] !== undefined) {
-            return dotType;
-        }
+    var dotTypes = $.map(this._dots, function(info) {
+        return info.type;
     });
+
+    return DotType.sort(new Set(dotTypes));
 };
 
 /**
