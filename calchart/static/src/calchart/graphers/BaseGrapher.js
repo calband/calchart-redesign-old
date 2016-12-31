@@ -224,13 +224,6 @@ BaseGrapher.prototype._drawDots = function(currentBeat, selectedDots) {
             .append("g")
             .attr("id", function(dot) {
                 return "dot-" + dot.getLabel();
-            })
-            .attr("class", function(dot) {
-                var dotClass = "dot ";
-                if (_this._options.drawDotType) {
-                    dotClass += dot.getDotType();
-                }
-                return dotClass;
             });
     }
     
@@ -253,21 +246,20 @@ BaseGrapher.prototype._drawDots = function(currentBeat, selectedDots) {
         // save dot in jQuery data also
         $(this).data("dot", dot);
 
-        var dotClass = "dot-marker ";
-
+        var dotClass = "dot ";
         if (selectedDots.indexOf(label) !== -1) {
             dotClass += "selected";
-        } else if (!_this._options.drawDotType) {
+        } else if (_this._options.drawDotType) {
+            dotClass += dot.getDotType();
+        } else {
             dotClass += CalchartUtils.getNearestOrientation(state.angle);
         }
 
-        var dotGroup = d3.select(this);
+        var dotGroup = d3.select(this).attr("class", dotClass);
+
         var dotMarker = dotGroup.selectAll(".dot-marker");
         if (dotMarker.empty()) {
-            dotMarker = dotGroup
-                .append("circle")
-                .attr("r", _this._dotRadius);
-
+            // draw slashes first, to keep behind dot-marker
             if (_this._options.drawDotType) {
                 var start = -1.1 * _this._dotRadius;
                 var end = 1.1 * _this._dotRadius;
@@ -286,9 +278,12 @@ BaseGrapher.prototype._drawDots = function(currentBeat, selectedDots) {
                     .attr("x2", end)
                     .attr("y2", end);
             }
-        }
 
-        dotMarker.attr("class", "dot-marker " + dotClass);
+            dotMarker = dotGroup
+                .append("circle")
+                .attr("r", _this._dotRadius)
+                .classed("dot-marker", true);
+        }
 
         if (_this._options.circleSelected) {
             var circle = dotGroup.selectAll("circle.selected-circle");

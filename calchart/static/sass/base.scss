@@ -250,6 +250,9 @@ header {
                 color: $dark-gray;
                 cursor: default;
             }
+            img {
+                max-height: 16px;
+            }
         }
     }
 }
@@ -328,52 +331,58 @@ svg.graph {
             stroke-dasharray: 5;
         }
     }
-    .dots {
-        .dot {
-            .fslash, .bslash {
-                display: none;
-                stroke: $uniform-white;
-                stroke-width: 2px;
-            }
-            &[class*=" plain"] .dot-marker {
-                fill: transparent;
-            }
-            &[class*="-forwardslash"], &[class*="-x"] {
-                .fslash {
-                    display: initial;
-                }
-            }
-            &[class*="-backslash"], &[class*="-x"] {
-                .bslash {
-                    display: initial;
-                }
-            }
+    .dots .dot {
+        .fslash, .bslash {
+            display: none;
+            stroke: $uniform-white;
+            stroke-width: 2px;
         }
         .dot-marker {
             fill: $uniform-white;
             stroke: $uniform-white;
             stroke-width: 2px;
-            &.facing-west {
-                fill: $uniform-yellow;
-                stroke: $uniform-yellow;
-            }
-            &.facing-north, &.facing-south {
-                fill: $uniform-blue;
-                stroke: $uniform-blue;
-            }
-            &.selected {
-                fill: $highlight-purple;
-                stroke: $highlight-purple;
-            }
         }
         .dot-label {
             font-size: 8px;
             fill: $medium-gray;
         }
-        .selected-circle {
-            stroke: $highlight-purple;
-            stroke-width: 2px;
-            fill: transparent;
+        // dot types
+        &[class*=" plain"] .dot-marker {
+            fill: transparent !important;
+        }
+        &[class*="-forwardslash"], &[class*="-x"] {
+            .fslash {
+                display: initial;
+            }
+        }
+        &[class*="-backslash"], &[class*="-x"] {
+            .bslash {
+                display: initial;
+            }
+        }
+        // orientation
+        &.facing-west {
+            fill: $uniform-yellow;
+            stroke: $uniform-yellow;
+        }
+        &.facing-north, &.facing-south {
+            fill: $uniform-blue;
+            stroke: $uniform-blue;
+        }
+        // selected
+        &.selected {
+            .fslash, .bslash {
+                stroke: $highlight-purple;
+            }
+            .dot-marker {
+                fill: $highlight-purple;
+                stroke: $highlight-purple;
+            }
+            .selected-circle {
+                stroke: $highlight-purple;
+                stroke-width: 2px;
+                fill: none;
+            }
         }
     }
 }

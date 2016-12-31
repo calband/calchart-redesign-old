@@ -178,6 +178,21 @@ DotContext.prototype.unload = function() {
 /**** ACTIONS ****/
 
 /**
+ * Changes the currently selected dots' dot type to the given dot type
+ *
+ * @param {string} dotType -- the dot type to change to
+ */
+DotContext.prototype.changeDotType = function(dotType) {
+    var selected = this._getSelected();
+    this._sheet.changeDotTypes(selected, dotType);
+
+    var selectedLabels = selected.map(function(dot) {
+        return dot.getLabel();
+    });
+    this._grapher.draw(this._sheet, 0, selectedLabels);
+};
+
+/**
  * Deselects the given dots. If no dots are given, deselects all dots.
  *
  * @param {jQuery|undefined} dots -- dots to deselect (defaults to all dots)
@@ -187,7 +202,10 @@ DotContext.prototype.deselectDots = function(dots) {
         dots = this._selectedDots;
     }
 
-    dots.find(".dot-marker").attr("class", "dot-marker");
+    dots.each(function() {
+        var classes = $(this).attr("class").replace(/selected/g, "").trim();
+        $(this).attr("class", classes);
+    });
     this._selectedDots = this._selectedDots.not(dots);
 };
 
@@ -273,9 +291,7 @@ DotContext.prototype.saveSelectionPositions = function() {
 
     // update movements
 
-    var dots = this._selectedDots.map(function() {
-        return $(this).data("dot");
-    }).toArray();
+    var dots = this._getSelected();
     this._sheet.updateMovements(dots);
     this._controller.checkContinuities({
         dots: dots,
@@ -328,7 +344,10 @@ DotContext.prototype.selectDots = function(dots, options) {
     }
 
     this._selectedDots = this._selectedDots.add(dots);
-    $(dots).find(".dot-marker").attr("class", "dot-marker selected");
+    $(dots).each(function() {
+        var classes = $(this).attr("class");
+        $(this).attr("class", classes + " selected");
+    });
 };
 
 /**
@@ -345,6 +364,15 @@ DotContext.prototype.toggleDots = function(dots, options) {
 };
 
 /**** HELPERS ****/
+
+/**
+ * @return {Array<Dot>} the selected dots as Dot objects
+ */
+DotContext.prototype._getSelected = function() {
+    return this._selectedDots.map(function() {
+        return $(this).data("dot");
+    }).toArray();
+};
 
 /**
  * A helper function to revert saveSelectionPositions (both for undo or redo),
@@ -372,9 +400,7 @@ DotContext.prototype._revertMoveDots = function(data, isUndo) {
         selectedDots = selectedDots.add(elem);
     }, this);
 
-    var dots = this._selectedDots.map(function() {
-        return $(this).data("dot");
-    }).toArray();
+    var dots = this._getSelected();
     this._sheet.updateMovements(dots);
     var prevSheet = this._sheet.getPrevSheet();
     if (prevSheet) {

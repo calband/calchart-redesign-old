@@ -14,10 +14,24 @@ class. Functions can be of the form:
       and 'foo(1)' runs `foo(1)`.
 """
 
+from django.templatetags.static import static as get_static_path
 from django.utils.html import format_html, format_html_join, mark_safe
 from django.utils.text import slugify
 
+from base.constants import DOT_TYPES
+
 ### MENU CLASSES ###
+
+def _collapse(items):
+    """
+    _collapse([1,2,3]) -> [1,2,3]
+    _collapse([[1,2,3]]) -> [1,2,3]
+    """
+    if len(items) == 1 and isinstance(items[0], list):
+        return items[0]
+    else:
+        return items
+
 
 class Menu(object):
     """
@@ -29,7 +43,7 @@ class Menu(object):
     </ul>
     """
     def __init__(self, *submenus):
-        self.submenus = submenus
+        self.submenus = _collapse(submenus)
 
     def render(self):
         return format_html(
@@ -116,7 +130,7 @@ class ToolbarGroup(object):
     </ul>
     """
     def __init__(self, *items):
-        self.items = items
+        self.items = _collapse(items)
 
     def render(self):
         return format_html(
@@ -137,6 +151,8 @@ class ToolbarContextGroup(ToolbarGroup):
     </ul>
     """
     def __init__(self, name, *items):
+        items = _collapse(items)
+
         super(ToolbarContextGroup, self).__init__(*items)
         self.name = name
 
@@ -162,9 +178,31 @@ class ToolbarItem(object):
 
     def render(self):
         return format_html(
-            '<li class="toolbar-item {}" data-name="{}" data-function="{}"><i class="icon-{}"></i></li>',
-            slugify(self.name), self.name, self.function, self.icon
+            '<li class="toolbar-item {}" data-name="{}" data-function="{}">{}</li>',
+            slugify(self.name), self.name, self.function, mark_safe(self._render_contents())
         )
+
+    def _render_contents(self):
+        return format_html('<i class="icon-{}"></i>', self.icon)
+
+class ImageToolbarItem(ToolbarItem):
+    """
+    A Calchart ToolbarItem, in the format
+
+    <li class="toolbar-item {{ class }}" data-name="{{ name }}" data-function="{{ function }}">
+        <img src="{% static 'img/' + src %}">
+    </li>
+
+    where the class is the slugified name
+    """
+    def __init__(self, name, src, function):
+        self.name = name
+        self.src = src
+        self.function = function
+
+    def _render_contents(self):
+        src = get_static_path('img/%s' % self.src)
+        return format_html('<img src="{}">', src)
 
 class CustomToolbarItem(object):
     """
@@ -222,6 +260,13 @@ editor_toolbar = Toolbar(
         'edit-dots',
         ToolbarItem('Selection', 'selection', 'TODO'),
         ToolbarItem('Lasso', 'lasso', 'TODO'),
+    ),
+    ToolbarContextGroup(
+        'edit-dots',
+        [
+            ImageToolbarItem(label, 'dot-%s.png' % slug, 'changeDotType(%s)' % slug)
+            for label, slug in DOT_TYPES
+        ]
     ),
     ToolbarContextGroup(
         'edit-continuity',

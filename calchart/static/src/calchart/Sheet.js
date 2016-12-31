@@ -162,6 +162,19 @@ Sheet.prototype.addContinuity = function(dotType, continuity) {
 };
 
 /**
+ * Change the dot types of the given dots
+ *
+ * @param {Array<Dot>} dots -- the dots to change dot types
+ * @param {string} dotType -- the dot type to change to
+ */
+Sheet.prototype.changeDotTypes = function(dots, dotType) {
+    dots.forEach(function(dot) {
+        var label = dot.getLabel();
+        this._dots[label].type = dotType;
+    }, this);
+};
+
+/**
  * Get the continuities for the given dot type
  *
  * @param {string} dotType -- the dot type to get continuities for
