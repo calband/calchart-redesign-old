@@ -104,7 +104,7 @@ Sheet.deserialize = function(show, data) {
 
     $.each(data.continuities, function(dot_type, continuities_data) {
         sheet._continuities[dot_type] = $.map(continuities_data, function(data) {
-            return Continuity.deserialize(data);
+            return Continuity.deserialize(sheet, data);
         });
     });
 

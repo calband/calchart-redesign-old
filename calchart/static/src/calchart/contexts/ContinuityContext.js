@@ -137,14 +137,13 @@ ContinuityContext.prototype._init = function() {
             disable_search_threshold: false,
         })
         .change(function() {
-            var continuity = new Continuity($(this).val());
+            var continuity = new Continuity(_this._sheet, $(this).val());
             _this._panel.find(".continuities").append(continuity.panelHTML(_this._sheet));
 
             var dotType = _this._panel.find(".dot-types li.active").data("dotType");
             _this._sheet.addContinuity(dotType, continuity);
 
-            $(this).val("")
-                .trigger("chosen:updated");
+            $(this).val("").trigger("chosen:updated");
         });
 
     this._panel.on("click", ".continuity .edit", function() {

@@ -10,8 +10,11 @@ var MovementCommandStop = require("calchart/movements/MovementCommandStop");
  * then move NS or EW to get to their next position.
  *
  * @param {boolean} isEWNS -- true if EWNS, otherwise NSEW
+ * @param {Sheet} sheet -- the sheet the continuity is for
  */
-var FountainGridContinuity = function(isEWNS) {
+var FountainGridContinuity = function(isEWNS, sheet) {
+    BaseContinuity.call(this, sheet);
+
     this._isEWNS = isEWNS;
 
     this._end = "MT";
@@ -24,13 +27,15 @@ JSUtils.extends(FountainGridContinuity, BaseContinuity);
 /**
  * Create a FountainGridContinuity from the given serialized data
  *
+ * @param {boolean} isEWNS -- true if EWNS, otherwise NSEW
+ * @param {Sheet} sheet -- the sheet the continuity is for
  * @param {object} data -- the JSON data to initialize the
  *   FountainGridContinuity with
  * @return {FountainGridContinuity} the FountainGridContinuity reconstructed
  *   from the given data
  */
-FountainGridContinuity.deserialize = function(isEWNS, data) {
-    var continuity = new FountainGridContinuity(isEWNS);
+FountainGridContinuity.deserialize = function(isEWNS, sheet, data) {
+    var continuity = new FountainGridContinuity(isEWNS, sheet);
     continuity._end = data.end;
     continuity._step = data.step;
     continuity._orientation = data.orientation;

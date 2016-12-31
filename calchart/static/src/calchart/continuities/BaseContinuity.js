@@ -5,8 +5,11 @@ var HTMLBuilder = require("utils/HTMLBuilder");
  * distinct from MovementCommands, as those are per-dot, and describe
  * the exact movement for the dot (e.g. 8E, 4S), whereas Continuities
  * describe movements for the dot type (e.g. EWNS to SS 2).
+ *
+ * @param {Sheet} sheet -- the sheet the continuity is for
  */
-var BaseContinuity = function() {
+var BaseContinuity = function(sheet) {
+    this._sheet = sheet;
 };
 
 /**
