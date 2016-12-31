@@ -156,28 +156,30 @@ $sidebar-width: 200px;
             margin: 10px 0;
             overflow-y: auto;
             .continuity {
+                @include vertically-center(false);
                 padding: 10px;
                 background: $light-gold;
                 &:not(:last-child) {
                     margin-bottom: 5px;
                 }
                 .info {
-                    display: inline-block;
+                    @include vertically-center(false);
                     width: calc(100% - #{$panel-ec-actions-width + 5px});
                     margin-right: 5px;
                     & > span {
                         margin-right: 20px;
                     }
                     .panel-continuity-end {
-                        display: inline-block;
                         & > span {
                             margin-right: 5px;
                         }
                     }
+                    input.panel-continuity-duration {
+                        width: 50px;
+                        margin: 0 10px;
+                    }
                 }
                 .actions {
-                    display: inline-block;
-                    vertical-align: middle;
                     width: $panel-ec-actions-width;
                     i {
                         cursor: pointer;

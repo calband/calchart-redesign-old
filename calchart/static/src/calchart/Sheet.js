@@ -104,7 +104,7 @@ Sheet.deserialize = function(show, data) {
 
     $.each(data.continuities, function(dot_type, continuities_data) {
         sheet._continuities[dot_type] = $.map(continuities_data, function(data) {
-            return Continuity.deserialize(sheet, data);
+            return Continuity.deserialize(sheet, dot_type, data);
         });
     });
 
@@ -329,7 +329,7 @@ Sheet.prototype.updateMovements = function(dots) {
         var position = info.position;
         var movements = [];
         continuities.forEach(function(continuity, i, arr) {
-            var moves = continuity.getMovements(this, dot, position);
+            var moves = continuity.getMovements(dot, position);
             movements = movements.concat(moves);
             position = movements[movements.length - 1].getEndPosition();
         }, this);

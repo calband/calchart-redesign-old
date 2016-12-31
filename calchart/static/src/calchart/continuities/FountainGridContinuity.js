@@ -11,15 +11,21 @@ var MovementCommandStop = require("calchart/movements/MovementCommandStop");
  *
  * @param {boolean} isEWNS -- true if EWNS, otherwise NSEW
  * @param {Sheet} sheet -- the sheet the continuity is for
+ * @param {string} dotType -- the dot type the continuity is for
+ * @param {object|undefined} options -- options for the continuity, including:
+ *   - {string} end -- whether to marktime or close at the end
+ *   - {string} step -- the step type to march, like high step, show high
+ *   - {string} orientation -- the direction to face at the end
  */
-var FountainGridContinuity = function(isEWNS, sheet) {
-    BaseContinuity.call(this, sheet);
+var FountainGridContinuity = function(isEWNS, sheet, dotType, options) {
+    BaseContinuity.call(this, sheet, dotType);
 
     this._isEWNS = isEWNS;
 
-    this._end = "MT";
-    this._step = "default";
-    this._orientation = "default";
+    options = options || {};
+    this._end = options.end || "MT";
+    this._step = options.step || "default";
+    this._orientation = options.orientation || "default";
 };
 
 JSUtils.extends(FountainGridContinuity, BaseContinuity);
@@ -29,17 +35,14 @@ JSUtils.extends(FountainGridContinuity, BaseContinuity);
  *
  * @param {boolean} isEWNS -- true if EWNS, otherwise NSEW
  * @param {Sheet} sheet -- the sheet the continuity is for
+ * @param {string} dotType -- the dot type the continuity is for
  * @param {object} data -- the JSON data to initialize the
  *   FountainGridContinuity with
  * @return {FountainGridContinuity} the FountainGridContinuity reconstructed
  *   from the given data
  */
-FountainGridContinuity.deserialize = function(isEWNS, sheet, data) {
-    var continuity = new FountainGridContinuity(isEWNS, sheet);
-    continuity._end = data.end;
-    continuity._step = data.step;
-    continuity._orientation = data.orientation;
-    return continuity;
+FountainGridContinuity.deserialize = function(isEWNS, sheet, dotType, data) {
+    return new FountainGridContinuity(isEWNS, sheet, dotType, data);
 };
 
 /**
@@ -58,8 +61,8 @@ FountainGridContinuity.prototype.serialize = function() {
 
 /**** INSTANCE METHODS ****/
 
-FountainGridContinuity.prototype.getMovements = function(sheet, dot, start) {
-    var end = sheet.getNextSheet().getInfoForDot(dot.getLabel()).position;
+FountainGridContinuity.prototype.getMovements = function(dot, start) {
+    var end = this._sheet.getNextSheet().getInfoForDot(dot.getLabel()).position;
 
     var deltaX = end.x - start.x;
     var deltaY = end.y - start.y;
@@ -96,7 +99,7 @@ FountainGridContinuity.prototype.getMovements = function(sheet, dot, start) {
         }
     }
 
-    var remaining = sheet.getDuration() - Math.abs(deltaX) - Math.abs(deltaY);
+    var remaining = this._sheet.getDuration() - Math.abs(deltaX) - Math.abs(deltaY);
     if (remaining > 0) {
         var orientation = this.getOrientation() === "east" ? 0 : 90;
         var marktime = this._end === "MT";
@@ -115,7 +118,7 @@ FountainGridContinuity.prototype.getOrientation = function() {
     return this._orientation === "default" ? "east" : this._orientation;
 };
 
-FountainGridContinuity.prototype.panelHTML = function(sheet) {
+FountainGridContinuity.prototype.panelHTML = function() {
     var _this = this;
     var type = this._isEWNS ? "EWNS" : "NSEW";
 
@@ -130,8 +133,7 @@ FountainGridContinuity.prototype.panelHTML = function(sheet) {
             },
             change: function() {
                 _this._end = $(this).val();
-                var dotType = $(".panel.edit-continuity .dot-types li.active").data("dotType");
-                sheet.updateMovements(dotType);
+                _this._updateMovements();
             },
             selected: this._end,
         });

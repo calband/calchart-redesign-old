@@ -29,14 +29,17 @@
 }
 
 // make children vertically centered within the element
-@mixin vertically-center {
-    font-size: 0;
-    &:before {
-        @include unselectable;
-        content: "";
-        display: inline-block;
-        height: 100%;
-        vertical-align: middle;
+@mixin vertically-center($expand: true) {
+    // expand to fill entire height
+    @if $expand {
+        font-size: 0;
+        &:before {
+            @include unselectable;
+            content: "";
+            display: inline-block;
+            height: 100%;
+            vertical-align: middle;
+        }
     }
     > * {
         display: inline-block;

@@ -7,9 +7,11 @@ var HTMLBuilder = require("utils/HTMLBuilder");
  * describe movements for the dot type (e.g. EWNS to SS 2).
  *
  * @param {Sheet} sheet -- the sheet the continuity is for
+ * @param {string} dotType -- the dot type the continuity is for
  */
-var BaseContinuity = function(sheet) {
+var BaseContinuity = function(sheet, dotType) {
     this._sheet = sheet;
+    this._dotType = dotType;
 };
 
 /**
@@ -28,20 +30,19 @@ BaseContinuity.prototype.serialize = function() {
 /**
  * Get the movements for the given dot for the given stuntsheet
  *
- * @param {Sheet} sheet -- the sheet the continuity is being executed for
  * @param {Dot} dot -- the dot the continuity is assigned to
  * @param {Coordinate} start -- the starting position of the movement
  * @return {Array<MovementCommand>} the movements to do for the dot
  */
-BaseContinuity.prototype.getMovements = function(sheet, dot, start) {
+BaseContinuity.prototype.getMovements = function(dot, start) {
     throw new Error(this.constructor.name + " did not define getMovements");
 };
 
 /**
- * @param {Sheet} sheet -- the currently active Sheet
+ * @param {string} dotType -- the type of dot 
  * @return {jQuery} the HTML element to add to the Edit Continuity panel
  */
-BaseContinuity.prototype.panelHTML = function(sheet) {
+BaseContinuity.prototype.panelHTML = function(dotType) {
     throw new Error(this.constructor.name + " did not define panelHTML");
 };
 
@@ -66,6 +67,13 @@ BaseContinuity.prototype.savePopup = function(data) {
 };
 
 /**** HELPERS ****/
+
+/**
+ * Update the movements for dots that use this continuity
+ */
+BaseContinuity.prototype._updateMovements = function() {
+    this._sheet.updateMovements(this._dotType);
+};
 
 /**
  * Wrap the given contents to add to the edit continuity panel
