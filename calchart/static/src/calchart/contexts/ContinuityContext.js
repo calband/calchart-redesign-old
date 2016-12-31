@@ -18,6 +18,10 @@ var ContinuityContext = function(controller) {
 JSUtils.extends(ContinuityContext, BaseContext);
 
 ContinuityContext.prototype.shortcuts = {
+    "left": "prevContinuityBeat",
+    "right": "nextContinuityBeat",
+    "down": "firstContinuityBeat",
+    "up": "lastContinuityBeat",
 };
 
 ContinuityContext.prototype.load = function() {
@@ -76,6 +80,22 @@ ContinuityContext.prototype.unload = function() {
 };
 
 /**** ACTIONS ****/
+
+/**
+ * Increments the beat and updates the seek bar
+ */
+ContinuityContext.prototype.firstContinuityBeat = function() {
+    this._controller.firstBeat();
+    this._updateSeek();
+};
+
+/**
+ * Decrements the beat and updates the seek bar
+ */
+ContinuityContext.prototype.lastContinuityBeat = function() {
+    this._controller.lastBeat();
+    this._updateSeek();
+};
 
 /**
  * Increments the beat and updates the seek bar

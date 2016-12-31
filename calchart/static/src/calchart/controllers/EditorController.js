@@ -275,6 +275,22 @@ EditorController.prototype.doAction = function(name, asRedo) {
 };
 
 /**
+ * Go to the zero-th beat of the sheet
+ */
+EditorController.prototype.firstBeat = function() {
+    this._currBeat = 0;
+    this._grapher.draw(this._activeSheet, this._currBeat);
+};
+
+/**
+ * Go to the last beat of the sheet
+ */
+EditorController.prototype.lastBeat = function() {
+    this._currBeat = this._activeSheet.getDuration();
+    this._grapher.draw(this._activeSheet, this._currBeat);
+};
+
+/**
  * Loads an editing context for the controller
  *
  * @param {string} name -- the name of the context to load
