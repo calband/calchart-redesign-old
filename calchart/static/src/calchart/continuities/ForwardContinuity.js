@@ -48,7 +48,7 @@ ForwardContinuity.deserialize = function(sheet, dotType, data) {
  */
 ForwardContinuity.prototype.serialize = function() {
     return {
-        type: "FM",
+        type: "FORWARD",
         steps: this._numSteps,
         direction: this._direction,
         stepType: this._stepType,

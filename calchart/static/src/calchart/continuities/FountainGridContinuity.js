@@ -9,15 +9,15 @@ var MovementCommandStop = require("calchart/movements/MovementCommandStop");
  * An EWNS or NSEW continuity, where dots move as far EW or NS as possible,
  * then move NS or EW to get to their next position.
  *
- * @param {boolean} isEWNS -- true if EWNS, otherwise NSEW
  * @param {Sheet} sheet -- the sheet the continuity is for
  * @param {string} dotType -- the dot type the continuity is for
+ * @param {boolean} isEWNS -- true if EWNS, otherwise NSEW
  * @param {object|undefined} options -- options for the continuity, including:
  *   - {string} end -- whether to marktime or close at the end
  *   - {string} step -- the step type to march, like high step, show high
  *   - {string} orientation -- the direction to face at the end
  */
-var FountainGridContinuity = function(isEWNS, sheet, dotType, options) {
+var FountainGridContinuity = function(sheet, dotType, isEWNS, options) {
     BaseContinuity.call(this, sheet, dotType);
 
     this._isEWNS = isEWNS;
@@ -33,7 +33,6 @@ JSUtils.extends(FountainGridContinuity, BaseContinuity);
 /**
  * Create a FountainGridContinuity from the given serialized data
  *
- * @param {boolean} isEWNS -- true if EWNS, otherwise NSEW
  * @param {Sheet} sheet -- the sheet the continuity is for
  * @param {string} dotType -- the dot type the continuity is for
  * @param {object} data -- the JSON data to initialize the
@@ -41,8 +40,8 @@ JSUtils.extends(FountainGridContinuity, BaseContinuity);
  * @return {FountainGridContinuity} the FountainGridContinuity reconstructed
  *   from the given data
  */
-FountainGridContinuity.deserialize = function(isEWNS, sheet, dotType, data) {
-    return new FountainGridContinuity(isEWNS, sheet, dotType, data);
+FountainGridContinuity.deserialize = function(sheet, dotType, data) {
+    return new FountainGridContinuity(sheet, dotType, data.ewns, data);
 };
 
 /**
@@ -52,7 +51,8 @@ FountainGridContinuity.deserialize = function(isEWNS, sheet, dotType, data) {
  */
 FountainGridContinuity.prototype.serialize = function() {
     return {
-        type: this._isEWNS ? "EWNS" : "NSEW",
+        type: "FOUNTAIN",
+        ewns: this._isEWNS,
         end: this._end,
         step: this._step,
         orientation: this._orientation,

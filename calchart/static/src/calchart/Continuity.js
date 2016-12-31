@@ -13,9 +13,9 @@ var StopContinuity = require("./continuities/StopContinuity");
 var Continuity = function(type, sheet, dotType) {
     switch (type) {
         case "EWNS":
-            return new FountainGridContinuity(true, sheet, dotType);
+            return new FountainGridContinuity(sheet, dotType, true);
         case "NSEW":
-            return new FountainGridContinuity(false, sheet, dotType);
+            return new FountainGridContinuity(sheet, dotType, false);
         case "FM":
             return new ForwardContinuity(sheet, dotType, 0, 0);
         case "MT":
@@ -40,11 +40,9 @@ var Continuity = function(type, sheet, dotType) {
  */
 Continuity.deserialize = function(sheet, dotType, data) {
     switch (data.type) {
-        case "EWNS":
-            return FountainGridContinuity.deserialize(true, sheet, dotType, data);
-        case "NSEW":
-            return FountainGridContinuity.deserialize(false, sheet, dotType, data);
-        case "FM":
+        case "FOUNTAIN":
+            return FountainGridContinuity.deserialize(sheet, dotType, data);
+        case "FORWARD":
             return ForwardContinuity.deserialize(sheet, dotType, data);
         case "STOP":
             return StopContinuity.deserialize(sheet, dotType, data);
