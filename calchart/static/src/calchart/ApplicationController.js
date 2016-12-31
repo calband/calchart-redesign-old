@@ -93,15 +93,25 @@ ApplicationController.prototype.init = function() {
     $(window).keydown(function(e) {
         // convert keydown event into string
         var pressedKeys = [];
+        var metaKey = false;
 
         if (e.metaKey || e.ctrlKey) {
             pressedKeys.push("ctrl");
+            metaKey = true;
         }
         if (e.altKey) {
             pressedKeys.push("alt");
+            metaKey = true;
         }
         if (e.shiftKey) {
             pressedKeys.push("shift");
+            metaKey = true;
+        }
+
+        // unless a meta key was pressed, ignore keypresses when
+        // typing into an input field
+        if ($("input:focus").exists()) {
+            return;
         }
 
         // http://api.jquery.com/event.which/

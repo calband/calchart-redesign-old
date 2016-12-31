@@ -132,17 +132,15 @@ ForwardContinuity.prototype.popupHTML = function() {
     };
 };
 
-ForwardContinuity.prototype.savePopup = function(data) {
+ForwardContinuity.prototype.savePopup = function(data, $continuity) {
     this._numSteps = data.steps;
     this._direction = data.direction;
     this._stepType = data.stepType;
 
-    return function($continuity) {
-        $continuity.find("input").val(data.steps);
-        $continuity.find("select")
-            .val(data.direction)
-            .trigger("chosen:updated");
-    };
+    $continuity.find("input").val(data.steps);
+    $continuity.find("select")
+        .val(data.direction)
+        .trigger("chosen:updated");
 };
 
 module.exports = ForwardContinuity;

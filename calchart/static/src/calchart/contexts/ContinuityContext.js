@@ -187,11 +187,7 @@ ContinuityContext.prototype._init = function() {
             },
             onSubmit: function(popup) {
                 var data = UIUtils.getData(popup);
-                var callback = continuity.savePopup(data);
-
-                if (callback) {
-                    callback($continuity);
-                }
+                continuity.savePopup(data, $continuity);
 
                 var dotType = _this._panel.find(".dot-types li.active").data("dotType");
                 _this._sheet.updateMovements(dotType);

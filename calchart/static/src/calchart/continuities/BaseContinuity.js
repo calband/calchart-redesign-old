@@ -59,10 +59,10 @@ BaseContinuity.prototype.popupHTML = function() {
  * Update this continuity when saving the Edit Continuity popup
  *
  * @param {object} data -- the popup data
- * @return {function|undefined} an optional callback function to run any actions
- *   on the continuity in the Edit Continuity panel
+ * @param {jQuery} $continuity -- the item in the Edit Continuity panel that
+ *   represents this continuity
  */
-BaseContinuity.prototype.savePopup = function(data) {
+BaseContinuity.prototype.savePopup = function(data, $continuity) {
     throw new Error(this.constructor.name + " did not define savePopup");
 };
 
