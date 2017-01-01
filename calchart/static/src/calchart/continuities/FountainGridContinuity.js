@@ -61,7 +61,8 @@ FountainGridContinuity.prototype.serialize = function() {
 
 /**** INSTANCE METHODS ****/
 
-FountainGridContinuity.prototype.getMovements = function(dot, start) {
+FountainGridContinuity.prototype.getMovements = function(dot, data) {
+    var start = data.position;
     var end = this._sheet.getNextSheet().getInfoForDot(dot.getLabel()).position;
 
     var deltaX = end.x - start.x;

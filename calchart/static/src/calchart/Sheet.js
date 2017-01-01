@@ -326,12 +326,20 @@ Sheet.prototype.updateMovements = function(dots) {
     dots.forEach(function(dot) {
         var continuities = _this._continuities[dot.getDotType()];
         var info = this._dots[dot.getLabel()];
-        var position = info.position;
+        var data = {
+            position: info.position,
+            remaining: duration,
+        };
+
         var movements = [];
         continuities.forEach(function(continuity, i, arr) {
-            var moves = continuity.getMovements(dot, position);
+            var moves = continuity.getMovements(dot, data);
             movements = movements.concat(moves);
-            position = movements[movements.length - 1].getEndPosition();
+
+            moves.forEach(function(movement) {
+                data.position = movement.getEndPosition();
+                data.remaining -= movement.getDuration();
+            });
         }, this);
         info.movements = movements;
     }, this);

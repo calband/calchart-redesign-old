@@ -57,10 +57,10 @@ ForwardContinuity.prototype.serialize = function() {
 
 /**** INSTANCE METHODS ****/
 
-ForwardContinuity.prototype.getMovements = function(dot, start) {
+ForwardContinuity.prototype.getMovements = function(dot, data) {
     var move = new MovementCommandMove(
-        start.x,
-        start.y,
+        data.position.x,
+        data.position.y,
         CalchartUtils.STEP_SIZES.STANDARD,
         this._direction,
         this._direction,

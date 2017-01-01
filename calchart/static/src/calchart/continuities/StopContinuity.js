@@ -51,7 +51,7 @@ StopContinuity.prototype.serialize = function() {
 
 /**** INSTANCE METHODS ****/
 
-StopContinuity.prototype.getMovements = function(dot, start) {
+StopContinuity.prototype.getMovements = function(dot, data) {
     // var move = new MovementCommandMove(
     //     start.x,
     //     start.y,

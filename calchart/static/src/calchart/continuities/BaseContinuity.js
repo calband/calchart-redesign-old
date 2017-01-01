@@ -30,11 +30,14 @@ BaseContinuity.prototype.serialize = function() {
 /**
  * Get the movements for the given dot for the given stuntsheet
  *
- * @param {Dot} dot -- the dot the continuity is assigned to
- * @param {Coordinate} start -- the starting position of the movement
+ * @param {Dot} dot -- the dot to get movements for
+ * @param {object} data -- data about the Sheet at the beginning of the
+ *   continuity. Includes:
+ *     - {Coordinate} position -- the starting position of the dot
+ *     - {int} remaining -- the number of beats left in the Sheet
  * @return {Array<MovementCommand>} the movements to do for the dot
  */
-BaseContinuity.prototype.getMovements = function(dot, start) {
+BaseContinuity.prototype.getMovements = function(dot, data) {
     throw new Error(this.constructor.name + " did not define getMovements");
 };
 
