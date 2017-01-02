@@ -361,10 +361,10 @@ EditorController.prototype.loadSheet = function(sheet) {
  */
 EditorController.prototype.nextBeat = function() {
     this._currBeat++;
-    var max = this._activeSheet.getDuration() - 1;
+    var duration = this._activeSheet.getDuration();
 
-    if (this._currBeat > max) {
-        this._currBeat = max;
+    if (this._currBeat > duration) {
+        this._currBeat = duration;
     } else {
         this.refreshGrapher();
     }

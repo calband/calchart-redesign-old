@@ -228,7 +228,7 @@ ContinuityContext.prototype._setupSeek = function(seek) {
     var moveMarker = function(pageX) {
         var prev = marker.offset().left;
         var numBeats = _this._sheet.getDuration();
-        var interval = seekWidth / (numBeats - 1);
+        var interval = seekWidth / numBeats;
 
         // snap to beat
         var x = MathUtils.bound(pageX - seekLeft - offset, 0, seekWidth);
@@ -288,12 +288,14 @@ ContinuityContext.prototype._updatePanel = function() {
 };
 
 /**
- * Update the seek bar with the current beat
+ * Update the seek bar with the current beat. The left-most position is
+ * beat 0 and the right-most position is the duration of the sheet, i.e.
+ * beat 0 of the next stunt sheet.
  */
 ContinuityContext.prototype._updateSeek = function() {
     var beat = this._controller.getCurrentBeat();
     var numBeats = this._sheet.getDuration();
-    var interval = $(".toolbar .seek").width() / (numBeats - 1);
+    var interval = $(".toolbar .seek").width() / numBeats;
 
     $(".toolbar .seek .marker").css("transform", "translateX(" + (interval * beat) + "px)");
 };
