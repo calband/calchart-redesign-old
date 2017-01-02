@@ -123,9 +123,9 @@ FountainGridContinuity.prototype.panelHTML = function(controller) {
     var _this = this;
     var type = this._isEWNS ? "EWNS" : "NSEW";
 
-    var label = HTMLBuilder.span(null, type);
+    var label = HTMLBuilder.span(type);
 
-    var endLabel = HTMLBuilder.span(null, "End:");
+    var endLabel = HTMLBuilder.span("End:");
     var endChoices = HTMLBuilder.select({
         options: CalchartUtils.ENDINGS,
         change: function() {

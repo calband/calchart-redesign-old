@@ -162,22 +162,15 @@ HTMLBuilder.select = function() {
 /**
  * Builds a <span> element
  *
- * @param {string} class -- the class to add to the <span>
  * @param {string} text -- the text to put in the span
- * @param {jQuery} appendTo -- the element to append the <span> to
+ * @param {string} class -- the class to add to the <span>
  */
 HTMLBuilder.span = function() {
-    var args = JSUtils.parseArgs(arguments, ["class", "text", "appendTo"]);
+    var args = JSUtils.parseArgs(arguments, ["text", "class"]);
 
-    var span = $("<span>")
+    return $("<span>")
         .addClass(args.class)
         .text(args.text);
-
-    if (args.appendTo) {
-        span.appendTo(args.appendTo);
-    }
-
-    return span;
 };
 
 module.exports = HTMLBuilder;

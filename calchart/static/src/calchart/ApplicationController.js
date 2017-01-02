@@ -307,7 +307,7 @@ ApplicationController.prototype._setupToolbar = function(toolbar) {
             }
 
             tooltipTimeout = setTimeout(function() {
-                var tooltip = HTMLBuilder.span("tooltip", name, "body");
+                var tooltip = HTMLBuilder.span(name, "tooltip").appendTo("body");
 
                 var arrow = HTMLBuilder
                     .make("span.tooltip-arrow")

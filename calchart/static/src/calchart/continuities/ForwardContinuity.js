@@ -73,7 +73,7 @@ ForwardContinuity.prototype.getMovements = function(dot, data) {
 ForwardContinuity.prototype.panelHTML = function(controller) {
     var _this = this;
 
-    var label = HTMLBuilder.span(null, "Move");
+    var label = HTMLBuilder.span("Move");
 
     var steps = HTMLBuilder.input({
         class: "panel-continuity-duration",

@@ -80,11 +80,11 @@ StopContinuity.prototype.panelHTML = function(controller) {
     var _this = this;
 
     if (!this._marktime) {
-        var label = HTMLBuilder.span(null, "Close");
+        var label = HTMLBuilder.span("Close");
         return this._wrapPanel("close", [label]);
     }
 
-    var label = HTMLBuilder.span(null, "MT");
+    var label = HTMLBuilder.span("MT");
 
     var duration = HTMLBuilder.input({
         class: "panel-continuity-duration",
