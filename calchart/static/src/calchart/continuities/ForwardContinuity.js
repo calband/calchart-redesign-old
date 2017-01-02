@@ -80,14 +80,7 @@ ForwardContinuity.prototype.panelHTML = function(controller) {
         type: "number",
         initial: this._numSteps,
         change: function() {
-            var duration = parseInt($(this).val());
-
-            if (duration < 0) {
-                $(this).val(0);
-            } else {
-                _this._numSteps = duration;
-            }
-
+            _this._numSteps = JSUtils.validatePositive(this);
             _this._updateMovements(controller);
         },
     });

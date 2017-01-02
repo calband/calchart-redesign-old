@@ -19,6 +19,13 @@ CalchartUtils.ENDINGS = {
     CL: "Close",
 };
 
+/* Options for orientation */
+CalchartUtils.ORIENTATIONS = {
+    default: "Default",
+    east: "East",
+    west: "West",
+};
+
 /* Multipliers for converting steps into standard step sizes */
 CalchartUtils.STEP_SIZES = {
     STANDARD: 8/8,

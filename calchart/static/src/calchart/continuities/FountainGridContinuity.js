@@ -154,11 +154,7 @@ FountainGridContinuity.prototype.popupHTML = function() {
     }));
 
     var orientation = HTMLBuilder.formfield("Final Orientation", HTMLBuilder.select({
-        options: {
-            default: "Default",
-            east: "East",
-            west: "West",
-        },
+        options: CalchartUtils.ORIENTATIONS,
         initial: this._orientation,
     }), "orientation");
 

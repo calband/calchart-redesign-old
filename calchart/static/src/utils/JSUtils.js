@@ -113,4 +113,21 @@ JSUtils.slugify = function(value) {
     return value.toLowerCase().replace(/ /g, "_");
 };
 
+/**
+ * Validate that the given input is a positive value, setting the input
+ * to 0 if negative
+ *
+ * @param {jQuery} input -- the input to validate
+ * @return {int} the value of the input
+ */
+JSUtils.validatePositive = function(input) {
+    var value = parseInt($(input).val());
+    if (value < 0) {
+        $(input).val(0);
+        return 0;
+    } else {
+        return value;
+    }
+};
+
 module.exports = JSUtils;

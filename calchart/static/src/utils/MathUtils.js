@@ -72,7 +72,8 @@ MathUtils.calcAngle = function(x1, y1, x2, y2) {
  *   unit circle
  */
 MathUtils.calcRotatedXPos = function(angle) {
-    return -Math.sin(this.toRadians(angle));
+    var val = -Math.sin(this.toRadians(angle));
+    return Math.round(val, 1e-5);
 };
 
 /**
@@ -85,7 +86,8 @@ MathUtils.calcRotatedXPos = function(angle) {
  *   unit circle
  */
 MathUtils.calcRotatedYPos = function(angle) {
-    return Math.cos(this.toRadians(angle));
+    var val = Math.cos(this.toRadians(angle));
+    return Math.round(val, 1e-5);
 };
 
 /**
