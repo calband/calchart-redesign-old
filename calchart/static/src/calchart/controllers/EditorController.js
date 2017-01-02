@@ -413,14 +413,21 @@ EditorController.prototype.refreshGrapher = function() {
 /**
  * Saves the show to the server
  *
- * @param {function|undefined} callback -- optional callback to run after saving show
+ * @param {function|undefined} callback -- optional callback to run after saving
+ *   show. By default, shows a saved message.
  */
 EditorController.prototype.saveShow = function(callback) {
     var data = this._show.serialize();
     var params = {
         viewer: JSON.stringify(data),
     };
-    // TODO: add sbowing success message to callback
+
+    if (callback === undefined) {
+        callback = function() {
+            UIUtils.showMessage("Saved!");
+        }
+    }
+
     UIUtils.doAction("save_show", params, callback);
 };
 
