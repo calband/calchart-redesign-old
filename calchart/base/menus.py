@@ -7,11 +7,7 @@ Menu and toolbar items are grouped into menu groups and toolbar groups, respecti
 these groups will be separated by a line.
 
 Functions are strings that represent a function defined in the associated ApplicationController
-class. Functions can be of the form:
-    - '<name>': the name of the function, to be run without arguments
-    - '<name>(<args>, ...)': the name of the function, run with the given arguments. Arguments will try
-      to be cast to a number, otherwise will be passed as a string. e.g. 'foo(bar)' runs `foo("bar")`
-      and 'foo(1)' runs `foo(1)`.
+class. See ApplicationController._parseAction for more details.
 """
 
 from django.templatetags.static import static as get_static_path

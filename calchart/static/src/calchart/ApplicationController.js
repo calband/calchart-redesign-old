@@ -69,10 +69,14 @@ ApplicationController.prototype.shortcuts = {};
  * Runs the method on this instance with the given name.
  *
  * @param {string} name -- the function to call
+ * @param {Array|undefined} args -- arguments to pass to the action. Can also
+ *   be passed in name (see _parseAction), which will override any arguments
+ *   passed in as a parameter
  */
-ApplicationController.prototype.doAction = function(name) {
+ApplicationController.prototype.doAction = function(name, args) {
     var action = this._getAction(name);
-    action.function.apply(this, action.args);
+    args = action.args || args || [];
+    action.function.apply(this, args);
 };
 
 /**
@@ -151,27 +155,27 @@ ApplicationController.prototype.init = function() {
 /**** HELPERS ****/
 
 /**
- * Parses the given function name according to menus.py
+ * Get the action represented by the given parameter
  *
- * @param {string} name -- the function name, optionally with arguments
+ * @param {string} name -- the function name (see _parseAction)
  * @return {object} an object of the form
  *   {
  *       function: function,
- *       args: Array<string|float>,
+ *       args: Array|null,
  *   }
  */
 ApplicationController.prototype._getAction = function(name) {
-    var action = this._parseAction(name);
+    var data = this._parseAction(name);
+    var action = this[data.name];
 
-    var _function = this[action.name];
-    if (_function === undefined) {
-        throw new errors.ActionError("No action with the name: " + action.name, action);
+    if (typeof action === "function") {
+        return {
+            function: action,
+            args: data.args,
+        };
+    } else {
+        throw new errors.ActionError("No action with the name: " + data.name);
     }
-
-    return {
-        function: _function,
-        args: action.args,
-    };
 };
 
 /**
@@ -185,13 +189,17 @@ ApplicationController.prototype._getShortcut = function(shortcut) {
 };
 
 /**
- * Parses the given function name according to menus.py
+ * Parses the given function name. The function name can be in one of the following formats:
  *
- * @param {string} name -- the function name, optionally with arguments
+ * @param {string} name -- the function name, in one of the following formats:
+ *   - <name>: the name of the function, without arguments specified
+ *   - <name>(<args>, ...): the name of the function, run with the given arguments. Arguments
+ *     will try to be cast to a number, otherwise will be passed as a string. e.g. foo(bar)
+ *     runs `foo("bar")` and foo(1) runs `foo(1)`.
  * @return {object} an object of the form
  *   {
  *       name: string,
- *       args: Array<string|float>,
+ *       args: Array|null,
  *   }
  */
 ApplicationController.prototype._parseAction = function(name) {
@@ -202,7 +210,7 @@ ApplicationController.prototype._parseAction = function(name) {
     }
 
     var actionName = match[1];
-    var actionArgs = [];
+    var actionArgs = null;
 
     if (match[2]) {
         // split args and try to parse numbers

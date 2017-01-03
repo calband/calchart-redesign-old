@@ -193,6 +193,23 @@ Show.prototype.loadSheet = function(sheet) {
     });
 };
 
+/**
+ * Remove a stuntsheet from the show
+ *
+ * @param {Sheet} sheet -- the sheet to remove
+ */
+Show.prototype.removeSheet = function(sheet) {
+    for (var i = 0; i < this._sheets.length; i++) {
+        var _sheet = this._sheets[i];
+        if (_sheet === sheet) {
+            this._sheets.splice(i, 1);
+            i--;
+        } else {
+            _sheet.setIndex(i);
+        }
+    }
+};
+
 /**** SONGS ****/
 // TODO
 

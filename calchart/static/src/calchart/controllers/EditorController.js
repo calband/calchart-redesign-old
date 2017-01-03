@@ -5,7 +5,7 @@
  *
  * - Constructors (including initialization functions)
  * - Instance methods
- * - Actions
+ * - Actions (anything that modifies the Show and can be undone)
  * - Helpers (prefixed with an underscore)
  */
 
@@ -84,88 +84,7 @@ EditorController.prototype.shortcuts = {
 };
 
 /**
- * Get the currently active Sheet
- *
- * @param {Sheet} the active sheet
- */
-EditorController.prototype.getActiveSheet = function() {
-    return this._activeSheet;
-};
-
-/**
- * Get the current beat number
- *
- * @param {int} the current beat
- */
-EditorController.prototype.getCurrentBeat = function() {
-    return this._currBeat;
-};
-
-/**
- * @return {Grapher} the grapher for the workspace
- */
-EditorController.prototype.getGrapher = function() {
-    return this._grapher;
-};
-
-/**
- * Refresh the UI according to the current state of the editor
- * and Show
- */
-EditorController.prototype.refresh = function() {
-    // refresh sidebar
-    $(".sidebar").empty();
-    this._show.getSheets().forEach(function(sheet) {
-        var label = HTMLBuilder.span(sheet.getLabel(), "label");
-        var preview = HTMLBuilder.make("svg.preview");
-
-        var $sheet = HTMLBuilder
-            .div("stuntsheet", [label, preview], ".sidebar")
-            .data("sheet", sheet);
-
-        if (sheet === this._activeSheet) {
-            $sheet
-                .addClass("active")
-                .scrollToView({
-                    margin: 10,
-                });
-        }
-    }, this);
-
-    // refresh grapher
-    if (this._activeSheet) {
-        this._grapher.draw(this._activeSheet, this._currBeat);
-    } else {
-        this._grapher.drawField();
-    }
-
-    this._context.refresh();
-};
-
-/**** ACTIONS
- *
- * Each action can define the following properties:
- *  - {string} _name: the verbose name of the action, used for Undo text or other labels
- *    (default to name of action, capitalized and spaced out)
- *  - {boolean} _canUndo: set true to indicate that the action can be undone (default true
- *    if _undo is defined, otherwise false)
- *  - {boolean} _clearsRedo: if true, when the action is run, clears history of actions
- *    that have been undone (default same as _canUndo)
- *  - {function} _undo: the function to run instead of the default undo function, which
- *    replaces the .content element with a clone saved from before the initial call
- *  - {function} _redo: the function to run instead of the default redo function, which
- *    simply calls the function again
- *
- * Example:
- *
- * EditorController.prototype.addStuntsheet = function() { ... };
- * EditorController.prototype.addStuntsheet._name = "Add a Stuntsheet";
- * EditorController.prototype.addStuntsheet._canUndo = true;
- *
- ****/
-
-/**
- * Adds a new stuntsheet to the Show and sidebar.
+ * Shows the popup that adds a stuntsheet to the Show
  */
 EditorController.prototype.addStuntsheet = function() {
     var _this = this;
@@ -186,15 +105,13 @@ EditorController.prototype.addStuntsheet = function() {
                 return;
             }
 
-            // add sheet
-            var sheet = _this._show.addSheet(data.num_beats);
-            _this.loadSheet(sheet);
+            // hide popup and add sheet to show
 
             UIUtils.hidePopup(popup);
+            _this.doAction("addSheet", [data.num_beats]);
         },
     });
 };
-EditorController.prototype.addStuntsheet._canUndo = true;
 
 /**
  * Check if any of the given dots have continuity errors in the currently
@@ -271,37 +188,27 @@ EditorController.prototype.checkContinuities = function() {
 /**
  * Runs the method on this instance with the given name.
  *
- * @param {string} name -- the function to call
- * @param {boolean} asRedo -- true if calling from a redo action
+ * The method can either be an instance method or an action. An action is
+ * anything that modifies the Show. All actions can be undone and redone.
+ * All other methods (things that update the controller, context, etc.) are
+ * instance methods.
+ *
+ * @param {string} name -- the function to call (see _parseAction)
+ * @param {Array|undefined} args -- arguments to pass to the action. Can also
+ *   be passed in name (see _parseAction), which will override any arguments
+ *   passed in as a parameter
  */
-EditorController.prototype.doAction = function(name, asRedo) {
-    var _action = this._getAction(name);
-    var action = _action.function;
+EditorController.prototype.doAction = function(name, args) {
+    var action = this._getAction(name);
+    action.args = action.args || args || [];
 
-    var canUndo = action._canUndo || action._undo;
-    var prevContent = $(".content").clone(true);
+    var data = action.function.apply(action.context, action.args);
 
-    // after doing an action, can't redo previous actions
-    if (!asRedo && (action._clearsRedo || (action._clearsRedo === undefined && canUndo))) {
+    if (action.canUndo) {
+        data = $.extend(data, action);
+        this._undoHistory.push(data);
+        // after doing an action, can't redo previous actions
         JSUtils.empty(this._redoHistory);
-    }
-
-    var data = action.apply(_action.context, _action.args);
-
-    if (canUndo) {
-        var label = action._name || JSUtils.fromCamelCase(name);
-        var actionData = {
-            name: name,
-            label: label,
-            content: prevContent,
-            data: data,
-            context: _action.context,
-            undo: action._undo,
-            redo: action._redo,
-        };
-
-        // TODO: show label in undo menu item
-        this._undoHistory.push(actionData);
     }
 };
 
@@ -311,6 +218,31 @@ EditorController.prototype.doAction = function(name, asRedo) {
 EditorController.prototype.firstBeat = function() {
     this._currBeat = 0;
     this.refresh();
+};
+
+/**
+ * Get the currently active Sheet
+ *
+ * @param {Sheet} the active sheet
+ */
+EditorController.prototype.getActiveSheet = function() {
+    return this._activeSheet;
+};
+
+/**
+ * Get the current beat number
+ *
+ * @param {int} the current beat
+ */
+EditorController.prototype.getCurrentBeat = function() {
+    return this._currBeat;
+};
+
+/**
+ * @return {Grapher} the grapher for the workspace
+ */
+EditorController.prototype.getGrapher = function() {
+    return this._grapher;
 };
 
 /**
@@ -397,15 +329,46 @@ EditorController.prototype.redo = function() {
         return;
     }
 
-    var actionData = this._redoHistory.pop();
+    var data = this._redoHistory.pop();
+    newData = data.function.apply(data.context, data.args);
+    // update the undo function
+    data.undo = newData.undo;
 
-    if (actionData.redo) {
-        actionData.redo.call(actionData.context, actionData.data);
+    this._undoHistory.push(data);
+};
+
+/**
+ * Refresh the UI according to the current state of the editor
+ * and Show
+ */
+EditorController.prototype.refresh = function() {
+    // refresh sidebar
+    $(".sidebar").empty();
+    this._show.getSheets().forEach(function(sheet) {
+        var label = HTMLBuilder.span(sheet.getLabel(), "label");
+        var preview = HTMLBuilder.make("svg.preview");
+
+        var $sheet = HTMLBuilder
+            .div("stuntsheet", [label, preview], ".sidebar")
+            .data("sheet", sheet);
+
+        if (sheet === this._activeSheet) {
+            $sheet
+                .addClass("active")
+                .scrollToView({
+                    margin: 10,
+                });
+        }
+    }, this);
+
+    // refresh grapher
+    if (this._activeSheet) {
+        this._grapher.draw(this._activeSheet, this._currBeat);
     } else {
-        this.doAction(actionData.name, true);
+        this._grapher.drawField();
     }
 
-    this._undoHistory.push(actionData);
+    this._context.refresh();
 };
 
 /**
@@ -446,56 +409,91 @@ EditorController.prototype.undo = function() {
         return;
     }
 
-    var actionData = this._undoHistory.pop();
-
-    if (actionData.undo) {
-        actionData.undo.call(actionData.context, actionData.data);
-    } else {
-        $(".content")
-            .after(actionData.content)
-            .remove();
-        this._grapher.rebindSVG();
-    }
-
-    this._redoHistory.push(actionData);
+    var data = this._undoHistory.pop();
+    data.undo.apply(data.context, data.args);
+    this._redoHistory.push(data);
 };
+
+/**** ACTIONS ****/
+
+/**
+ * Contains all actions in the EditorController. Actions are any methods that modify
+ * the Show and can be undone/redone. All actions must return an object containing:
+ *   - {function} undo -- the function that will undo this action. `this` will be
+ *     set to the EditorController instance
+ *   - {undefined|string} label -- optional label to use for the Undo/Redo menu item.
+ *     Defaults to the name of the action, capitalized and spaced out
+ *
+ * Actions are also passed the EditorController instance as `this`.
+ */
+var EditorActions = {};
+
+/**
+ * Adds a Sheet to the Show
+ *
+ * @this {EditorController}
+ * @param {int} numBeats -- the number of beats for the stuntsheet
+ */
+EditorActions.addSheet = function(numBeats) {
+    var sheet = this._show.addSheet(numBeats);
+    this.loadSheet(sheet);
+    return {
+        undo: function() {
+            this._show.removeSheet(sheet);
+            if (this._activeSheet === sheet) {
+                this.loadSheet(this._show.getSheets()[0]);
+            } else {
+                this.refresh();
+            }
+        },
+    };
+};
+
+EditorController.prototype._actions = EditorActions;
 
 /**** HELPERS ****/
 
 /**
- * Parses the given function name according to menus.py
+ * Get the action represented by the given parameter
  *
  * Overriding ApplicationController's _getAction to allow looking up
- * actions in the active Context
+ * methods in EditorActions and the active Context.
  *
- * @param {string} name -- the function name, optionally with arguments
+ * @param {string} name -- the function name (see _parseAction)
  * @return {object} an object of the form
  *   {
  *       context: object,
  *       function: function,
- *       args: Array<string|float>,
+ *       args: Array|null,
+ *       canUndo: boolean,
  *   }
  */
 EditorController.prototype._getAction = function(name) {
-    try {
-        var action = ApplicationController.prototype._getAction.call(this, name);
-        action.context = this;
+    var data = this._parseAction(name);
+
+    var getAction = function(context, container, canUndo) {
+        var action = container[data.name];
+        if (typeof action === "function") {
+            return {
+                context: context,
+                function: action,
+                args: data.args,
+                canUndo: canUndo,
+            };
+        }
+    };
+
+    var action = (
+        getAction(this, this, false) ||
+        getAction(this, this._actions, true) ||
+        getAction(this._context, this._context, false) ||
+        getAction(this._context, this._context.actions, true)
+    );
+
+    if (action === undefined) {
+        throw new errors.ActionError("No action with the name: " + data.name);
+    } else {
         return action;
-    } catch (e) {
-        if (!(e instanceof errors.ActionError)) {
-            throw e;
-        }
-
-        var _function = this._context[e.data.name];
-        if (_function === undefined) {
-            throw new errors.ActionError("No action with the name: " + e.data.name, e.data);
-        }
-
-        return {
-            context: this._context,
-            function: _function,
-            args: e.data.args,
-        };
     }
 };
 
@@ -504,11 +502,7 @@ EditorController.prototype._getAction = function(name) {
  */
 EditorController.prototype._getShortcut = function(shortcut) {
     var action = ApplicationController.prototype._getShortcut.call(this, shortcut);
-    if (action === undefined) {
-        return this._context.shortcuts[shortcut];
-    } else {
-        return action;
-    }
+    return action || this._context.shortcuts[shortcut];
 };
 
 module.exports = EditorController;

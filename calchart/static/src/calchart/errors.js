@@ -18,11 +18,9 @@ var JSUtils = require("utils/JSUtils");
  * An error regarding ApplicationController actions
  *
  * @param {string} message -- the error message
- * @param {object} data -- any additional data to store
  */
-var ActionError = function(message, data) {
+var ActionError = function(message) {
     this.message = message;
-    this.data = data;
 };
 JSUtils.extends(ActionError, Error);
 

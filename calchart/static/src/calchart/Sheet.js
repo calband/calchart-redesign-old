@@ -308,6 +308,15 @@ Sheet.prototype.removeContinuity = function(dotType, continuity) {
 };
 
 /**
+ * Updates the index of the Sheet
+ *
+ * @param {int} index -- the index to set
+ */
+Sheet.prototype.setIndex = function(index) {
+    this._index = index;
+};
+
+/**
  * Update the movements for the given dots
  *
  * @param {string|Dot|Array<Dot>} dots -- the dots to update movements for, as either

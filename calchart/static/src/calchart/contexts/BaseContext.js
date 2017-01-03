@@ -19,6 +19,11 @@ var BaseContext = function(controller) {
 // Maps BaseContext constructor names to whether they've been initialized yet
 BaseContext.prototype._initialized = {};
 
+/**** INSTANCE METHODS ****/
+
+// Methods that modify the Show that can be undone/redone
+BaseContext.prototype.actions = {};
+
 // Shortcuts that the user can press to run actions in the EditorController
 BaseContext.prototype.shortcuts = {};
 
