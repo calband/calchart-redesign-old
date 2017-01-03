@@ -164,14 +164,10 @@ FountainGridContinuity.prototype.popupHTML = function() {
     };
 };
 
-FountainGridContinuity.prototype.savePopup = function(data, $continuity) {
+FountainGridContinuity.prototype.savePopup = function(data) {
     this._end = data.end;
     this._step = data.step_type;
     this._orientation = data.orientation;
-
-    $continuity.find("select")
-        .val(data.end)
-        .trigger("chosen:updated");
 };
 
 module.exports = FountainGridContinuity;

@@ -12,6 +12,7 @@
 var ApplicationController = require("calchart/ApplicationController");
 var Context = require("calchart/Context");
 var Dot = require("calchart/Dot");
+var errors = require("calchart/errors");
 var Grapher = require("calchart/Grapher");
 var HTMLBuilder = require("utils/HTMLBuilder");
 var JSUtils = require("utils/JSUtils");
@@ -58,23 +59,20 @@ EditorController.prototype.init = function() {
         drawDotType: true,
     };
     this._grapher = new Grapher(this._show, $(".grapher-draw-target"), grapherOptions);
-    this._grapher.drawField();
 
     $(".content .sidebar").on("click", ".stuntsheet", function() {
-        _this.loadSheet(this);
+        var sheet = $(this).data("sheet");
+        _this.loadSheet(sheet);
     });
 
-    var sheets = this._show.getSheets();
-    for (var i = 0; i < sheets.length; i++) {
-        this._addStuntsheetToSidebar(sheets[i]);
-    }
-
-
-    if (sheets.length > 0) {
-        this.loadSheet($(".sidebar .stuntsheet").first());
-    }
-
     this.loadContext("dot");
+
+    var sheets = this._show.getSheets();
+    if (sheets.length > 0) {
+        this.loadSheet(sheets[0]);
+    } else {
+        this.refresh();
+    }
 };
 
 /**** INSTANCE METHODS ****/
@@ -108,6 +106,40 @@ EditorController.prototype.getCurrentBeat = function() {
  */
 EditorController.prototype.getGrapher = function() {
     return this._grapher;
+};
+
+/**
+ * Refresh the UI according to the current state of the editor
+ * and Show
+ */
+EditorController.prototype.refresh = function() {
+    // refresh sidebar
+    $(".sidebar").empty();
+    this._show.getSheets().forEach(function(sheet) {
+        var label = HTMLBuilder.span(sheet.getLabel(), "label");
+        var preview = HTMLBuilder.make("svg.preview");
+
+        var $sheet = HTMLBuilder
+            .div("stuntsheet", [label, preview], ".sidebar")
+            .data("sheet", sheet);
+
+        if (sheet === this._activeSheet) {
+            $sheet
+                .addClass("active")
+                .scrollToView({
+                    margin: 10,
+                });
+        }
+    }, this);
+
+    // refresh grapher
+    if (this._activeSheet) {
+        this._grapher.draw(this._activeSheet, this._currBeat);
+    } else {
+        this._grapher.drawField();
+    }
+
+    this._context.refresh();
 };
 
 /**** ACTIONS
@@ -156,8 +188,7 @@ EditorController.prototype.addStuntsheet = function() {
 
             // add sheet
             var sheet = _this._show.addSheet(data.num_beats);
-            var stuntsheet = _this._addStuntsheetToSidebar(sheet);
-            _this.loadSheet(stuntsheet);
+            _this.loadSheet(sheet);
 
             UIUtils.hidePopup(popup);
         },
@@ -279,7 +310,7 @@ EditorController.prototype.doAction = function(name, asRedo) {
  */
 EditorController.prototype.firstBeat = function() {
     this._currBeat = 0;
-    this.refreshGrapher();
+    this.refresh();
 };
 
 /**
@@ -287,7 +318,7 @@ EditorController.prototype.firstBeat = function() {
  */
 EditorController.prototype.lastBeat = function() {
     this._currBeat = this._activeSheet.getDuration();
-    this.refreshGrapher();
+    this.refresh();
 };
 
 /**
@@ -308,45 +339,20 @@ EditorController.prototype.loadContext = function(name) {
  * Load the given stuntsheet, either a stuntsheet in the sidebar
  * or a Sheet object
  *
- * @param {Sheet|jQuery} sheet -- the sheet to load
+ * @param {jQuery} sheet -- the sheet to load
  */
 EditorController.prototype.loadSheet = function(sheet) {
-    var $sheet = $(sheet);
-    if (sheet instanceof Sheet) {
-        $(".sidebar .stuntsheet").each(function() {
-            var _sheet = $(this).data("sheet");
-            if (_sheet === sheet) {
-                $sheet = $(this);
-                return false;
-            }
-        });
-    } else {
-        sheet = $sheet.data("sheet");
-    }
-
     // only load if the sheet isn't already loaded
     if (sheet === this._activeSheet) {
         return;
     }
 
-    // update sidebar
-    $(".sidebar .active").removeClass("active");
-    $sheet
-        .addClass("active")
-        .scrollToView({
-            margin: 10,
-        });
-
-    // update instance variables
+    // update state
     this._activeSheet = sheet;
     this._currBeat = 0;
-
-    // load sheet into necessary objects
     this._show.loadSheet(sheet);
-    this._grapher.draw(sheet);
-    if (this._context) {
-        this._context.loadSheet(sheet);
-    }
+
+    this.refresh();
 
     // disable continuity context if sheet is the last sheet
     if (sheet.isLastSheet()) {
@@ -366,7 +372,7 @@ EditorController.prototype.nextBeat = function() {
     if (this._currBeat > duration) {
         this._currBeat = duration;
     } else {
-        this.refreshGrapher();
+        this.refresh();
     }
 };
 
@@ -379,7 +385,7 @@ EditorController.prototype.prevBeat = function() {
     if (this._currBeat < 0) {
         this._currBeat = 0;
     } else {
-        this.refreshGrapher();
+        this.refresh();
     }
 };
 
@@ -400,14 +406,6 @@ EditorController.prototype.redo = function() {
     }
 
     this._undoHistory.push(actionData);
-};
-
-/**
- * Redraw the Grapher with the currently active stuntsheet and
- * current beat
- */
-EditorController.prototype.refreshGrapher = function() {
-    this._grapher.draw(this._activeSheet, this._currBeat);
 };
 
 /**
@@ -438,7 +436,6 @@ EditorController.prototype.saveShow = function(callback) {
  */
 EditorController.prototype.setBeat = function(beat) {
     this._currBeat = beat;
-    this.refreshGrapher();
 };
 
 /**
@@ -466,25 +463,6 @@ EditorController.prototype.undo = function() {
 /**** HELPERS ****/
 
 /**
- * Add the given Sheet to the sidebar
- *
- * @param {Sheet} sheet -- the Sheet to add
- * @return {jQuery} the stuntsheet added to the sidebar
- */
-EditorController.prototype._addStuntsheetToSidebar = function(sheet) {
-    // containers for elements in sidebar
-    var label = HTMLBuilder.make("span.label");
-    var preview = HTMLBuilder.make("svg.preview");
-
-    var stuntsheet = HTMLBuilder
-        .div("stuntsheet", [label, preview], ".sidebar")
-        .data("sheet", sheet);
-
-    this._updateSidebar(stuntsheet);
-    return stuntsheet;
-};
-
-/**
  * Parses the given function name according to menus.py
  *
  * Overriding ApplicationController's _getAction to allow looking up
@@ -499,25 +477,26 @@ EditorController.prototype._addStuntsheetToSidebar = function(sheet) {
  *   }
  */
 EditorController.prototype._getAction = function(name) {
-    var action = this._parseAction(name);
-    var context = this;
+    try {
+        var action = ApplicationController.prototype._getAction.call(this, name);
+        action.context = this;
+        return action;
+    } catch (e) {
+        if (!(e instanceof errors.ActionError)) {
+            throw e;
+        }
 
-    var _function = this[action.name];
-    // try looking in the context
-    if (_function === undefined) {
-        _function = this._context[action.name];
-        context = this._context;
-    }
-    // action not found in controller or context
-    if (_function === undefined) {
-        throw new Error("No action with the name: " + action.name);
-    }
+        var _function = this._context[e.data.name];
+        if (_function === undefined) {
+            throw new errors.ActionError("No action with the name: " + e.data.name, e.data);
+        }
 
-    return {
-        context: context,
-        function: _function,
-        args: action.args,
-    };
+        return {
+            context: this._context,
+            function: _function,
+            args: e.data.args,
+        };
+    }
 };
 
 /**
@@ -530,32 +509,6 @@ EditorController.prototype._getShortcut = function(shortcut) {
     } else {
         return action;
     }
-};
-
-/**
- * Update the given stuntsheet in the sidebar. If no stuntsheet is given,
- * updates every stuntsheet in the sidebar. Use this function when needing
- * to relabel stuntsheets (after reordering) or when a stuntsheet's formation
- * changes.
- *
- * @param {jQuery|undefined} stuntsheet -- the stuntsheet to update in the sidebar
- */
-EditorController.prototype._updateSidebar = function(stuntsheet) {
-    if (stuntsheet === undefined) {
-        var stuntsheets = $(".sidebar .stuntsheet");
-    } else {
-        var stuntsheets = $(stuntsheet);
-    }
-
-    var show = this._show;
-    stuntsheets.each(function() {
-        var sheet = $(this).data("sheet");
-
-        var label = sheet.getLabel(show);
-        $(this).find("span.label").text(label);
-
-        // TODO: update preview
-    });
 };
 
 module.exports = EditorController;

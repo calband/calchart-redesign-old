@@ -15,9 +15,21 @@
 var JSUtils = require("utils/JSUtils");
 
 /**
+ * An error regarding ApplicationController actions
+ *
+ * @param {string} message -- the error message
+ * @param {object} data -- any additional data to store
+ */
+var ActionError = function(message, data) {
+    this.message = message;
+    this.data = data;
+};
+JSUtils.extends(ActionError, Error);
+
+/**
  * An error thrown in the context of animating a show
  *
- * @param {string} message -- the message to display
+ * @param {string} message -- the error message
  */
 var AnimationStateError = function(message) {
     this.message = message;
@@ -36,6 +48,7 @@ var NotImplementedError = function(obj) {
 JSUtils.extends(NotImplementedError, Error);
 
 module.exports = {
+    ActionError: ActionError,
     AnimationStateError: AnimationStateError,
     NotImplementedError: NotImplementedError,
 };

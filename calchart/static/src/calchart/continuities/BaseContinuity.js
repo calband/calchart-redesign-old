@@ -63,10 +63,8 @@ BaseContinuity.prototype.popupHTML = function() {
  * Update this continuity when saving the Edit Continuity popup
  *
  * @param {object} data -- the popup data
- * @param {jQuery} $continuity -- the item in the Edit Continuity panel that
- *   represents this continuity
  */
-BaseContinuity.prototype.savePopup = function(data, $continuity) {
+BaseContinuity.prototype.savePopup = function(data) {
     throw new errors.NotImplementedError(this);
 };
 
@@ -80,7 +78,7 @@ BaseContinuity.prototype.savePopup = function(data, $continuity) {
  */
 BaseContinuity.prototype._updateMovements = function(controller) {
     this._sheet.updateMovements(this._dotType);
-    controller.refreshGrapher();
+    controller.refresh();
 };
 
 /**

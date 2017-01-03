@@ -30,12 +30,10 @@ BaseContext.prototype.load = function() {
 };
 
 /**
- * Updates the active sheet
- *
- * @param {Sheet} sheet -- the sheet to load
+ * Refreshes the UI according to the state of the controller and context
  */
-BaseContext.prototype.loadSheet = function(sheet) {
-    this._sheet = sheet;
+BaseContext.prototype.refresh = function() {
+    this._sheet = this._controller.getActiveSheet();
 };
 
 /**

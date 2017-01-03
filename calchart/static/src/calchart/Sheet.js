@@ -349,6 +349,8 @@ Sheet.prototype.updateMovements = function(dots) {
  * Update the position of the corresponding Dot for the given dot
  *
  * @param {jQuery} dot -- the HTML representation of the dot
+ * @param {int} x -- the x-coordinate of the new position, in steps
+ * @param {int} y -- the y-coordinate of the new position, in steps
  */
 Sheet.prototype.updatePosition = function(dot, x, y) {
     var label = $(dot).data("dot").getLabel();

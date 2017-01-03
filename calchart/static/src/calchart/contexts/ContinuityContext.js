@@ -21,16 +21,17 @@ var ContinuityContext = function(controller) {
 JSUtils.extends(ContinuityContext, BaseContext);
 
 ContinuityContext.prototype.shortcuts = {
-    "left": "prevContinuityBeat",
-    "right": "nextContinuityBeat",
-    "down": "firstContinuityBeat",
-    "up": "lastContinuityBeat",
+    "left": "prevBeat",
+    "right": "nextBeat",
+    "down": "firstBeat",
+    "up": "lastBeat",
 };
 
 ContinuityContext.prototype.load = function() {
     var _this = this;
 
     this._panel.show();
+    this._controller.setBeat(0);
     this._updatePanel();
 
     this._addEvents(window, {
@@ -60,60 +61,30 @@ ContinuityContext.prototype.load = function() {
     this._setupSeek(".toolbar .seek");
 };
 
-ContinuityContext.prototype.loadSheet = function(sheet) {
-    if (sheet.isLastSheet()) {
+ContinuityContext.prototype.refresh = function() {
+    BaseContext.prototype.refresh.call(this);
+
+    if (this._sheet.isLastSheet()) {
         this._controller.loadContext("dot");
+        return;
     }
 
-    BaseContext.prototype.loadSheet.call(this, sheet);
-
     this._updatePanel();
-    this._updateSeek();
+
+    // update seek bar
+    var beat = this._controller.getCurrentBeat();
+    var numBeats = this._sheet.getDuration();
+    var interval = $(".toolbar .seek").width() / numBeats;
+
+    $(".toolbar .seek .marker").css("transform", "translateX(" + (interval * beat) + "px)");
 };
 
 ContinuityContext.prototype.unload = function() {
     this._panel.hide();
     this._removeEvents(window, document, ".toolbar .seek");
 
-    this._controller.setBeat(0);
-    this._updateSeek();
-
     $(".toolbar .edit-continuity").removeClass("active");
     $(".toolbar .edit-continuity-group").addClass("hide");
-};
-
-/**** ACTIONS ****/
-
-/**
- * Increments the beat and updates the seek bar
- */
-ContinuityContext.prototype.firstContinuityBeat = function() {
-    this._controller.firstBeat();
-    this._updateSeek();
-};
-
-/**
- * Decrements the beat and updates the seek bar
- */
-ContinuityContext.prototype.lastContinuityBeat = function() {
-    this._controller.lastBeat();
-    this._updateSeek();
-};
-
-/**
- * Increments the beat and updates the seek bar
- */
-ContinuityContext.prototype.nextContinuityBeat = function() {
-    this._controller.nextBeat();
-    this._updateSeek();
-};
-
-/**
- * Decrements the beat and updates the seek bar
- */
-ContinuityContext.prototype.prevContinuityBeat = function() {
-    this._controller.prevBeat();
-    this._updateSeek();
 };
 
 /**** HELPERS ****/
@@ -172,8 +143,7 @@ ContinuityContext.prototype._init = function() {
         });
 
     this._panel.on("click", ".continuity .edit", function() {
-        var $continuity = $(this).parents(".continuity");
-        var continuity = $continuity.data("continuity");
+        var continuity = $(this).parents(".continuity").data("continuity");
         var html = continuity.popupHTML();
 
         UIUtils.showPopup("edit-continuity", {
@@ -187,7 +157,7 @@ ContinuityContext.prototype._init = function() {
             },
             onSubmit: function(popup) {
                 var data = UIUtils.getData(popup);
-                continuity.savePopup(data, $continuity);
+                continuity.savePopup(data);
 
                 var dotType = _this._panel.find(".dot-types li.active").data("dotType");
                 _this._sheet.updateMovements(dotType);
@@ -196,6 +166,7 @@ ContinuityContext.prototype._init = function() {
                     quiet: true,
                 });
                 UIUtils.hidePopup(popup);
+                _this.refresh();
             },
         });
     });
@@ -237,7 +208,7 @@ ContinuityContext.prototype._setupSeek = function(seek) {
         // don't redraw screen if the beat didn't change
         if (x !== prev) {
             _this._controller.setBeat(beat);
-            _this._updateSeek();
+            _this._controller.refresh();
         }
     };
 
@@ -285,19 +256,6 @@ ContinuityContext.prototype._updatePanel = function() {
     });
 
     this._changeTab(this._panel.find(".dot-types li:first"));
-};
-
-/**
- * Update the seek bar with the current beat. The left-most position is
- * beat 0 and the right-most position is the duration of the sheet, i.e.
- * beat 0 of the next stunt sheet.
- */
-ContinuityContext.prototype._updateSeek = function() {
-    var beat = this._controller.getCurrentBeat();
-    var numBeats = this._sheet.getDuration();
-    var interval = $(".toolbar .seek").width() / numBeats;
-
-    $(".toolbar .seek .marker").css("transform", "translateX(" + (interval * beat) + "px)");
 };
 
 module.exports = ContinuityContext;

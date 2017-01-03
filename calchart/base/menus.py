@@ -270,9 +270,9 @@ editor_toolbar = Toolbar(
     ),
     ToolbarContextGroup(
         'edit-continuity',
-        ToolbarItem('Previous Beat', 'chevron-left', 'prevContinuityBeat'),
+        ToolbarItem('Previous Beat', 'chevron-left', 'prevBeat'),
         CustomToolbarItem('Seek', '<span class="bar"></span><span class="marker"></span>'),
-        ToolbarItem('Next Beat', 'chevron-right', 'nextContinuityBeat'),
+        ToolbarItem('Next Beat', 'chevron-right', 'nextBeat'),
         ToolbarItem('Check Continuities', 'check', 'checkContinuities'),
     ),
 )

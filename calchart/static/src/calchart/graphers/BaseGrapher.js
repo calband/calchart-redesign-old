@@ -115,6 +115,20 @@ BaseGrapher.prototype.getDots = function() {
 };
 
 /**
+ * Get the position of the given dot, in pixel coordinates
+ *
+ * @param {jQuery} dot -- the Dot to get the position of in the stunt sheet
+ * @return {object} the coordinates of the dot, in pixels
+ */
+BaseGrapher.prototype.getPosition = function(dot) {
+    var position = $(dot).data("dot").getFirstPosition();
+    return {
+        x: this._scale.toDistance(position.x) + this._scale.minX,
+        y: this._scale.toDistance(position.y) + this._scale.minY,
+    };
+};
+
+/**
  * Get the GrapherScale this Grapher is using
  *
  * @return {GrapherScale} the scale of the Grapher field
@@ -128,8 +142,8 @@ BaseGrapher.prototype.getScale = function() {
  *   did not call savePosition)
  */
 BaseGrapher.prototype.hasMoved = function(dot) {
-    var oldPosition = $(dot).data("position");
-    var newPosition = this._parsePosition(dot);
+    var oldPosition = this.getPosition(dot);
+    var newPosition = $(dot).data("position");
     return oldPosition.x !== newPosition.x || oldPosition.y !== newPosition.y;
 };
 
@@ -140,35 +154,18 @@ BaseGrapher.prototype.hasMoved = function(dot) {
  * @param {jQuery} dot -- the dot to move
  * @param {float} x -- the x-coordinate of the dot's position, in pixels
  * @param {float} y -- the y-coordinate of the dot's position, in pixels
- * @param {object|undefined} options -- options for moving the dot, including
- *   the following options:
- *     - {boolean} transition -- true if this is a transitionary movement (so
- *       don't save position)
  */
-BaseGrapher.prototype.moveDot = function(dot, x, y, options) {
-    options = options || {};
-
+BaseGrapher.prototype.moveDot = function(dot, x, y) {
     // contain dot in workspace
     x = MathUtils.bound(x, 0, this._svgWidth);
     y = MathUtils.bound(y, 0, this._svgHeight);
 
-    $(dot).attr("transform", "translate(" + x + "," + y + ")");
-
-    if (!options.transition) {
-        this.savePosition(dot);
-    }
-};
-
-/**
- * Save the given dot's position
- *
- * @param {jQuery} dot -- the dot whose position should be saved
- * @return {object} the position of the dot
- */
-BaseGrapher.prototype.savePosition = function(dot) {
-    var position = this._parsePosition(dot);
-    $(dot).data("position", position);
-    return position;
+    $(dot)
+        .attr("transform", "translate(" + x + "," + y + ")")
+        .data("position", {
+            x: x,
+            y: y,
+        });
 };
 
 /**
@@ -317,19 +314,6 @@ BaseGrapher.prototype._drawDots = function(currentBeat, selectedDots) {
 
         _this.moveDot($(dotGroup[0]), x, y);
     });
-};
-
-/**
- * @param {jQuery} dot -- the dot to parse position of
- * @return {object} position of the dot, parsed from its transform
- *   attribute, in the form {x:x, y:y}
- */
-BaseGrapher.prototype._parsePosition = function(dot) {
-    var match = $(dot).attr("transform").match(/translate\(([\d\.]+),([\d\.]+)\)/);
-    return {
-        x: parseFloat(match[1]),
-        y: parseFloat(match[2]),
-    };
 };
 
 module.exports = BaseGrapher;

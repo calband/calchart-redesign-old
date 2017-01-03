@@ -137,15 +137,8 @@ DotContext.prototype.load = function() {
         mouseup: function() {
             switch (dragState) {
                 case "drag":
-                    var hasMoved = false;
-                    _this._selectedDots.each(function() {
-                        if (_this._grapher.hasMoved(this)) {
-                            hasMoved = true;
-                            // break loop
-                            return false;
-                        }
-                    });
-                    if (hasMoved) {
+                    var dot = _this._selectedDots.first();
+                    if (_this._grapher.hasMoved(dot)) {
                         _this._controller.doAction("saveSelectionPositions");
                     }
                     break;
@@ -162,8 +155,8 @@ DotContext.prototype.load = function() {
     $(".toolbar .edit-dots-group").removeClass("hide");
 };
 
-DotContext.prototype.loadSheet = function(sheet) {
-    BaseContext.prototype.loadSheet.call(this, sheet);
+DotContext.prototype.refresh = function() {
+    BaseContext.prototype.refresh.call(this);
     this.selectDots(this._selectedDots);
 };
 
@@ -185,11 +178,7 @@ DotContext.prototype.unload = function() {
 DotContext.prototype.changeDotType = function(dotType) {
     var selected = this._getSelected();
     this._sheet.changeDotTypes(selected, dotType);
-
-    var selectedLabels = selected.map(function(dot) {
-        return dot.getLabel();
-    });
-    this._grapher.draw(this._sheet, 0, selectedLabels);
+    this._controller.refresh();
 };
 
 /**
@@ -202,11 +191,8 @@ DotContext.prototype.deselectDots = function(dots) {
         dots = this._selectedDots;
     }
 
-    dots.each(function() {
-        var classes = $(this).attr("class").replace(/selected/g, "").trim();
-        $(this).attr("class", classes);
-    });
     this._selectedDots = this._selectedDots.not(dots);
+    this._controller.refresh();
 };
 
 /**
@@ -217,9 +203,6 @@ DotContext.prototype.deselectDots = function(dots) {
  */
 DotContext.prototype.moveSelection = function(deltaX, deltaY) {
     var _this = this;
-    var options = {
-        transition: true,
-    };
 
     var prevScroll = {
         top: $(".workspace").scrollTop(),
@@ -228,12 +211,11 @@ DotContext.prototype.moveSelection = function(deltaX, deltaY) {
 
     this._selectedDots
         .each(function() {
-            var position = $(this).data("position");
+            var position = _this._grapher.getPosition(this);
             _this._grapher.moveDot(
                 this,
                 position.x + deltaX + scrollOffset.left,
-                position.y + deltaY + scrollOffset.top,
-                options
+                position.y + deltaY + scrollOffset.top
             );
         })
         .scrollToView(".workspace", {
@@ -274,15 +256,15 @@ DotContext.prototype.saveSelectionPositions = function() {
         // for undo/redo-ing
         var dotData = {
             selector: "#" + $(this).attr("id"),
-            before: $(this).data("position"),
+            before: _this._grapher.getPosition(this),
         };
 
-        var position = _this._grapher.savePosition(this);
+        var position = $(this).data("position");
         var x = scale.toSteps(position.x - scale.minX);
         var y = scale.toSteps(position.y - scale.minY);
         _this._sheet.updatePosition(this, x, y);
 
-        dotData.after = $(this).data("position");
+        dotData.after = _this._grapher.getPosition(this);
         dotsData.push(dotData);
     });
 

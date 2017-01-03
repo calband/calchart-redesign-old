@@ -130,13 +130,12 @@ StopContinuity.prototype.popupHTML = function() {
     };
 };
 
-StopContinuity.prototype.savePopup = function(data, $continuity) {
+StopContinuity.prototype.savePopup = function(data) {
     this._orientation = data.orientation;
 
     if (this._marktime) {
         this._duration = data.duration;
         this._stepType = data.stepType;
-        $continuity.find("input").val(data.duration);
     }
 };
 

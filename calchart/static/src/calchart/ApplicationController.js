@@ -9,6 +9,7 @@
  * - Helpers (prefixed with an underscore)
  */
 
+var errors = require("calchart/errors");
 var HTMLBuilder = require("utils/HTMLBuilder");
 var JSUtils = require("utils/JSUtils");
 
@@ -164,7 +165,7 @@ ApplicationController.prototype._getAction = function(name) {
 
     var _function = this[action.name];
     if (_function === undefined) {
-        throw new Error("No action with the name: " + action.name);
+        throw new errors.ActionError("No action with the name: " + action.name, action);
     }
 
     return {
@@ -286,7 +287,7 @@ ApplicationController.prototype._setupToolbar = function(toolbar) {
             }
         })
         .mouseup(function() {
-            if ($(this).hasClass("disabled")) {
+            if (!$(this).hasClass("focus")) {
                 return;
             }
 
