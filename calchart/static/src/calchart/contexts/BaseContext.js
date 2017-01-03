@@ -1,3 +1,5 @@
+var errors = require("calchart/errors");
+
 /**
  * Subclasses of this class define how the mouse cursor interacts with
  * the editor application.
@@ -24,7 +26,7 @@ BaseContext.prototype.shortcuts = {};
  * Runs any actions to initialize this context
  */
 BaseContext.prototype.load = function() {
-    throw new Error(this.constructor.name + " did not define load");
+    throw new errors.NotImplementedError(this);
 };
 
 /**

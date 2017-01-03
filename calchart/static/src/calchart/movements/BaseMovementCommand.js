@@ -1,4 +1,5 @@
 var Coordinate = require("calchart/Coordinate");
+var errors = require("calchart/errors");
 
 /**
  * Represents an individual movement that a dot executes during a
@@ -27,7 +28,7 @@ var BaseMovementCommand = function(startX, startY, endX, endY, duration) {
  * @return {object} a JSON object containing this MovementCommand's data
  */
 BaseMovementCommand.prototype.serialize = function() {
-    throw new Error(this.constructor.name + " did not define serialize");
+    throw new errors.NotImplementedError(this);
 };
 
 /**
@@ -36,7 +37,7 @@ BaseMovementCommand.prototype.serialize = function() {
  * @return {Coordinate} the position where the movement begins
  */
 BaseMovementCommand.prototype.getStartPosition = function() {
-        return new Coordinate(this._startX, this._startY);
+    return new Coordinate(this._startX, this._startY);
 };
 
 /**
@@ -79,7 +80,7 @@ BaseMovementCommand.prototype.getOrientation = function() {
  *   returns null.
  */
 BaseMovementCommand.prototype.getAnimationState = function(beatNum) {
-    throw new Error(this.constructor.name + " did not define getAnimationState");
+    throw new errors.NotImplementedError(this);
 };
 
 /**
@@ -89,7 +90,7 @@ BaseMovementCommand.prototype.getAnimationState = function(beatNum) {
  * @return {string} the text displayed for this movement
  */
 BaseMovementCommand.prototype.getContinuityText = function() {
-    throw new Error(this.constructor.name + " did not define getContinuityText");
+    throw new errors.NotImplementedError(this);
 };
 
 module.exports = BaseMovementCommand;

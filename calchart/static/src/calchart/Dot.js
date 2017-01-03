@@ -1,4 +1,5 @@
 var AnimationState = require("./AnimationState");
+var errors = require("calchart/errors");
 
 /**
  * A Dot object contains all the data for a marcher in a Show, containing the
@@ -114,7 +115,9 @@ Dot.prototype.getAnimationState = function(beatNum, sheet) {
         }
     }
 
-    throw new Error("Ran out of movements for " + this._label + ": " + remaining + " beats remaining");
+    throw new errors.AnimationStateError(
+        "Ran out of movements for " + this._label + ": " + remaining + " beats remaining"
+    );
 };
 
 /**

@@ -1,3 +1,5 @@
+var util = require("util");
+
 /**
  * A collection of Javascript utility/helper functions.
  */
@@ -19,12 +21,7 @@ JSUtils.empty = function(array) {
  *   from another.
  * @param {function} ParentClass The class to inherit from.
  */
-JSUtils.extends = function(ChildClass, ParentClass) {
-    var Inheritor = function() {}; // dummy constructor
-    Inheritor.prototype = ParentClass.prototype;
-    ChildClass.prototype = new Inheritor();
-    ChildClass.prototype.constructor = ChildClass;
-};
+JSUtils.extends = util.inherits;
 
 /**
  * Convert the given string from camel case into a capitalized string.

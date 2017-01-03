@@ -1,3 +1,4 @@
+var errors = require("calchart/errors");
 var HTMLBuilder = require("utils/HTMLBuilder");
 
 /**
@@ -22,7 +23,7 @@ var BaseContinuity = function(sheet, dotType) {
  * @return {object} a JSON object containing this Continuity's data
  */
 BaseContinuity.prototype.serialize = function() {
-    throw new Error(this.constructor.name + " did not define serialize");
+    throw new errors.NotImplementedError(this);
 };
 
 /**** INSTANCE METHODS ****/
@@ -38,7 +39,7 @@ BaseContinuity.prototype.serialize = function() {
  * @return {Array<MovementCommand>} the movements to do for the dot
  */
 BaseContinuity.prototype.getMovements = function(dot, data) {
-    throw new Error(this.constructor.name + " did not define getMovements");
+    throw new errors.NotImplementedError(this);
 };
 
 /**
@@ -46,7 +47,7 @@ BaseContinuity.prototype.getMovements = function(dot, data) {
  * @return {jQuery} the HTML element to add to the Edit Continuity panel
  */
 BaseContinuity.prototype.panelHTML = function(controller) {
-    throw new Error(this.constructor.name + " did not define panelHTML");
+    throw new errors.NotImplementedError(this);
 };
 
 /**
@@ -55,7 +56,7 @@ BaseContinuity.prototype.panelHTML = function(controller) {
  *   - {Array<jQuery>} fields -- the fields to add to the form
  */
 BaseContinuity.prototype.popupHTML = function() {
-    throw new Error(this.constructor.name + " did not define popupHTML");
+    throw new errors.NotImplementedError(this);
 };
 
 /**
@@ -66,7 +67,7 @@ BaseContinuity.prototype.popupHTML = function() {
  *   represents this continuity
  */
 BaseContinuity.prototype.savePopup = function(data, $continuity) {
-    throw new Error(this.constructor.name + " did not define savePopup");
+    throw new errors.NotImplementedError(this);
 };
 
 /**** HELPERS ****/

@@ -10,6 +10,7 @@
  */
 
 var CalchartUtils = require("utils/CalchartUtils");
+var errors = require("calchart/errors");
 var GrapherScale = require("calchart/GrapherScale");
 var MathUtils = require("utils/MathUtils");
 
@@ -60,7 +61,7 @@ BaseGrapher.prototype.FIELD_WIDTH = null;
  * should implement this function to draw common field attributes
  */
 BaseGrapher.prototype.drawField = function() {
-    throw new Error("BaseGrapher subclasses need to implement _drawField");
+    throw new errors.NotImplementedError(this);
 };
 
 /**** INSTANCE METHODS ****/
