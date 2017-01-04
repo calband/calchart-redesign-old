@@ -358,7 +358,7 @@ EditorController.prototype.refresh = function() {
         if (sheet === this._activeSheet) {
             $sheet
                 .addClass("active")
-                .scrollToView({
+                .scrollIntoView({
                     margin: 10,
                 });
         }

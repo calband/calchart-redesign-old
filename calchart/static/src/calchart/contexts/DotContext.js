@@ -212,7 +212,8 @@ DotContext.prototype.getSelected = function() {
 };
 
 /**
- * Move all selected dots the given amount
+ * Move all selected dots the given amount, from the dot's initial
+ * position (i.e. from the position as stored in the Sheet)
  *
  * @param {float} deltaX -- the amount to move in the x direction, in pixels
  * @param {float} deltaY -- the amount to move in the y direction, in pixels
@@ -220,26 +221,17 @@ DotContext.prototype.getSelected = function() {
 DotContext.prototype.moveSelection = function(deltaX, deltaY) {
     var _this = this;
 
-    var prevScroll = {
-        top: $(".workspace").scrollTop(),
-        left: $(".workspace").scrollLeft(),
-    };
-
     this._selectedDots
         .each(function() {
-            var position = _this._grapher.getPosition(this);
-            _this._grapher.moveDot(
-                this,
-                position.x + deltaX,
-                position.y + deltaY
-            );
+            _this._grapher.moveDot(this, deltaX, deltaY);
         })
-        .scrollToView(".workspace", {
+        .scrollIntoView(".workspace", {
             tolerance: 10,
+            callback: function(deltaX, deltaY) {
+                _this._scrollOffset.top += deltaY;
+                _this._scrollOffset.left += deltaX;
+            },
         });
-
-    this._scrollOffset.top += $(".workspace").scrollTop() - prevScroll.top;
-    this._scrollOffset.left += $(".workspace").scrollLeft() - prevScroll.left;
 };
 
 /**

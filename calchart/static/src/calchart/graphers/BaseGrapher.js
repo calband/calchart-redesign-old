@@ -138,14 +138,26 @@ BaseGrapher.prototype.getScale = function() {
 };
 
 /**
- * Moves the given dot to the given coordinates, which either represent the
- * center of the dot or the top-left corner of the dot.
+ * Moves the given dot with the given change in position from the dot's
+ * initial position
+ *
+ * @param {jQuery} dot -- the dot to move
+ * @param {float} deltaX -- the change in the x-direction, in pixels
+ * @param {float} deltaY -- the change in the y-direction, in pixels
+ */
+BaseGrapher.prototype.moveDot = function(dot, deltaX, deltaY) {
+    var position = this.getPosition(dot);
+    this.moveDotTo(dot, position.x + deltaX, position.y + deltaY);
+};
+
+/**
+ * Moves the given dot to the given coordinates
  *
  * @param {jQuery} dot -- the dot to move
  * @param {float} x -- the x-coordinate of the dot's position, in pixels
  * @param {float} y -- the y-coordinate of the dot's position, in pixels
  */
-BaseGrapher.prototype.moveDot = function(dot, x, y) {
+BaseGrapher.prototype.moveDotTo = function(dot, x, y) {
     // contain dot in workspace
     x = MathUtils.bound(x, 0, this._svgWidth);
     y = MathUtils.bound(y, 0, this._svgHeight);
@@ -294,7 +306,7 @@ BaseGrapher.prototype._drawDots = function(currentBeat, selectedDots) {
             dotLabel.attr("x", offsetX).attr("y", offsetY);
         }
 
-        _this.moveDot($(dotGroup[0]), x, y);
+        _this.moveDotTo($(dotGroup[0]), x, y);
     });
 };
 

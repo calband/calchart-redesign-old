@@ -1,3 +1,5 @@
+var MathUtils = require("./MathUtils");
+
 /**
  * Contains functions to add to the jQuery API. Maps name of function to the function.
  */
@@ -59,8 +61,10 @@ jQueryUtils.exists = function() {
  *     trigger scrolling, in pixels (default 0).
  *   - {int} margin -- the amount of space beyond the object to
  *     scroll (defaults to tolerance).
+ *   - {function} callback -- a callback function that takes in
+ *     the change in x/y positions
  */
-jQueryUtils.scrollToView = function(parent, options) {
+jQueryUtils.scrollIntoView = function(parent, options) {
     // in case passing in options, with default parent
     if (typeof parent === "object" && !(parent instanceof jQuery)) {
         options = parent;
@@ -72,6 +76,7 @@ jQueryUtils.scrollToView = function(parent, options) {
     var tolerance = options.tolerance || 0;
     var margin = options.margin || tolerance;
 
+    // top/left of the visible part of the parent
     var parentOffset = parent.offset();
     var parentHeight = parent.outerHeight();
     var parentWidth = parent.outerWidth();
@@ -113,20 +118,36 @@ jQueryUtils.scrollToView = function(parent, options) {
         scroll.right = Math.max(scroll.right, right);
     });
 
+    var deltaX = 0;
+    var deltaY = 0;
+
     if (scroll.top < tolerance && scroll.bottom > -tolerance) {
         // if elements hidden on both top and bottom, don't scroll
     } else if (scroll.top < tolerance) {
-        parent.scrollTop(parent.scrollTop() + scroll.top - margin);
+        deltaY = scroll.top - margin;
     } else if (scroll.bottom > -tolerance) {
-        parent.scrollTop(parent.scrollTop() + scroll.bottom + margin);
+        deltaY = scroll.bottom + margin;
     }
 
     if (scroll.left < tolerance && scroll.right > -tolerance) {
         // if elements hidden on both left and right, don't scroll
     } else if (scroll.left < tolerance) {
-        parent.scrollLeft(parent.scrollLeft() + scroll.left - margin);
+        deltaX = scroll.left - margin;
     } else if (scroll.right > -tolerance) {
-        parent.scrollLeft(parent.scrollLeft() + scroll.right + margin);
+        deltaX = scroll.right + margin;
+    }
+
+    var parentScroll = {
+        top: parent.scrollTop(),
+        left: parent.scrollLeft(),
+    };
+    var scrollY = MathUtils.bound(parentScroll.top + deltaY, 0, parent.prop("scrollHeight") - parentHeight);
+    var scrollX = MathUtils.bound(parentScroll.left + deltaX, 0, parent.prop("scrollWidth") - parentWidth);
+    parent.scrollTop(scrollY);
+    parent.scrollLeft(scrollX);
+
+    if (options.callback) {
+        options.callback(scrollX - parentScroll.left, scrollY - parentScroll.top);
     }
 };
 
