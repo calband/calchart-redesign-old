@@ -273,6 +273,7 @@ EditorController.prototype.loadContext = function(name) {
 
     $("body").addClass("context-" + name);
     this._context = Context.load(name, this);
+    this._context.refresh();
 };
 
 /**

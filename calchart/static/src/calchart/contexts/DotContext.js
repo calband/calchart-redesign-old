@@ -6,7 +6,6 @@
  * - Constructors (including loading/unloading functions)
  * - Instance methods
  * - Actions (methods that modify the Show)
- * - Helpers (prefixed with an underscore)
  */
 
 var BaseContext = require("./BaseContext");

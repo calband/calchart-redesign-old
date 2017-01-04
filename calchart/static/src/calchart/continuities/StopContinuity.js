@@ -130,13 +130,4 @@ StopContinuity.prototype.popupHTML = function() {
     };
 };
 
-StopContinuity.prototype.savePopup = function(data) {
-    this._orientation = data.orientation;
-
-    if (this._marktime) {
-        this._duration = data.duration;
-        this._stepType = data.stepType;
-    }
-};
-
 module.exports = StopContinuity;

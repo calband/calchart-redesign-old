@@ -107,7 +107,7 @@ ForwardContinuity.prototype.popupHTML = function() {
     var steps = HTMLBuilder.formfield("Number of steps", HTMLBuilder.input({
         type: "number",
         initial: this._numSteps,
-    }), "steps");
+    }), "numSteps");
 
     var direction = HTMLBuilder.formfield("Direction", HTMLBuilder.select({
         options: CalchartUtils.DIRECTIONS,
@@ -123,12 +123,6 @@ ForwardContinuity.prototype.popupHTML = function() {
         name: "Forward March",
         fields: [steps, direction, stepType],
     };
-};
-
-ForwardContinuity.prototype.savePopup = function(data) {
-    this._numSteps = data.steps;
-    this._direction = data.direction;
-    this._stepType = data.stepType;
 };
 
 module.exports = ForwardContinuity;

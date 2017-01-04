@@ -151,7 +151,7 @@ FountainGridContinuity.prototype.popupHTML = function() {
     var step = HTMLBuilder.formfield("Step Type", HTMLBuilder.select({
         options: CalchartUtils.STEP_TYPES,
         initial: this._step,
-    }));
+    }), "step");
 
     var orientation = HTMLBuilder.formfield("Final Orientation", HTMLBuilder.select({
         options: CalchartUtils.ORIENTATIONS,
@@ -162,12 +162,6 @@ FountainGridContinuity.prototype.popupHTML = function() {
         name: this._isEWNS ? "EWNS" : "NSEW",
         fields: [end, step, orientation],
     };
-};
-
-FountainGridContinuity.prototype.savePopup = function(data) {
-    this._end = data.end;
-    this._step = data.step_type;
-    this._orientation = data.orientation;
 };
 
 module.exports = FountainGridContinuity;

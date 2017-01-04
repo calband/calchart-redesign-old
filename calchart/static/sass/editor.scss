@@ -137,7 +137,7 @@ $sidebar-width: 200px;
         height: $panel-handle-height;
     }
     &.edit-continuity {
-        $panel-ec-actions-width: 32px;
+        $panel-ec-actions-width: 40px;
         width: 300px;
         background: $light-gray;
         .add-continuity {
@@ -169,10 +169,8 @@ $sidebar-width: 200px;
                     & > span {
                         margin-right: 20px;
                     }
-                    .panel-continuity-end {
-                        & > span {
-                            margin-right: 5px;
-                        }
+                    .panel-continuity-end > span {
+                        margin-right: 5px;
                     }
                     input.panel-continuity-duration {
                         width: 50px;
@@ -182,11 +180,15 @@ $sidebar-width: 200px;
                 .actions {
                     width: $panel-ec-actions-width;
                     i {
+                        margin: 0 2px;
                         cursor: pointer;
                         &.delete {
                             color: $red;
                         }
                     }
+                }
+                .chosen-container {
+                    text-align: center;
                 }
             }
         }

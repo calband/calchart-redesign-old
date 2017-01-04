@@ -53,7 +53,9 @@ BaseContinuity.prototype.panelHTML = function(controller) {
 /**
  * @return {object} data to populate the Edit Continuity popup, with the values:
  *   - {string} name -- the name of the continuity
- *   - {Array<jQuery>} fields -- the fields to add to the form
+ *   - {Array<jQuery>} fields -- the fields to add to the form. The fields need
+ *     to have their name match the instance variable, e.g. "orientation" for
+ *     this._orientation
  */
 BaseContinuity.prototype.popupHTML = function() {
     throw new errors.NotImplementedError(this);
@@ -63,9 +65,20 @@ BaseContinuity.prototype.popupHTML = function() {
  * Update this continuity when saving the Edit Continuity popup
  *
  * @param {object} data -- the popup data
+ * @return {object} the values that were changed, mapping name
+ *   of field to the old value
  */
 BaseContinuity.prototype.savePopup = function(data) {
-    throw new errors.NotImplementedError(this);
+    var _this = this;
+    var changed = {};
+    $.each(data, function(key, val) {
+        var old = _this["_" + key];
+        if (old !== val) {
+            changed[key] = old;
+            _this["_" + key] = val;
+        }
+    });
+    return changed;
 };
 
 /**** HELPERS ****/

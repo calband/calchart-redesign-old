@@ -1,9 +1,22 @@
+/**
+ * @fileOverview This file defines the DotContext class, the context
+ * used to edit dot positions for a stuntsheet. Functions in this file
+ * are organized alphabetically in the following sections:
+ *
+ * - Constructors (including loading/unloading functions)
+ * - Instance methods
+ * - Actions (methods that modify the Show)
+ * - Helpers (prefixed with an underscore)
+ */
+
 var BaseContext = require("./BaseContext");
 var Continuity = require("calchart/Continuity");
 var HTMLBuilder = require("utils/HTMLBuilder");
 var JSUtils = require("utils/JSUtils");
 var MathUtils = require("utils/MathUtils");
 var UIUtils = require("utils/UIUtils");
+
+/**** CONSTRUCTORS ****/
 
 /**
  * The default editor context, that allows a user to edit dot
@@ -32,7 +45,6 @@ ContinuityContext.prototype.load = function() {
 
     this._panel.show();
     this._controller.setBeat(0);
-    this._updatePanel();
 
     this._addEvents(window, {
         // always keep panel on screen
@@ -61,24 +73,6 @@ ContinuityContext.prototype.load = function() {
     this._setupSeek(".toolbar .seek");
 };
 
-ContinuityContext.prototype.refresh = function() {
-    BaseContext.prototype.refresh.call(this);
-
-    if (this._sheet.isLastSheet()) {
-        this._controller.loadContext("dot");
-        return;
-    }
-
-    this._updatePanel();
-
-    // update seek bar
-    var beat = this._controller.getCurrentBeat();
-    var numBeats = this._sheet.getDuration();
-    var interval = $(".toolbar .seek").width() / numBeats;
-
-    $(".toolbar .seek .marker").css("transform", "translateX(" + (interval * beat) + "px)");
-};
-
 ContinuityContext.prototype.unload = function() {
     this._panel.hide();
     this._removeEvents(window, document, ".toolbar .seek");
@@ -87,27 +81,139 @@ ContinuityContext.prototype.unload = function() {
     $(".toolbar .edit-continuity-group").addClass("hide");
 };
 
-/**** HELPERS ****/
+/**** INSTANCE METHODS ****/
 
-/**
- * Change the currently active dot type
- *
- * @param {jQuery} tab -- the tab for the dot type to select
- */
-ContinuityContext.prototype._changeTab = function(tab) {
-    var _this = this;
+ContinuityContext.prototype.refresh = function() {
+    BaseContext.prototype.refresh.call(this);
 
-    $(tab).addClass("active")
-        .siblings().removeClass("active");
+    if (this._sheet.isLastSheet()) {
+        this._controller.loadContext("dot");
+        return;
+    }
 
-    var continuities = this._panel.find(".continuities").empty();
-    var dotType = $(tab).data("dotType");
-    this._sheet.getContinuities(dotType).forEach(function(continuity) {
-        continuities.append(continuity.panelHTML(_this._controller));
+    // update tabs list in panel
+    var tabs = this._panel.find(".dot-types").empty();
+    var path = tabs.data("path");
+    $.each(this._sheet.getDotTypes(), function(i, dotType) {
+        var dot = HTMLBuilder.img(path.replace("DOT_TYPE", dotType));
+
+        HTMLBuilder.make("li.tab", tabs)
+            .addClass(dotType)
+            .append(dot)
+            .data("dotType", dotType);
     });
 
-    this._dotType = dotType;
+    // activate dot type tab
+    if (this._dotType === null) {
+        this._dotType = tabs.find("li.tab:first").data("dotType");
+    }
+    var tab = tabs.find("." + this._dotType).addClass("active");
+    var continuities = this._panel.find(".continuities").empty();
+    this._sheet.getContinuities(this._dotType).forEach(function(continuity) {
+        var continuityHTML = continuity.panelHTML(this._controller);
+        continuities.append(continuityHTML);
+    }, this);
+
+    // update seek bar
+    var beat = this._controller.getCurrentBeat();
+    var numBeats = this._sheet.getDuration();
+    var interval = $(".toolbar .seek").width() / numBeats;
+    $(".toolbar .seek .marker").css("transform", "translateX(" + (interval * beat) + "px)");
 };
+
+/**** ACTIONS ****/
+
+var ContextActions = {};
+
+/**
+ * Adds a continuity of the given type to the given sheet for the
+ * given dot type
+ *
+ * @param {string} type -- the type of Continuity to create (see
+ *   calchart/Continuity)
+ * @param {Sheet|undefined} sheet -- the sheet to add continuity to,
+ *   defaults to the currently active sheet
+ * @param {string|undefined} dotType -- the dot type to add continuity
+ *   for, defaults to the currently active dot type
+ */
+ContextActions.addContinuity = function(type, sheet, dotType) {
+    sheet = sheet || this._sheet;
+    dotType = dotType || this._dotType;
+
+    var continuity = new Continuity(type, sheet, dotType);
+    sheet.addContinuity(dotType, continuity);
+    this._controller.refresh();
+
+    return {
+        data: [type, sheet, dotType],
+        undo: function() {
+            sheet.removeContinuity(dotType, continuity);
+            this._controller.refresh();
+        },
+    };
+};
+
+/**
+ * Saves the given continuity in the given sheet for the given dot type
+ *
+ * @param {Continuity} continuity -- the Continuity to save
+ * @param {object} data -- the data to save
+ * @param {Sheet|undefined} sheet -- the sheet to add continuity to,
+ *   defaults to the currently active sheet
+ * @param {string|undefined} dotType -- the dot type to add continuity
+ *   for, defaults to the currently active dot type
+ */
+ContextActions.saveContinuity = function(continuity, data, sheet, dotType) {
+    sheet = sheet || this._sheet;
+    dotType = dotType || this._dotType;
+
+    var changed = continuity.savePopup(data);
+
+    sheet.updateMovements(dotType);
+    this._controller.checkContinuities({
+        dots: dotType,
+        quiet: true,
+    });
+    this._controller.refresh();
+
+    return {
+        data: [continuity, data, sheet, dotType],
+        undo: function() {
+            continuity.savePopup(changed);
+            sheet.updateMovements(dotType);
+            this._controller.refresh();
+        },
+    };
+};
+
+/**
+ * Removes the given continuity from the given sheet for the given dot type
+ *
+ * @param {Continuity} continuity -- the Continuity to remove
+ * @param {Sheet|undefined} sheet -- the sheet to remove continuity from,
+ *   defaults to the currently active sheet
+ * @param {string|undefined} dotType -- the dot type to remove continuity
+ *   for, defaults to the currently active dot type
+ */
+ContextActions.removeContinuity = function(continuity, sheet, dotType) {
+    sheet = sheet || this._sheet;
+    dotType = dotType || this._dotType;
+
+    sheet.removeContinuity(dotType, continuity);
+    this._controller.refresh();
+
+    return {
+        data: [continuity, sheet, dotType],
+        undo: function() {
+            sheet.addContinuity(dotType, continuity);
+            this._controller.refresh();
+        },
+    };
+};
+
+ContinuityContext.prototype.actions = ContextActions;
+
+/**** HELPERS ****/
 
 /**
  * Initialize the continuity panel and toolbar
@@ -115,17 +221,19 @@ ContinuityContext.prototype._changeTab = function(tab) {
 ContinuityContext.prototype._init = function() {
     var _this = this;
 
-    // Continuity panel
-
+    // setup continuity panel
     UIUtils.setupPanel(this._panel, {
         bottom: 20,
         right: 20,
     });
 
+    // changing tabs
     this._panel.on("click", ".tab", function() {
-        _this._changeTab(this);
+        _this._dotType = $(this).data("dotType");
+        _this.refresh();
     });
 
+    // add continuity dropdown
     this._panel
         .find(".add-continuity select")
         .dropdown({
@@ -133,15 +241,12 @@ ContinuityContext.prototype._init = function() {
             disable_search_threshold: false,
         })
         .change(function() {
-            var continuity = new Continuity($(this).val(), _this._sheet, _this._dotType);
-            var dotType = _this._panel.find(".dot-types li.active").data("dotType");
-
-            _this._sheet.addContinuity(dotType, continuity);
-            _this._panel.find(".continuities").append(continuity.panelHTML(_this._controller));
-
+            var type = $(this).val();
+            _this._controller.doAction("addContinuity", [type]);
             $(this).val("").trigger("chosen:updated");
         });
 
+    // edit continuity popup
     this._panel.on("click", ".continuity .edit", function() {
         var continuity = $(this).parents(".continuity").data("continuity");
         var html = continuity.popupHTML();
@@ -157,27 +262,16 @@ ContinuityContext.prototype._init = function() {
             },
             onSubmit: function(popup) {
                 var data = UIUtils.getData(popup);
-                continuity.savePopup(data);
-
-                var dotType = _this._panel.find(".dot-types li.active").data("dotType");
-                _this._sheet.updateMovements(dotType);
-                _this._controller.checkContinuities({
-                    dots: dotType,
-                    quiet: true,
-                });
+                _this._controller.doAction("saveContinuity", [continuity, data]);
                 UIUtils.hidePopup(popup);
-                _this.refresh();
             },
         });
     });
 
+    // remove continuity link
     this._panel.on("click", ".continuity .delete", function() {
-        var elem = $(this).parents(".continuity");
-        var continuity = elem.data("continuity");
-        elem.remove();
-
-            var dotType = _this._panel.find(".dot-types li.active").data("dotType");
-        _this._sheet.removeContinuity(dotType, continuity);
+        var continuity = $(this).parents(".continuity").data("continuity");
+        _this._controller.doAction("removeContinuity", [continuity]);
     });
 };
 
@@ -236,26 +330,6 @@ ContinuityContext.prototype._setupSeek = function(seek) {
             isDrag = false;
         },
     });
-};
-
-/**
- * Updates the panel with information from the currently active
- * sheet
- */
-ContinuityContext.prototype._updatePanel = function() {
-    var _this = this;
-    var tabs = this._panel.find(".dot-types").empty();
-    var path = tabs.data("path");
-
-    $.each(this._sheet.getDotTypes(), function(i, dotType) {
-        var dot = HTMLBuilder.img(path.replace("DOT_TYPE", dotType));
-
-        HTMLBuilder.make("li.tab", tabs)
-            .append(dot)
-            .data("dotType", dotType);
-    });
-
-    this._changeTab(this._panel.find(".dot-types li:first"));
 };
 
 module.exports = ContinuityContext;
