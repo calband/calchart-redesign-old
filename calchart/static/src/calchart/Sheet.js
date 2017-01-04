@@ -355,15 +355,14 @@ Sheet.prototype.updateMovements = function(dots) {
 };
 
 /**
- * Update the position of the corresponding Dot for the given dot
+ * Update the position of the given Dot
  *
- * @param {jQuery} dot -- the HTML representation of the dot
+ * @param {Dot} dot -- the dot to update positions for
  * @param {int} x -- the x-coordinate of the new position, in steps
  * @param {int} y -- the y-coordinate of the new position, in steps
  */
 Sheet.prototype.updatePosition = function(dot, x, y) {
-    var label = $(dot).data("dot").getLabel();
-    var coordinate = this._dots[label].position;
+    var coordinate = this._dots[dot.getLabel()].position;
     coordinate.x = x;
     coordinate.y = y;
 };

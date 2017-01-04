@@ -90,19 +90,10 @@ Dot.prototype.loadSheet = function(sheet) {
  *   defaulting to the currently loaded stuntsheet
  * @return {AnimationState} An AnimationState that describes the Dot at
  *   a moment of the show. If the Dot has no position at the specified beat,
- *   returns null.
+ *   throws an AnimationStateError.
  */
 Dot.prototype.getAnimationState = function(beatNum, sheet) {
-    if (sheet === undefined) {
-        if (this._sheetInfo) {
-            var movements = this._sheetInfo.movements;
-        } else {
-            return;
-        }
-    } else {
-        var movements = sheet.getInfoForDot(this._label).movements;
-    }
-
+    var movements = this.getSheetInfo(sheet).movements;
     var remaining = beatNum;
 
     for (var i = 0; i < movements.length; i++) {
@@ -123,41 +114,57 @@ Dot.prototype.getAnimationState = function(beatNum, sheet) {
 /**
  * Return the dot's dot type for the currently loaded stuntsheet
  *
+ * @param {Sheet|undefined} sheet -- the sheet to get dot type in,
+ *   defaulting to the currently loaded stuntsheet
  * @return {string} the dot type for the current stuntsheet
  */
-Dot.prototype.getDotType = function() {
-    if (this._sheetInfo) {
-        return this._sheetInfo.type;
-    }
+Dot.prototype.getDotType = function(sheet) {
+    return this.getSheetInfo(sheet).type;
 };
 
 /**
  * Get the position of the dot at the beginning of the currently loaded stuntsheet
  *
+ * @param {Sheet|undefined} sheet -- the sheet to get the position of the dot in,
+ *   defaulting to the currently loaded stuntsheet
  * @return {Coordinate} the initial position of the dot
  */
-Dot.prototype.getFirstPosition = function() {
-    if (this._sheetInfo) {
-        return this._sheetInfo.position;
-    }
+Dot.prototype.getFirstPosition = function(sheet) {
+    return this.getSheetInfo(sheet).position;
 }
 
 /**
  * Get the position of the dot at the end of the currently loaded stuntsheet
  *
+ * @param {Sheet|undefined} sheet -- the sheet to get the position of the dot in,
+ *   defaulting to the currently loaded stuntsheet
  * @return {Coordinate} the final position of the dot
  */
-Dot.prototype.getLastPosition = function() {
-    if (!this._sheetInfo) {
-        return;
-    }
-
-    var movements = this._sheetInfo.movements;
+Dot.prototype.getLastPosition = function(sheet) {
+    var sheetInfo = this.getSheetInfo(sheet);
+    var movements = sheetInfo.movements;
     if (movements.length === 0) {
-        return this._sheetInfo.position;
+        return sheetInfo.position;
     } else {
         return movements[movements.length - 1].getEndPosition();
     }
 }
+
+/**
+ * Get the info for this dot in the given sheet.
+ *
+ * @param {Sheet|undefined} sheet -- the sheet to get the info in. Defaults
+ *   to the currently loaded stuntsheet
+ * @return {object} the info for this dot in the given sheet
+ */
+Dot.prototype.getSheetInfo = function(sheet) {
+    if (sheet) {
+        return sheet.getInfoForDot(this);
+    } else if (this._sheetInfo) {
+        return this._sheetInfo;
+    } else {
+        throw new Error("No sheet is currently loaded");
+    }
+};
 
 module.exports = Dot;

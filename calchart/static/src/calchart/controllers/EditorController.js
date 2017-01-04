@@ -62,7 +62,11 @@ EditorController.prototype.init = function() {
 
     $(".content .sidebar").on("click", ".stuntsheet", function() {
         var sheet = $(this).data("sheet");
-        _this.loadSheet(sheet);
+
+        // only load if the sheet isn't already loaded
+        if (sheet !== this._activeSheet) {
+            _this.loadSheet(sheet);
+        }
     });
 
     this.loadContext("dot");
@@ -205,8 +209,12 @@ EditorController.prototype.doAction = function(name, args) {
     var data = action.function.apply(action.context, action.args);
 
     if (action.canUndo) {
-        data = $.extend(data, action);
-        this._undoHistory.push(data);
+        var actionData = $.extend({}, data, action);
+        // if data was returned from the action, use it for redos instead
+        // of the initial args
+        actionData.args = data.data || action.args;
+        this._undoHistory.push(actionData);
+
         // after doing an action, can't redo previous actions
         JSUtils.empty(this._redoHistory);
     }
@@ -274,11 +282,6 @@ EditorController.prototype.loadContext = function(name) {
  * @param {jQuery} sheet -- the sheet to load
  */
 EditorController.prototype.loadSheet = function(sheet) {
-    // only load if the sheet isn't already loaded
-    if (sheet === this._activeSheet) {
-        return;
-    }
-
     // update state
     this._activeSheet = sheet;
     this._currBeat = 0;
@@ -329,12 +332,12 @@ EditorController.prototype.redo = function() {
         return;
     }
 
-    var data = this._redoHistory.pop();
-    newData = data.function.apply(data.context, data.args);
-    // update the undo function
-    data.undo = newData.undo;
+    var actionData = this._redoHistory.pop();
+    newData = actionData.function.apply(actionData.context, actionData.args);
+    // update undo function
+    actionData.undo = newData.undo;
 
-    this._undoHistory.push(data);
+    this._undoHistory.push(actionData);
 };
 
 /**
@@ -409,9 +412,9 @@ EditorController.prototype.undo = function() {
         return;
     }
 
-    var data = this._undoHistory.pop();
-    data.undo.apply(data.context, data.args);
-    this._redoHistory.push(data);
+    var actionData = this._undoHistory.pop();
+    actionData.undo.apply(actionData.context);
+    this._redoHistory.push(actionData);
 };
 
 /**** ACTIONS ****/
@@ -421,6 +424,8 @@ EditorController.prototype.undo = function() {
  * the Show and can be undone/redone. All actions must return an object containing:
  *   - {function} undo -- the function that will undo this action. `this` will be
  *     set to the EditorController instance
+ *   - {undefined|object} data -- optional data to pass to the redo function. Defaults
+ *     to any arguments initially passed to the function
  *   - {undefined|string} label -- optional label to use for the Undo/Redo menu item.
  *     Defaults to the name of the action, capitalized and spaced out
  *
@@ -440,11 +445,7 @@ EditorActions.addSheet = function(numBeats) {
     return {
         undo: function() {
             this._show.removeSheet(sheet);
-            if (this._activeSheet === sheet) {
-                this.loadSheet(this._show.getSheets()[0]);
-            } else {
-                this.refresh();
-            }
+            this.loadSheet(this._show.getSheets()[0]);
         },
     };
 };

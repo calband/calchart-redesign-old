@@ -215,7 +215,8 @@ ApplicationController.prototype._parseAction = function(name) {
     if (match[2]) {
         // split args and try to parse numbers
         actionArgs = $.map(match[3].split(/,\s*/), function(arg) {
-            return parseFloat(arg) || arg;
+            var num = parseFloat(arg);
+            return isNaN(num) ? arg : num;
         });
     }
 

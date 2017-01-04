@@ -1,14 +1,20 @@
+/**
+ * @fileOverview This file defines the DotContext class, the context
+ * used to edit dot positions for a stuntsheet. Functions in this file
+ * are organized alphabetically in the following sections:
+ *
+ * - Constructors (including loading/unloading functions)
+ * - Instance methods
+ * - Actions (methods that modify the Show)
+ * - Helpers (prefixed with an underscore)
+ */
+
 var BaseContext = require("./BaseContext");
 var HTMLBuilder = require("utils/HTMLBuilder");
 var JSUtils = require("utils/JSUtils");
 var MathUtils = require("utils/MathUtils");
 
-// Global variable to track how much the workspace has scrolled
-// when moving the dots
-var scrollOffset = {
-    top: 0,
-    left: 0,
-};
+/**** CONSTRUCTORS ****/
 
 /**
  * The default editor context, that allows a user to select dots with a rectangular
@@ -24,25 +30,22 @@ var DotContext = function(controller) {
 
     // number of steps to snap dots to when dragging: null, 1, 2, 4
     this._grid = 2;
+
+    // variables to track state when dragging dots
+    this._scrollOffset = {};
+    this._moveOffset = {};
 };
 
 JSUtils.extends(DotContext, BaseContext);
-
-DotContext.prototype.shortcuts = {
-    "ctrl+a": "selectAll",
-    "left": "nudgeDots(-1, 0)",
-    "up": "nudgeDots(0, -1)",
-    "right": "nudgeDots(1, 0)",
-    "down": "nudgeDots(0, 1)",
-};
 
 DotContext.prototype.load = function() {
     var _this = this;
     var svgOrigin = $("svg.graph").position();
     var scale = this._grapher.getScale();
 
+    // variables to track state when dragging dots
     var dragState = "none"; // none, drag, select
-    var dragStart = null; // event object on mousedown
+    var dragStart = null;
 
     this._addEvents(".workspace", {
         contextmenu: function(e) {
@@ -58,13 +61,21 @@ DotContext.prototype.load = function() {
 
                 if (e.shiftKey || e.ctrlKey || e.metaKey) {
                     _this.toggleDots(dot);
-                } else if (!_this._selectedDots.filter(dot).exists()) {
+                    this._dragState = "none";
+                    return;
+                }
+
+                if (!_this._selectedDots.filter(dot).exists()) {
                     _this.selectDots(dot, {
                         append: false,
                     });
                 }
 
                 dragState = "drag";
+                _this._scrollOffset.top = 0;
+                _this._scrollOffset.left = 0;
+                _this._moveOffset.x = 0;
+                _this._moveOffset.y = 0;
             } else {
                 _this.deselectDots();
                 HTMLBuilder.div("selection-box", null, "body");
@@ -91,9 +102,11 @@ DotContext.prototype.load = function() {
                     // snap deltaX and deltaY to grid; dots can themselves be off
                     // the grid, but they move in a consistent interval
                     var snap = scale.toDistance(_this._grid);
-                    deltaX = MathUtils.round(deltaX, snap);
-                    deltaY = MathUtils.round(deltaY, snap);
+                    deltaX = MathUtils.round(_this._scrollOffset.left + deltaX, snap);
+                    deltaY = MathUtils.round(_this._scrollOffset.top + deltaY, snap);
                     _this.moveSelection(deltaX, deltaY);
+                    _this._moveOffset.x = deltaX;
+                    _this._moveOffset.y = deltaY;
                     break;
                 case "select":
                     // relative to page
@@ -104,6 +117,7 @@ DotContext.prototype.load = function() {
                     var maxX = minX + width;
                     var maxY = minY + height;
 
+                    // update dimensions of the selection box
                     $(".selection-box").css({
                         top: minY,
                         left: minX,
@@ -117,6 +131,7 @@ DotContext.prototype.load = function() {
                     maxX -= svgOrigin.left;
                     maxY -= svgOrigin.top;
 
+                    // select dots within the selection box
                     _this.deselectDots();
                     _this._grapher.getDots().each(function() {
                         var dot = $(this);
@@ -130,17 +145,17 @@ DotContext.prototype.load = function() {
                             _this.selectDots(dot);
                         }
                     });
-
-                    break;
             }
         },
         mouseup: function() {
             switch (dragState) {
                 case "drag":
-                    var dot = _this._selectedDots.first();
-                    if (_this._grapher.hasMoved(dot)) {
-                        _this._controller.doAction("saveSelectionPositions");
+                    if (_this._moveOffset.x === 0 && _this._moveOffset.y === 0) {
+                        break;
                     }
+                    var deltaX = scale.toSteps(_this._moveOffset.x);
+                    var deltaY = scale.toSteps(_this._moveOffset.y);
+                    _this._controller.doAction("moveDots", [deltaX, deltaY]);
                     break;
                 case "select":
                     $(".selection-box").remove();
@@ -155,11 +170,6 @@ DotContext.prototype.load = function() {
     $(".toolbar .edit-dots-group").removeClass("hide");
 };
 
-DotContext.prototype.refresh = function() {
-    BaseContext.prototype.refresh.call(this);
-    this.selectDots(this._selectedDots);
-};
-
 DotContext.prototype.unload = function() {
     this._removeEvents(document, ".workspace");
     this.deselectDots();
@@ -168,17 +178,14 @@ DotContext.prototype.unload = function() {
     $(".toolbar .edit-dots-group").addClass("hide");
 };
 
-/**** ACTIONS ****/
+/**** INSTANCE METHODS ****/
 
-/**
- * Changes the currently selected dots' dot type to the given dot type
- *
- * @param {string} dotType -- the dot type to change to
- */
-DotContext.prototype.changeDotType = function(dotType) {
-    var selected = this._getSelected();
-    this._sheet.changeDotTypes(selected, dotType);
-    this._controller.refresh();
+DotContext.prototype.shortcuts = {
+    "ctrl+a": "selectAll",
+    "left": "nudgeDots(-1, 0)",
+    "up": "nudgeDots(0, -1)",
+    "right": "nudgeDots(1, 0)",
+    "down": "nudgeDots(0, 1)",
 };
 
 /**
@@ -193,6 +200,15 @@ DotContext.prototype.deselectDots = function(dots) {
 
     this._selectedDots = this._selectedDots.not(dots);
     this._controller.refresh();
+};
+
+/**
+ * @return {Array<Dot>} the selected dots as Dot objects
+ */
+DotContext.prototype.getSelected = function() {
+    return this._selectedDots.map(function() {
+        return $(this).data("dot");
+    }).toArray();
 };
 
 /**
@@ -214,16 +230,16 @@ DotContext.prototype.moveSelection = function(deltaX, deltaY) {
             var position = _this._grapher.getPosition(this);
             _this._grapher.moveDot(
                 this,
-                position.x + deltaX + scrollOffset.left,
-                position.y + deltaY + scrollOffset.top
+                position.x + deltaX,
+                position.y + deltaY
             );
         })
         .scrollToView(".workspace", {
             tolerance: 10,
         });
 
-    scrollOffset.top += $(".workspace").scrollTop() - prevScroll.top;
-    scrollOffset.left += $(".workspace").scrollLeft() - prevScroll.left;
+    this._scrollOffset.top += $(".workspace").scrollTop() - prevScroll.top;
+    this._scrollOffset.left += $(".workspace").scrollLeft() - prevScroll.left;
 };
 
 /**
@@ -233,75 +249,15 @@ DotContext.prototype.moveSelection = function(deltaX, deltaY) {
  * @param {int} deltaY -- the amount to move in the y direction, in steps
  */
 DotContext.prototype.nudgeDots = function(deltaX, deltaY) {
-    var scale = this._grapher.getScale();
-    deltaX = scale.toDistance(deltaX);
-    deltaY = scale.toDistance(deltaY);
-    this.moveSelection(deltaX, deltaY);
-    this._controller.doAction("saveSelectionPositions");
+    this._controller.doAction("moveDots", [deltaX, deltaY]);
 };
 
 /**
- * Save the positions of all selected dots, both in the Grapher and in the
- * Sheet, and updates the movements for the dots in both this Sheet and
- * the previous Sheet.
+ * Refreshes the UI according to the state of the controller and context
  */
-DotContext.prototype.saveSelectionPositions = function() {
-    var _this = this;
-    var scale = this._grapher.getScale();
-    var dotsData = [];
-
-    // save positions
-
-    this._selectedDots.each(function() {
-        // for undo/redo-ing
-        var dotData = {
-            selector: "#" + $(this).attr("id"),
-            before: _this._grapher.getPosition(this),
-        };
-
-        var position = $(this).data("position");
-        var x = scale.toSteps(position.x - scale.minX);
-        var y = scale.toSteps(position.y - scale.minY);
-        _this._sheet.updatePosition(this, x, y);
-
-        dotData.after = _this._grapher.getPosition(this);
-        dotsData.push(dotData);
-    });
-
-    scrollOffset.top = 0;
-    scrollOffset.left = 0;
-
-    // update movements
-
-    var dots = this._getSelected();
-    this._sheet.updateMovements(dots);
-    this._controller.checkContinuities({
-        dots: dots,
-        sheet: this._sheet,
-        quiet: true,
-    });
-
-    var prevSheet = this._sheet.getPrevSheet();
-    if (prevSheet) {
-        prevSheet.updateMovements(dots);
-        this._controller.checkContinuities({
-            dots: dots,
-            sheet: prevSheet,
-            quiet: true,
-        });
-    }
-
-    return {
-        dots: dotsData,
-        sheet: this._sheet,
-    };
-};
-DotContext.prototype.saveSelectionPositions._name = "Move dots";
-DotContext.prototype.saveSelectionPositions._undo = function(data) {
-    this._revertMoveDots(data, true);
-};
-DotContext.prototype.saveSelectionPositions._redo = function(data) {
-    this._revertMoveDots(data, false);
+DotContext.prototype.refresh = function() {
+    BaseContext.prototype.refresh.call(this);
+    this.selectDots(this._selectedDots);
 };
 
 /**
@@ -345,51 +301,110 @@ DotContext.prototype.toggleDots = function(dots, options) {
     this.deselectDots(deselect);
 };
 
-/**** HELPERS ****/
+/**** ACTIONS ****/
+
+var ContextActions = {};
 
 /**
- * @return {Array<Dot>} the selected dots as Dot objects
- */
-DotContext.prototype._getSelected = function() {
-    return this._selectedDots.map(function() {
-        return $(this).data("dot");
-    }).toArray();
-};
-
-/**
- * A helper function to revert saveSelectionPositions (both for undo or redo),
- * since undo-ing should actually also revert moving the dots (not just saving
- * the positions).
+ * Changes the currently selected dots' dot type to the given dot type
  *
- * @param {object} data -- the data returned from saveSelectionPositions
- * @param {boolean} isUndo -- true to undo the function, false to redo
+ * @param {string} dotType -- the dot type to change to
+ * @param {Sheet|undefined} sheet -- the sheet to change dot types for.
+ *   Defaults to the current sheet
  */
-DotContext.prototype._revertMoveDots = function(data, isUndo) {
-    var selectedDots = $();
-    var scale = this._grapher.getScale();
-    this._controller.loadSheet(data.sheet);
+ContextActions.changeDotType = function(dotType, sheet) {
+    sheet = sheet || this._sheet;
 
-    data.dots.forEach(function(dot) {
-        var elem = $(dot.selector);
-        var position = isUndo ? dot.before : dot.after;
+    var selected = this.getSelected();
+    var oldTypes = {};
 
-        this._grapher.moveDot(elem, position.x, position.y);
+    selected.forEach(function(dot) {
+        var dotType = dot.getDotType(sheet);
+        if (oldTypes[dotType] === undefined) {
+            oldTypes[dotType] = [];
+        }
+        oldTypes[dotType].push(dot);
+    });
 
-        var x = scale.toSteps(position.x - scale.minX);
-        var y = scale.toSteps(position.y - scale.minY);
-        data.sheet.updatePosition(elem, x, y);
+    sheet.changeDotTypes(selected, dotType);
+    this._controller.loadSheet(sheet);
 
-        selectedDots = selectedDots.add(elem);
-    }, this);
-
-    var dots = this._getSelected();
-    this._sheet.updateMovements(dots);
-    var prevSheet = this._sheet.getPrevSheet();
-    if (prevSheet) {
-        prevSheet.updateMovements(dots);
-    }
-    
-    this._selectedDots = selectedDots;
+    return {
+        data: [dotType, sheet],
+        undo: function() {
+            $.each(oldTypes, function(dotType, dots) {
+                sheet.changeDotTypes(dots, dotType);
+            });
+            this._controller.loadSheet(sheet);
+        },
+    };
 };
+
+/**
+ * Move the given dots a given distance
+ *
+ * @param {float} deltaX -- the distance to move the dots in the
+ *   x-direction, in steps
+ * @param {float} deltaY -- the distance to move the dots in the
+ *   y-direction, in steps
+ * @param {Sheet|undefined} sheet -- the sheet to move dots for. Defaults
+ *   to the currently loaded stunt sheet
+ * @param {Array<Dot>|undefined} dots -- the dots to move. Defaults to the
+ *   currently selected dots
+ */
+ContextActions.moveDots = function(deltaX, deltaY, sheet, dots) {
+    sheet = sheet || this._sheet;
+    dots = dots || this.getSelected();
+    var prevPositions = {};
+
+    // update positions
+
+    dots.forEach(function(dot) {
+        var position = dot.getFirstPosition(sheet);
+        // copy position
+        prevPositions[dot.getLabel()] = $.extend({}, position);
+        sheet.updatePosition(dot, position.x + deltaX, position.y + deltaY);
+    });
+
+    // update movements
+
+    var controller = this._controller;
+    var _updateMovements = function() {
+        sheet.updateMovements(dots);
+        controller.checkContinuities({
+            dots: dots,
+            sheet: sheet,
+            quiet: true,
+        });
+
+        var prevSheet = sheet.getPrevSheet();
+        if (prevSheet) {
+            prevSheet.updateMovements(dots);
+            controller.checkContinuities({
+                dots: dots,
+                sheet: prevSheet,
+                quiet: true,
+            });
+        }
+    };
+    _updateMovements();
+
+    // refresh
+    controller.loadSheet(sheet);
+
+    return {
+        data: [deltaX, deltaY, sheet, dots],
+        undo: function() {
+            dots.forEach(function(dot) {
+                var position = prevPositions[dot.getLabel()];
+                sheet.updatePosition(dot, position.x, position.y);
+            });
+            _updateMovements();
+            controller.loadSheet(sheet);
+        },
+    };
+};
+
+DotContext.prototype.actions = ContextActions;
 
 module.exports = DotContext;

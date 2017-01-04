@@ -138,16 +138,6 @@ BaseGrapher.prototype.getScale = function() {
 };
 
 /**
- * @return {boolean} true if the dot has moved (i.e. called moveDot, but
- *   did not call savePosition)
- */
-BaseGrapher.prototype.hasMoved = function(dot) {
-    var oldPosition = this.getPosition(dot);
-    var newPosition = $(dot).data("position");
-    return oldPosition.x !== newPosition.x || oldPosition.y !== newPosition.y;
-};
-
-/**
  * Moves the given dot to the given coordinates, which either represent the
  * center of the dot or the top-left corner of the dot.
  *
