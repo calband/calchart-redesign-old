@@ -238,7 +238,7 @@ ContinuityContext.prototype._init = function() {
             var val = $(this).attr("value");
             var li = HTMLBuilder.li($(this).text())
                 .click(function() {
-                    $(select).val(val);
+                    $(select).val(val).change();
                 })
                 .appendTo(dropdown);
         });

@@ -61,7 +61,7 @@ StopContinuity.prototype.serialize = function() {
 /**** INSTANCE METHODS ****/
 
 StopContinuity.prototype.getMovements = function(dot, data) {
-    if (this._marktime) {
+    if (this._marktime && this._duration !== null) {
         var duration = this._duration;
     } else {
         var duration = data.remaining;
@@ -89,23 +89,39 @@ StopContinuity.prototype.panelHTML = function(controller) {
     var _this = this;
 
     if (!this._marktime) {
+        // close
         var label = HTMLBuilder.span("Close");
         return this._wrapPanel("close", [label]);
+    } else if (this._duration === null) {
+        // mark time remaining
+        var label = HTMLBuilder.span("MTRM");
+
+        var orientation = HTMLBuilder.select({
+            options: CalchartUtils.ORIENTATIONS,
+            change: function() {
+                _this._orientation = $(this).val();
+                _this._updateMovements(controller);
+            },
+            initial: this._orientation,
+        });
+
+        return this._wrapPanel("mtrm", [label, orientation]);
+    } else {
+        // mark time for a duration
+        var label = HTMLBuilder.span("MT");
+
+        var duration = HTMLBuilder.input({
+            class: "panel-continuity-duration",
+            type: "number",
+            initial: this._duration,
+            change: function() {
+                _this._duration = JSUtils.validatePositive(this);
+                _this._updateMovements(controller);
+            },
+        });
+
+        return this._wrapPanel("mt", [label, duration]);
     }
-
-    var label = HTMLBuilder.span("MT");
-
-    var duration = HTMLBuilder.input({
-        class: "panel-continuity-duration",
-        type: "number",
-        initial: this._duration,
-        change: function() {
-            _this._duration = JSUtils.validatePositive(this);
-            _this._updateMovements(controller);
-        },
-    });
-
-    return this._wrapPanel("mt", [label, duration]);
 };
 
 StopContinuity.prototype.popupHTML = function() {
@@ -131,9 +147,15 @@ StopContinuity.prototype.popupHTML = function() {
         initial: this._stepType,
     }));
 
+    var fields = [duration, orientation, stepType];
+
+    if (this._duration === null) {
+        fields.splice(0, 1);
+    }
+
     return {
-        name: "Mark Time",
-        fields: [duration, orientation, stepType],
+        name: this._duration === null ? "Mark Time Remaining" : "Mark Time",
+        fields: fields,
     };
 };
 
