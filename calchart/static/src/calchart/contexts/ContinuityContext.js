@@ -227,6 +227,49 @@ ContinuityContext.prototype._init = function() {
         right: 20,
     });
 
+    // different dropdowns; chosen doesn't render outside of scroll overflow
+    this._panel.on("mousedown", "select", function(e) {
+        e.preventDefault();
+
+        var select = this;
+        var dropdown = HTMLBuilder.make("ul.panel-dropdown", "body");
+
+        $(this).children().each(function() {
+            var val = $(this).attr("value");
+            var li = HTMLBuilder.li($(this).text())
+                .click(function() {
+                    $(select).val(val);
+                })
+                .appendTo(dropdown);
+        });
+
+        var offset = $(this).offset();
+        var selected = $(this).children(":selected");
+        // move dropdown so mouse starts on selected option
+        offset.top -= selected.index() * dropdown.children(":first").outerHeight();
+        dropdown
+            .css({
+                top: offset.top,
+                left: offset.left,
+                width: $(this).outerWidth(),
+            });
+
+        // make sure dropdown does not go off screen
+        var top = dropdown.offset().top;
+        if (top < 0) {
+            dropdown.css("top", 0);
+        }
+        var max = $(window).height() - dropdown.outerHeight();
+        if (top > max) {
+            dropdown.css("top", max);
+        }
+    });
+    $(window).click(function(e) {
+        if (!$(e.target).is(".panel select")) {
+            $(".panel-dropdown").remove();
+        }
+    });
+
     // changing tabs
     this._panel.on("click", ".tab", function() {
         _this._dotType = $(this).data("dotType");

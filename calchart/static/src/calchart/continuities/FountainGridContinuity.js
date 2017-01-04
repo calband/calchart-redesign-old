@@ -125,7 +125,7 @@ FountainGridContinuity.prototype.panelHTML = function(controller) {
 
     var label = HTMLBuilder.span(type);
 
-    var endLabel = HTMLBuilder.span("End:");
+    var endLabel = HTMLBuilder.label("End:");
     var endChoices = HTMLBuilder.select({
         options: CalchartUtils.ENDINGS,
         change: function() {
@@ -134,12 +134,8 @@ FountainGridContinuity.prototype.panelHTML = function(controller) {
         },
         initial: this._end,
     });
-    var end = HTMLBuilder.div("panel-continuity-end", [endLabel, endChoices]);
-    endChoices.dropdown({
-        width: 110,
-    });
 
-    return this._wrapPanel(type, [label, end]);
+    return this._wrapPanel(type, [label, endLabel, endChoices]);
 };
 
 FountainGridContinuity.prototype.popupHTML = function() {

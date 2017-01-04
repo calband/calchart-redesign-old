@@ -121,6 +121,20 @@ HTMLBuilder.input = function() {
 };
 
 /**
+ * Builds a <label> element
+ *
+ * @param {string} text -- the text to show in the element
+ * @param {string} class -- the class to add to the element
+ */
+HTMLBuilder.label = function() {
+    var args = JSUtils.parseArgs(arguments, ["text", "class"]);
+
+    return $("<label>")
+        .text(args.text)
+        .addClass(args.class);
+};
+
+/**
  * Builds an <li> element
  *
  * @param {string} text -- the text to show in the element

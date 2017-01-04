@@ -130,6 +130,7 @@ $sidebar-width: 200px;
     position: absolute;
     background: $dark-gray;
     z-index: z-index(popup);
+    box-shadow: 0 0 5px $medium-gray;
     $panel-handle-height: 10px;
     .panel-handle {
         background: $medium-gray;
@@ -167,14 +168,15 @@ $sidebar-width: 200px;
                     width: calc(100% - #{$panel-ec-actions-width + 5px});
                     margin-right: 5px;
                     & > span {
-                        margin-right: 20px;
+                        width: 50px;
+                        margin-right: 5px;
                     }
-                    .panel-continuity-end > span {
+                    label {
                         margin-right: 5px;
                     }
                     input.panel-continuity-duration {
                         width: 50px;
-                        margin: 0 10px;
+                        margin-right: 5px;
                     }
                 }
                 .actions {
@@ -187,8 +189,20 @@ $sidebar-width: 200px;
                         }
                     }
                 }
-                .chosen-container {
-                    text-align: center;
+                select {
+                    -webkit-appearance: none;
+                    padding: 5px 10px;
+                    padding-right: 20px;
+                    width: initial;
+                    background: $light-gray url(../img/updown.png) no-repeat right;
+                    background-size: 1.2em;
+                    color: $blue;
+                    border: 1px solid $medium-gray;
+                    border-radius: 3px;
+                    font-size: 0.8em;
+                    vertical-align: middle;
+                    outline: 0;
+                    cursor: pointer;
                 }
             }
         }
@@ -218,6 +232,24 @@ $sidebar-width: 200px;
                     height: 14px;
                 }
             }
+        }
+    }
+}
+
+.panel-dropdown {
+    position: absolute;
+    padding: 5px 0;
+    z-index: z-index(popup);
+    background: $light-gray;
+    border: 1px solid $medium-gray;
+    border-radius: 3px;
+    li {
+        padding: 5px 0;
+        text-align: center;
+        cursor: pointer;
+        &:hover {
+            background: $blue;
+            color: $light-gray;
         }
     }
 }

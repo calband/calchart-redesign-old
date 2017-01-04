@@ -96,10 +96,6 @@ ForwardContinuity.prototype.panelHTML = function(controller) {
 
     var panel = this._wrapPanel("fm", [label, steps, direction]);
 
-    direction.dropdown({
-        width: 50,
-    });
-
     return panel;
 };
 
