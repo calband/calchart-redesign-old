@@ -91,6 +91,8 @@ MovementCommandMove.prototype._getPosition = function(beatNum) {
     var numSteps = Math.floor(beatNum / this._beatsPerStep);
     var x = this._startX + this._deltaXPerStep * numSteps;
     var y = this._startY + this._deltaYPerStep * numSteps;
+    x = MathUtils.roundSmall(x);
+    y = MathUtils.roundSmall(y);
     return new Coordinate(x, y);
 };
 

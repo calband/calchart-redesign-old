@@ -53,7 +53,7 @@ StopContinuity.prototype.serialize = function() {
         type: "STOP",
         isMarkTime: this._marktime,
         duration: this._duration,
-        step: this._step,
+        step: this._stepType,
         orientation: this._orientation,
     };
 };
@@ -69,11 +69,20 @@ StopContinuity.prototype.getMovements = function(dot, data) {
     var move = new MovementCommandStop(
         data.position.x,
         data.position.y,
-        this._orientation,
+        this.getOrientation(),
         duration,
         this._marktime
     );
     return [move];
+};
+
+/**
+ * Get the orientation for the movement, in Calchart degrees
+ */
+StopContinuity.prototype.getOrientation = function() {
+    // TODO: resolve default
+    var orientation = this._orientation === "default" ? "east" : this._orientation;
+    return orientation === "east" ? 0 : 90;
 };
 
 StopContinuity.prototype.panelHTML = function(controller) {
@@ -96,9 +105,7 @@ StopContinuity.prototype.panelHTML = function(controller) {
         },
     });
 
-    var panel = this._wrapPanel("mt", [label, duration]);
-
-    return panel;
+    return this._wrapPanel("mt", [label, duration]);
 };
 
 StopContinuity.prototype.popupHTML = function() {

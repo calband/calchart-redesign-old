@@ -9,17 +9,18 @@ var MovementCommandMove = require("./MovementCommandMove");
  * @param {float} startY -- the y-coordinate of the movement's start position
  * @param {float} endX -- the x-coordinate of the movement's end position
  * @param {float} endY -- the y-coordinate of the movement's end position
- * @param {float} orientation -- the direction toward which the dot will face,
- *   while moving, in Calchart degrees
+ * @param {float|null} orientation -- the direction toward which the dot will face,
+ *   while moving, in Calchart degrees. If null, faces towards motion.
  * @param {int} duration -- the duration of the movement, in beats
  * @param {int} beatsPerStep -- the number of beats per each step of the movement
  */ 
 var MovementCommandEven = function(startX, startY, endX, endY, orientation, duration, beatsPerStep) {
-    this._endX = endX;
-    this._endY = endY;
-
     var stepSize = MathUtils.calcDistance(startX, startY, endX, endY) / duration;
     var direction = MathUtils.calcAngle(startX, startY, endX, endY);
+
+    if (orientation === null) {
+        orientation = direction;
+    }
 
     MovementCommandMove.call(this, startX, startY, stepSize, direction, orientation, duration, beatsPerStep);
 };

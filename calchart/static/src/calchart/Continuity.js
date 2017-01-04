@@ -1,3 +1,4 @@
+var EvenContinuity = require("./continuities/EvenContinuity");
 var FountainGridContinuity = require("./continuities/FountainGridContinuity");
 var ForwardContinuity = require("./continuities/ForwardContinuity");
 var StopContinuity = require("./continuities/StopContinuity");
@@ -24,6 +25,8 @@ var Continuity = function(type, sheet, dotType) {
             return new StopContinuity(sheet, dotType, true, null);
         case "CL":
             return new StopContinuity(sheet, dotType, false, null);
+        case "EVEN":
+            return new EvenContinuity(sheet, dotType);
         default:
             throw new Error("No continuity of the type: " + type);
     }
@@ -46,6 +49,8 @@ Continuity.deserialize = function(sheet, dotType, data) {
             return ForwardContinuity.deserialize(sheet, dotType, data);
         case "STOP":
             return StopContinuity.deserialize(sheet, dotType, data);
+        case "EVEN":
+            return EvenContinuity.deserialize(sheet, dotType, data);
         default:
             throw new Error("No continuity of the type: " + data.type);
     }

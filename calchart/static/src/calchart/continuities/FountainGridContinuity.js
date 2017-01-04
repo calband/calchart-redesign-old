@@ -63,7 +63,8 @@ FountainGridContinuity.prototype.serialize = function() {
 
 FountainGridContinuity.prototype.getMovements = function(dot, data) {
     var start = data.position;
-    var end = this._sheet.getNextSheet().getInfoForDot(dot.getLabel()).position;
+    var nextSheet = this._sheet.getNextSheet();
+    var end = dot.getFirstPosition(nextSheet);
 
     var deltaX = end.x - start.x;
     var deltaY = end.y - start.y;
@@ -102,7 +103,7 @@ FountainGridContinuity.prototype.getMovements = function(dot, data) {
 
     var remaining = this._sheet.getDuration() - Math.abs(deltaX) - Math.abs(deltaY);
     if (remaining > 0) {
-        var orientation = this.getOrientation() === "east" ? 0 : 90;
+        var orientation = this.getOrientation();
         var marktime = this._end === "MT";
         var stop = new MovementCommandStop(end.x, end.y, orientation, remaining, marktime);
         movements.push(stop);
@@ -112,11 +113,12 @@ FountainGridContinuity.prototype.getMovements = function(dot, data) {
 };
 
 /**
- * Get the final orientation for the final mark time, resolving default.
+ * Get the final orientation for the final mark time, in Calchart degrees
  */
 FountainGridContinuity.prototype.getOrientation = function() {
     // TODO: resolve default
-    return this._orientation === "default" ? "east" : this._orientation;
+    var orientation = this._orientation === "default" ? "east" : this._orientation;
+    return orientation === "east" ? 0 : 90;
 };
 
 FountainGridContinuity.prototype.panelHTML = function(controller) {

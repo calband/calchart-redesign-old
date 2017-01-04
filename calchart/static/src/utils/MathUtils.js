@@ -72,8 +72,7 @@ MathUtils.calcAngle = function(x1, y1, x2, y2) {
  *   unit circle
  */
 MathUtils.calcRotatedXPos = function(angle) {
-    var val = -Math.sin(this.toRadians(angle));
-    return Math.round(val, 1e-5);
+    return -Math.sin(this.toRadians(angle));
 };
 
 /**
@@ -86,8 +85,7 @@ MathUtils.calcRotatedXPos = function(angle) {
  *   unit circle
  */
 MathUtils.calcRotatedYPos = function(angle) {
-    var val = Math.cos(this.toRadians(angle));
-    return Math.round(val, 1e-5);
+    return Math.cos(this.toRadians(angle));
 };
 
 /**
@@ -114,6 +112,17 @@ MathUtils.quarterTurn = function(angle, isCW) {
  */
 MathUtils.round = function(x, interval) {
     return Math.round(x / interval) * interval;
+};
+
+/**
+ * Round the given number to the nearest 1e-10 (for rounding
+ * errors)
+ *
+ * @param {float} x -- the number to round
+ * @return {float} x rounded to the nearest 1e-10
+ */
+MathUtils.roundSmall = function(x) {
+    return this.round(x, 1e-10);
 };
 
 /**

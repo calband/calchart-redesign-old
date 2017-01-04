@@ -94,9 +94,7 @@ ForwardContinuity.prototype.panelHTML = function(controller) {
         },
     });
 
-    var panel = this._wrapPanel("fm", [label, steps, direction]);
-
-    return panel;
+    return this._wrapPanel("fm", [label, steps, direction]);
 };
 
 ForwardContinuity.prototype.popupHTML = function() {

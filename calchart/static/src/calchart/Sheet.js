@@ -333,7 +333,7 @@ Sheet.prototype.updateMovements = function(dots) {
     var duration = this._numBeats;
 
     dots.forEach(function(dot) {
-        var continuities = _this._continuities[dot.getDotType()];
+        var continuities = _this._continuities[dot.getDotType(_this)];
         var info = this._dots[dot.getLabel()];
         var data = {
             position: info.position,
