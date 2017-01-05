@@ -38,6 +38,19 @@ JSUtils.fromCamelCase = function(s) {
 };
 
 /**
+ * Get the value from an optional object, returning the given default if
+ * the object or value is undefined.
+ *
+ * @param {object|undefined} obj -- the object to retrieve from
+ * @param {string} key -- the key of the value to retrieve
+ * @param {*} defaultVal -- the default value to return
+ * @return {*} the value of the object, or the default if undefined
+ */
+JSUtils.get = function(obj, key, defaultVal) {
+    return (obj !== undefined && obj[key] !== undefined) ? obj[key] : defaultVal;
+};
+
+/**
  * Parse the arguments passed to a function as either positional arguments
  * or as keyword arguments, passed as an object.
  *

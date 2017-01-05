@@ -21,8 +21,7 @@ var ForwardContinuity = function(sheet, dotType, steps, direction, options) {
     this._numSteps = steps;
     this._direction = direction;
 
-    options = options || {};
-    this._stepType = options.stepType || "default";
+    this._stepType = JSUtils.get(options, "stepType", "default");
 };
 
 JSUtils.extends(ForwardContinuity, BaseContinuity);
@@ -61,11 +60,8 @@ ForwardContinuity.prototype.getMovements = function(dot, data) {
     var move = new MovementCommandMove(
         data.position.x,
         data.position.y,
-        CalchartUtils.STEP_SIZES.STANDARD,
         this._direction,
-        this._direction,
-        this._numSteps,
-        1
+        this._numSteps
     );
     return [move];
 };

@@ -9,20 +9,17 @@ var MovementCommandMove = require("./MovementCommandMove");
  * @param {float} startY -- the y-coordinate of the movement's start position
  * @param {float} endX -- the x-coordinate of the movement's end position
  * @param {float} endY -- the y-coordinate of the movement's end position
- * @param {float|null} orientation -- the direction toward which the dot will face,
- *   while moving, in Calchart degrees. If null, faces towards motion.
  * @param {int} duration -- the duration of the movement, in beats
- * @param {int} beatsPerStep -- the number of beats per each step of the movement
+ * @param {object} options -- options for the movement, including:
+ *   - {float} orientation -- the direction toward which the dot will face,
+ *     while moving, in Calchart degrees. (default same as direction)
+ *   - {int} beatsPerStep -- the number of beats per each step of the movement. (default 1)
  */ 
-var MovementCommandEven = function(startX, startY, endX, endY, orientation, duration, beatsPerStep) {
-    var stepSize = MathUtils.calcDistance(startX, startY, endX, endY) / duration;
+var MovementCommandEven = function(startX, startY, endX, endY, duration, options) {
     var direction = MathUtils.calcAngle(startX, startY, endX, endY);
+    options.stepSize = MathUtils.calcDistance(startX, startY, endX, endY) / duration;
 
-    if (orientation === null) {
-        orientation = direction;
-    }
-
-    MovementCommandMove.call(this, startX, startY, stepSize, direction, orientation, duration, beatsPerStep);
+    MovementCommandMove.call(this, startX, startY, direction, duration, options);
 };
 
 JSUtils.extends(MovementCommandEven, MovementCommandMove);
@@ -41,9 +38,8 @@ MovementCommandEven.deserialize = function(data) {
         data.startY,
         data.endX,
         data.endY,
-        data.orientation,
         data.duration,
-        data.beatsPerStep
+        data.options
     );
 };
 
@@ -59,9 +55,11 @@ MovementCommandEven.prototype.serialize = function() {
         startY: this._startY,
         endX: this._endX,
         endY: this._endY,
-        orientation: this._orientation,
         duration: this._duration,
-        beatsPerStep: this._beatsPerStep,
+        options: {
+            orientation: this._orientation,
+            beatsPerStep: this._beatsPerStep,
+        },
     };
 };
 

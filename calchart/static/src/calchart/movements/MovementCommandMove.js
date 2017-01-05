@@ -1,5 +1,6 @@
 var AnimationState = require("calchart/AnimationState");
 var BaseMovementCommand = require("./BaseMovementCommand");
+var CalchartUtils = require("utils/CalchartUtils");
 var Coordinate = require("calchart/Coordinate");
 var JSUtils = require("utils/JSUtils");
 var MathUtils = require("utils/MathUtils");
@@ -9,31 +10,30 @@ var MathUtils = require("utils/MathUtils");
  *
  * @param {float} startX -- the x-coordinate of the movement's start position
  * @param {float} startY -- the y-coordinate of the movement's start position
- * @param {float} stepSize -- the multiplier for converting steps into standard
- *   step sizes. See CalchartUtils.STEP_SIZES
  * @param {float} direction -- the direction toward which the dot will move,
  *   in Calchart degrees
- * @param {float} orientation -- the direction toward which the dot will face,
- *   while moving, in Calchart degrees
  * @param {int} duration -- the duration of the movement, in beats
- * @param {int} beatsPerStep -- the number of beats per each step of the movement
+ * @param {object} options -- options for the movement, including:
+ *   - {float} stepSize -- the multiplier for converting steps into standard step
+ *     sizes. See CalchartUtils.STEP_SIZES. (default CalchartUtils.STEP_SIZES.STANDARD)
+ *   - {float} orientation -- the direction toward which the dot will face,
+ *     while moving, in Calchart degrees. (default same as direction)
+ *   - {int} beatsPerStep -- the number of beats per each step of the movement. (default 1)
  */ 
-var MovementCommandMove = function(startX, startY, stepSize, direction, orientation, duration, beatsPerStep) {
+var MovementCommandMove = function(startX, startY, direction, duration, options) {
+    this._stepSize = JSUtils.get(options, "stepSize", CalchartUtils.STEP_SIZES.STANDARD);
+    this._orientation = JSUtils.get(options, "orientation", direction);
+    this._beatsPerStep = JSUtils.get(options, "beatsPerStep", 1);
+
     this._direction = direction;
-    this._stepSize = stepSize;
+    this._deltaXPerStep = MathUtils.calcRotatedXPos(direction) * this._stepSize;
+    this._deltaYPerStep = MathUtils.calcRotatedYPos(direction) * this._stepSize;
 
-    this._deltaXPerStep = MathUtils.calcRotatedXPos(direction) * stepSize;
-    this._deltaYPerStep = MathUtils.calcRotatedYPos(direction) * stepSize;
-    this._orientation = orientation;
-
-    // defining again here for _getPosition
-    this._startX = startX;
-    this._startY = startY;
-    this._beatsPerStep = beatsPerStep;
+    BaseMovementCommand.call(this, startX, startY, null, null, duration);
 
     var end = this._getPosition(duration);
-
-    BaseMovementCommand.call(this, startX, startY, end.x, end.y, duration);
+    this._endX = end.x;
+    this._endY = end.y;
 };
 
 JSUtils.extends(MovementCommandMove, BaseMovementCommand);
@@ -50,11 +50,9 @@ MovementCommandMove.deserialize = function(data) {
     return new MovementCommandMove(
         data.startX,
         data.startY,
-        data.stepSize,
         data.direction,
-        data.orientation,
         data.duration,
-        data.beatsPerStep
+        data.options
     );
 };
 
@@ -68,11 +66,13 @@ MovementCommandMove.prototype.serialize = function() {
         type: "MovementCommandMove",
         startX: this._startX,
         startY: this._startY,
-        stepSize: this._stepSize,
         direction: this._direction,
-        orientation: this._orientation,
         duration: this._duration,
-        beatsPerStep: this._beatsPerStep,
+        options: {
+            stepSize: this._stepSize,
+            orientation: this._orientation,
+            beatsPerStep: this._beatsPerStep,
+        },
     };
 };
 

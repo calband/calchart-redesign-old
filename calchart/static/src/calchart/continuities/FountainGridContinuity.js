@@ -22,10 +22,9 @@ var FountainGridContinuity = function(sheet, dotType, isEWNS, options) {
 
     this._isEWNS = isEWNS;
 
-    options = options || {};
-    this._end = options.end || "MT";
-    this._step = options.step || "default";
-    this._orientation = options.orientation || "default";
+    this._end = JSUtils.get(options, "end", "MT");
+    this._step = JSUtils.get(options, "step", "default");
+    this._orientation = JSUtils.get(options, "orientation", "default");
 };
 
 JSUtils.extends(FountainGridContinuity, BaseContinuity);
@@ -73,15 +72,7 @@ FountainGridContinuity.prototype.getMovements = function(dot, data) {
 
     var movements = [];
     var addMovement = function(x, y, dir, duration) {
-        var movement = new MovementCommandMove(
-            x,
-            y,
-            CalchartUtils.STEP_SIZES.STANDARD,
-            dir,
-            dir,
-            Math.abs(duration),
-            1
-        );
+        var movement = new MovementCommandMove(x, y, dir, Math.abs(duration));
         movements.push(movement);
     };
 

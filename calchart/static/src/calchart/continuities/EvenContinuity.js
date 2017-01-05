@@ -18,9 +18,8 @@ var MovementCommandEven = require("calchart/movements/MovementCommandEven");
 var EvenContinuity = function(sheet, dotType, options) {
     BaseContinuity.call(this, sheet, dotType);
 
-    options = options || {};
-    this._stepType = options.step || "default";
-    this._orientation = options.orientation || "";
+    this._stepType = JSUtils.get(options, "step", "default");
+    this._orientation = JSUtils.get(options, "orientation", "");
 };
 
 JSUtils.extends(EvenContinuity, BaseContinuity);
@@ -57,15 +56,17 @@ EvenContinuity.prototype.serialize = function() {
 EvenContinuity.prototype.getMovements = function(dot, data) {
     var nextSheet = this._sheet.getNextSheet();
     var end = dot.getFirstPosition(nextSheet);
+    var options = {
+        orientation: this.getOrientation(),
+    };
 
     var move = new MovementCommandEven(
         data.position.x,
         data.position.y,
         end.x,
         end.y,
-        this.getOrientation(),
         data.remaining,
-        1
+        options
     );
     return [move];
 };
@@ -77,7 +78,7 @@ EvenContinuity.prototype.getOrientation = function() {
     switch (this._orientation) {
         case "":
             // face direction of motion
-            return null;
+            return undefined;
         case "east":
             return 0;
         case "west":

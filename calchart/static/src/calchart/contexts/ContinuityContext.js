@@ -44,7 +44,6 @@ ContinuityContext.prototype.load = function() {
     var _this = this;
 
     this._panel.show();
-    this._controller.setBeat(0);
 
     this._addEvents(window, {
         // always keep panel on screen
@@ -76,6 +75,7 @@ ContinuityContext.prototype.load = function() {
 ContinuityContext.prototype.unload = function() {
     this._panel.hide();
     this._removeEvents(window, document, ".toolbar .seek");
+    this._controller.setBeat(0);
 
     $(".toolbar .edit-continuity").removeClass("active");
     $(".toolbar .edit-continuity-group").addClass("hide");

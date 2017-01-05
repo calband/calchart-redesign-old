@@ -22,9 +22,8 @@ var StopContinuity = function(sheet, dotType, isMarkTime, duration, options) {
     this._marktime = isMarkTime;
     this._duration = duration;
 
-    options = options || {};
-    this._stepType = options.step || "default";
-    this._orientation = options.orientation || "default";
+    this._stepType = JSUtils.get(options, "step", "default");
+    this._orientation = JSUtils.get(options, "orientation", "default");
 };
 
 JSUtils.extends(StopContinuity, BaseContinuity);

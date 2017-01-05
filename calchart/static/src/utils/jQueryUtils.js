@@ -1,3 +1,4 @@
+var JSUtils = require("./JSUtils");
 var MathUtils = require("./MathUtils");
 
 /**
@@ -72,9 +73,8 @@ jQueryUtils.scrollIntoView = function(parent, options) {
     }
 
     parent = $(parent || this.parent()).first();
-    options = options || {};
-    var tolerance = options.tolerance || 0;
-    var margin = options.margin || tolerance;
+    var tolerance = JSUtils.get(options, "tolerance", 0);
+    var margin = JSUtils.get(options, "margin", tolerance);
 
     // top/left of the visible part of the parent
     var parentOffset = parent.offset();
