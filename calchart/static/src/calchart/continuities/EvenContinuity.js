@@ -14,12 +14,15 @@ var MovementCommandEven = require("calchart/movements/MovementCommandEven");
  *   - {string} step -- the step type to march, like high step, show high
  *   - {string} orientation -- the direction to face while moving (only for
  *     military slides)
+ *   - {int} beatsPerStep -- the number of beats per each step of the movement.
+ *     (default 1)
  */
 var EvenContinuity = function(sheet, dotType, options) {
     BaseContinuity.call(this, sheet, dotType);
 
     this._stepType = JSUtils.get(options, "step", "default");
     this._orientation = JSUtils.get(options, "orientation", "");
+    this._beatsPerStep = JSUtils.get(options, "beatsPerStep", 1);
 };
 
 JSUtils.extends(EvenContinuity, BaseContinuity);
@@ -48,6 +51,7 @@ EvenContinuity.prototype.serialize = function() {
         type: "EVEN",
         step: this._stepType,
         orientation: this._orientation,
+        beatsPerStep: this._beatsPerStep,
     };
 };
 
@@ -58,6 +62,7 @@ EvenContinuity.prototype.getMovements = function(dot, data) {
     var end = dot.getFirstPosition(nextSheet);
     var options = {
         orientation: this.getOrientation(),
+        beatsPerStep: this._beatsPerStep,
     };
 
     var move = new MovementCommandEven(
@@ -111,9 +116,14 @@ EvenContinuity.prototype.popupHTML = function() {
         initial: this._orientation,
     }));
 
+    var beatsPerStep = HTMLBuilder.formfield("Beats per Step", HTMLBuilder.input({
+        type: "number",
+        initial: this._beatsPerStep,
+    }));
+
     return {
         name: "Even",
-        fields: [stepType, orientation],
+        fields: [stepType, orientation, beatsPerStep],
     };
 };
 

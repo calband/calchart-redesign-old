@@ -16,6 +16,8 @@ var MovementCommandStop = require("calchart/movements/MovementCommandStop");
  *   - {string} end -- whether to marktime or close at the end
  *   - {string} step -- the step type to march, like high step, show high
  *   - {string} orientation -- the direction to face at the end
+ *   - {int} beatsPerStep -- the number of beats per each step of the movement.
+ *     (default 1)
  */
 var FountainGridContinuity = function(sheet, dotType, isEWNS, options) {
     BaseContinuity.call(this, sheet, dotType);
@@ -23,8 +25,9 @@ var FountainGridContinuity = function(sheet, dotType, isEWNS, options) {
     this._isEWNS = isEWNS;
 
     this._end = JSUtils.get(options, "end", "MT");
-    this._step = JSUtils.get(options, "step", "default");
+    this._stepType = JSUtils.get(options, "stepType", "default");
     this._orientation = JSUtils.get(options, "orientation", "default");
+    this._beatsPerStep = JSUtils.get(options, "beatsPerStep", 1);
 };
 
 JSUtils.extends(FountainGridContinuity, BaseContinuity);
@@ -53,8 +56,9 @@ FountainGridContinuity.prototype.serialize = function() {
         type: "FOUNTAIN",
         ewns: this._isEWNS,
         end: this._end,
-        step: this._step,
+        stepType: this._stepType,
         orientation: this._orientation,
+        beatsPerStep: this._beatsPerStep,
     };
 };
 
@@ -71,8 +75,11 @@ FountainGridContinuity.prototype.getMovements = function(dot, data) {
     var dirY = deltaY < 0 ? 180 : 0;
 
     var movements = [];
+    var options = {
+        beatsPerStep: this._beatsPerStep,
+    };
     var addMovement = function(x, y, dir, duration) {
-        var movement = new MovementCommandMove(x, y, dir, Math.abs(duration));
+        var movement = new MovementCommandMove(x, y, dir, Math.abs(duration), options);
         movements.push(movement);
     };
 
@@ -96,7 +103,7 @@ FountainGridContinuity.prototype.getMovements = function(dot, data) {
     if (remaining > 0) {
         var orientation = this.getOrientation();
         var marktime = this._end === "MT";
-        var stop = new MovementCommandStop(end.x, end.y, orientation, remaining, marktime);
+        var stop = new MovementCommandStop(end.x, end.y, orientation, remaining, marktime, options);
         movements.push(stop);
     }
 
@@ -139,17 +146,22 @@ FountainGridContinuity.prototype.popupHTML = function() {
 
     var step = HTMLBuilder.formfield("Step Type", HTMLBuilder.select({
         options: CalchartUtils.STEP_TYPES,
-        initial: this._step,
-    }), "step");
+        initial: this._stepType,
+    }));
 
     var orientation = HTMLBuilder.formfield("Final Orientation", HTMLBuilder.select({
         options: CalchartUtils.ORIENTATIONS,
         initial: this._orientation,
     }), "orientation");
 
+    var beatsPerStep = HTMLBuilder.formfield("Beats per Step", HTMLBuilder.input({
+        type: "number",
+        initial: this._beatsPerStep,
+    }));
+
     return {
         name: this._isEWNS ? "EWNS" : "NSEW",
-        fields: [end, step, orientation],
+        fields: [end, step, orientation, beatsPerStep],
     };
 };
 

@@ -14,6 +14,8 @@ var MovementCommandMove = require("calchart/movements/MovementCommandMove");
  * @param {int} direction -- the direction to march, in Calchart degrees
  * @param {object|undefined} options -- options for the continuity, including:
  *   - {string} stepType -- the step type to march, like high step, show high
+ *   - {int} beatsPerStep -- the number of beats per each step of the movement.
+ *     (default 1)
  */
 var ForwardContinuity = function(sheet, dotType, steps, direction, options) {
     BaseContinuity.call(this, sheet, dotType);
@@ -22,6 +24,7 @@ var ForwardContinuity = function(sheet, dotType, steps, direction, options) {
     this._direction = direction;
 
     this._stepType = JSUtils.get(options, "stepType", "default");
+    this._beatsPerStep = JSUtils.get(options, "beatsPerStep", 1);
 };
 
 JSUtils.extends(ForwardContinuity, BaseContinuity);
@@ -51,6 +54,7 @@ ForwardContinuity.prototype.serialize = function() {
         steps: this._numSteps,
         direction: this._direction,
         stepType: this._stepType,
+        beatsPerStep: this._beatsPerStep,
     };
 };
 
@@ -61,7 +65,10 @@ ForwardContinuity.prototype.getMovements = function(dot, data) {
         data.position.x,
         data.position.y,
         this._direction,
-        this._numSteps
+        this._numSteps * this._beatsPerStep,
+        {
+            beatsPerStep: this._beatsPerStep,
+        }
     );
     return [move];
 };
@@ -109,9 +116,14 @@ ForwardContinuity.prototype.popupHTML = function() {
         initial: this._stepType,
     }));
 
+    var beatsPerStep = HTMLBuilder.formfield("Beats per Step", HTMLBuilder.input({
+        type: "number",
+        initial: this._beatsPerStep,
+    }));
+
     return {
         name: "Forward March",
-        fields: [steps, direction, stepType],
+        fields: [steps, direction, stepType, beatsPerStep],
     };
 };
 

@@ -39,7 +39,7 @@ MovementCommandEven.deserialize = function(data) {
         data.endX,
         data.endY,
         data.duration,
-        data.options
+        data
     );
 };
 
@@ -56,10 +56,8 @@ MovementCommandEven.prototype.serialize = function() {
         endX: this._endX,
         endY: this._endY,
         duration: this._duration,
-        options: {
-            orientation: this._orientation,
-            beatsPerStep: this._beatsPerStep,
-        },
+        orientation: this._orientation,
+        beatsPerStep: this._beatsPerStep,
     };
 };
 

@@ -52,7 +52,7 @@ MovementCommandMove.deserialize = function(data) {
         data.startY,
         data.direction,
         data.duration,
-        data.options
+        data
     );
 };
 
@@ -68,11 +68,9 @@ MovementCommandMove.prototype.serialize = function() {
         startY: this._startY,
         direction: this._direction,
         duration: this._duration,
-        options: {
-            stepSize: this._stepSize,
-            orientation: this._orientation,
-            beatsPerStep: this._beatsPerStep,
-        },
+        stepSize: this._stepSize,
+        orientation: this._orientation,
+        beatsPerStep: this._beatsPerStep,
     };
 };
 

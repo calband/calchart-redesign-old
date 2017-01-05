@@ -59,11 +59,11 @@ HTMLBuilder.div = function() {
  * @param {string} label -- the label for the field
  * @param {jQuery|string} field -- the field to wrap in the form field, either
  *    the HTML element itself or a string to pass to HTMLBuilder.make
- * @param {string} name -- the name attribute for the field (defaults to label slugified)
+ * @param {string} name -- the name attribute for the field (defaults to label as camel case)
  */
 HTMLBuilder.formfield = function() {
     var args = JSUtils.parseArgs(arguments, ["label", "field", "name"]);
-    var name = args.name || JSUtils.slugify(args.label);
+    var name = args.name || JSUtils.toCamelCase(args.label);
 
     if (typeof args.field === "string") {
         args.field = this.make(args.field);

@@ -11,10 +11,14 @@ var JSUtils = require("utils/JSUtils");
  *   while moving, in Calchart degrees
  * @param {int} duration -- the duration of the movement, in beats
  * @param {boolean} isMarkTime -- true if marking time, false if close
+ * @param {object} options -- options for the movement, including:
+ *   - {int} beatsPerStep -- the number of beats per each step of the movement,
+ *     only useful for marking time. (default 1)
  */
-var MovementCommandStop = function(startX, startY, orientation, duration, isMarkTime) {
+var MovementCommandStop = function(startX, startY, orientation, duration, isMarkTime, options) {
     this._orientation = orientation;
     this._isMarkTime = isMarkTime;
+    this._beatsPerStep = JSUtils.get(options, "beatsPerStep", 1);
 
     BaseMovementCommand.call(this, startX, startY, startX, startY, duration);
 };
@@ -35,7 +39,8 @@ MovementCommandStop.deserialize = function(data) {
         data.startY,
         data.orientation,
         data.duration,
-        data.isMarkTime
+        data.isMarkTime,
+        data
     );
 };
 
@@ -52,6 +57,7 @@ MovementCommandStop.prototype.serialize = function() {
         orientation: this._orientation,
         duration: this._duration,
         isMarkTime: this._isMarkTime,
+        beatsPerStep: this._beatsPerStep,
     };
 };
 
@@ -66,7 +72,8 @@ MovementCommandStop.prototype.getContinuityText = function() {
     if (this._isMarkTime) {
         return "Close";
     } else {
-        return "MT " + this._duration + " " + this.getOrientation();
+        var steps = this._duration / this._beatsPerStep;
+        return "MT " + steps + " " + this.getOrientation();
     }
 };
 

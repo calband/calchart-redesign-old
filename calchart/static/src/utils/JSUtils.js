@@ -114,13 +114,15 @@ JSUtils.range = function() {
 };
 
 /**
- * Slugifies the given value
+ * Convert the given value to camel case
  *
- * @param {string} value -- the value to slugify
- * @return {string} the slugified value
+ * @param {string} value -- the value to convert
+ * @return {string} the value as camel case
  */
-JSUtils.slugify = function(value) {
-    return value.toLowerCase().replace(/ /g, "_");
+JSUtils.toCamelCase = function(value) {
+    return value.toLowerCase().replace(/ (\w+)/g, function(str) {
+        return str[1].toUpperCase() + str.slice(2);
+    });
 };
 
 /**

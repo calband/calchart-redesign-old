@@ -15,6 +15,8 @@ var MovementCommandStop = require("calchart/movements/MovementCommandStop");
  * @param {object|undefined} options -- options for the continuity, including:
  *   - {string} step -- the step type to march, like high step, show high
  *   - {string} orientation -- the direction to face at the end
+ *   - {int} beatsPerStep -- the number of beats per each step of the movement.
+ *     (default 1)
  */
 var StopContinuity = function(sheet, dotType, isMarkTime, duration, options) {
     BaseContinuity.call(this, sheet, dotType);
@@ -24,6 +26,7 @@ var StopContinuity = function(sheet, dotType, isMarkTime, duration, options) {
 
     this._stepType = JSUtils.get(options, "step", "default");
     this._orientation = JSUtils.get(options, "orientation", "default");
+    this._beatsPerStep = JSUtils.get(options, "beatsPerStep", 1);
 };
 
 JSUtils.extends(StopContinuity, BaseContinuity);
@@ -54,6 +57,7 @@ StopContinuity.prototype.serialize = function() {
         duration: this._duration,
         step: this._stepType,
         orientation: this._orientation,
+        beatsPerStep: this._beatsPerStep,
     };
 };
 
@@ -65,13 +69,19 @@ StopContinuity.prototype.getMovements = function(dot, data) {
     } else {
         var duration = data.remaining;
     }
+    var options = {
+        beatsPerStep: this._beatsPerStep,
+    };
+
     var move = new MovementCommandStop(
         data.position.x,
         data.position.y,
         this.getOrientation(),
         duration,
-        this._marktime
+        this._marktime,
+        options
     );
+
     return [move];
 };
 
@@ -109,6 +119,7 @@ StopContinuity.prototype.panelHTML = function(controller) {
         // mark time for a duration
         var label = HTMLBuilder.span("MT");
 
+        var durationLabel = HTMLBuilder.span("Beats:");
         var duration = HTMLBuilder.input({
             class: "panel-continuity-duration",
             type: "number",
@@ -119,7 +130,7 @@ StopContinuity.prototype.panelHTML = function(controller) {
             },
         });
 
-        return this._wrapPanel("mt", [label, duration]);
+        return this._wrapPanel("mt", [label, durationLabel, duration]);
     }
 };
 
@@ -146,7 +157,12 @@ StopContinuity.prototype.popupHTML = function() {
         initial: this._stepType,
     }));
 
-    var fields = [duration, orientation, stepType];
+    var beatsPerStep = HTMLBuilder.formfield("Beats per Step", HTMLBuilder.input({
+        type: "number",
+        initial: this._beatsPerStep,
+    }));
+
+    var fields = [duration, orientation, stepType, beatsPerStep];
 
     if (this._duration === null) {
         fields.splice(0, 1);
