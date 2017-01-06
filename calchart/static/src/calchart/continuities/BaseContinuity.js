@@ -1,5 +1,6 @@
 var errors = require("calchart/errors");
 var HTMLBuilder = require("utils/HTMLBuilder");
+var JSUtils = require("utils/JSUtils");
 
 /**
  * Represents a continuity for a dot type during a stuntsheet. This is
@@ -9,10 +10,21 @@ var HTMLBuilder = require("utils/HTMLBuilder");
  *
  * @param {Sheet} sheet -- the sheet the continuity is for
  * @param {string} dotType -- the dot type the continuity is for
+ * @param {object|undefined} options -- options for most/all continuities. Can either
+ *   be the given type or the string "default", which will be resolved by getting
+ *   the value from the Sheet. Possible options include:
+ *   - {string} stepType -- the step type to march, like high step, show high
+ *   - {int} beatsPerStep -- the number of beats per each step of the movement.
+ *   - {string} orientation -- orientation, as either east or west. The meaning for
+ *     this option is different for each continuity
  */
-var BaseContinuity = function(sheet, dotType) {
+var BaseContinuity = function(sheet, dotType, options) {
     this._sheet = sheet;
     this._dotType = dotType;
+
+    this._stepType = JSUtils.get(options, "stepType", "default");
+    this._beatsPerStep = JSUtils.get(options, "beatsPerStep", "default");
+    this._orientation = JSUtils.get(options, "orientation", "default");
 };
 
 /**
@@ -23,10 +35,23 @@ var BaseContinuity = function(sheet, dotType) {
  * @return {object} a JSON object containing this Continuity's data
  */
 BaseContinuity.prototype.serialize = function() {
-    throw new errors.NotImplementedError(this);
+    return {
+        stepType: this._stepType,
+        beatsPerStep: this._beatsPerStep,
+        orientation: this._orientation,
+    };
 };
 
 /**** INSTANCE METHODS ****/
+
+/**
+ * Get the number of beats per step for this continuity, resolving any defaults
+ *
+ * @return {int} beats per step
+ */
+BaseContinuity.prototype.getBeatsPerStep = function() {
+    return this._beatsPerStep === "default" ? this._sheet.getBeatsPerStep() : this._beatsPerStep;
+};
 
 /**
  * Get the movements for the given dot for the given stuntsheet
@@ -40,6 +65,35 @@ BaseContinuity.prototype.serialize = function() {
  */
 BaseContinuity.prototype.getMovements = function(dot, data) {
     throw new errors.NotImplementedError(this);
+};
+
+/**
+ * Get this continuity's orientation, resolving any defaults
+ *
+ * @return {int} orientation, in Calchart degrees
+ */
+BaseContinuity.prototype.getOrientation = function() {
+    switch (this._orientation) {
+        case "default":
+            return this._sheet.getOrientation();
+        case "east":
+            return 0;
+        case "west":
+            return 90;
+        case "":
+            // for EvenContinuity, moving in direction of travel
+            return undefined;
+    }
+    throw new Error("Invalid orientation: " + this._orientation);
+};
+
+/**
+ * Get this continuity's step type, resolving any defaults
+ *
+ * @return {string} step type (see CalchartUtils.STEP_TYPES)
+ */
+BaseContinuity.prototype.getStepType = function() {
+    return this._stepType === "default" ? this._sheet.getStepType() : this._stepType;
 };
 
 /**

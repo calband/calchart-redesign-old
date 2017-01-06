@@ -11,9 +11,8 @@ var MovementCommandMove = require("./MovementCommandMove");
  * @param {float} endY -- the y-coordinate of the movement's end position
  * @param {int} duration -- the duration of the movement, in beats
  * @param {object} options -- options for the movement, including:
- *   - {float} orientation -- the direction toward which the dot will face,
- *     while moving, in Calchart degrees. (default same as direction)
- *   - {int} beatsPerStep -- the number of beats per each step of the movement. (default 1)
+ *   - {float} orientation -- default direction of travel
+ *   - {int} beatsPerStep
  */ 
 var MovementCommandEven = function(startX, startY, endX, endY, duration, options) {
     var direction = MathUtils.calcAngle(startX, startY, endX, endY);
@@ -49,16 +48,9 @@ MovementCommandEven.deserialize = function(data) {
  * @return {object} a JSON object containing this MovementCommandEven's data
  */
 MovementCommandEven.prototype.serialize = function() {
-    return {
+    return $.extend(MovementCommandMove.prototype.serialize.call(this), {
         type: "MovementCommandEven",
-        startX: this._startX,
-        startY: this._startY,
-        endX: this._endX,
-        endY: this._endY,
-        duration: this._duration,
-        orientation: this._orientation,
-        beatsPerStep: this._beatsPerStep,
-    };
+    });
 };
 
 /**

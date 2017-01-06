@@ -12,15 +12,13 @@ var JSUtils = require("utils/JSUtils");
  * @param {int} duration -- the duration of the movement, in beats
  * @param {boolean} isMarkTime -- true if marking time, false if close
  * @param {object} options -- options for the movement, including:
- *   - {int} beatsPerStep -- the number of beats per each step of the movement,
- *     only useful for marking time. (default 1)
+ *   - {int} beatsPerStep
  */
 var MovementCommandStop = function(startX, startY, orientation, duration, isMarkTime, options) {
-    this._orientation = orientation;
     this._isMarkTime = isMarkTime;
-    this._beatsPerStep = JSUtils.get(options, "beatsPerStep", 1);
+    options.orientation = orientation;
 
-    BaseMovementCommand.call(this, startX, startY, startX, startY, duration);
+    BaseMovementCommand.call(this, startX, startY, startX, startY, duration, options);
 };
 
 JSUtils.extends(MovementCommandStop, BaseMovementCommand);
@@ -50,15 +48,10 @@ MovementCommandStop.deserialize = function(data) {
  * @return {object} a JSON object containing this MovementCommandStop's data
  */
 MovementCommandStop.prototype.serialize = function() {
-    return {
+    return $.extend(BaseMovementCommand.prototype.serialize.call(this), {
         type: "MovementCommandStop",
-        startX: this._startX,
-        startY: this._startY,
-        orientation: this._orientation,
-        duration: this._duration,
         isMarkTime: this._isMarkTime,
-        beatsPerStep: this._beatsPerStep,
-    };
+    });
 };
 
 MovementCommandStop.prototype.getAnimationState = function(beatNum) {

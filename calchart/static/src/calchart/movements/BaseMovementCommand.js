@@ -1,5 +1,6 @@
 var Coordinate = require("calchart/Coordinate");
 var errors = require("calchart/errors");
+var JSUtils = require("utils/JSUtils");
 
 /**
  * Represents an individual movement that a dot executes during a
@@ -11,13 +12,21 @@ var errors = require("calchart/errors");
  * @param {int} endX -- the x-coordinate where the movement ends
  * @param {int} endY -- the y-coordinate where the movement ends
  * @param {int} duration -- the duration of the movement, in beats
+ * @param {object} options -- options for most/all movements, including:
+ *   - {float} orientation -- the direction toward which the dot will face,
+ *     while moving, in Calchart degrees. (default undefined)
+ *   - {int} beatsPerStep -- the number of beats per each step of the movement.
+ *     (default 1)
  **/
-var BaseMovementCommand = function(startX, startY, endX, endY, duration) {
+var BaseMovementCommand = function(startX, startY, endX, endY, duration, options) {
     this._startX = startX;
     this._startY = startY;
     this._endX = endX;
     this._endY = endY;
     this._duration = duration;
+
+    this._orientation = options.orientation;
+    this._beatsPerStep = JSUtils.get(options, "beatsPerStep", 1);
 };
 
 /**
@@ -28,7 +37,15 @@ var BaseMovementCommand = function(startX, startY, endX, endY, duration) {
  * @return {object} a JSON object containing this MovementCommand's data
  */
 BaseMovementCommand.prototype.serialize = function() {
-    throw new errors.NotImplementedError(this);
+    return {
+        startX: this._startX,
+        startY: this._startY,
+        endX: this._endX,
+        endY: this._endY,
+        duration: this._duration,
+        orientation: this._orientation,
+        beatsPerStep: this._beatsPerStep,
+    };
 };
 
 /**

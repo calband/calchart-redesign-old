@@ -13,18 +13,14 @@ var MovementCommandMove = require("calchart/movements/MovementCommandMove");
  * @param {int} steps -- the number of steps
  * @param {int} direction -- the direction to march, in Calchart degrees
  * @param {object|undefined} options -- options for the continuity, including:
- *   - {string} stepType -- the step type to march, like high step, show high
- *   - {int} beatsPerStep -- the number of beats per each step of the movement.
- *     (default 1)
+ *   - {string} stepType
+ *   - {int} beatsPerStep
  */
 var ForwardContinuity = function(sheet, dotType, steps, direction, options) {
-    BaseContinuity.call(this, sheet, dotType);
+    BaseContinuity.call(this, sheet, dotType, options);
 
     this._numSteps = steps;
     this._direction = direction;
-
-    this._stepType = JSUtils.get(options, "stepType", "default");
-    this._beatsPerStep = JSUtils.get(options, "beatsPerStep", 1);
 };
 
 JSUtils.extends(ForwardContinuity, BaseContinuity);
@@ -49,25 +45,24 @@ ForwardContinuity.deserialize = function(sheet, dotType, data) {
  * @return {object} a JSON object containing this ForwardContinuity's data
  */
 ForwardContinuity.prototype.serialize = function() {
-    return {
+    return $.extend(BaseContinuity.prototype.serialize.call(this), {
         type: "FORWARD",
         steps: this._numSteps,
         direction: this._direction,
-        stepType: this._stepType,
-        beatsPerStep: this._beatsPerStep,
-    };
+    });
 };
 
 /**** INSTANCE METHODS ****/
 
 ForwardContinuity.prototype.getMovements = function(dot, data) {
+    var beatsPerStep = thie.getBeatsPerStep();
     var move = new MovementCommandMove(
         data.position.x,
         data.position.y,
         this._direction,
-        this._numSteps * this._beatsPerStep,
+        this._numSteps * beatsPerStep,
         {
-            beatsPerStep: this._beatsPerStep,
+            beatsPerStep: beatsPerStep,
         }
     );
     return [move];

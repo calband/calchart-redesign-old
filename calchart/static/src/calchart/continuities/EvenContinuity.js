@@ -8,21 +8,17 @@ var MovementCommandEven = require("calchart/movements/MovementCommandEven");
  * A continuity where dots use the rest of the time to go straight to
  * their next dot
  *
- * @param {Sheet} sheet -- the sheet the continuity is for
- * @param {string} dotType -- the dot type the continuity is for
+ * @param {Sheet} sheet
+ * @param {string} dotType
  * @param {object|undefined} options -- options for the continuity, including:
- *   - {string} step -- the step type to march, like high step, show high
+ *   - {string} stepType
+ *   - {int} beatsPerStep
  *   - {string} orientation -- the direction to face while moving (only for
- *     military slides)
- *   - {int} beatsPerStep -- the number of beats per each step of the movement.
- *     (default 1)
+ *     military slides). Can also be the empty string to denote moving in the
+ *     same direction
  */
 var EvenContinuity = function(sheet, dotType, options) {
-    BaseContinuity.call(this, sheet, dotType);
-
-    this._stepType = JSUtils.get(options, "step", "default");
-    this._orientation = JSUtils.get(options, "orientation", "");
-    this._beatsPerStep = JSUtils.get(options, "beatsPerStep", 1);
+    BaseContinuity.call(this, sheet, dotType, options);
 };
 
 JSUtils.extends(EvenContinuity, BaseContinuity);
@@ -47,12 +43,9 @@ EvenContinuity.deserialize = function(sheet, dotType, data) {
  * @return {object} a JSON object containing this EvenContinuity's data
  */
 EvenContinuity.prototype.serialize = function() {
-    return {
+    return $.extend(BaseContinuity.prototype.serialize.call(this), {
         type: "EVEN",
-        step: this._stepType,
-        orientation: this._orientation,
-        beatsPerStep: this._beatsPerStep,
-    };
+    });
 };
 
 /**** INSTANCE METHODS ****/
@@ -62,7 +55,7 @@ EvenContinuity.prototype.getMovements = function(dot, data) {
     var end = dot.getFirstPosition(nextSheet);
     var options = {
         orientation: this.getOrientation(),
-        beatsPerStep: this._beatsPerStep,
+        beatsPerStep: this.getBeatsPerStep(),
     };
 
     var move = new MovementCommandEven(
@@ -74,23 +67,6 @@ EvenContinuity.prototype.getMovements = function(dot, data) {
         options
     );
     return [move];
-};
-
-/**
- * Get the orientation for the movement, in Calchart degrees
- */
-EvenContinuity.prototype.getOrientation = function() {
-    switch (this._orientation) {
-        case "":
-            // face direction of motion
-            return undefined;
-        case "east":
-            return 0;
-        case "west":
-            return 90;
-        default:
-            throw new Error("Invalid orientation: " + this._orientation);
-    }
 };
 
 EvenContinuity.prototype.panelHTML = function(controller) {
@@ -110,8 +86,9 @@ EvenContinuity.prototype.popupHTML = function() {
     var orientation = HTMLBuilder.formfield("Orientation", HTMLBuilder.select({
         options: {
             "": "Direction of Travel",
-            "east": "East",
-            "west": "West",
+            "default": "Facing Default",
+            "east": "Facing East",
+            "west": "Facing West",
         },
         initial: this._orientation,
     }));

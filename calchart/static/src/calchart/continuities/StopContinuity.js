@@ -13,20 +13,15 @@ var MovementCommandStop = require("calchart/movements/MovementCommandStop");
  * @param {int|null} duration -- the number of beats to mark time or close; null
  *   use remaining beats
  * @param {object|undefined} options -- options for the continuity, including:
- *   - {string} step -- the step type to march, like high step, show high
+ *   - {string} stepType -- only used for mark time
+ *   - {int} beatsPerStep -- only used for mark time
  *   - {string} orientation -- the direction to face at the end
- *   - {int} beatsPerStep -- the number of beats per each step of the movement.
- *     (default 1)
  */
 var StopContinuity = function(sheet, dotType, isMarkTime, duration, options) {
-    BaseContinuity.call(this, sheet, dotType);
+    BaseContinuity.call(this, sheet, dotType, options);
 
     this._marktime = isMarkTime;
     this._duration = duration;
-
-    this._stepType = JSUtils.get(options, "step", "default");
-    this._orientation = JSUtils.get(options, "orientation", "default");
-    this._beatsPerStep = JSUtils.get(options, "beatsPerStep", 1);
 };
 
 JSUtils.extends(StopContinuity, BaseContinuity);
@@ -51,14 +46,11 @@ StopContinuity.deserialize = function(sheet, dotType, data) {
  * @return {object} a JSON object containing this StopContinuity's data
  */
 StopContinuity.prototype.serialize = function() {
-    return {
+    return $.extend(BaseContinuity.prototype.serialize.call(this), {
         type: "STOP",
         isMarkTime: this._marktime,
         duration: this._duration,
-        step: this._stepType,
-        orientation: this._orientation,
-        beatsPerStep: this._beatsPerStep,
-    };
+    });
 };
 
 /**** INSTANCE METHODS ****/
@@ -70,7 +62,7 @@ StopContinuity.prototype.getMovements = function(dot, data) {
         var duration = data.remaining;
     }
     var options = {
-        beatsPerStep: this._beatsPerStep,
+        beatsPerStep: this.getBeatsPerStep(),
     };
 
     var move = new MovementCommandStop(
@@ -83,15 +75,6 @@ StopContinuity.prototype.getMovements = function(dot, data) {
     );
 
     return [move];
-};
-
-/**
- * Get the orientation for the movement, in Calchart degrees
- */
-StopContinuity.prototype.getOrientation = function() {
-    // TODO: resolve default
-    var orientation = this._orientation === "default" ? "east" : this._orientation;
-    return orientation === "east" ? 0 : 90;
 };
 
 StopContinuity.prototype.panelHTML = function(controller) {

@@ -16,20 +16,18 @@ var MathUtils = require("utils/MathUtils");
  * @param {object} options -- options for the movement, including:
  *   - {float} stepSize -- the multiplier for converting steps into standard step
  *     sizes. See CalchartUtils.STEP_SIZES. (default CalchartUtils.STEP_SIZES.STANDARD)
- *   - {float} orientation -- the direction toward which the dot will face,
- *     while moving, in Calchart degrees. (default same as direction)
- *   - {int} beatsPerStep -- the number of beats per each step of the movement. (default 1)
+ *   - {float} orientation -- default same as direction
+ *   - {int} beatsPerStep
  */ 
 var MovementCommandMove = function(startX, startY, direction, duration, options) {
     this._stepSize = JSUtils.get(options, "stepSize", CalchartUtils.STEP_SIZES.STANDARD);
-    this._orientation = JSUtils.get(options, "orientation", direction);
-    this._beatsPerStep = JSUtils.get(options, "beatsPerStep", 1);
+    options.orientation = JSUtils.get(options, "orientation", direction);
 
     this._direction = direction;
     this._deltaXPerStep = MathUtils.calcRotatedXPos(direction) * this._stepSize;
     this._deltaYPerStep = MathUtils.calcRotatedYPos(direction) * this._stepSize;
 
-    BaseMovementCommand.call(this, startX, startY, null, null, duration);
+    BaseMovementCommand.call(this, startX, startY, null, null, duration, options);
 
     var end = this._getPosition(duration);
     this._endX = end.x;
@@ -62,16 +60,11 @@ MovementCommandMove.deserialize = function(data) {
  * @return {object} a JSON object containing this MovementCommandMove's data
  */
 MovementCommandMove.prototype.serialize = function() {
-    return {
+    return $.extend(BaseMovementCommand.prototype.serialize.call(this), {
         type: "MovementCommandMove",
-        startX: this._startX,
-        startY: this._startY,
         direction: this._direction,
-        duration: this._duration,
         stepSize: this._stepSize,
-        orientation: this._orientation,
-        beatsPerStep: this._beatsPerStep,
-    };
+    });
 };
 
 MovementCommandMove.prototype.getAnimationState = function(beatNum) {

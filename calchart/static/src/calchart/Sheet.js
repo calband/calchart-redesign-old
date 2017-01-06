@@ -181,6 +181,16 @@ Sheet.prototype.changeDotTypes = function(dots, dotType) {
 };
 
 /**
+ * Get the number of beats per step for this sheet, resolving any defaults
+ *
+ * @return {int} beats per step
+ */
+Sheet.prototype.getBeatsPerStep = function() {
+    // return this._beatsPerStep === "default" ? this._show.getBeatsPerStep() : this._beatsPerStep;
+    return 1;
+};
+
+/**
  * Get the continuities for the given dot type
  *
  * @param {string} dotType -- the dot type to get continuities for
@@ -278,6 +288,16 @@ Sheet.prototype.getNextSheet = function() {
 };
 
 /**
+ * Get this sheet's orientation, resolving any defaults
+ *
+ * @return {int} orientation, in Calchart degrees
+ */
+Sheet.prototype.getOrientation = function() {
+    // return this._orientation === "default" ? this._show.getOrientation() : this._orientation;
+    return 0;
+};
+
+/**
  * Get the sheet that precedes this sheet
  *
  * @return {Sheet|undefined} the sheet before this sheet in the
@@ -285,6 +305,16 @@ Sheet.prototype.getNextSheet = function() {
  */
 Sheet.prototype.getPrevSheet = function() {
     return this._show.getSheets()[this._index - 1];
+};
+
+/**
+ * Get this sheet's step type, resolving any defaults
+ *
+ * @return {string} step type (see CalchartUtils.STEP_TYPES)
+ */
+Sheet.prototype.getStepType = function() {
+    // return this._stepType === "default" ? this._show.getStepType() : this._stepType;
+    return "HS";
 };
 
 /**

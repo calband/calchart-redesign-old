@@ -109,12 +109,42 @@ Show.prototype.serialize = function() {
 /**** INSTANCE METHODS ****/
 
 /**
+ * Get the number of beats per step for the show
+ *
+ * @return {int} beats per step
+ */
+Show.prototype.getBeatsPerStep = function() {
+    // return this._beatsPerStep;
+    return 1;
+};
+
+/**
  * Get the field type of the show
  *
  * @return {string} the field type
  */
 Show.prototype.getFieldType = function() {
     return this._fieldType;
+};
+
+/**
+ * Get the orientation of the show
+ *
+ * @return {int} orientation, in Calchart degrees
+ */
+Show.prototype.getOrientation = function() {
+    // return this._orientation;
+    return 0;
+};
+
+/**
+ * Get the step type of the show
+ *
+ * @return {string} step type (see CalchartUtils.STEP_TYPES)
+ */
+Show.prototype.getStepType = function() {
+    // return this._stepType;
+    return "HS";
 };
 
 /**** DOTS ****/

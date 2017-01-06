@@ -13,21 +13,16 @@ var MovementCommandStop = require("calchart/movements/MovementCommandStop");
  * @param {string} dotType -- the dot type the continuity is for
  * @param {boolean} isEWNS -- true if EWNS, otherwise NSEW
  * @param {object|undefined} options -- options for the continuity, including:
- *   - {string} end -- whether to marktime or close at the end
- *   - {string} step -- the step type to march, like high step, show high
+ *   - {string} stepType
+ *   - {int} beatsPerStep
  *   - {string} orientation -- the direction to face at the end
- *   - {int} beatsPerStep -- the number of beats per each step of the movement.
- *     (default 1)
+ *   - {string} end -- whether to marktime or close at the end
  */
 var FountainGridContinuity = function(sheet, dotType, isEWNS, options) {
-    BaseContinuity.call(this, sheet, dotType);
+    BaseContinuity.call(this, sheet, dotType, options);
 
     this._isEWNS = isEWNS;
-
     this._end = JSUtils.get(options, "end", "MT");
-    this._stepType = JSUtils.get(options, "stepType", "default");
-    this._orientation = JSUtils.get(options, "orientation", "default");
-    this._beatsPerStep = JSUtils.get(options, "beatsPerStep", 1);
 };
 
 JSUtils.extends(FountainGridContinuity, BaseContinuity);
@@ -52,14 +47,11 @@ FountainGridContinuity.deserialize = function(sheet, dotType, data) {
  * @return {object} a JSON object containing this FountainGridContinuity's data
  */
 FountainGridContinuity.prototype.serialize = function() {
-    return {
+    return $.extend(BaseContinuity.prototype.serialize.call(this), {
         type: "FOUNTAIN",
         ewns: this._isEWNS,
         end: this._end,
-        stepType: this._stepType,
-        orientation: this._orientation,
-        beatsPerStep: this._beatsPerStep,
-    };
+    });
 };
 
 /**** INSTANCE METHODS ****/
@@ -76,7 +68,7 @@ FountainGridContinuity.prototype.getMovements = function(dot, data) {
 
     var movements = [];
     var options = {
-        beatsPerStep: this._beatsPerStep,
+        beatsPerStep: this.getBeatsPerStep(),
     };
     var addMovement = function(x, y, dir, duration) {
         var movement = new MovementCommandMove(x, y, dir, Math.abs(duration), options);
@@ -108,15 +100,6 @@ FountainGridContinuity.prototype.getMovements = function(dot, data) {
     }
 
     return movements;
-};
-
-/**
- * Get the final orientation for the final mark time, in Calchart degrees
- */
-FountainGridContinuity.prototype.getOrientation = function() {
-    // TODO: resolve default
-    var orientation = this._orientation === "default" ? "east" : this._orientation;
-    return orientation === "east" ? 0 : 90;
 };
 
 FountainGridContinuity.prototype.panelHTML = function(controller) {
