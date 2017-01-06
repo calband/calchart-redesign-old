@@ -24,9 +24,6 @@ var DotContext = function(controller) {
 
     this._grapher = controller.getGrapher();
 
-    // dots selected to edit
-    this._selectedDots = $();
-
     // number of steps to snap dots to when dragging: null, 1, 2, 4
     this._grid = 2;
 
@@ -59,13 +56,13 @@ DotContext.prototype.load = function() {
                 var dot = target.parent();
 
                 if (e.shiftKey || e.ctrlKey || e.metaKey) {
-                    _this.toggleDots(dot);
+                    _this._controller.toggleDots(dot);
                     this._dragState = "none";
                     return;
                 }
 
-                if (!_this._selectedDots.filter(dot).exists()) {
-                    _this.selectDots(dot, {
+                if (!_this._grapher.isSelected(dot)) {
+                    _this._controller.selectDots(dot, {
                         append: false,
                     });
                 }
@@ -76,7 +73,7 @@ DotContext.prototype.load = function() {
                 _this._moveOffset.x = 0;
                 _this._moveOffset.y = 0;
             } else {
-                _this.deselectDots();
+                _this._controller.deselectDots();
                 HTMLBuilder.div("selection-box", null, "body");
                 dragState = "select";
             }
@@ -131,7 +128,7 @@ DotContext.prototype.load = function() {
                     maxY -= svgOrigin.top;
 
                     // select dots within the selection box
-                    _this.deselectDots();
+                    _this._controller.deselectDots();
                     _this._grapher.getDots().each(function() {
                         var dot = $(this);
                         var position = dot.data("position");
@@ -141,7 +138,7 @@ DotContext.prototype.load = function() {
                             position.y >= minY &&
                             position.y <= maxY
                         ) {
-                            _this.selectDots(dot);
+                            _this._controller.selectDots(dot);
                         }
                     });
             }
@@ -171,7 +168,7 @@ DotContext.prototype.load = function() {
 
 DotContext.prototype.unload = function() {
     this._removeEvents(document, ".workspace");
-    this.deselectDots();
+    this._controller.deselectDots();
 
     $(".toolbar .edit-dots").removeClass("active");
     $(".toolbar .edit-dots-group").addClass("hide");
@@ -188,29 +185,6 @@ DotContext.prototype.shortcuts = {
 };
 
 /**
- * Deselects the given dots. If no dots are given, deselects all dots.
- *
- * @param {jQuery|undefined} dots -- dots to deselect (defaults to all dots)
- */
-DotContext.prototype.deselectDots = function(dots) {
-    if (dots === undefined) {
-        dots = this._selectedDots;
-    }
-
-    this._selectedDots = this._selectedDots.not(dots);
-    this._controller.refresh();
-};
-
-/**
- * @return {Array<Dot>} the selected dots as Dot objects
- */
-DotContext.prototype.getSelected = function() {
-    return this._selectedDots.map(function() {
-        return $(this).data("dot");
-    }).toArray();
-};
-
-/**
  * Move all selected dots the given amount, from the dot's initial
  * position (i.e. from the position as stored in the Sheet)
  *
@@ -220,7 +194,7 @@ DotContext.prototype.getSelected = function() {
 DotContext.prototype.moveSelection = function(deltaX, deltaY) {
     var _this = this;
 
-    this._selectedDots
+    this._controller.getSelection()
         .each(function() {
             _this._grapher.moveDot(this, deltaX, deltaY);
         })
@@ -243,55 +217,6 @@ DotContext.prototype.nudgeDots = function(deltaX, deltaY) {
     this._controller.doAction("moveDots", [deltaX, deltaY]);
 };
 
-/**
- * Refreshes the UI according to the state of the controller and context
- */
-DotContext.prototype.refresh = function() {
-    BaseContext.prototype.refresh.call(this);
-    this.selectDots(this._selectedDots);
-};
-
-/**
- * Select all dots in the graph
- */
-DotContext.prototype.selectAll = function() {
-    this.selectDots(this._grapher.getDots());
-};
-
-/**
- * Add the given dots to the list of selected dots
- *
- * @param {jQuery} dots -- the dots to select
- * @param {object|undefined} options -- optional dictionary with the given options:
- *   - {boolean} append -- if false, deselect all dots before selecting (default true)
- */
-DotContext.prototype.selectDots = function(dots, options) {
-    options = options || {};
-
-    if (options.append === false) {
-        this.deselectDots();
-    }
-
-    this._selectedDots = this._selectedDots.add(dots);
-    $(dots).each(function() {
-        var classes = $(this).attr("class");
-        $(this).attr("class", classes + " selected");
-    });
-};
-
-/**
- * For each dot, if it's selected, deselect it; otherwise, select it.
- *
- * @param {jQuery} dots -- the dots to toggle selection
- */
-DotContext.prototype.toggleDots = function(dots, options) {
-    var select = dots.not(this._selectedDots);
-    var deselect = dots.filter(this._selectedDots);
-
-    this.selectDots(select);
-    this.deselectDots(deselect);
-};
-
 /**** ACTIONS ****/
 
 var ContextActions = {};
@@ -306,7 +231,7 @@ var ContextActions = {};
 ContextActions.changeDotType = function(dotType, sheet) {
     sheet = sheet || this._sheet;
 
-    var selected = this.getSelected();
+    var selected = this._controller.getSelectedDots();
     var oldTypes = {};
 
     selected.forEach(function(dot) {
@@ -345,7 +270,7 @@ ContextActions.changeDotType = function(dotType, sheet) {
  */
 ContextActions.moveDots = function(deltaX, deltaY, sheet, dots) {
     sheet = sheet || this._sheet;
-    dots = dots || this.getSelected();
+    dots = dots || this._controller.getSelectedDots();
     var prevPositions = {};
 
     // update positions

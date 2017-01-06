@@ -87,11 +87,10 @@ BaseGrapher.prototype.clearDots = function() {
  * @param {Stuntsheet} sheet -- the stuntsheet to draw.
  * @param {int|undefined} currentBeat -- the beat to draw, relative to
  *   the start of the stuntsheet. Defaults to 0.
- * @param {Array<string>|undefined} selectedDots -- labels of selected dots
+ * @param {jQuery} selectedDots -- the selected dots
  */
 BaseGrapher.prototype.draw = function(sheet, currentBeat, selectedDots) {
     currentBeat = currentBeat || 0;
-    selectedDots = selectedDots || [];
 
     var fieldType = sheet.getFieldType();
     var field = this._svg.select(".field");
@@ -135,6 +134,14 @@ BaseGrapher.prototype.getPosition = function(dot) {
  */
 BaseGrapher.prototype.getScale = function() {
     return this._scale;
+};
+
+/**
+ * @param {jQuery} dot -- the dot to check
+ * @return {boolean} true if the given dot is selected
+ */
+BaseGrapher.prototype.isSelected = function(dot) {
+    return d3.select(dot[0]).classed("selected");
 };
 
 /**
@@ -193,7 +200,7 @@ BaseGrapher.prototype.setOption = function(name, val) {
  * that beat onto the SVG context of this grapher.
  *
  * @param {int} currentBeat -- beat of stuntsheet to draw
- * @param {Array<string>} selectedDots -- labels of selected dots
+ * @param {jQuery} selectedDots -- the selected dots
  */
 BaseGrapher.prototype._drawDots = function(currentBeat, selectedDots) {
     var _this = this;
@@ -242,7 +249,7 @@ BaseGrapher.prototype._drawDots = function(currentBeat, selectedDots) {
         if (_this._options.drawDotType) {
             dotClass += dot.getDotType();
         }
-        if (selectedDots.indexOf(label) !== -1) {
+        if (selectedDots.filter(this).exists()) {
             dotClass += " selected";
         } else if (!_this._options.drawDotType) {
             dotClass += CalchartUtils.getNearestOrientation(state.angle);

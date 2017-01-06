@@ -35,6 +35,7 @@ var EditorController = function(show) {
     this._context = null;
     this._activeSheet = null;
     this._currBeat = null;
+    this._selectedDots = $(); // dots selected to edit, used with DotContext
 
     this._undoHistory = [];
     this._redoHistory = [];
@@ -74,8 +75,6 @@ EditorController.prototype.init = function() {
     var sheets = this._show.getSheets();
     if (sheets.length > 0) {
         this.loadSheet(sheets[0]);
-    } else {
-        this.refresh();
     }
 };
 
@@ -190,6 +189,20 @@ EditorController.prototype.checkContinuities = function() {
 };
 
 /**
+ * Deselects the given dots. If no dots are given, deselects all dots.
+ *
+ * @param {jQuery|undefined} dots -- dots to deselect (defaults to all dots)
+ */
+EditorController.prototype.deselectDots = function(dots) {
+    if (dots === undefined) {
+        dots = this._selectedDots;
+    }
+
+    this._selectedDots = this._selectedDots.not(dots);
+    this.refresh();
+};
+
+/**
  * Runs the method on this instance with the given name.
  *
  * The method can either be an instance method or an action. An action is
@@ -251,6 +264,22 @@ EditorController.prototype.getCurrentBeat = function() {
  */
 EditorController.prototype.getGrapher = function() {
     return this._grapher;
+};
+
+/**
+ * @return {jQuery} the selected dots
+ */
+EditorController.prototype.getSelection = function() {
+    return this._selectedDots;
+};
+
+/**
+ * @return {Array<Dot>} the selected dots as Dot objects
+ */
+EditorController.prototype.getSelectedDots = function() {
+    return this._selectedDots.map(function() {
+        return $(this).data("dot");
+    }).toArray();
 };
 
 /**
@@ -367,7 +396,7 @@ EditorController.prototype.refresh = function() {
 
     // refresh grapher
     if (this._activeSheet) {
-        this._grapher.draw(this._activeSheet, this._currBeat);
+        this._grapher.draw(this._activeSheet, this._currBeat, this._selectedDots);
     } else {
         this._grapher.drawField();
     }
@@ -397,12 +426,50 @@ EditorController.prototype.saveShow = function(callback) {
 };
 
 /**
+ * Select all dots in the graph
+ */
+EditorController.prototype.selectAll = function() {
+    this.selectDots(this._grapher.getDots());
+};
+
+/**
+ * Add the given dots to the list of selected dots
+ *
+ * @param {jQuery} dots -- the dots to select
+ * @param {object|undefined} options -- optional dictionary with the given options:
+ *   - {boolean} append -- if false, deselect all dots before selecting (default true)
+ */
+EditorController.prototype.selectDots = function(dots, options) {
+    options = options || {};
+
+    if (options.append === false) {
+        this.deselectDots();
+    }
+
+    this._selectedDots = this._selectedDots.add(dots);
+    this.refresh();
+};
+
+/**
  * Set the current beat to the given beat
  *
  * @param {int} beat -- the beat to set to
  */
 EditorController.prototype.setBeat = function(beat) {
     this._currBeat = beat;
+};
+
+/**
+ * For each dot, if it's selected, deselect it; otherwise, select it.
+ *
+ * @param {jQuery} dots -- the dots to toggle selection
+ */
+EditorController.prototype.toggleDots = function(dots, options) {
+    var select = dots.not(this._selectedDots);
+    var deselect = dots.filter(this._selectedDots);
+
+    this.selectDots(select);
+    this.deselectDots(deselect);
 };
 
 /**
