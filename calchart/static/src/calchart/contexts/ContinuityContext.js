@@ -87,8 +87,7 @@ ContinuityContext.prototype.unload = function() {
 ContinuityContext.prototype.refresh = function() {
     BaseContext.prototype.refresh.call(this);
 
-    if (this._sheet.isLastSheet()) {
-        this._controller.loadContext("dot");
+    if (this._sheet === null) {
         return;
     }
 

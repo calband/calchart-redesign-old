@@ -58,7 +58,11 @@ FountainGridContinuity.prototype.serialize = function() {
 
 FountainGridContinuity.prototype.getMovements = function(dot, data) {
     var start = data.position;
-    var end = this._sheet.getNextSheet().getPosition(dot);
+    var nextSheet = this._sheet.getNextSheet();
+    if (nextSheet === null) {
+        return [];
+    }
+    var end = nextSheet.getPosition(dot);
 
     var deltaX = end.x - start.x;
     var deltaY = end.y - start.y;

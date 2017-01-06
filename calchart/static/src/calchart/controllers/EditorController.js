@@ -60,15 +60,21 @@ EditorController.prototype.init = function() {
         drawDotType: true,
     };
     this._grapher = new Grapher(this._show, $(".grapher-draw-target"), grapherOptions);
+    this._grapher.drawField();
 
-    $(".content .sidebar").on("click", ".stuntsheet", function() {
-        var sheet = $(this).data("sheet");
+    $(".content .sidebar")
+        .on("contextmenu", ".stuntsheet", function(e) {
+            e.preventDefault();
+            console.log("contextmenu");
+        })
+        .on("click", ".stuntsheet", function() {
+            var sheet = $(this).data("sheet");
 
-        // only load if the sheet isn't already loaded
-        if (sheet !== this._activeSheet) {
-            _this.loadSheet(sheet);
-        }
-    });
+            // only load if the sheet isn't already loaded
+            if (sheet !== this._activeSheet) {
+                _this.loadSheet(sheet);
+            }
+        });
 
     this.loadContext("dot");
 
@@ -84,6 +90,7 @@ EditorController.prototype.shortcuts = {
     "ctrl+s": "saveShow",
     "ctrl+z": "undo",
     "ctrl+shift+z": "redo",
+    "ctrl+backspace": "deleteSheet",
 };
 
 /**
@@ -146,7 +153,7 @@ EditorController.prototype.checkContinuities = function() {
         var dots = args.dots;
     }
 
-    var errors = {
+    var moveErrors = {
         lackMoves: [],
         wrongPosition: [],
     };
@@ -155,25 +162,31 @@ EditorController.prototype.checkContinuities = function() {
         try {
             var final = sheet.getAnimationState(dot, duration);
         } catch (e) {
-            // ignore if no movements
-            if (sheet.getDotInfo(dot).movements.length !== 0) {
-                errors.lackMoves.push(dot.getLabel());
+            if (e instanceof errors.AnimationStateError) {
+                // ignore if no movements
+                if (sheet.getDotInfo(dot).movements.length !== 0) {
+                    moveErrors.lackMoves.push(dot.getLabel());
+                }
+            } else {
+                throw e;
             }
             return;
         }
 
-        var position = nextSheet.getDotInfo(dot).position;
-        if (final.x !== position.x || final.y !== position.y) {
-            errors.wrongPosition.push(dot.getLabel());
+        if (nextSheet) {
+            var position = nextSheet.getDotInfo(dot).position;
+            if (final.x !== position.x || final.y !== position.y) {
+                moveErrors.wrongPosition.push(dot.getLabel());
+            }
         }
     });
 
     var errorMessages = [];
-    if (errors.lackMoves.length > 0) {
-        errorMessages.push("Dots did not have enough to do: " + errors.lackMoves.join(", "));
+    if (moveErrors.lackMoves.length > 0) {
+        errorMessages.push("Dots did not have enough to do: " + moveErrors.lackMoves.join(", "));
     }
-    if (errors.wrongPosition.length > 0) {
-        errorMessages.push("Dots did not make it to their next spot: " + errors.wrongPosition.join(", "));
+    if (moveErrors.wrongPosition.length > 0) {
+        errorMessages.push("Dots did not make it to their next spot: " + moveErrors.wrongPosition.join(", "));
     }
 
     if (errorMessages.length > 0) {
@@ -317,13 +330,6 @@ EditorController.prototype.loadSheet = function(sheet) {
     this._currBeat = 0;
 
     this.refresh();
-
-    // disable continuity context if sheet is the last sheet
-    if (sheet.isLastSheet()) {
-        $(".toolbar .edit-continuity").addClass("disabled");
-    } else {
-        $(".toolbar .edit-continuity").removeClass("disabled");
-    }
 };
 
 /**
@@ -405,8 +411,6 @@ EditorController.prototype.refresh = function() {
     // refresh grapher
     if (this._activeSheet) {
         this._grapher.draw(this._activeSheet, this._currBeat, this._selectedDots);
-    } else {
-        this._grapher.drawField();
     }
 
     this._context.refresh();
@@ -517,11 +521,41 @@ var EditorActions = {};
  */
 EditorActions.addSheet = function(numBeats) {
     var sheet = this._show.addSheet(numBeats);
+    var prevSheet = sheet.getPrevSheet();
+    if (prevSheet) {
+        prevSheet.updateMovements();
+    }
     this.loadSheet(sheet);
     return {
         undo: function() {
             this._show.removeSheet(sheet);
-            this.loadSheet(this._show.getSheets()[0]);
+            if (prevSheet) {
+                prevSheet.updateMovements();
+            }
+            this.loadSheet(prevSheet);
+        },
+    };
+};
+
+/**
+ * Deletes the currently active sheet
+ */
+EditorActions.deleteSheet = function() {
+    var sheet = this._activeSheet;
+    var prevSheet = sheet.getPrevSheet();
+    var nextSheet = sheet.getNextSheet();
+    this._show.removeSheet(sheet);
+    if (prevSheet) {
+        prevSheet.updateMovements();
+    }
+    this.loadSheet(prevSheet || nextSheet);
+    return {
+        undo: function() {
+            this._show.insertSheet(sheet, sheet.getIndex());
+            if (prevSheet) {
+                prevSheet.updateMovements();
+            }
+            this.loadSheet(sheet);
         },
     };
 };

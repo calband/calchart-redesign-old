@@ -337,6 +337,13 @@ Sheet.prototype.getFinalPosition = function(dot) {
 };
 
 /**
+ * @return {int} the index of this sheet
+ */
+Sheet.prototype.getIndex = function() {
+    return this._index;
+};
+
+/**
  * Get the label for this Sheet, either the custom label or the sheet
  * number in the given Show.
  */
@@ -351,11 +358,11 @@ Sheet.prototype.getLabel = function() {
 /**
  * Get the sheet that follows this sheet
  *
- * @return {Sheet|undefined} the sheet after this sheet in the
- *   show, or undefined if this is the last sheet
+ * @return {Sheet|null} the sheet after this sheet in the
+ *   show, or null if this is the last sheet
  */
 Sheet.prototype.getNextSheet = function() {
-    return this._show.getSheets()[this._index + 1];
+    return this._show.getSheets()[this._index + 1] || null;
 };
 
 /**
@@ -388,11 +395,11 @@ Sheet.prototype.getPosition = function(dot) {
 /**
  * Get the sheet that precedes this sheet
  *
- * @return {Sheet|undefined} the sheet before this sheet in the
- *   show, or undefined if this is the first sheet
+ * @return {Sheet|null} the sheet before this sheet in the
+ *   show, or null if this is the first sheet
  */
 Sheet.prototype.getPrevSheet = function() {
-    return this._show.getSheets()[this._index - 1];
+    return this._show.getSheets()[this._index - 1] || null;
 };
 
 /**
@@ -436,14 +443,17 @@ Sheet.prototype.setIndex = function(index) {
 /**
  * Update the movements for the given dots
  *
- * @param {string|Dot|Array<Dot>} dots -- the dots to update movements for, as either
- *   the dot type, the Dot, or a list of Dots.
+ * @param {string|Dot|Array<Dot>|undefined} dots -- the dots to update movements
+ *   for, as either the dot type, the Dot, or a list of Dots. If undefined, updates
+ *   all dots.
  */
 Sheet.prototype.updateMovements = function(dots) {
     if (typeof dots === "string") {
         dots = this.getDotsOfType(dots);
     } else if (dots instanceof Dot) {
         dots = [dots];
+    } else if (dots === undefined) {
+        dots = this._show.getDots();
     }
 
     var duration = this._numBeats;

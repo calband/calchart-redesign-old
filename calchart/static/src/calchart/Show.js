@@ -208,15 +208,6 @@ Show.prototype.getDotByLabel = function(label) {
 /**** SHEETS ****/
 
 /**
- * Get all stuntsheets in the Show
- *
- * @return {Array<Sheet>} the list of stuntsheets in the show
- */
-Show.prototype.getSheets = function() {
-    return this._sheets;
-};
-
-/**
  * Add a stuntsheet to the show with the given number of beats
  *
  * @param {int} numBeats -- the number of beats for the stuntsheet
@@ -227,6 +218,28 @@ Show.prototype.addSheet = function(numBeats) {
     var sheet = Sheet.create(this, index, numBeats, this.getDotLabels());
     this._sheets.push(sheet);
     return sheet;
+};
+
+/**
+ * Get all stuntsheets in the Show
+ *
+ * @return {Array<Sheet>} the list of stuntsheets in the show
+ */
+Show.prototype.getSheets = function() {
+    return this._sheets;
+};
+
+/**
+ * Insert the given stuntsheet at the given index
+ *
+ * @param {Sheet} sheet -- the sheet to insert
+ * @param {int} index -- the index to insert the sheet into
+ */
+Show.prototype.insertSheet = function(sheet, index) {
+    this._sheets.splice(index, 0, sheet);
+    for (var i = index + 1; i < this._sheets.length; i++) {
+        this._sheets[i].setIndex(i);
+    }
 };
 
 /**
