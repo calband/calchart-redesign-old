@@ -1,8 +1,5 @@
 var MathUtils = require("utils/MathUtils");
 
-// the minimum amount of space between the field and the SVG
-var FIELD_PADDING = 30;
-
 /**
  * An object containing dimension and scale information for a
  * field in a Grapher.
@@ -10,14 +7,16 @@ var FIELD_PADDING = 30;
  * @param {Grapher} grapher -- the grapher to get the scale of
  * @param {float} svgWidth -- the width of the svg
  * @param {float} svgHeight -- the height of the svg
+ * @param {float} padding -- the minimum amount of space between the
+ *   field and the SVG
  */
-var GrapherScale = function(grapher, svgWidth, svgHeight) {
+var GrapherScale = function(grapher, svgWidth, svgHeight, padding) {
     // keep aspect ratio of width/height
-    this.width = svgWidth - 2 * FIELD_PADDING;
+    this.width = svgWidth - 2 * padding;
     this.height = this.width * grapher.FIELD_HEIGHT / grapher.FIELD_WIDTH;
 
     if (this.height > svgHeight) {
-        this.height = svgHeight - 2 * FIELD_PADDING;
+        this.height = svgHeight - 2 * padding;
         this.width = this.height * grapher.FIELD_WIDTH / grapher.FIELD_HEIGHT;
     }
 

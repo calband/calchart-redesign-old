@@ -12,6 +12,7 @@
 var CalchartUtils = require("utils/CalchartUtils");
 var errors = require("calchart/errors");
 var GrapherScale = require("calchart/GrapherScale");
+var JSUtils = require("utils/JSUtils");
 var MathUtils = require("utils/MathUtils");
 
 /**** CONSTRUCTOR ****/
@@ -34,7 +35,9 @@ var BaseGrapher = function(show, drawTarget, options) {
 
     this._svgWidth = this._drawTarget.width();
     this._svgHeight = this._drawTarget.height();
-    this._scale = new GrapherScale(this, this._svgWidth, this._svgHeight);
+
+    var padding = JSUtils.get(this._options, "fieldPadding", 30);
+    this._scale = new GrapherScale(this, this._svgWidth, this._svgHeight, padding);
 
     // fraction of a step in pixels
     this._dotRadius = this._scale.toDistance(3/4);
@@ -85,8 +88,8 @@ BaseGrapher.prototype.clearDots = function() {
  * particular stuntsheet.
  *
  * @param {Stuntsheet} sheet -- the stuntsheet to draw.
- * @param {int|undefined} currentBeat -- the beat to draw, relative to
- *   the start of the stuntsheet. Defaults to 0.
+ * @param {int} currentBeat -- the beat to draw, relative to the start
+ *   of the stuntsheet.
  * @param {jQuery} selectedDots -- the selected dots
  */
 BaseGrapher.prototype.draw = function(sheet, currentBeat, selectedDots) {
@@ -101,7 +104,7 @@ BaseGrapher.prototype.draw = function(sheet, currentBeat, selectedDots) {
         this.drawField();
     }
 
-    this._drawDots(currentBeat, selectedDots);
+    this._drawDots(sheet, currentBeat, selectedDots);
 };
 
 /**
@@ -181,12 +184,17 @@ BaseGrapher.prototype.moveDotTo = function(dot, x, y) {
  * Sets a Grapher option. The available options are:
  *  - {boolean} circleSelected -- if true, circles the selected dot, or the last
  *    selected dot, if multiple (default false)
- *  - {boolean} showLabels -- if true, show the label next to each dot (default false)
- *  - {boolean} labelLeft -- if true, show the label on the left of the dot (default true)
- *  - {boolean} drawYardlineNumbers -- if true, draws yardline numbers (default false)
  *  - {boolean} draw4Step -- if true, draws 4 step lines (default false)
- *  - {boolean} drawDotType -- if true, draw dots according to their dot type. If false,
- *    colors dots differently based on their orientation (default false)
+ *  - {boolean} drawDotType -- if true, draw dots according to their dot type, overriding
+ *    drawOrientation. (default false)
+ *  - {boolean} drawOrientation -- if true, colors dots differently based on orientation.
+ *  - {boolean} drawYardlineNumbers -- if true, draws yardline numbers (default false)
+ *  - {boolean} drawYardlines -- if true, draw yardlines and hashes (default true)
+ *    (default true)
+ *  - {float} fieldPadding -- the minimum amount of space between the field and the SVG
+ *    (default 30)
+ *  - {boolean} labelLeft -- if true, show the label on the left of the dot (default true)
+ *  - {boolean} showLabels -- if true, show the label next to each dot (default false)
  */
 BaseGrapher.prototype.setOption = function(name, val) {
     this._options[name] = val;
@@ -199,10 +207,11 @@ BaseGrapher.prototype.setOption = function(name, val) {
  * and the dot labels of all selected dots, draw the dots in this stuntsheet at
  * that beat onto the SVG context of this grapher.
  *
+ * @param {Sheet} sheet -- the sheet to draw
  * @param {int} currentBeat -- beat of stuntsheet to draw
  * @param {jQuery} selectedDots -- the selected dots
  */
-BaseGrapher.prototype._drawDots = function(currentBeat, selectedDots) {
+BaseGrapher.prototype._drawDots = function(sheet, currentBeat, selectedDots) {
     var _this = this;
 
     // group containing all dots
@@ -230,13 +239,13 @@ BaseGrapher.prototype._drawDots = function(currentBeat, selectedDots) {
         var label = dot.getLabel();
         // special case in case dots are positioned without having movements
         if (currentBeat === 0) {
-            var state = dot.getFirstPosition();
+            var state = dot.getFirstPosition(sheet);
         } else {
             try {
-                var state = dot.getAnimationState(currentBeat);
+                var state = dot.getAnimationState(currentBeat, sheet);
             } catch (e) {
                 // ran out of movements
-                var state = dot.getLastPosition();
+                var state = dot.getLastPosition(sheet);
             }
         }
         var x = _this._scale.xScale(state.x);
@@ -248,11 +257,11 @@ BaseGrapher.prototype._drawDots = function(currentBeat, selectedDots) {
         var dotClass = "dot ";
         if (_this._options.drawDotType) {
             dotClass += dot.getDotType();
+        } else if (_this._options.drawOrientation !== false) {
+            dotClass += CalchartUtils.getNearestOrientation(state.angle);
         }
         if (selectedDots.filter(this).exists()) {
             dotClass += " selected";
-        } else if (!_this._options.drawDotType) {
-            dotClass += CalchartUtils.getNearestOrientation(state.angle);
         }
 
         var dotGroup = d3.select(this).attr("class", dotClass);

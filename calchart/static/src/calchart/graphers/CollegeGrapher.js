@@ -41,6 +41,10 @@ CollegeGrapher.prototype.drawField = function() {
         .attr("x", SOUTH)
         .attr("y", WEST);
 
+    if (this._options.drawYardlines === false) {
+        return;
+    }
+
     var yardlineSteps = JSUtils.range(8, 160, 8);
 
     // append the yardlines, excluding the 0 yardlines

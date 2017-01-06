@@ -364,11 +364,12 @@ svg.graph {
             }
         }
         // orientation
-        &.facing-west {
+        &.facing-west .dot-marker {
             fill: $uniform-yellow;
             stroke: $uniform-yellow;
         }
-        &.facing-north, &.facing-south {
+        &.facing-north .dot-marker,
+        &.facing-south .dot-marker {
             fill: $uniform-blue;
             stroke: $uniform-blue;
         }

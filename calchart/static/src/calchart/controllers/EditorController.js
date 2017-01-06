@@ -376,14 +376,23 @@ EditorController.prototype.redo = function() {
  */
 EditorController.prototype.refresh = function() {
     // refresh sidebar
-    $(".sidebar").empty();
+    var sidebar = $(".sidebar").empty();
     this._show.getSheets().forEach(function(sheet) {
         var label = HTMLBuilder.span(sheet.getLabel(), "label");
-        var preview = HTMLBuilder.make("svg.preview");
+
+        var preview = HTMLBuilder.div("preview");
+        var options = {
+            drawOrientation: false,
+            drawYardlines: false,
+            fieldPadding: 5,
+        };
 
         var $sheet = HTMLBuilder
-            .div("stuntsheet", [label, preview], ".sidebar")
+            .div("stuntsheet", [label, preview], sidebar)
             .data("sheet", sheet);
+
+        // field preview
+        new Grapher(this._show, preview, options).draw(sheet, 0, $());
 
         if (sheet === this._activeSheet) {
             $sheet
