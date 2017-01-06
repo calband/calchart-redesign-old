@@ -153,16 +153,16 @@ EditorController.prototype.checkContinuities = function() {
 
     dots.forEach(function(dot) {
         try {
-            var final = dot.getAnimationState(duration, sheet);
+            var final = sheet.getAnimationState(dot, duration);
         } catch (e) {
             // ignore if no movements
-            if (sheet.getInfoForDot(dot).movements.length !== 0) {
+            if (sheet.getDotInfo(dot).movements.length !== 0) {
                 errors.lackMoves.push(dot.getLabel());
             }
             return;
         }
 
-        var position = nextSheet.getInfoForDot(dot).position;
+        var position = nextSheet.getDotInfo(dot).position;
         if (final.x !== position.x || final.y !== position.y) {
             errors.wrongPosition.push(dot.getLabel());
         }
@@ -315,7 +315,6 @@ EditorController.prototype.loadSheet = function(sheet) {
     // update state
     this._activeSheet = sheet;
     this._currBeat = 0;
-    this._show.loadSheet(sheet);
 
     this.refresh();
 

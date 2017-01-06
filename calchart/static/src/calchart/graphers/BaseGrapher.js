@@ -10,6 +10,7 @@
  */
 
 var CalchartUtils = require("utils/CalchartUtils");
+var Coordinate = require("calchart/Coordinate");
 var errors = require("calchart/errors");
 var GrapherScale = require("calchart/GrapherScale");
 var JSUtils = require("utils/JSUtils");
@@ -117,20 +118,6 @@ BaseGrapher.prototype.getDots = function() {
 };
 
 /**
- * Get the position of the given dot, in pixel coordinates
- *
- * @param {jQuery} dot -- the Dot to get the position of in the stunt sheet
- * @return {object} the coordinates of the dot, in pixels
- */
-BaseGrapher.prototype.getPosition = function(dot) {
-    var position = $(dot).data("dot").getFirstPosition();
-    return {
-        x: this._scale.toDistance(position.x) + this._scale.minX,
-        y: this._scale.toDistance(position.y) + this._scale.minY,
-    };
-};
-
-/**
  * Get the GrapherScale this Grapher is using
  *
  * @return {GrapherScale} the scale of the Grapher field
@@ -148,19 +135,6 @@ BaseGrapher.prototype.isSelected = function(dot) {
 };
 
 /**
- * Moves the given dot with the given change in position from the dot's
- * initial position
- *
- * @param {jQuery} dot -- the dot to move
- * @param {float} deltaX -- the change in the x-direction, in pixels
- * @param {float} deltaY -- the change in the y-direction, in pixels
- */
-BaseGrapher.prototype.moveDot = function(dot, deltaX, deltaY) {
-    var position = this.getPosition(dot);
-    this.moveDotTo(dot, position.x + deltaX, position.y + deltaY);
-};
-
-/**
  * Moves the given dot to the given coordinates
  *
  * @param {jQuery} dot -- the dot to move
@@ -174,10 +148,7 @@ BaseGrapher.prototype.moveDotTo = function(dot, x, y) {
 
     $(dot)
         .attr("transform", "translate(" + x + "," + y + ")")
-        .data("position", {
-            x: x,
-            y: y,
-        });
+        .data("position", new Coordinate(x, y));
 };
 
 /**
@@ -236,16 +207,15 @@ BaseGrapher.prototype._drawDots = function(sheet, currentBeat, selectedDots) {
     }
     
     dotGroups.each(function(dot) {
-        var label = dot.getLabel();
         // special case in case dots are positioned without having movements
         if (currentBeat === 0) {
-            var state = dot.getFirstPosition(sheet);
+            var state = sheet.getPosition(dot);
         } else {
             try {
-                var state = dot.getAnimationState(currentBeat, sheet);
+                var state = sheet.getAnimationState(dot, currentBeat);
             } catch (e) {
                 // ran out of movements
-                var state = dot.getLastPosition(sheet);
+                var state = sheet.getFinalPosition(dot);
             }
         }
         var x = _this._scale.xScale(state.x);
@@ -256,7 +226,7 @@ BaseGrapher.prototype._drawDots = function(sheet, currentBeat, selectedDots) {
 
         var dotClass = "dot ";
         if (_this._options.drawDotType) {
-            dotClass += dot.getDotType();
+            dotClass += sheet.getDotType(dot);
         } else if (_this._options.drawOrientation !== false) {
             dotClass += CalchartUtils.getNearestOrientation(state.angle);
         }
@@ -316,7 +286,7 @@ BaseGrapher.prototype._drawDots = function(sheet, currentBeat, selectedDots) {
                 dotLabel = dotGroup.append("text")
                     .classed("dot-label", true)
                     .attr("font-size", _this._dotRadius * 2.5)
-                    .text(label);
+                    .text(dot.getLabel());
             }
 
             dotLabel.attr("x", offsetX).attr("y", offsetY);

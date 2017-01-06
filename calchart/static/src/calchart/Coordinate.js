@@ -1,8 +1,15 @@
 /**
- * A Coordinate represents a dot's position on the field
+ * A Coordinate represents a dot's position on the field, either
+ * in units of steps or pixels.
  *
- * @param {float} x -- number of steps from the south endzone
- * @param {float} y -- number of steps from the west sideline
+ * If in steps, x is the number of steps from the south endzone and
+ * y is the number of steps from the west sideline.
+ *
+ * If in pixels, x is the number of pixels from the left edge and y
+ * is the number of pixels from the top edge.
+ *
+ * @param {float} x -- the x-coordinate of the position
+ * @param {float} y -- the y-coordinate of the position
  */
 var Coordinate = function(x, y) {
     this.x = x;

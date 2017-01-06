@@ -1,3 +1,4 @@
+var Coordinate = require("calchart/Coordinate");
 var MathUtils = require("utils/MathUtils");
 
 /**
@@ -43,18 +44,44 @@ var GrapherScale = function(grapher, svgWidth, svgHeight, padding) {
  * Get the scaled distance for the given number of steps
  *
  * @param {float} steps -- the number of steps to get the scaled distance
+ * @return {float} the scaled distance represented by the given number of steps
  */
 GrapherScale.prototype.toDistance = function(steps) {
     return this._ratio * steps;
 };
 
 /**
+ * Convert the given coordinate from steps to distance
+ *
+ * @param {Coordinate} steps -- the number of steps to get the scaled distance
+ * @return {Coordinate} the coordinate as distance from the origin of the SVG
+ */
+GrapherScale.prototype.toDistanceCoordinates = function(steps) {
+    var x = this.toDistance(steps.x) + this.minX;
+    var y = this.toDistance(steps.y) + this.minY;
+    return new Coordinate(x, y);
+};
+
+/**
  * Get the number of steps for the given distance
  *
  * @param {float} distance -- the distance to measure in steps
+ * @param {float} the number of steps represented by the given distance
  */
 GrapherScale.prototype.toSteps = function(distance) {
     return distance / this._ratio;
+};
+
+/**
+ * Convert the given coordinate from distance to steps
+ *
+ * @param {Coordinate} distance -- the scaled distance to convert to steps
+ * @return {Coordinate} the coordinate as steps from the southwest corner of the field
+ */
+GrapherScale.prototype.toStepCoordinates = function(distance) {
+    var x = this.toSteps(distance.x - this.minX);
+    var y = this.toSteps(distance.y - this.minY);
+    return new Coordinate(x, y);
 };
 
 module.exports = GrapherScale;

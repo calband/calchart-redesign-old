@@ -51,8 +51,7 @@ EvenContinuity.prototype.serialize = function() {
 /**** INSTANCE METHODS ****/
 
 EvenContinuity.prototype.getMovements = function(dot, data) {
-    var nextSheet = this._sheet.getNextSheet();
-    var end = dot.getFirstPosition(nextSheet);
+    var end = this._sheet.getNextSheet().getPosition(dot);
     var options = {
         orientation: this.getOrientation(),
         beatsPerStep: this.getBeatsPerStep(),

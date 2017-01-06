@@ -230,17 +230,6 @@ Show.prototype.addSheet = function(numBeats) {
 };
 
 /**
- * Load the given Sheet to every Dot. See Dot.loadSheet
- *
- * @param {Sheet} sheet -- the sheet to load
- */
-Show.prototype.loadSheet = function(sheet) {
-    $.each(this._dots, function(_, dot) {
-        dot.loadSheet(sheet);
-    });
-};
-
-/**
  * Remove a stuntsheet from the show
  *
  * @param {Sheet} sheet -- the sheet to remove

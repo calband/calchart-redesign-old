@@ -193,10 +193,13 @@ DotContext.prototype.shortcuts = {
  */
 DotContext.prototype.moveSelection = function(deltaX, deltaY) {
     var _this = this;
+    var scale = this._grapher.getScale();
 
     this._controller.getSelection()
         .each(function() {
-            _this._grapher.moveDot(this, deltaX, deltaY);
+            var dotPosition = _this._sheet.getPosition($(this).data("dot"));
+            var position = scale.toDistanceCoordinates(dotPosition);
+            _this._grapher.moveDotTo(this, position.x + deltaX, position.y + deltaY);
         })
         .scrollIntoView(".workspace", {
             tolerance: 10,
@@ -235,7 +238,7 @@ ContextActions.changeDotType = function(dotType, sheet) {
     var oldTypes = {};
 
     selected.forEach(function(dot) {
-        var dotType = dot.getDotType(sheet);
+        var dotType = sheet.getDotType(dot);
         if (oldTypes[dotType] === undefined) {
             oldTypes[dotType] = [];
         }
@@ -276,7 +279,7 @@ ContextActions.moveDots = function(deltaX, deltaY, sheet, dots) {
     // update positions
 
     dots.forEach(function(dot) {
-        var position = dot.getFirstPosition(sheet);
+        var position = sheet.getPosition(dot);
         // copy position
         prevPositions[dot.getLabel()] = $.extend({}, position);
         sheet.updatePosition(dot, position.x + deltaX, position.y + deltaY);

@@ -7,10 +7,12 @@
  * - Instance methods
  */
 
+var AnimationState = require("./AnimationState");
 var Coordinate = require("./Coordinate");
 var Continuity = require("./Continuity");
 var Dot = require("./Dot");
 var DotType = require("./DotType");
+var errors = require("calchart/errors");
 var JSUtils = require("utils/JSUtils");
 var MovementCommand = require("./MovementCommand");
 var UIUtils = require("utils/UIUtils");
@@ -24,10 +26,8 @@ var UIUtils = require("utils/UIUtils");
  *  - the index of the Sheet in the Show
  *  - an optional label for the Sheet
  *  - the number of beats in the stuntsheet
- *  - for each dot, its dot type
- *  - for each dot, its position
- *  - for each dot, its movements
- *  - for each dot type, its continuity
+ *  - each dot's information (see Sheet.getDotInfo)
+ *  - each dot type's continuities
  *
  * @param {Show} show -- the Show this sheet is part of
  * @param {int} index -- the index of this Sheet in the Show
@@ -62,7 +62,7 @@ var Sheet = function(show, index, numBeats, options) {
     this._orientation = options.orientation;
     this._stepType = options.stepType;
 
-    // map dot labels to their info for the sheet. See Sheet.getInfoForDot
+    // map dot labels to their info for the sheet. See Sheet.getDotInfo
     this._dots = {};
     // map dot type to Continuities
     this._continuities = {};
@@ -197,6 +197,36 @@ Sheet.prototype.changeDotTypes = function(dots, dotType) {
 };
 
 /**
+ * Returns an AnimationState object that describes the given Dot's position,
+ * orientation, etc. for this stuntsheet
+ *
+ * @param {Dot} dot -- the dot to get info of
+ * @param {int} beatNum -- the beat of the current stuntsheet
+ * @return {AnimationState} An AnimationState that describes the given Dot at
+ *   a moment of the show. If the Dot has no position at the specified beat,
+ *   throws an AnimationStateError.
+ */
+Sheet.prototype.getAnimationState = function(dot, beatNum) {
+    var label = dot.getLabel();
+    var movements = this._dots[label].movements;
+    var remaining = beatNum;
+
+    for (var i = 0; i < movements.length; i++) {
+        var movement = movements[i];
+        var duration = movement.getDuration();
+        if (remaining <= duration) {
+            return movement.getAnimationState(remaining);
+        } else {
+            remaining -= duration;
+        }
+    }
+
+    throw new errors.AnimationStateError(
+        "Ran out of movements for " + label + ": " + remaining + " beats remaining"
+    );
+};
+
+/**
  * Get the number of beats per step for this sheet, resolving any defaults
  *
  * @return {int} beats per step
@@ -216,12 +246,28 @@ Sheet.prototype.getContinuities = function(dotType) {
 };
 
 /**
+ * Get the info for the given Dot for this stuntsheet
+ *
+ * @param {Dot|string} dot -- the dot or dot label to retrieve info for
+ * @return {object} the dot's information for this stuntsheet, containing:
+ *   - {DotType} type -- the dot's type
+ *   - {Coordinate} position -- the dot's starting position
+ *   - {Array<MovementCommand>} movements -- the dot's movements in the sheet
+ */
+Sheet.prototype.getDotInfo = function(dot) {
+    if (dot instanceof Dot) {
+        dot = dot.getLabel();
+    }
+    return this._dots[dot];
+};
+
+/**
  * Get all dots of the given dot type
  *
  * @param {string} dotType -- the dot type to get dots for
  * @return {Array<Dot>} all dots of the given type
  */
-Sheet.prototype.getDotType = function(dotType) {
+Sheet.prototype.getDotsOfType = function(dotType) {
     var dots = this._show.getDotMapping();
     var dotTypeDots = [];
 
@@ -232,6 +278,16 @@ Sheet.prototype.getDotType = function(dotType) {
     });
 
     return dotTypeDots;
+};
+
+/**
+ * Get the dot type of the given dot
+ *
+ * @param {Dot|string} dot -- the dot or dot label to get the dot type of
+ * @return {string} the dot type of the given dot
+ */
+Sheet.prototype.getDotType = function(dot) {
+    return this.getDotInfo(dot).type;
 };
 
 /**
@@ -265,19 +321,19 @@ Sheet.prototype.getFieldType = function() {
 };
 
 /**
- * Get the info for the given Dot for this stuntsheet
+ * Get the position of the given dot at the end of the sheet
  *
- * @param {string|Dot} dot -- the dot to retrieve info for
- * @return {object} the dot's information for this stuntsheet, containing:
- *   - {DotType} type: the dot's type
- *   - {Coordinate} position: the dot's starting position
- *   - {Array<MovementCommand>} movements: the dot's movements in the sheet
+ * @param {string|Dot} dot -- the dot or dot label
+ * @return {Coordinate} the final position of the dot in the sheet
  */
-Sheet.prototype.getInfoForDot = function(dot) {
-    if (dot instanceof Dot) {
-        dot = dot.getLabel();
+Sheet.prototype.getFinalPosition = function(dot) {
+    var dotInfo = this.getDotInfo(dot);
+    var movements = dotInfo.movements;
+    if (movements.length === 0) {
+        return dotInfo.position;
+    } else {
+        return movements[movements.length - 1].getEndPosition();
     }
-    return this._dots[dot];
 };
 
 /**
@@ -320,6 +376,16 @@ Sheet.prototype.getOrientation = function() {
 };
 
 /**
+ * Get the position of the dot at the beginning of the sheet
+ *
+ * @param {string|Dot} dot -- the dot or dot label
+ * @return {Coordinate} the initial position of the dot in the sheet
+ */
+Sheet.prototype.getPosition = function(dot) {
+    return this.getDotInfo(dot).position;
+};
+
+/**
  * Get the sheet that precedes this sheet
  *
  * @return {Sheet|undefined} the sheet before this sheet in the
@@ -343,7 +409,7 @@ Sheet.prototype.getStepType = function() {
  */
 Sheet.prototype.isLastSheet = function() {
     return this._index === this._show.getSheets().length - 1;
-}
+};
 
 /**
  * Remove the given continuity to the given dot type
@@ -375,16 +441,15 @@ Sheet.prototype.setIndex = function(index) {
  */
 Sheet.prototype.updateMovements = function(dots) {
     if (typeof dots === "string") {
-        dots = this.getDotType(dots);
+        dots = this.getDotsOfType(dots);
     } else if (dots instanceof Dot) {
         dots = [dots];
     }
 
-    var _this = this;
     var duration = this._numBeats;
 
     dots.forEach(function(dot) {
-        var continuities = _this._continuities[dot.getDotType(_this)];
+        var continuities = this._continuities[this.getDotType(dot)];
         var info = this._dots[dot.getLabel()];
         var data = {
             position: info.position,
