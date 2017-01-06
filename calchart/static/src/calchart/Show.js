@@ -23,11 +23,15 @@ var Song = require("./Song");
  *  - a Sheet object for each stuntsheet in the show
  *  - a Song object for each song in the show
  *  - the field type for the show (see base/constants.py)
+ *  - the number of beats per step for the show
+ *  - the step type for the Show (see CalchartUtils.STEP_TYPES)
+ *  - the orientation of the Show (east-facing or west-facing)
  *
  * @param {object} show_data -- the JSON data to initialize the Show with
  */
 var Show = function(show_data) {
     var _this = this;
+
     this._dots = {};
     show_data.dots.forEach(function(dot_data) {
         var dot = Dot.deserialize(dot_data);
@@ -41,7 +45,10 @@ var Show = function(show_data) {
         return Song.deserialize(song_data);
     });
 
-    this._fieldType = show_data.field_type;
+    this._fieldType = show_data.fieldType;
+    this._beatsPerStep = show_data.beatsPerStep;
+    this._stepType = show_data.stepType;
+    this._orientation = show_data.orientation;
 };
 
 /**
@@ -79,7 +86,10 @@ Show.create = function(data) {
         dots: dots,
         sheets: [],
         songs: [],
-        field_type: data.field_type,
+        fieldType: data.field_type,
+        beatsPerStep: 1,
+        stepType: "HS",
+        orientation: "east",
     });
 };
 
@@ -89,7 +99,12 @@ Show.create = function(data) {
  * @return {object} a JSON object containing this Show's data
  */
 Show.prototype.serialize = function() {
-    var data = {};
+    var data = {
+        fieldType: this._fieldType,
+        beatsPerStep: this._beatsPerStep,
+        stepType: this._stepType,
+        orientation: this._orientation,
+    };
 
     data.dots = [];
     $.each(this._dots, function(label, dot) {
@@ -101,7 +116,6 @@ Show.prototype.serialize = function() {
     data.songs = this._songs.map(function(song) {
         return song.serialize();
     });
-    data.field_type = this._fieldType;
 
     return data;
 };
@@ -114,8 +128,7 @@ Show.prototype.serialize = function() {
  * @return {int} beats per step
  */
 Show.prototype.getBeatsPerStep = function() {
-    // return this._beatsPerStep;
-    return 1;
+    return this._beatsPerStep;
 };
 
 /**
@@ -133,8 +146,13 @@ Show.prototype.getFieldType = function() {
  * @return {int} orientation, in Calchart degrees
  */
 Show.prototype.getOrientation = function() {
-    // return this._orientation;
-    return 0;
+    switch (this._orientation) {
+        case "east":
+            return 0;
+        case "west":
+            return 90;
+    }
+    throw new Error("Invalid orientation: " + this._orientation);
 };
 
 /**
@@ -143,8 +161,7 @@ Show.prototype.getOrientation = function() {
  * @return {string} step type (see CalchartUtils.STEP_TYPES)
  */
 Show.prototype.getStepType = function() {
-    // return this._stepType;
-    return "HS";
+    return this._stepType;
 };
 
 /**** DOTS ****/

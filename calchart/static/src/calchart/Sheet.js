@@ -308,7 +308,15 @@ Sheet.prototype.getNextSheet = function() {
  * @return {int} orientation, in Calchart degrees
  */
 Sheet.prototype.getOrientation = function() {
-    return this._orientation === "default" ? this._show.getOrientation() : this._orientation;
+    switch (this._orientation) {
+        case "default":
+            return this._show.getOrientation();
+        case "east":
+            return 0;
+        case "west":
+            return 90;
+    }
+    throw new Error("Invalid orientation: " + this._orientation);
 };
 
 /**
