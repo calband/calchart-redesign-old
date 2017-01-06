@@ -118,43 +118,46 @@ StopContinuity.prototype.panelHTML = function(controller) {
 };
 
 StopContinuity.prototype.popupHTML = function() {
-    var orientation = HTMLBuilder.formfield("Orientation", HTMLBuilder.select({
-        options: CalchartUtils.ORIENTATIONS,
-        initial: this._orientation,
-    }));
+    var fields = this._getPopupFields();
 
     if (!this._marktime) {
         return {
             name: "Close",
-            fields: [orientation],
+            fields: [fields.orientation],
+        };
+    } else if (this._duration === null) {
+        return {
+            name: "Mark Time Remaining",
+            fields: [
+                fields.orientation,
+                fields.stepType,
+                fields.beatsPerStep,
+            ],
+        };
+    } else {
+        return {
+            name: "Mark Time",
+            fields: [
+                fields.duration,
+                fields.orientation,
+                fields.stepType,
+                fields.beatsPerStep,
+            ],
         };
     }
+};
 
-    var duration = HTMLBuilder.formfield("Number of beats", HTMLBuilder.input({
+/**** HELPERS ****/
+
+StopContinuity.prototype._getPopupFields = function() {
+    var fields = BaseContinuity.prototype._getPopupFields.call(this);
+
+    fields.duration = HTMLBuilder.formfield("Number of beats", HTMLBuilder.input({
         type: "number",
         initial: this._duration,
     }), "duration");
 
-    var stepType = HTMLBuilder.formfield("Step Type", HTMLBuilder.select({
-        options: CalchartUtils.STEP_TYPES,
-        initial: this._stepType,
-    }));
-
-    var beatsPerStep = HTMLBuilder.formfield("Beats per Step", HTMLBuilder.input({
-        type: "number",
-        initial: this._beatsPerStep,
-    }));
-
-    var fields = [duration, orientation, stepType, beatsPerStep];
-
-    if (this._duration === null) {
-        fields.splice(0, 1);
-    }
-
-    return {
-        name: this._duration === null ? "Mark Time Remaining" : "Mark Time",
-        fields: fields,
-    };
+    return fields;
 };
 
 module.exports = StopContinuity;

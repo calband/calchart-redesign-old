@@ -122,30 +122,32 @@ FountainGridContinuity.prototype.panelHTML = function(controller) {
 };
 
 FountainGridContinuity.prototype.popupHTML = function() {
-    var end = HTMLBuilder.formfield("End", HTMLBuilder.select({
+    var fields = this._getPopupFields();
+
+    return {
+        name: this._isEWNS ? "EWNS" : "NSEW",
+        fields: [
+            fields.end,
+            fields.stepType,
+            fields.orientation,
+            fields.beatsPerStep,
+        ],
+    };
+};
+
+/**** HELPERS ****/
+
+FountainGridContinuity.prototype._getPopupFields = function() {
+    var fields = BaseContinuity.prototype._getPopupFields.call(this);
+
+    fields.end = HTMLBuilder.formfield("End", HTMLBuilder.select({
         options: CalchartUtils.ENDINGS,
         initial: this._end,
     }));
 
-    var step = HTMLBuilder.formfield("Step Type", HTMLBuilder.select({
-        options: CalchartUtils.STEP_TYPES,
-        initial: this._stepType,
-    }));
+    fields.orientation.find("label").text("Final Orientation:");
 
-    var orientation = HTMLBuilder.formfield("Final Orientation", HTMLBuilder.select({
-        options: CalchartUtils.ORIENTATIONS,
-        initial: this._orientation,
-    }), "orientation");
-
-    var beatsPerStep = HTMLBuilder.formfield("Beats per Step", HTMLBuilder.input({
-        type: "number",
-        initial: this._beatsPerStep,
-    }));
-
-    return {
-        name: this._isEWNS ? "EWNS" : "NSEW",
-        fields: [end, step, orientation, beatsPerStep],
-    };
+    return fields;
 };
 
 module.exports = FountainGridContinuity;

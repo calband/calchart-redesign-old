@@ -55,7 +55,7 @@ ForwardContinuity.prototype.serialize = function() {
 /**** INSTANCE METHODS ****/
 
 ForwardContinuity.prototype.getMovements = function(dot, data) {
-    var beatsPerStep = thie.getBeatsPerStep();
+    var beatsPerStep = this.getBeatsPerStep();
     var move = new MovementCommandMove(
         data.position.x,
         data.position.y,
@@ -96,30 +96,37 @@ ForwardContinuity.prototype.panelHTML = function(controller) {
 };
 
 ForwardContinuity.prototype.popupHTML = function() {
-    var steps = HTMLBuilder.formfield("Number of steps", HTMLBuilder.input({
+    var fields = this._getPopupFields();
+
+    return {
+        name: "Forward March",
+        fields: [
+            fields.steps,
+            fields.direction,
+            fields.stepType,
+            fields.beatsPerStep,
+        ],
+    };
+};
+
+/**** HELPERS ****/
+
+ForwardContinuity.prototype._getPopupFields = function() {
+    var fields = BaseContinuity.prototype._getPopupFields.call(this);
+
+    fields.steps = HTMLBuilder.formfield("Number of steps", HTMLBuilder.input({
         type: "number",
         initial: this._numSteps,
     }), "numSteps");
 
-    var direction = HTMLBuilder.formfield("Direction", HTMLBuilder.select({
+    fields.direction = HTMLBuilder.formfield("Direction", HTMLBuilder.select({
         options: CalchartUtils.DIRECTIONS,
         initial: this._direction,
     }));
 
-    var stepType = HTMLBuilder.formfield("Step Type", HTMLBuilder.select({
-        options: CalchartUtils.STEP_TYPES,
-        initial: this._stepType,
-    }));
+    delete fields.orientation;
 
-    var beatsPerStep = HTMLBuilder.formfield("Beats per Step", HTMLBuilder.input({
-        type: "number",
-        initial: this._beatsPerStep,
-    }));
-
-    return {
-        name: "Forward March",
-        fields: [steps, direction, stepType, beatsPerStep],
-    };
+    return fields;
 };
 
 module.exports = ForwardContinuity;

@@ -63,10 +63,10 @@ MovementCommandStop.prototype.getAnimationState = function(beatNum) {
  */
 MovementCommandStop.prototype.getContinuityText = function() {
     if (this._isMarkTime) {
-        return "Close";
-    } else {
         var steps = this._duration / this._beatsPerStep;
         return "MT " + steps + " " + this.getOrientation();
+    } else {
+        return "Close";
     }
 };
 

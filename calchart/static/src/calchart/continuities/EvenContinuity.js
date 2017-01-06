@@ -78,30 +78,34 @@ EvenContinuity.prototype.panelHTML = function(controller) {
 };
 
 EvenContinuity.prototype.popupHTML = function() {
-    var stepType = HTMLBuilder.formfield("Step Type", HTMLBuilder.select({
-        options: CalchartUtils.STEP_TYPES,
-        initial: this._stepType,
-    }));
+    var fields = this._getPopupFields();
 
-    var orientation = HTMLBuilder.formfield("Orientation", HTMLBuilder.select({
+    return {
+        name: "Even",
+        fields: [
+            fields.stepType,
+            fields.orientation,
+            fields.beatsPerStep,
+        ],
+    };
+};
+
+/**** HELPERS ****/
+
+EvenContinuity.prototype._getPopupFields = function() {
+    var fields = BaseContinuity.prototype._getPopupFields.call(this);
+
+    fields.orientation = HTMLBuilder.formfield("Orientation", HTMLBuilder.select({
         options: {
             "": "Direction of Travel",
-            "default": "Facing Default",
-            "east": "Facing East",
-            "west": "Facing West",
+            "default": "Default",
+            "east": "East",
+            "west": "West",
         },
         initial: this._orientation,
     }));
 
-    var beatsPerStep = HTMLBuilder.formfield("Beats per Step", HTMLBuilder.input({
-        type: "number",
-        initial: this._beatsPerStep,
-    }));
-
-    return {
-        name: "Even",
-        fields: [stepType, orientation, beatsPerStep],
-    };
+    return fields;
 };
 
 module.exports = EvenContinuity;

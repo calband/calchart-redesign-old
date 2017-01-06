@@ -1,3 +1,4 @@
+var CalchartUtils = require("utils/CalchartUtils");
 var errors = require("calchart/errors");
 var HTMLBuilder = require("utils/HTMLBuilder");
 var JSUtils = require("utils/JSUtils");
@@ -151,6 +152,33 @@ BaseContinuity.prototype.savePopup = function(data) {
 BaseContinuity.prototype._updateMovements = function(controller) {
     this._sheet.updateMovements(this._dotType);
     controller.refresh();
+};
+
+/**
+ * Get the form fields for the popup.
+ *
+ * @return {object} an object whose keys are the names of the fields and
+ *   the values are the jQuery form fields.
+ */
+BaseContinuity.prototype._getPopupFields = function() {
+    var fields = {};
+
+    fields.stepType = HTMLBuilder.formfield("Step Type", HTMLBuilder.select({
+        options: CalchartUtils.STEP_TYPES,
+        initial: this._stepType,
+    }));
+
+    fields.beatsPerStep = HTMLBuilder.formfield("Beats per Step", HTMLBuilder.input({
+        type: "number",
+        initial: this._beatsPerStep,
+    }));
+
+    fields.orientation = HTMLBuilder.formfield("Orientation", HTMLBuilder.select({
+        options: CalchartUtils.ORIENTATIONS,
+        initial: this._orientation,
+    }));
+
+    return fields;
 };
 
 /**
