@@ -114,6 +114,18 @@ JSUtils.range = function() {
 };
 
 /**
+ * Return the given options, setting undefined keys according to the given
+ * defaults
+ *
+ * @param {object|undefined} options -- the options to return
+ * @param {object} defaults -- the defaults to set
+ * @return {object} the given defaults, overridden with the given options
+ */
+JSUtils.setDefaults = function(options, defaults) {
+    return $.extend({}, defaults, options);
+};
+
+/**
  * Convert the given value to camel case
  *
  * @param {string} value -- the value to convert

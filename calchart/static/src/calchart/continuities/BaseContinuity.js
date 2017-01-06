@@ -22,9 +22,14 @@ var BaseContinuity = function(sheet, dotType, options) {
     this._sheet = sheet;
     this._dotType = dotType;
 
-    this._stepType = JSUtils.get(options, "stepType", "default");
-    this._beatsPerStep = JSUtils.get(options, "beatsPerStep", "default");
-    this._orientation = JSUtils.get(options, "orientation", "default");
+    options = JSUtils.setDefaults(options, {
+        stepType: "default",
+        beatsPerStep: "default",
+        orientation: "default",
+    });
+    this._stepType = options.stepType;
+    this._beatsPerStep = options.beatsPerStep;
+    this._orientation = options.orientation;
 };
 
 /**

@@ -16,7 +16,7 @@ var MovementCommandStop = require("calchart/movements/MovementCommandStop");
  *   - {string} stepType
  *   - {int} beatsPerStep
  *   - {string} orientation -- the direction to face at the end
- *   - {string} end -- whether to marktime or close at the end
+ *   - {string} end -- whether to marktime or close at the end (default mark time)
  */
 var FountainGridContinuity = function(sheet, dotType, isEWNS, options) {
     BaseContinuity.call(this, sheet, dotType, options);

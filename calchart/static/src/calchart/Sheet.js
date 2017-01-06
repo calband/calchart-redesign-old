@@ -11,6 +11,7 @@ var Coordinate = require("./Coordinate");
 var Continuity = require("./Continuity");
 var Dot = require("./Dot");
 var DotType = require("./DotType");
+var JSUtils = require("utils/JSUtils");
 var MovementCommand = require("./MovementCommand");
 var UIUtils = require("utils/UIUtils");
 
@@ -35,19 +36,31 @@ var UIUtils = require("utils/UIUtils");
  *   contain optional information about a stuntsheet, such as:
  *     - {string} label -- a label for the Sheet
  *     - {string} fieldType -- the field type
+ *     - {int|string} beatsPerStep -- the default number of beats per step for
+ *       continuities in the Sheet, or "default" to get the number of beats per
+ *       step from the Show
+ *     - {string} orientation -- the default orientation for continuities in the
+ *       Sheet, or "default" to get the orientation from the Show
+ *     - {string} stepType -- the default step type for continuities in the Sheet,
+ *       or "default" to get the step type from the Show
  */
 var Sheet = function(show, index, numBeats, options) {
     this._show = show;
     this._index = index;
     this._numBeats = numBeats;
 
-    var defaults = {
+    options = JSUtils.setDefaults(options, {
         label: null,
         fieldType: null,
-    };
-    options = $.extend(defaults, options);
+        beatsPerStep: "default",
+        orientation: "default",
+        stepType: "default",
+    });
     this._label = options.label;
     this._fieldType = options.fieldType;
+    this._beatsPerStep = options.beatsPerStep;
+    this._orientation = options.orientation;
+    this._stepType = options.stepType;
 
     // map dot labels to their info for the sheet. See Sheet.getInfoForDot
     this._dots = {};
@@ -125,6 +138,9 @@ Sheet.prototype.serialize = function() {
     data.options = {
         label: this._label,
         fieldType: this._fieldType,
+        beatsPerStep: this._beatsPerStep,
+        orientation: this._orientation,
+        stepType: this._stepType,
     };
     
     data.dots = {};
@@ -186,8 +202,7 @@ Sheet.prototype.changeDotTypes = function(dots, dotType) {
  * @return {int} beats per step
  */
 Sheet.prototype.getBeatsPerStep = function() {
-    // return this._beatsPerStep === "default" ? this._show.getBeatsPerStep() : this._beatsPerStep;
-    return 1;
+    return this._beatsPerStep === "default" ? this._show.getBeatsPerStep() : this._beatsPerStep;
 };
 
 /**
@@ -293,8 +308,7 @@ Sheet.prototype.getNextSheet = function() {
  * @return {int} orientation, in Calchart degrees
  */
 Sheet.prototype.getOrientation = function() {
-    // return this._orientation === "default" ? this._show.getOrientation() : this._orientation;
-    return 0;
+    return this._orientation === "default" ? this._show.getOrientation() : this._orientation;
 };
 
 /**
@@ -313,8 +327,7 @@ Sheet.prototype.getPrevSheet = function() {
  * @return {string} step type (see CalchartUtils.STEP_TYPES)
  */
 Sheet.prototype.getStepType = function() {
-    // return this._stepType === "default" ? this._show.getStepType() : this._stepType;
-    return "HS";
+    return this._stepType === "default" ? this._show.getStepType() : this._stepType;
 };
 
 /**
