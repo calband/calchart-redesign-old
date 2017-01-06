@@ -130,6 +130,12 @@ BaseContinuity.prototype.popupHTML = function() {
  */
 BaseContinuity.prototype.savePopup = function(data) {
     var _this = this;
+
+    // validate beats per step
+    if (data.beatsPerStep === "custom") {
+        data.beatsPerStep = data.customBeatsPerStep;
+    }
+
     var changed = {};
     $.each(data, function(key, val) {
         var old = _this["_" + key];
@@ -138,6 +144,7 @@ BaseContinuity.prototype.savePopup = function(data) {
             _this["_" + key] = val;
         }
     });
+
     return changed;
 };
 
@@ -168,10 +175,28 @@ BaseContinuity.prototype._getPopupFields = function() {
         initial: this._stepType,
     }));
 
-    fields.beatsPerStep = HTMLBuilder.formfield("Beats per Step", HTMLBuilder.input({
-        type: "number",
-        initial: this._beatsPerStep,
+    // beats per step is a select between default/custom, which disables/enables an
+    // input for a custom beats per step
+    fields.beatsPerStep = HTMLBuilder.formfield("Beats per Step", HTMLBuilder.select({
+        options: {
+            default: "Default",
+            custom: "Custom",
+        },
+        change: function() {
+            var disabled = $(this).val() !== "custom";
+            $(this).parent()
+                .find(".custom-beats-per-step")
+                .prop("disabled", disabled);
+        },
+        initial: this._beatsPerStep === "default" ? "default" : "custom",
     }));
+    HTMLBuilder.input({
+        class: "custom-beats-per-step",
+        name: "customBeatsPerStep",
+        type: "number",
+        initial: this.getBeatsPerStep(),
+    }).appendTo(fields.beatsPerStep);
+    fields.beatsPerStep.find("select").change();
 
     fields.orientation = HTMLBuilder.formfield("Orientation", HTMLBuilder.select({
         options: CalchartUtils.ORIENTATIONS,

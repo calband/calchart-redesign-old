@@ -55,15 +55,15 @@ ForwardContinuity.prototype.serialize = function() {
 /**** INSTANCE METHODS ****/
 
 ForwardContinuity.prototype.getMovements = function(dot, data) {
-    var beatsPerStep = this.getBeatsPerStep();
+    var options = {
+        beatsPerStep: this.getBeatsPerStep(),
+    };
     var move = new MovementCommandMove(
         data.position.x,
         data.position.y,
         this._direction,
-        this._numSteps * beatsPerStep,
-        {
-            beatsPerStep: beatsPerStep,
-        }
+        this._numSteps * options.beatsPerStep,
+        options
     );
     return [move];
 };

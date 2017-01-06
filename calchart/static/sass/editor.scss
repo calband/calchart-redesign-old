@@ -122,6 +122,17 @@ $sidebar-width: 200px;
         label {
             width: 125px;
         }
+        .field.beatsPerStep {
+            select {
+                width: 90px;
+            }
+            input.custom-beats-per-step {
+                margin-left: 10px;
+                width: 50px;
+                vertical-align: middle;
+                text-align: center;
+            }
+        }
     }
 }
 

@@ -66,6 +66,9 @@ input {
         box-shadow: 0 0 5px $gold;
         border-color: $semilight-gray;
     }
+    &:disabled {
+        background-color: $light-gray;
+    }
     &[type=number] {
         width: 75px;
         text-align: center;

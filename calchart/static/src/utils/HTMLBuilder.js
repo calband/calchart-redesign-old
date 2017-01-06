@@ -107,15 +107,17 @@ HTMLBuilder.img = function(src) {
  *
  * @param {string} class -- the class to add to the <input>
  * @param {string} type -- the type of the input
+ * @param {string} name -- the name of the input
  * @param {string|float} initial -- the initial value of the input
  * @param {function} change -- the callback to run when the value is changed
  */
 HTMLBuilder.input = function() {
-    var args = JSUtils.parseArgs(arguments, ["class", "type", "initial", "change"]);
+    var args = JSUtils.parseArgs(arguments, ["class", "type", "name", "initial", "change"]);
 
     return $("<input>")
         .addClass(args.class)
         .attr("type", args.type)
+        .attr("name", args.name)
         .attr("value", args.initial)
         .change(args.change);
 };

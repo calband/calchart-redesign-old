@@ -45,8 +45,19 @@ var NotImplementedError = function(obj) {
 };
 JSUtils.extends(NotImplementedError, Error);
 
+/**
+ * An error for errors when validating data
+ *
+ * @param {string} message -- the error message to show on the UI
+ */
+var ValidationError = function(message) {
+    this.message = message;
+};
+JSUtils.extends(ValidationError, Error);
+
 module.exports = {
     ActionError: ActionError,
     AnimationStateError: AnimationStateError,
     NotImplementedError: NotImplementedError,
+    ValidationError: ValidationError,
 };

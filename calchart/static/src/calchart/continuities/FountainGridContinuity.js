@@ -70,8 +70,9 @@ FountainGridContinuity.prototype.getMovements = function(dot, data) {
     var options = {
         beatsPerStep: this.getBeatsPerStep(),
     };
-    var addMovement = function(x, y, dir, duration) {
-        var movement = new MovementCommandMove(x, y, dir, Math.abs(duration), options);
+    var addMovement = function(x, y, dir, steps) {
+        var duration = Math.abs(steps) * options.beatsPerStep;
+        var movement = new MovementCommandMove(x, y, dir, duration, options);
         movements.push(movement);
     };
 

@@ -11,6 +11,7 @@
 
 var BaseContext = require("./BaseContext");
 var Continuity = require("calchart/Continuity");
+var errors = require("calchart/errors");
 var HTMLBuilder = require("utils/HTMLBuilder");
 var JSUtils = require("utils/JSUtils");
 var MathUtils = require("utils/MathUtils");
@@ -167,7 +168,16 @@ ContextActions.saveContinuity = function(continuity, data, sheet, dotType) {
     sheet = sheet || this._sheet;
     dotType = dotType || this._dotType;
 
-    var changed = continuity.savePopup(data);
+    try {
+        var changed = continuity.savePopup(data);
+    } catch (e) {
+        if (e instanceof errors.ValidationError) {
+            UIUtils.showError(e.message);
+            return;
+        } else {
+            throw e;
+        }
+    }
 
     sheet.updateMovements(dotType);
     this._controller.checkContinuities({
