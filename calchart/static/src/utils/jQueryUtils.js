@@ -195,6 +195,44 @@ jQueryUtils.scrollIntoView = function(parent, options) {
 };
 
 /**
+ * Position this element at the given position in the top, left corner. If
+ * the element goes offscreen to the right, position the element on the left
+ * instead. If the element goes below the screen, position the element so
+ * that its bottom edge is on the bottom of the screen.
+ *
+ * @param {float} top -- the position of the top edge of the element, unless
+ *   offscreen
+ * @param {float} left -- the position of the left edge of the element,
+ *   unless offscreen
+ * @param {float|undefined} right -- the position of the right edge of the
+ *   element, if it goes offscreen. (Default same as left)
+ */
+jQueryUtils.smartPosition = function(top, left, right) {
+    if (right === undefined) {
+        right = left;
+    }
+
+    var position = {
+        top: top,
+        left: left,
+    };
+
+    var width = this.outerWidth();
+    var maxWidth = $(window).width();
+    if (left + width > maxWidth) {
+        position.left = right - width;
+    }
+
+    var height = this.outerHeight();
+    var maxHeight = $(window).height();
+    if (top + height > maxHeight) {
+        position.top = maxHeight - height;
+    }
+
+    return this.css(position);
+};
+
+/**
  * Exports a function that takes in the jQuery operator and adds the
  * functions defined in jQueryUtils to the $.fn API
  */

@@ -54,6 +54,7 @@ DotContext.prototype.load = function() {
 
     this._addEvents(".workspace", {
         contextmenu: function(e) {
+            // TODO: different if on a dot
             UIUtils.showContextMenu(e, {
                 "Edit Continuity": "todo",
                 "Change Dot Type": {

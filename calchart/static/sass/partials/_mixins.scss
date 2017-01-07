@@ -22,9 +22,10 @@
 
 // create a menu that shows near the user's mouse
 @mixin hover-menu {
+    @include unselectable;
     position: absolute;
     padding: 5px 0;
-    z-index: z-index(popup);
+    z-index: z-index(menu);
     background: $light-gray;
     border: 1px solid $medium-gray;
     li {

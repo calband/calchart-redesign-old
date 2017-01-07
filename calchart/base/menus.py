@@ -6,7 +6,7 @@ for the menu/toolbar when rendered.
 Menu and toolbar items are grouped into menu groups and toolbar groups, respectively. In the UI,
 these groups will be separated by a line.
 
-Functions are strings that represent a function defined in the associated ApplicationController
+Actions are strings that represent an action defined in the associated ApplicationController
 class. See ApplicationController._parseAction for more details.
 """
 
@@ -44,15 +44,15 @@ class Menu(object):
     def render(self):
         return format_html(
             '<ul class="menu">{}</ul>',
-            mark_safe(''.join(submenu.render(top_level=True) for submenu in self.submenus))
+            mark_safe(''.join(submenu.render() for submenu in self.submenus))
         )
 
 class SubMenu(object):
     """
     A Calchart SubMenu, in the format
 
-    <li class="has-submenu"> # .has-submenu if not top level
-        <span>{{ name }}</span>
+    <li>
+        {{ name }}
         <div class="submenu">
             # for each group
             <ul class="menu-group">
@@ -66,12 +66,11 @@ class SubMenu(object):
         self.name = name
         self.groups = groups
 
-    def render(self, top_level=False):
-        li_class = '' if top_level else 'has-submenu'
+    def render(self):
         menu_groups = mark_safe(''.join(self.render_group(group) for group in self.groups))
         return format_html(
-            '<li class="{}"><span>{}</span><div class="submenu">{}</div></li>',
-            li_class, self.name, menu_groups
+            '<li>{}<div class="submenu">{}</div></li>',
+            self.name, menu_groups
         )
 
     def render_group(self, group):
@@ -84,18 +83,16 @@ class MenuItem(object):
     """
     A Calchart MenuItem, in the format
 
-    <li data-function="{{ function }}">
-        <span>{{ name }}</span>
-    </li>
+    <li data-action="{{ action }}">{{ name }}</li>
     """
-    def __init__(self, name, function):
+    def __init__(self, name, action):
         self.name = name
-        self.function = function
+        self.action = action
 
     def render(self):
         return format_html(
-            '<li data-function="{}"><span>{}</span></li>',
-            self.function, self.name
+            '<li data-action="{}">{}</li>',
+            self.action, self.name
         )
 
 class Toolbar(object):
@@ -160,22 +157,22 @@ class ToolbarItem(object):
     """
     A Calchart ToolbarItem, in the format
 
-    <li class="toolbar-item {{ class }}" data-name="{{ name }}" data-function="{{ function }}">
+    <li class="toolbar-item {{ class }}" data-name="{{ name }}" data-action="{{ action }}">
         <i class="icon-{{ icon }}"></i>
     </li>
 
     where the class is the slugified name
     """
-    def __init__(self, name, icon, function):
+    def __init__(self, name, icon, action):
         self.name = name
         # icon class, e.g. "plus" (see css/fonts/icons-reference.html)
         self.icon = icon
-        self.function = function
+        self.action = action
 
     def render(self):
         return format_html(
-            '<li class="toolbar-item {}" data-name="{}" data-function="{}">{}</li>',
-            slugify(self.name), self.name, self.function, mark_safe(self._render_contents())
+            '<li class="toolbar-item {}" data-name="{}" data-action="{}">{}</li>',
+            slugify(self.name), self.name, self.action, mark_safe(self._render_contents())
         )
 
     def _render_contents(self):
@@ -185,16 +182,16 @@ class ImageToolbarItem(ToolbarItem):
     """
     A Calchart ToolbarItem, in the format
 
-    <li class="toolbar-item {{ class }}" data-name="{{ name }}" data-function="{{ function }}">
+    <li class="toolbar-item {{ class }}" data-name="{{ name }}" data-action="{{ action }}">
         <img src="{% static 'img/' + src %}">
     </li>
 
     where the class is the slugified name
     """
-    def __init__(self, name, src, function):
+    def __init__(self, name, src, action):
         self.name = name
         self.src = src
-        self.function = function
+        self.action = action
 
     def _render_contents(self):
         src = get_static_path('img/%s' % self.src)

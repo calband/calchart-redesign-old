@@ -64,17 +64,11 @@ EditorController.prototype.init = function() {
 
     $(".content .sidebar")
         .contextmenu(function(e) {
-            // in case any context menus are already active
-            $(".context-menu").remove();
-
             UIUtils.showContextMenu(e, {
                 "Add Sheet...": "addStuntsheet",
             });
         })
         .on("contextmenu", ".stuntsheet", function(e) {
-            // in case any context menus are already active
-            $(".context-menu").remove();
-
             var sheet = $(this).data("sheet");
             _this.loadSheet(sheet);
 

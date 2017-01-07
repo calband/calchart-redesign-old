@@ -82,20 +82,23 @@ UIUtils.getData = function(parent) {
  */
 UIUtils.bindSubmenu = function(parent, submenu) {
     var showSubmenu = function() {
-        // TODO: show on right, unless it goes off-screen.
-        // TODO: align top of submenu to top of parent, unless goes below screen
+        var offset = $(parent).offset();
+        var top = offset.top;
+        var left = offset.left + $(parent).outerWidth();
+        var right = offset.left;
+
         $(submenu)
-            .css({
-                top: 0,
-                left: 0,
-            })
+            .smartPosition(top, left, right)
             .show();
     };
     var hideSubmenu = function() {
         $(submenu).hide();
     };
 
-    $(parent).hover(showSubmenu, hideSubmenu);
+    // TODO: don't hide if over submenu
+    $(parent)
+        .addClass("has-submenu")
+        .hover(showSubmenu, hideSubmenu);
     $(submenu).appendTo("body");
 };
 
@@ -110,7 +113,13 @@ UIUtils.bindSubmenu = function(parent, submenu) {
 UIUtils.showContextMenu = function(e, items) {
     e.preventDefault();
 
-    var menu = HTMLBuilder.make("ul.context-menu");
+    var closeMenus = function() {
+        $(".context-menu").remove();
+    };
+
+    // close any existing menus
+    closeMenus();
+    var menu = HTMLBuilder.make("ul.context-menu").appendTo("body");
 
     var makeMenu = function(parent, items) {
         $.each(items, function(label, action) {
@@ -118,7 +127,7 @@ UIUtils.showContextMenu = function(e, items) {
             if (typeof action === "string") {
                 item.click(function() {
                     window.controller.doAction(action);
-                    menu.clickOff();
+                    closeMenus();
                 });
             } else {
                 var submenu = HTMLBuilder.make("ul.context-menu.submenu");
@@ -128,18 +137,19 @@ UIUtils.showContextMenu = function(e, items) {
         });
     };
 
+    menu.empty();
     makeMenu(menu, items);
 
-    menu
-        .clickOff(function() {
-            menu.remove();
-            $(".context-menu.submenu").remove();
-        })
-        .css({
-            top: e.pageY,
-            left: e.pageX,
-        })
-        .appendTo("body");
+    menu.smartPosition(e.pageY, e.pageX);
+
+    // clicking outside of context menu and its submenus closes them
+    $(window).click(function(e) {
+        var target = $(e.target);
+        if (target.notIn(".context-menu")) {
+            closeMenus();
+            $(this).off(e);
+        }
+    });
 };
 
 /**** PANELS ****/

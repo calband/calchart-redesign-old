@@ -225,65 +225,89 @@ ApplicationController.prototype._parseAction = function(name) {
 /**
  * Sets up the given menu element.
  *
+ * - "menu" refers to the main menu container, which contain the menu tabs
+ * - "menu tab" refers to the elements in the main menu container that can
+ *   be clicked on to open their corresponding submenu.
+ * - "submenu" refers to any menu containing menu items
+ * - "menu item" refers to any item in a submenu that can do actions or open
+ *   another submenu
+ *
  * @param {jQuery|string} menu -- jQuery object or selector to setup
  */
 ApplicationController.prototype._setupMenu = function(menu) {
-    var _this = this;
+    var controller = this;
 
-    var hideMenu = function() {
-        $(menu).removeClass("active")
-            .find("li.active")
-            .removeClass("active");
+    // open the given menu tab
+    var openSubmenu = function(menuTab, submenu) {
+        closeSubmenus();
+        $(menuTab).addClass("active");
+
+        var offset = $(menuTab).offset();
+        $(submenu)
+            .css({
+                top: offset.top + $(menuTab).outerHeight(),
+                left: offset.left,
+            })
+            .show();
     };
 
-    // set up activating menu
-    $(menu).children("li").children("span")
-        .click(function() {
-            if ($(menu).hasClass("active")) {
-                hideMenu();
-                return;
+    // close all submenus
+    var closeSubmenus = function() {
+        $(menu).children().removeClass("active");
+        $(".submenu").hide();
+        $(window).off("close-submenus");
+    };
+
+    // recursively set up submenu items
+    var setupMenuItems = function(submenu) {
+        $(submenu).find("li").each(function() {
+            var action = $(this).data("action");
+            if (action) {
+                $(this).click(function() {
+                    controller.doAction(action);
+                    closeSubmenus();
+                });
             }
 
-            $(menu)
-                .addClass("active")
-                .children("li.active")
-                .removeClass("active");
+            var subsubmenu = $(this).children(".submenu");
+            if (subsubmenu.exists()) {
+                UIUtils.bindSubmenu(this, subsubmenu);
+                setupMenuItems(subsubmenu);
+            }
+        });
+    };
 
-            $(this).parent().addClass("active");
-        })
-        .mouseenter(function() {
-            if ($(menu).hasClass("active")) {
-                $(menu).children("li.active").removeClass("active");
-                $(this).parent().addClass("active");
+    var menuTabs = $(menu).children();
+    menuTabs.each(function() {
+        var menuTab = this;
+        var submenu = $(this).children(".submenu").appendTo("body");
+
+        // clicking toggles active menu
+        $(this).click(function() {
+            if ($(menu).children(".active").exists()) {
+                closeSubmenus();
+            } else {
+                openSubmenu(menuTab, submenu);
+
+                // clicking outside of menu and its submenus closes them
+                $(window).on("click.close-submenus", function(e) {
+                    var target = $(e.target);
+                    if (target.notIn(menuTabs) && target.notIn(".submenu")) {
+                        closeSubmenus();
+                        $(this).off(e);
+                    }
+                });
             }
         });
 
-    // clicking outside the menu and any submenus will close the menu
-    $(window).click(function(e) {
-        if (!$(menu).hasClass("active")) {
-            return;
-        }
+        // activate submenu when hovered over
+        $(this).mouseenter(function() {
+            if ($(menu).children(".active").exists()) {
+                openSubmenu(menuTab, submenu);
+            }
+        });
 
-        var target = $(e.target);
-        if (target.notIn($(menu).children()) && target.notIn(".submenu")) {
-            hideMenu();
-        }
-    });
-
-    // set up click and add shortcuts to menu
-    $(menu).children().find("li").each(function() {
-        var _function = $(this).data("function");
-        if (_function) {
-            $(this).click(function() {
-                _this.doAction(_function);
-                hideMenu();
-            });
-        }
-
-        var submenu = $(this).children(".submenu");
-        if (submenu.exists()) {
-            UIUtils.bindSubmenu(this, submenu);
-        }
+        setupMenuItems(submenu);
     });
 };
 
