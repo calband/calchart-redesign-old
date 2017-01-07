@@ -207,11 +207,15 @@ DotContext.prototype.unload = function() {
 /**** INSTANCE METHODS ****/
 
 DotContext.prototype.shortcuts = {
-    "ctrl+a": "selectAll",
     "left": "nudgeDots(-1, 0)",
     "up": "nudgeDots(0, -1)",
     "right": "nudgeDots(1, 0)",
     "down": "nudgeDots(0, 1)",
+    "shift+left": "nudgeDots(-4, 0)",
+    "shift+up": "nudgeDots(0, -4)",
+    "shift+right": "nudgeDots(4, 0)",
+    "shift+down": "nudgeDots(0, 4)",
+    "ctrl+a": "selectAll",
 };
 
 /**

@@ -159,10 +159,6 @@ BaseGrapher.prototype.isSelected = function(dot) {
  * @param {float} y -- the y-coordinate of the dot's position, in pixels
  */
 BaseGrapher.prototype.moveDotTo = function(dot, x, y) {
-    // contain dot in workspace
-    x = MathUtils.bound(x, 0, this._svgWidth);
-    y = MathUtils.bound(y, 0, this._svgHeight);
-
     $(dot)
         .attr("transform", "translate(" + x + "," + y + ")")
         .data("position", new Coordinate(x, y));
