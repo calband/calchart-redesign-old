@@ -38,9 +38,14 @@ JSUtils.extends(DotContext, BaseContext);
 
 DotContext.prototype.load = function() {
     var _this = this;
-    var origin = $(".workspace").offset();
-    var svg = this._grapher.getGraph();
     var scale = this._grapher.getScale();
+
+    var workspace = $(".workspace").offset();
+    var graph = this._grapher.getGraph();
+    var svg = {
+        width: graph.outerWidth(),
+        height: graph.outerHeight(),
+    };
 
     // variables to track state when dragging dots
     var dragState = "none"; // none, drag, select
@@ -127,18 +132,30 @@ DotContext.prototype.load = function() {
                     // relative to workspace
                     var width = Math.abs(deltaX);
                     var height = Math.abs(deltaY);
-                    var minX = Math.min(e.pageX, dragStart.pageX) - origin.left + scrollStart.left;
-                    var minY = Math.min(e.pageY, dragStart.pageY) - origin.top + scrollStart.top;
-                    var maxX = minX + width;
-                    var maxY = minY + height;
+
+                    var minX = Math.min(e.pageX, dragStart.pageX) - workspace.left + scrollStart.left;
+                    var minY = Math.min(e.pageY, dragStart.pageY) - workspace.top + scrollStart.top;
+
+                    // contain in graph
+                    var maxX = Math.min(minX + width, svg.width);
+                    var maxY = Math.min(minY + height, svg.height);
+                    width = maxX - minX;
+                    height = maxY - minY;
 
                     // update dimensions of the selection box
-                    $(".selection-box").css({
-                        top: minY,
-                        left: minX,
-                        width: width,
-                        height: height,
-                    });
+                    $(".selection-box")
+                        .css({
+                            top: minY,
+                            left: minX,
+                            width: width,
+                            height: height,
+                        })
+                        .scrollIntoView(".workspace", {
+                            callback: function(deltaX, deltaY) {
+                                scrollStart.top += deltaY;
+                                scrollStart.left += deltaX;
+                            },
+                        });
 
                     // select dots within the selection box
                     _this._controller.deselectDots();
