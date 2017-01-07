@@ -15,4 +15,11 @@ $(document).ready(function() {
         .on("click", ".popup-box button.cancel", function() {
             UIUtils.hidePopup();
         });
+
+    // ESC closes active popups
+    $(window).keydown(function(e) {
+        if (e.which === 27) {
+            UIUtils.hidePopup();
+        }
+    });
 });
