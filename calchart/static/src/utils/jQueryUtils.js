@@ -7,6 +7,37 @@ var MathUtils = require("./MathUtils");
 var jQueryUtils = {};
 
 /**
+ * Runs a callback function if the user clicks off this element. If run without
+ * arguments, triggers the callback.
+ *
+ * @param {function} callback -- the function to run when anything besides this element
+ *   is clicked on. The click event is passed into the function. After the callback runs
+ *   once, it is removed.
+ */
+jQueryUtils.clickOff = function() {
+    var _this = this;
+
+    if (arguments.length === 0) {
+        var callback = $(this).data("callback");
+        callback.call(this);
+        $(window).off(".clickOff");
+    } else {
+        var callback = arguments[0];
+    }
+
+    $(window).on("click.clickOff", function(e) {
+        if (!$(e.target).closest(_this).exists()) {
+            callback.call(_this, e);
+            $(window).off(e);
+        }
+    });
+
+    $(this).data("callback", callback);
+
+    return this;
+};
+
+/**
  * Convert a <select> element into a fancy dropdown. We use the Chosen library
  * (http://harvesthq.github.io/chosen/) to convert the selects and we style it
  * on our own in _mixins.scss. In order to support re-initializing Chosen dropdowns,

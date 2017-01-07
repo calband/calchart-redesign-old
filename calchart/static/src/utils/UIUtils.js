@@ -1,9 +1,10 @@
 /**
  * @fileOverview This file is organized in the following sections:
  *
+ * - Context menu utilities
  * - Form utilities
- * - Popup utilities
  * - Panel utilities
+ * - Popup utilities
  * - Message utilities
  */
 
@@ -14,6 +15,40 @@ var HTMLBuilder = require("./HTMLBuilder");
  * of the application
  */
 var UIUtils = {};
+
+/**** CONTEXT MENUS ****/
+
+/**
+ * Show a context menu with the given items
+ *
+ * @param {Event} e -- the click event that activated the context menu
+ * @param {object} items -- the items to show in the context menu,
+ *   mapping label to action.
+ */
+UIUtils.showContextMenu = function(e, items) {
+    e.preventDefault();
+
+    var menu = HTMLBuilder.make("ul.context-menu");
+
+    $.each(items, function(label, action) {
+        HTMLBuilder.li(label)
+            .click(function() {
+                window.controller.doAction(action);
+                menu.clickOff();
+            })
+            .appendTo(menu);
+    });
+
+    menu
+        .clickOff(function() {
+            menu.remove();
+        })
+        .css({
+            top: e.pageY,
+            left: e.pageX,
+        })
+        .appendTo("body");
+};
 
 /**** FORMS ****/
 
@@ -69,64 +104,6 @@ UIUtils.getData = function(parent) {
         }
     });
     return data;
-};
-
-/**** POPUPS ****/
-
-/**
- * Shows the popup with the given name
- *
- * @param {string} name -- the name of the popup to show
- * @param {object} options -- an object containing additional parameters, such as:
- *   - {function} init -- optional function to run before the popup is shown
- *   - {function} onSubmit -- optional function to run when the Save button is pressed
- *   - {function} onHide -- optional function to run after the popup is hidden
- */
-UIUtils.showPopup = function(name, options) {
-    var popup = $(".popup-box." + name).addClass("active");
-
-    // clear inputs and messages
-    popup.find("input, select, textarea").val("");
-
-    if (options.init !== undefined) {
-        options.init(popup);
-    }
-
-    popup.find("form")
-        .off("submit.popup")
-        .on("submit.popup", function(e) {
-            e.preventDefault();
-
-            if (options.onSubmit !== undefined) {
-                options.onSubmit(popup);
-            }
-        });
-
-    popup.data("onHide", options.onHide);
-
-    $(".popup").show();
-
-    // auto focus on first input
-    popup.find("input:first").focus();
-};
-
-/**
- * Hides the given popup
- *
- * @param {jQuery|string} popup -- the popup or the name of the popup to hide
- */
-UIUtils.hidePopup = function(popup) {
-    if (typeof popup === "string") {
-        popup = $(".popup-box." + popup);
-    }
-
-    $(".popup").hide();
-    $(popup).removeClass("active");
-
-    var onHide = $(popup).data("onHide");
-    if (onHide) {
-        onHide(popup);
-    }
 };
 
 /**** PANELS ****/
@@ -209,6 +186,64 @@ UIUtils.setupPanel = function(panel, options) {
             }
         },
     });
+};
+
+/**** POPUPS ****/
+
+/**
+ * Shows the popup with the given name
+ *
+ * @param {string} name -- the name of the popup to show
+ * @param {object} options -- an object containing additional parameters, such as:
+ *   - {function} init -- optional function to run before the popup is shown
+ *   - {function} onSubmit -- optional function to run when the Save button is pressed
+ *   - {function} onHide -- optional function to run after the popup is hidden
+ */
+UIUtils.showPopup = function(name, options) {
+    var popup = $(".popup-box." + name).addClass("active");
+
+    // clear inputs and messages
+    popup.find("input, select, textarea").val("");
+
+    if (options.init !== undefined) {
+        options.init(popup);
+    }
+
+    popup.find("form")
+        .off("submit.popup")
+        .on("submit.popup", function(e) {
+            e.preventDefault();
+
+            if (options.onSubmit !== undefined) {
+                options.onSubmit(popup);
+            }
+        });
+
+    popup.data("onHide", options.onHide);
+
+    $(".popup").show();
+
+    // auto focus on first input
+    popup.find("input:first").focus();
+};
+
+/**
+ * Hides the given popup
+ *
+ * @param {jQuery|string} popup -- the popup or the name of the popup to hide
+ */
+UIUtils.hidePopup = function(popup) {
+    if (typeof popup === "string") {
+        popup = $(".popup-box." + popup);
+    }
+
+    $(".popup").hide();
+    $(popup).removeClass("active");
+
+    var onHide = $(popup).data("onHide");
+    if (onHide) {
+        onHide(popup);
+    }
 };
 
 /**** MESSAGES ****/

@@ -205,6 +205,10 @@ header {
     }
 }
 
+.context-menu {
+    @include hover-menu;
+}
+
 .toolbar {
     z-index: z-index(toolbar);
     padding: 5px 0;

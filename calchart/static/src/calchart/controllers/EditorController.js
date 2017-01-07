@@ -63,9 +63,28 @@ EditorController.prototype.init = function() {
     this._grapher.drawField();
 
     $(".content .sidebar")
+        .contextmenu(function(e) {
+            // in case any context menus are already active
+            $(".context-menu").remove();
+
+            UIUtils.showContextMenu(e, {
+                "Add Sheet...": "addStuntsheet",
+            });
+        })
         .on("contextmenu", ".stuntsheet", function(e) {
-            e.preventDefault();
-            console.log("contextmenu");
+            // in case any context menus are already active
+            $(".context-menu").remove();
+
+            var sheet = $(this).data("sheet");
+            _this.loadSheet(sheet);
+
+            UIUtils.showContextMenu(e, {
+                "Duplicate Sheet": "duplicateSheet",
+                "Delete Sheet": "deleteSheet",
+                "Properties...": "showProperties",
+            });
+
+            return false;
         })
         .on("click", ".stuntsheet", function() {
             var sheet = $(this).data("sheet");
@@ -87,10 +106,11 @@ EditorController.prototype.init = function() {
 /**** INSTANCE METHODS ****/
 
 EditorController.prototype.shortcuts = {
+    "alt+n": "addStuntsheet", // can't capture ctrl+n: http://stackoverflow.com/a/7296303/4966649
+    "ctrl+backspace": "deleteSheet",
+    "ctrl+shift+z": "redo",
     "ctrl+s": "saveShow",
     "ctrl+z": "undo",
-    "ctrl+shift+z": "redo",
-    "ctrl+backspace": "deleteSheet",
 };
 
 /**

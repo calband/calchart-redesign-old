@@ -96,27 +96,22 @@ ApplicationController.prototype.init = function() {
 
     // set up keyboard shortcuts
     $(window).keydown(function(e) {
+        // ignore keypresses when typing into an input field
+        if ($("input:focus").exists()) {
+            return;
+        }
+
         // convert keydown event into string
         var pressedKeys = [];
-        var metaKey = false;
 
         if (e.metaKey || e.ctrlKey) {
             pressedKeys.push("ctrl");
-            metaKey = true;
         }
         if (e.altKey) {
             pressedKeys.push("alt");
-            metaKey = true;
         }
         if (e.shiftKey) {
             pressedKeys.push("shift");
-            metaKey = true;
-        }
-
-        // unless a meta key was pressed, ignore keypresses when
-        // typing into an input field
-        if ($("input:focus").exists()) {
-            return;
         }
 
         // http://api.jquery.com/event.which/
@@ -235,6 +230,7 @@ ApplicationController.prototype._setupMenu = function(menu) {
     var _this = this;
 
     // set up activating menu
+    // TODO: submenus
     $(menu).children("li")
         .click(function() {
             $(menu).children("li.active").removeClass("active");
@@ -248,14 +244,10 @@ ApplicationController.prototype._setupMenu = function(menu) {
             $(this).addClass("active");
 
             // clicking off the menu will close the menu
-            $(window).click(function(e) {
-                // TODO: except .has-submenu
-                if (!$(e.target).closest(menu).exists()) {
-                    $(menu).removeClass("active")
-                        .children("li.active")
-                        .removeClass("active");
-                    $(this).off(e);
-                }
+            $(menu).clickOff(function() {
+                $(this).removeClass("active")
+                    .children("li.active")
+                    .removeClass("active");
             });
         })
         .mouseenter(function() {
@@ -264,7 +256,6 @@ ApplicationController.prototype._setupMenu = function(menu) {
                 $(this).addClass("active");
             }
         });
-        // TODO: functionality for hover over .has-submenu
 
     // set up click and add shortcuts to menu
     $(menu).find("li").each(function() {

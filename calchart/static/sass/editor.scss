@@ -252,19 +252,10 @@ $sidebar-width: 200px;
 }
 
 .panel-dropdown {
-    position: absolute;
-    padding: 5px 0;
-    z-index: z-index(popup);
-    background: $light-gray;
-    border: 1px solid $medium-gray;
+    @include hover-menu;
     border-radius: 3px;
     li {
-        padding: 5px 0;
+        padding: 5px;
         text-align: center;
-        cursor: pointer;
-        &:hover {
-            background: $blue;
-            color: $light-gray;
-        }
     }
 }
