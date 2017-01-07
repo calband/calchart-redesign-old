@@ -167,7 +167,6 @@ header {
                 cursor: pointer;
                 width: 100%;
                 white-space: nowrap;
-                // TODO: style has-submenu
             }
         }
     }
@@ -178,6 +177,7 @@ header {
     position: absolute;
     border: 1px solid $dark-gray;
     background: $white;
+    // TODO: add arrow to has-submenu
 }
 
 .context-menu {
