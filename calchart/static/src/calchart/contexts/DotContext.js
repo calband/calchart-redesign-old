@@ -12,6 +12,7 @@ var BaseContext = require("./BaseContext");
 var HTMLBuilder = require("utils/HTMLBuilder");
 var JSUtils = require("utils/JSUtils");
 var MathUtils = require("utils/MathUtils");
+var UIUtils = require("utils/UIUtils");
 
 /**** CONSTRUCTORS ****/
 
@@ -45,9 +46,19 @@ DotContext.prototype.load = function() {
 
     this._addEvents(".workspace", {
         contextmenu: function(e) {
-            e.preventDefault();
-
-            // TODO: custom context menu
+            UIUtils.showContextMenu(e, {
+                "Edit Continuity": "todo",
+                "Change Dot Type": {
+                    "Plain": "todo",
+                    "Solid": "todo",
+                    "Plain Forwardslash": "todo",
+                    "Solid Forwardslash": "todo",
+                    "Plain Backslash": "todo",
+                    "Solid Backslash": "todo",
+                    "Plain Cross": "todo",
+                    "Solid Cross": "todo",
+                },
+            });
         },
         mousedown: function(e) {
             var target = $(e.target);

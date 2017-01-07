@@ -1,8 +1,8 @@
 /**
  * @fileOverview This file is organized in the following sections:
  *
- * - Context menu utilities
  * - Form utilities
+ * - Menu utilities
  * - Panel utilities
  * - Popup utilities
  * - Message utilities
@@ -15,40 +15,6 @@ var HTMLBuilder = require("./HTMLBuilder");
  * of the application
  */
 var UIUtils = {};
-
-/**** CONTEXT MENUS ****/
-
-/**
- * Show a context menu with the given items
- *
- * @param {Event} e -- the click event that activated the context menu
- * @param {object} items -- the items to show in the context menu,
- *   mapping label to action.
- */
-UIUtils.showContextMenu = function(e, items) {
-    e.preventDefault();
-
-    var menu = HTMLBuilder.make("ul.context-menu");
-
-    $.each(items, function(label, action) {
-        HTMLBuilder.li(label)
-            .click(function() {
-                window.controller.doAction(action);
-                menu.clickOff();
-            })
-            .appendTo(menu);
-    });
-
-    menu
-        .clickOff(function() {
-            menu.remove();
-        })
-        .css({
-            top: e.pageY,
-            left: e.pageX,
-        })
-        .appendTo("body");
-};
 
 /**** FORMS ****/
 
@@ -104,6 +70,76 @@ UIUtils.getData = function(parent) {
         }
     });
     return data;
+};
+
+/**** MENUS ****/
+
+/**
+ * Attach the given submenu to the parent.
+ *
+ * @param {jQuery} parent -- the menu item that shows the submenu
+ * @param {jQuery} submenu -- the submenu that will be shown
+ */
+UIUtils.attachSubmenu = function(parent, submenu) {
+    var showSubmenu = function() {
+        // TODO
+    };
+    var hideSubmenu = function() {
+        // TODO
+    };
+
+    $(parent)
+        .hover(showSubmenu, hideSubmenu)
+        .click(showSubmenu);
+
+    $(submenu).appendTo("body");
+};
+
+/**
+ * Show a context menu with the given items
+ *
+ * @param {Event} e -- the click event that activated the context menu
+ * @param {object} items -- the items to show in the context menu,
+ *   mapping label to action. Can also map to another object, which
+ *   will be a submenu
+ */
+UIUtils.showContextMenu = function(e, items) {
+    e.preventDefault();
+
+    var menu = HTMLBuilder.make("ul.context-menu");
+
+    var _makeSubmenu = function(items) {
+    };
+
+    $.each(items, function(label, action) {
+        var item = HTMLBuilder.li(label).appendTo(menu);
+        if (typeof action === "string") {
+            item.click(function() {
+                window.controller.doAction(action);
+                menu.clickOff();
+            });
+        } else {
+            var submenu = HTMLBuilder.make("ul.context-menu.submenu");
+
+            $.each(items, function(label, action) {
+                var item = HTMLBuilder.li(label)
+                    .click()
+                    .appendTo(submenu);
+            })
+
+            UIUtils.attachSubmenu(item, submenu);
+        }
+    });
+
+    menu
+        .clickOff(function() {
+            menu.remove();
+        })
+        .css({
+            top: e.pageY,
+            left: e.pageX,
+        })
+        .appendTo("body");
 };
 
 /**** PANELS ****/
