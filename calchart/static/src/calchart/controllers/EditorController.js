@@ -321,14 +321,15 @@ EditorController.prototype.lastBeat = function() {
  * Loads an editing context for the controller
  *
  * @param {string} name -- the name of the context to load
+ * @param {object|undefined} options -- any options to pass Context.load
  */
-EditorController.prototype.loadContext = function(name) {
+EditorController.prototype.loadContext = function(name, options) {
     if (this._context) {
         this._context.unload();
     }
 
     $("body").addClass("context-" + name);
-    this._context = Context.load(name, this);
+    this._context = Context.load(name, this, options);
     this.refresh();
 };
 

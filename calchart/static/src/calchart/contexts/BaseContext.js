@@ -35,8 +35,10 @@ BaseContext.prototype._initialized = {};
 
 /**
  * Runs any actions to initialize this context
+ *
+ * @param {object|undefined} options -- options to customize loading of the Context
  */
-BaseContext.prototype.load = function() {
+BaseContext.prototype.load = function(options) {
     throw new errors.NotImplementedError(this);
 };
 

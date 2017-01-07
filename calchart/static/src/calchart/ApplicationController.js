@@ -189,9 +189,12 @@ ApplicationController.prototype._getShortcut = function(shortcut) {
  *
  * @param {string} name -- the function name, in one of the following formats:
  *   - <name>: the name of the function, without arguments specified
- *   - <name>(<args>, ...): the name of the function, run with the given arguments. Arguments
- *     will try to be cast to a number, otherwise will be passed as a string. e.g. foo(bar)
- *     runs `foo("bar")` and foo(1) runs `foo(1)`.
+ *   - <name>(<args>): the name of the function, run with the given comma separated arguments.
+ *     Arguments can be given in the following formats:
+ *       - a number; e.g. "foo(1)" -> `foo(1)`
+ *       - a string; e.g. "foo(bar)" -> `foo("bar")`
+ *       - an object; e.g. "foo(x=1)" -> `foo({x: 1})`
+ *       - an array; e.g. "foo(bar, [1,2])" -> `foo("bar", [1,2])`
  * @return {object} an object of the form
  *   {
  *       name: string,
@@ -199,20 +202,67 @@ ApplicationController.prototype._getShortcut = function(shortcut) {
  *   }
  */
 ApplicationController.prototype._parseAction = function(name) {
-    var match = name.match(/(\w+)(\((.+)\))?/);
+    var actionMatch = name.match(/^(\w+)(\((.+)\))?$/);
 
-    if (match === null) {
+    if (actionMatch === null) {
         throw new Error("Action name in an invalid format: " + name);
     }
 
-    var actionName = match[1];
+    var actionName = actionMatch[1];
     var actionArgs = null;
 
-    if (match[2]) {
-        // split args and try to parse numbers
-        actionArgs = $.map(match[3].split(/,\s*/), function(arg) {
-            var num = parseFloat(arg);
-            return isNaN(num) ? arg : num;
+    if (actionMatch[2]) {
+        actionArgs = [];
+
+        // manually split arguments, to avoid complicated regexes
+        var argsData = actionMatch[3];
+        var buffer = "";
+        for (var i = 0; i < argsData.length; i++) {
+            var char = argsData[i];
+            switch (char) {
+                case ",":
+                    actionArgs.push(buffer);
+                    buffer = "";
+                    break;
+                case "[":
+                    while (char !== "]") {
+                        buffer += char;
+                        i++;
+                        char = argsData[i];
+                    }
+                    // don't break to add ending bracket
+                default:
+                    buffer += char;
+            }
+        }
+        actionArgs.push(buffer);
+
+        // parse arguments
+        actionArgs = $.map(actionArgs, function(arg) {
+            arg = arg.trim();
+
+            // float or array
+            try {
+                return JSON.parse(arg);
+            } catch (e) {}
+
+            // object
+            if (arg.indexOf("=") !== -1) {
+                var split = arg.split("=");
+
+                var key = split[0];
+                var val = parseFloat(split[1]);
+                if (isNaN(val)) {
+                    val = split[1];
+                }
+
+                var obj = {};
+                obj[key] = val;
+                return obj;
+            }
+
+            // string
+            return arg;
         });
     }
 

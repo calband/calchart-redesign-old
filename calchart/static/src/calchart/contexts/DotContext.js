@@ -36,7 +36,7 @@ var DotContext = function(controller) {
 
 JSUtils.extends(DotContext, BaseContext);
 
-DotContext.prototype.load = function() {
+DotContext.prototype.load = function(options) {
     var _this = this;
     var scale = this._grapher.getScale();
 
@@ -55,11 +55,15 @@ DotContext.prototype.load = function() {
     this._addEvents(".workspace", {
         contextmenu: function(e) {
             var menu = {};
+            var target = $(e.target);
 
-            if ($(e.target).is(".dot-marker")) {
+            if (target.is(".dot-marker")) {
+                var dot = target.parent().data("dot");
+                var dotType = _this._sheet.getDotType(dot);
+
                 $.extend(menu, {
                     // TODO: autoload dot type
-                    "Edit Continuity...": "loadContext(continuity)",
+                    "Edit Continuity...": "loadContext(continuity, dotType=" + dotType + ")",
                     "Change Dot Type...": {
                         "Plain": "changeDotType(plain)",
                         "Solid": "changeDotType(solid)",

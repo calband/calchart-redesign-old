@@ -41,10 +41,11 @@ ContinuityContext.prototype.shortcuts = {
     "up": "lastBeat",
 };
 
-ContinuityContext.prototype.load = function() {
+ContinuityContext.prototype.load = function(options) {
     var _this = this;
 
     this._panel.show();
+    this._dotType = JSUtils.get(options, "dotType", null);
 
     this._addEvents(window, {
         // always keep panel on screen

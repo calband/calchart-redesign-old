@@ -10,9 +10,10 @@ module.exports = {
      *
      * @param {string} name -- the name of the context to load
      * @param {EditorController} controller -- the editor controller
+     * @param {object|undefined} options -- any options to pass to .load()
      * @return {BaseContext} the context that was loaded
      */
-    load: function(name, controller) {
+    load: function(name, controller, options) {
         switch (name) {
             case "continuity":
                 var context = new ContinuityContext(controller);
@@ -23,7 +24,7 @@ module.exports = {
             default:
                 throw new Error("No context named: " + name);
         }
-        context.load();
+        context.load(options);
         return context;
     },
 };
