@@ -24,7 +24,7 @@ jQueryUtils.clickOff = function() {
         $(parent).off(".clickOff");
     } else {
         var callback = arguments[0];
-        var parent = arguments[1];
+        var parent = arguments[1] || window;
     }
 
     $(parent).on("click.clickOff", function(e) {
