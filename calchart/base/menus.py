@@ -51,7 +51,7 @@ class SubMenu(object):
     """
     A Calchart SubMenu, in the format
 
-    <li class="has-submenu"> # .has-submenu if not top level
+    <li>
         <span>{{ name }}</span>
         <div class="submenu">
             # for each group
@@ -67,11 +67,10 @@ class SubMenu(object):
         self.groups = groups
 
     def render(self, top_level=False):
-        li_class = '' if top_level else 'has-submenu'
         menu_groups = mark_safe(''.join(self.render_group(group) for group in self.groups))
         return format_html(
-            '<li class="{}"><span>{}</span><div class="submenu">{}</div></li>',
-            li_class, self.name, menu_groups
+            '<li><span>{}</span><div class="submenu">{}</div></li>',
+            self.name, menu_groups
         )
 
     def render_group(self, group):

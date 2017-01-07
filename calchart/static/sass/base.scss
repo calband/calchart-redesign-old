@@ -1,4 +1,14 @@
+/**
+ * This file is organized in the following sections:
+ *
+ * - HTML elements
+ * - Menu and toolbar elements
+ * - Other UI components
+ */
+
 @import "partials/vars", "partials/mixins", "partials/fonts", "partials/functions";
+
+/**** HTML ELEMENTS ****/
 
 html, body, div, span, h1, h2, h3, h4, h5, h6,
 p, a, ul, li, label, form, input, textarea,
@@ -86,47 +96,6 @@ button {
     }
 }
 
-form.post-action {
-    display: none;
-}
-
-.field {
-    margin: 10px 0;
-}
-
-ul.messages {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    padding: 10px;
-    z-index: z-index(messages);
-    li.message {
-        background: rgba($light-gray, 0.9);
-        padding: 10px 30px;
-        border-radius: 4px;
-        text-align: center;
-        color: $blue;
-        &:not(:last-child) {
-            margin-bottom: 5px;
-        }
-        &:hover {
-            background: $light-gray;
-        }
-        &.error {
-            color: $red;
-        }
-        .close-message {
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: $gold;
-            cursor: pointer;
-        }
-    }
-}
-
 header {
     position: relative;
     margin: 20px;
@@ -149,12 +118,15 @@ header {
     }
 }
 
+/**** MENUS ****/
+
 .menu {
     @include unselectable;
     z-index: z-index(menu);
     li {
         display: inline-block;
         cursor: default;
+        // need spans to hide part of the top border for the submenu
         span {
             display: inline-block;
             padding: 5px 10px;
@@ -186,12 +158,8 @@ header {
         }
     }
     .submenu {
-        display: none;
-        position: absolute;
-        left: 0;
         top: 27px;
-        border: 1px solid $dark-gray;
-        background: $white;
+        left: 0;
         ul.menu-group {
             padding: 5px 0;
             border-bottom: 1px solid $light-gray;
@@ -205,8 +173,19 @@ header {
     }
 }
 
+.submenu {
+    display: none;
+    position: absolute;
+    border: 1px solid $dark-gray;
+    background: $white;
+}
+
 .context-menu {
     @include hover-menu;
+    &.submenu {
+        background: $light-gray;
+        border-color: $medium-gray;
+    }
 }
 
 .toolbar {
@@ -278,6 +257,49 @@ header {
         margin-left: -5px;
         border: 5px solid transparent;
         border-top-color: $black;
+    }
+}
+
+/**** COMPONENTS ****/
+
+form.post-action {
+    display: none;
+}
+
+.field {
+    margin: 10px 0;
+}
+
+ul.messages {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 10px;
+    z-index: z-index(messages);
+    li.message {
+        background: rgba($light-gray, 0.9);
+        padding: 10px 30px;
+        border-radius: 4px;
+        text-align: center;
+        color: $blue;
+        &:not(:last-child) {
+            margin-bottom: 5px;
+        }
+        &:hover {
+            background: $light-gray;
+        }
+        &.error {
+            color: $red;
+        }
+        .close-message {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: $gold;
+            cursor: pointer;
+        }
     }
 }
 

@@ -28,7 +28,7 @@ jQueryUtils.clickOff = function() {
     }
 
     $(parent).on("click.clickOff", function(e) {
-        if (!$(e.target).closest(_this).exists()) {
+        if ($(e.target).notIn(_this)) {
             callback.call(_this, e);
             $(parent).off(e);
         }
@@ -82,6 +82,16 @@ jQueryUtils.dropdown = function(options) {
  */
 jQueryUtils.exists = function() {
     return this.length !== 0;
+};
+
+/**
+ * Check that clicking on this element is not clicking in the given element
+ *
+ * @param {jQuery} element -- the element to test
+ * @return {boolean} true if this element is not in the given element
+ */
+jQueryUtils.notIn = function(element) {
+    return !this.closest(element).exists();
 };
 
 /**

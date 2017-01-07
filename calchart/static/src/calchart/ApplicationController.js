@@ -12,6 +12,7 @@
 var errors = require("calchart/errors");
 var HTMLBuilder = require("utils/HTMLBuilder");
 var JSUtils = require("utils/JSUtils");
+var UIUtils = require("utils/UIUtils");
 
 /**** CONSTRUCTORS ****/
 
@@ -229,41 +230,59 @@ ApplicationController.prototype._parseAction = function(name) {
 ApplicationController.prototype._setupMenu = function(menu) {
     var _this = this;
 
-    // set up activating menu
-    // TODO: submenus
-    $(menu).children("li")
-        .click(function() {
-            $(menu).children("li.active").removeClass("active");
+    var hideMenu = function() {
+        $(menu).removeClass("active")
+            .find("li.active")
+            .removeClass("active");
+    };
 
+    // set up activating menu
+    $(menu).children("li").children("span")
+        .click(function() {
             if ($(menu).hasClass("active")) {
-                $(menu).removeClass("active");
+                hideMenu();
                 return;
             }
 
-            $(menu).addClass("active");
-            $(this).addClass("active");
+            $(menu)
+                .addClass("active")
+                .children("li.active")
+                .removeClass("active");
 
-            // clicking off the menu will close the menu
-            $(menu).clickOff(function() {
-                $(this).removeClass("active")
-                    .children("li.active")
-                    .removeClass("active");
-            });
+            $(this).parent().addClass("active");
         })
         .mouseenter(function() {
             if ($(menu).hasClass("active")) {
                 $(menu).children("li.active").removeClass("active");
-                $(this).addClass("active");
+                $(this).parent().addClass("active");
             }
         });
 
+    // clicking outside the menu and any submenus will close the menu
+    $(window).click(function(e) {
+        if (!$(menu).hasClass("active")) {
+            return;
+        }
+
+        var target = $(e.target);
+        if (target.notIn($(menu).children()) && target.notIn(".submenu")) {
+            hideMenu();
+        }
+    });
+
     // set up click and add shortcuts to menu
-    $(menu).find("li").each(function() {
+    $(menu).children().find("li").each(function() {
         var _function = $(this).data("function");
         if (_function) {
             $(this).click(function() {
                 _this.doAction(_function);
+                hideMenu();
             });
+        }
+
+        var submenu = $(this).children(".submenu");
+        if (submenu.exists()) {
+            UIUtils.bindSubmenu(this, submenu);
         }
     });
 };

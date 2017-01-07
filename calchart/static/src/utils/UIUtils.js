@@ -75,23 +75,27 @@ UIUtils.getData = function(parent) {
 /**** MENUS ****/
 
 /**
- * Attach the given submenu to the parent.
+ * Bind the given submenu to the parent.
  *
  * @param {jQuery} parent -- the menu item that shows the submenu
  * @param {jQuery} submenu -- the submenu that will be shown
  */
-UIUtils.attachSubmenu = function(parent, submenu) {
+UIUtils.bindSubmenu = function(parent, submenu) {
     var showSubmenu = function() {
-        // TODO
+        // TODO: show on right, unless it goes off-screen.
+        // TODO: align top of submenu to top of parent, unless goes below screen
+        $(submenu)
+            .css({
+                top: 0,
+                left: 0,
+            })
+            .show();
     };
     var hideSubmenu = function() {
-        // TODO
+        $(submenu).hide();
     };
 
-    $(parent)
-        .hover(showSubmenu, hideSubmenu)
-        .click(showSubmenu);
-
+    $(parent).hover(showSubmenu, hideSubmenu);
     $(submenu).appendTo("body");
 };
 
@@ -119,7 +123,7 @@ UIUtils.showContextMenu = function(e, items) {
             } else {
                 var submenu = HTMLBuilder.make("ul.context-menu.submenu");
                 makeMenu(submenu, action);
-                UIUtils.attachSubmenu(item, submenu);
+                UIUtils.bindSubmenu(item, submenu);
             }
         });
     };
