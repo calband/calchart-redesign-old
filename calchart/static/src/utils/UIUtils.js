@@ -234,7 +234,7 @@ UIUtils.setupPanel = function(panel, options) {
 UIUtils.showPopup = function(name, options) {
     var popup = $(".popup-box." + name).addClass("active");
 
-    // clear inputs and messages
+    // clear inputs
     popup.find("input, select, textarea").val("");
 
     if (options.init !== undefined) {
@@ -251,28 +251,23 @@ UIUtils.showPopup = function(name, options) {
             }
         });
 
+    $(".popup").show();
     popup.data("onHide", options.onHide);
 
-    $(".popup").show();
-
     // auto focus on first input
-    popup.find("input:first").focus();
+    popup.find("input, select, textarea").first().focus();
 };
 
 /**
- * Hides the given popup
- *
- * @param {jQuery|string} popup -- the popup or the name of the popup to hide
+ * Hides the currently active popup
  */
-UIUtils.hidePopup = function(popup) {
-    if (typeof popup === "string") {
-        popup = $(".popup-box." + popup);
-    }
+UIUtils.hidePopup = function() {
+    var popup = $(".popup-box.active");
 
     $(".popup").hide();
-    $(popup).removeClass("active");
+    popup.removeClass("active");
 
-    var onHide = $(popup).data("onHide");
+    var onHide = popup.data("onHide");
     if (onHide) {
         onHide(popup);
     }

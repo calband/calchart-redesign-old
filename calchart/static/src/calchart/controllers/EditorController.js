@@ -137,7 +137,7 @@ EditorController.prototype.addStuntsheet = function() {
 
             // hide popup and add sheet to show
 
-            UIUtils.hidePopup(popup);
+            UIUtils.hidePopup();
             _this.doAction("addSheet", [data.num_beats]);
         },
     });

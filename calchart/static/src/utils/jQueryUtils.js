@@ -13,6 +13,7 @@ var jQueryUtils = {};
  * @param {function} callback -- the function to run when anything besides this element
  *   is clicked on. The click event is passed into the function. After the callback runs
  *   once, it is removed.
+ * @param {jQuery} parent -- the parent to listen for clicks. Defaults to window.
  */
 jQueryUtils.clickOff = function() {
     var _this = this;
@@ -20,15 +21,16 @@ jQueryUtils.clickOff = function() {
     if (arguments.length === 0) {
         var callback = $(this).data("callback");
         callback.call(this);
-        $(window).off(".clickOff");
+        $(parent).off(".clickOff");
     } else {
         var callback = arguments[0];
+        var parent = arguments[1];
     }
 
-    $(window).on("click.clickOff", function(e) {
+    $(parent).on("click.clickOff", function(e) {
         if (!$(e.target).closest(_this).exists()) {
             callback.call(_this, e);
-            $(window).off(e);
+            $(parent).off(e);
         }
     });
 

@@ -315,7 +315,7 @@ ContinuityContext.prototype._init = function() {
             onSubmit: function(popup) {
                 var data = UIUtils.getData(popup);
                 _this._controller.doAction("saveContinuity", [continuity, data]);
-                UIUtils.hidePopup(popup);
+                UIUtils.hidePopup();
             },
         });
     });

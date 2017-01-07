@@ -6,8 +6,13 @@ jQueryUtils(jQuery);
 $(document).ready(function() {
     $("select").dropdown();
 
-    $(".popup-box button.cancel").click(function() {
-        var popup = $(this).parents(".popup-box");
-        UIUtils.hidePopup(popup);
-    });
+    $(".popup")
+        .on("click", function(e) {
+            if (!$(e.target).closest(".popup-box").exists()) {
+                UIUtils.hidePopup();
+            }
+        })
+        .on("click", ".popup-box button.cancel", function() {
+            UIUtils.hidePopup();
+        });
 });

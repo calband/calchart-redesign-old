@@ -42,7 +42,7 @@ $(document).ready(function() {
 
             var controller = EditorController.init(Show.create(data));
             controller.saveShow(function() {
-                UIUtils.hidePopup("setup-show");
+                UIUtils.hidePopup();
             });
         },
     });
