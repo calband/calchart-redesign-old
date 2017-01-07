@@ -128,6 +128,13 @@ BaseGrapher.prototype.getDots = function() {
 };
 
 /**
+ * @return {jQuery} the SVG graph element
+ */
+BaseGrapher.prototype.getGraph = function() {
+    return $(this._svg[0]);
+};
+
+/**
  * Get the GrapherScale this Grapher is using
  *
  * @return {GrapherScale} the scale of the Grapher field

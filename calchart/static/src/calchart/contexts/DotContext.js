@@ -28,8 +28,9 @@ var DotContext = function(controller) {
     // number of steps to snap dots to when dragging: null, 1, 2, 4
     this._grid = 2;
 
-    // variables to track state when dragging dots
+    // tracks how much the workspace has scrolled while dragging dots
     this._scrollOffset = {};
+    // tracks how far the selection has been moved from their initial positions
     this._moveOffset = {};
 };
 
@@ -37,12 +38,14 @@ JSUtils.extends(DotContext, BaseContext);
 
 DotContext.prototype.load = function() {
     var _this = this;
-    var svgOrigin = $("svg.graph").position();
+    var origin = $(".workspace").offset();
+    var svg = this._grapher.getGraph();
     var scale = this._grapher.getScale();
 
     // variables to track state when dragging dots
     var dragState = "none"; // none, drag, select
     var dragStart = null;
+    var scrollStart = {};
 
     this._addEvents(".workspace", {
         contextmenu: function(e) {
@@ -85,11 +88,15 @@ DotContext.prototype.load = function() {
                 _this._moveOffset.y = 0;
             } else {
                 _this._controller.deselectDots();
-                HTMLBuilder.div("selection-box", null, "body");
+                HTMLBuilder.div("selection-box", null, $(".workspace"));
                 dragState = "select";
             }
 
             dragStart = e;
+            scrollStart = {
+                top: $(".workspace").scrollTop(),
+                left: $(".workspace").scrollLeft(),
+            };
         },
     });
 
@@ -101,6 +108,7 @@ DotContext.prototype.load = function() {
 
             e.preventDefault();
 
+            // change from beginning of move to now
             var deltaX = e.pageX - dragStart.pageX;
             var deltaY = e.pageY - dragStart.pageY;
 
@@ -116,11 +124,11 @@ DotContext.prototype.load = function() {
                     _this._moveOffset.y = deltaY;
                     break;
                 case "select":
-                    // relative to page
+                    // relative to workspace
                     var width = Math.abs(deltaX);
                     var height = Math.abs(deltaY);
-                    var minX = Math.min(e.pageX, dragStart.pageX);
-                    var minY = Math.min(e.pageY, dragStart.pageY);
+                    var minX = Math.min(e.pageX, dragStart.pageX) - origin.left + scrollStart.left;
+                    var minY = Math.min(e.pageY, dragStart.pageY) - origin.top + scrollStart.top;
                     var maxX = minX + width;
                     var maxY = minY + height;
 
@@ -131,12 +139,6 @@ DotContext.prototype.load = function() {
                         width: width,
                         height: height,
                     });
-
-                    // relative to svgOrigin
-                    minX -= svgOrigin.left;
-                    minY -= svgOrigin.top;
-                    maxX -= svgOrigin.left;
-                    maxY -= svgOrigin.top;
 
                     // select dots within the selection box
                     _this._controller.deselectDots();

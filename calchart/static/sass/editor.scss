@@ -6,13 +6,6 @@ body {
     min-width: 800px;
     min-height: 750px;
     cursor: default;
-    &.context-dot {
-        .selection-box {
-            position: absolute;
-            border: 2px solid rgba($white, 0.8);
-            background: rgba($white, 0.2);
-        }
-    }
 }
 
 $editor-header-height: 100px;
@@ -109,6 +102,11 @@ $sidebar-width: 200px;
             // implementing zoom
             min-width: 1250px;
             min-height: 700px;
+        }
+        .selection-box {
+            position: absolute;
+            border: 2px solid rgba($white, 0.8);
+            background: rgba($white, 0.2);
         }
     }
 }
