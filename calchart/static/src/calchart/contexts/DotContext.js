@@ -54,20 +54,30 @@ DotContext.prototype.load = function() {
 
     this._addEvents(".workspace", {
         contextmenu: function(e) {
-            // TODO: different if on a dot
-            UIUtils.showContextMenu(e, {
-                "Edit Continuity": "todo",
-                "Change Dot Type": {
-                    "Plain": "changeDotType(plain)",
-                    "Solid": "changeDotType(solid)",
-                    "Plain Forwardslash": "changeDotType(plain-forwardslash)",
-                    "Solid Forwardslash": "changeDotType(solid-forwardslash)",
-                    "Plain Backslash": "changeDotType(plain-backslash)",
-                    "Solid Backslash": "changeDotType(solid-backslash)",
-                    "Plain Cross": "changeDotType(plain-x)",
-                    "Solid Cross": "changeDotType(solid-x)",
-                },
-            });
+            var menu = {};
+
+            if ($(e.target).is(".dot-marker")) {
+                $.extend(menu, {
+                    // TODO: autoload dot type
+                    "Edit Continuity...": "loadContext(continuity)",
+                    "Change Dot Type...": {
+                        "Plain": "changeDotType(plain)",
+                        "Solid": "changeDotType(solid)",
+                        "Plain Forwardslash": "changeDotType(plain-forwardslash)",
+                        "Solid Forwardslash": "changeDotType(solid-forwardslash)",
+                        "Plain Backslash": "changeDotType(plain-backslash)",
+                        "Solid Backslash": "changeDotType(solid-backslash)",
+                        "Plain Cross": "changeDotType(plain-x)",
+                        "Solid Cross": "changeDotType(solid-x)",
+                    },
+                });
+            } else {
+                $.extend(menu, {
+                    "Edit Continuity...": "loadContext(continuity)",
+                });
+            }
+
+            UIUtils.showContextMenu(e, menu);
         },
         mousedown: function(e) {
             var target = $(e.target);

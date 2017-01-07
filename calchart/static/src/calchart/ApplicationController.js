@@ -323,8 +323,6 @@ ApplicationController.prototype._setupToolbar = function(toolbar) {
     // set up click
     $(toolbar).find("li")
         .mousedown(function(e) {
-            // don't highlight text
-            e.preventDefault();
             if (!$(this).hasClass("disabled")) {
                 $(this).addClass("focus");
             }
@@ -335,7 +333,7 @@ ApplicationController.prototype._setupToolbar = function(toolbar) {
             }
 
             $(this).removeClass("focus");
-            var name = $(this).data("function");
+            var name = $(this).data("action");
             if (name !== undefined) {
                 _this.doAction(name);
             }
