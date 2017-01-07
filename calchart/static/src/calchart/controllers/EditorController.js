@@ -232,7 +232,7 @@ EditorController.prototype.deselectDots = function(dots) {
     }
 
     this._selectedDots = this._selectedDots.not(dots);
-    this.refresh();
+    this._grapher.deselectDots(dots);
 };
 
 /**
@@ -479,7 +479,7 @@ EditorController.prototype.selectDots = function(dots, options) {
     }
 
     this._selectedDots = this._selectedDots.add(dots);
-    this.refresh();
+    this._grapher.selectDots(this._selectedDots);
 };
 
 /**

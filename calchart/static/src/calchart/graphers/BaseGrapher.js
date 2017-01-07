@@ -85,6 +85,16 @@ BaseGrapher.prototype.clearDots = function() {
 };
 
 /**
+ * Deselect the given dots. Use to deselect dots without having to refresh the
+ * entire graph.
+ *
+ * @param {jQuery} dots -- the dots to deselect
+ */
+BaseGrapher.prototype.deselectDots = function(dots) {
+    d3.selectAll(dots).classed("selected", false);
+};
+
+/**
  * Draws a moment in a field show. The moment is given as a beat of a
  * particular stuntsheet.
  *
@@ -149,6 +159,15 @@ BaseGrapher.prototype.moveDotTo = function(dot, x, y) {
     $(dot)
         .attr("transform", "translate(" + x + "," + y + ")")
         .data("position", new Coordinate(x, y));
+};
+
+/**
+ * Select the given dots. Use to select dots without having to refresh the entire graph.
+ *
+ * @param {jQuery} dots -- the dots to select
+ */
+BaseGrapher.prototype.selectDots = function(dots) {
+    d3.selectAll(dots).classed("selected", true);
 };
 
 /**
