@@ -47,9 +47,8 @@ UIUtils.doAction = function(action, params, success) {
         data: data,
         success: success,
         error: function(xhr) {
-            // TODO: slide down an ajax error message at the top of the screen
             console.error(xhr);
-            alert("An error occurred");
+            UIUtils.showError("An error occurred.");
         },
     });
 };
