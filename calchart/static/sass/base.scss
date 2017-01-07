@@ -168,7 +168,7 @@ header {
         width: 100%;
         padding: 5px 10px;
         color: $dark-gray;
-        &:hover {
+        &:hover, &.active {
             background: $light-gray;
         }
     }
@@ -184,11 +184,15 @@ header {
         z-index: z-index(context-menu);
         li {
             color: $blue;
+            &:hover {
+                color: $light-gray;
+            }
         }
     }
 }
 
 .toolbar {
+    @include unselectable;
     z-index: z-index(toolbar);
     padding: 5px 0;
     background: $light-gray;

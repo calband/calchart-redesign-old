@@ -255,7 +255,7 @@ ApplicationController.prototype._setupMenu = function(menu) {
     var closeSubmenus = function() {
         $(menu).children().removeClass("active");
         $(".submenu").hide();
-        $(window).off("close-submenus");
+        $(window).off(".close-submenus");
     };
 
     // recursively set up submenu items
@@ -271,7 +271,7 @@ ApplicationController.prototype._setupMenu = function(menu) {
 
             var subsubmenu = $(this).children(".submenu");
             if (subsubmenu.exists()) {
-                UIUtils.bindSubmenu(this, subsubmenu);
+                UIUtils.bindSubmenu(submenu, this, subsubmenu);
                 setupMenuItems(subsubmenu);
             }
         });
@@ -302,7 +302,7 @@ ApplicationController.prototype._setupMenu = function(menu) {
 
         // activate submenu when hovered over
         $(this).mouseenter(function() {
-            if ($(menu).children(".active").exists()) {
+            if ($(menu).children(".active").not(menuTab).exists()) {
                 openSubmenu(menuTab, submenu);
             }
         });

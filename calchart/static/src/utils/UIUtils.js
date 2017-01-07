@@ -77,28 +77,36 @@ UIUtils.getData = function(parent) {
 /**
  * Bind the given submenu to the parent.
  *
+ * @param {jQuery} container -- the parent's container
  * @param {jQuery} parent -- the menu item that shows the submenu
  * @param {jQuery} submenu -- the submenu that will be shown
  */
-UIUtils.bindSubmenu = function(parent, submenu) {
-    var showSubmenu = function() {
-        var offset = $(parent).offset();
-        var top = offset.top;
-        var left = offset.left + $(parent).outerWidth();
-        var right = offset.left;
-
-        $(submenu)
-            .smartPosition(top, left, right)
-            .show();
-    };
-    var hideSubmenu = function() {
-        $(submenu).hide();
-    };
-
-    // TODO: don't hide if over submenu
+UIUtils.bindSubmenu = function(container, parent, submenu) {
     $(parent)
         .addClass("has-submenu")
-        .hover(showSubmenu, hideSubmenu);
+        .mouseenter(function() {
+            var offset = $(parent).offset();
+
+            // manually offset a pixel to accentuate hover
+            var top = offset.top + 1;
+            var left = offset.left + $(parent).outerWidth() - 1;
+            var right = offset.left + 1;
+
+            $(parent).addClass("active");
+
+            $(submenu)
+                .smartPosition(top, left, right)
+                .show();
+
+            $(container).on("mouseenter", "li", function(e) {
+                if (!$(this).is(parent)) {
+                    $(parent).removeClass("active");
+                    $(submenu).hide();
+                    $(container).off(e);
+                }
+            });
+        });
+
     $(submenu).appendTo("body");
 };
 
@@ -132,7 +140,7 @@ UIUtils.showContextMenu = function(e, items) {
             } else {
                 var submenu = HTMLBuilder.make("ul.context-menu.submenu");
                 makeMenu(submenu, action);
-                UIUtils.bindSubmenu(item, submenu);
+                UIUtils.bindSubmenu(parent, item, submenu);
             }
         });
     };
