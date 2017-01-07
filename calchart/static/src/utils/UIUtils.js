@@ -108,32 +108,28 @@ UIUtils.showContextMenu = function(e, items) {
 
     var menu = HTMLBuilder.make("ul.context-menu");
 
-    var _makeSubmenu = function(items) {
+    var makeMenu = function(parent, items) {
+        $.each(items, function(label, action) {
+            var item = HTMLBuilder.li(label).appendTo(parent);
+            if (typeof action === "string") {
+                item.click(function() {
+                    window.controller.doAction(action);
+                    menu.clickOff();
+                });
+            } else {
+                var submenu = HTMLBuilder.make("ul.context-menu.submenu");
+                makeMenu(submenu, action);
+                UIUtils.attachSubmenu(item, submenu);
+            }
+        });
     };
 
-    $.each(items, function(label, action) {
-        var item = HTMLBuilder.li(label).appendTo(menu);
-        if (typeof action === "string") {
-            item.click(function() {
-                window.controller.doAction(action);
-                menu.clickOff();
-            });
-        } else {
-            var submenu = HTMLBuilder.make("ul.context-menu.submenu");
-
-            $.each(items, function(label, action) {
-                var item = HTMLBuilder.li(label)
-                    .click()
-                    .appendTo(submenu);
-            })
-
-            UIUtils.attachSubmenu(item, submenu);
-        }
-    });
+    makeMenu(menu, items);
 
     menu
         .clickOff(function() {
             menu.remove();
+            $(".context-menu.submenu").remove();
         })
         .css({
             top: e.pageY,

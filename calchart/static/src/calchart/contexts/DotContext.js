@@ -49,14 +49,14 @@ DotContext.prototype.load = function() {
             UIUtils.showContextMenu(e, {
                 "Edit Continuity": "todo",
                 "Change Dot Type": {
-                    "Plain": "todo",
-                    "Solid": "todo",
-                    "Plain Forwardslash": "todo",
-                    "Solid Forwardslash": "todo",
-                    "Plain Backslash": "todo",
-                    "Solid Backslash": "todo",
-                    "Plain Cross": "todo",
-                    "Solid Cross": "todo",
+                    "Plain": "changeDotType(plain)",
+                    "Solid": "changeDotType(solid)",
+                    "Plain Forwardslash": "changeDotType(plain-forwardslash)",
+                    "Solid Forwardslash": "changeDotType(solid-forwardslash)",
+                    "Plain Backslash": "changeDotType(plain-backslash)",
+                    "Solid Backslash": "changeDotType(solid-backslash)",
+                    "Plain Cross": "changeDotType(plain-x)",
+                    "Solid Cross": "changeDotType(solid-x)",
                 },
             });
         },
