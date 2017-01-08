@@ -67,6 +67,20 @@ ContinuityContext.prototype.load = function(options) {
             }
         },
     });
+    this._addEvents(".workspace", {
+        contextmenu: function(e) {
+            UIUtils.showContextMenu(e, {
+                "Edit dots...": "loadContext(dot)",
+                "Go to": {
+                    "First beat": "firstBeat",
+                    "Previous beat": "prevBeat",
+                    "Next beat": "nextBeat",
+                    "Last beat": "lastBeat",
+                },
+                "Check Continuities...": "checkContinuities",
+            });
+        },
+    });
     
     $(".toolbar .edit-continuity").addClass("active");
     $(".toolbar .edit-continuity-group").removeClass("hide");
@@ -76,7 +90,7 @@ ContinuityContext.prototype.load = function(options) {
 
 ContinuityContext.prototype.unload = function() {
     this._panel.hide();
-    this._removeEvents(window, document, ".toolbar .seek");
+    this._removeEvents(window, document, ".workspace", ".toolbar .seek");
     this._controller.setBeat(0);
 
     $(".toolbar .edit-continuity").removeClass("active");

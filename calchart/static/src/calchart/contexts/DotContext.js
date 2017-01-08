@@ -62,9 +62,8 @@ DotContext.prototype.load = function(options) {
                 var dotType = _this._sheet.getDotType(dot);
 
                 $.extend(menu, {
-                    // TODO: autoload dot type
-                    "Edit Continuity...": "loadContext(continuity, dotType=" + dotType + ")",
-                    "Change Dot Type...": {
+                    "Edit continuity...": "loadContext(continuity, dotType=" + dotType + ")",
+                    "Change dot type": {
                         "Plain": "changeDotType(plain)",
                         "Solid": "changeDotType(solid)",
                         "Plain Forwardslash": "changeDotType(plain-forwardslash)",
@@ -77,7 +76,7 @@ DotContext.prototype.load = function(options) {
                 });
             } else {
                 $.extend(menu, {
-                    "Edit Continuity...": "loadContext(continuity)",
+                    "Edit continuity...": "loadContext(continuity)",
                 });
             }
 
