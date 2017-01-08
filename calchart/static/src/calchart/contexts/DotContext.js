@@ -208,6 +208,8 @@ DotContext.prototype.load = function(options) {
 
     $(".toolbar .edit-dots").addClass("active");
     $(".toolbar .edit-dots-group").removeClass("hide");
+
+    this.loadSelection("box");
 };
 
 DotContext.prototype.unload = function() {
@@ -230,6 +232,30 @@ DotContext.prototype.shortcuts = {
     "shift+right": "nudgeDots(4, 0)",
     "shift+down": "nudgeDots(0, 4)",
     "ctrl+a": "selectAll",
+};
+
+/**
+ * Load the given selection method.
+ *
+ * @param {string} name -- the name of the selection to use
+ */
+DotContext.prototype.loadSelection = function(name) {
+    var toolbarClass = "";
+
+    // TODO: make it actually change selection method
+    switch (name) {
+        case "box":
+            toolbarClass = "selection";
+            break;
+        case "lasso":
+            toolbarClass = "lasso";
+            break;
+        default:
+            throw new Error("No selection named: " + name);
+    }
+
+    $(".toolbar .dot-selection li").removeClass("active");
+    $(".toolbar ." + toolbarClass).addClass("active");
 };
 
 /**

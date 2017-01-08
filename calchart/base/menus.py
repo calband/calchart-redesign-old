@@ -117,13 +117,14 @@ class ToolbarGroup(object):
     """
     A Calchart ToolbarGroup, in the format
 
-    <ul class="toolbar-group">
+    <ul class="toolbar-group {{ kwargs.classes }}">
         # for each item
         {{ ToolbarItem.render }}
     </ul>
     """
-    def __init__(self, *items):
+    def __init__(self, *items, **kwargs):
         self.items = _collapse(items)
+        self.classes = kwargs.get('classes', '')
 
     def render(self):
         return format_html(
@@ -132,7 +133,7 @@ class ToolbarGroup(object):
         )
 
     def _get_classes(self):
-        return 'toolbar-group'
+        return 'toolbar-group %s' % self.classes
 
 class ToolbarContextGroup(ToolbarGroup):
     """
@@ -143,10 +144,10 @@ class ToolbarContextGroup(ToolbarGroup):
         {{ ToolbarItem.render }}
     </ul>
     """
-    def __init__(self, name, *items):
+    def __init__(self, name, *items, **kwargs):
         items = _collapse(items)
 
-        super(ToolbarContextGroup, self).__init__(*items)
+        super(ToolbarContextGroup, self).__init__(*items, **kwargs)
         self.name = name
 
     def _get_classes(self):
@@ -189,9 +190,8 @@ class ImageToolbarItem(ToolbarItem):
     where the class is the slugified name
     """
     def __init__(self, name, src, action):
-        self.name = name
+        super(ImageToolbarItem, self).__init__(name, None, action)
         self.src = src
-        self.action = action
 
     def _render_contents(self):
         src = get_static_path('img/%s' % self.src)
@@ -251,8 +251,9 @@ editor_toolbar = Toolbar(
     ),
     ToolbarContextGroup(
         'edit-dots',
-        ToolbarItem('Selection', 'selection', 'TODO'),
-        ToolbarItem('Lasso', 'lasso', 'TODO'),
+        ToolbarItem('Selection', 'selection', 'loadSelection(box)'),
+        ToolbarItem('Lasso', 'lasso', 'loadSelection(lasso)'),
+        classes='dot-selection',
     ),
     ToolbarContextGroup(
         'edit-dots',
