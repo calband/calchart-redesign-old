@@ -150,7 +150,7 @@ UIUtils.showContextMenu = function(e, items) {
     menu.smartPosition(e.pageY, e.pageX);
 
     // clicking outside of context menu and its submenus closes them
-    $(window).click(function(e) {
+    $(window).mousedown(function(e) {
         var target = $(e.target);
         if (target.notIn(".context-menu")) {
             closeMenus();
