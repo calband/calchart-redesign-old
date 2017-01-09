@@ -57,6 +57,8 @@ DotContext.prototype.unload = function() {
 /**** INSTANCE METHODS ****/
 
 DotContext.prototype.shortcuts = {
+    "s": "loadSelection(box)",
+    "l": "loadSelection(lasso)",
     "left": "nudgeDots(-1, 0)",
     "up": "nudgeDots(0, -1)",
     "right": "nudgeDots(1, 0)",
