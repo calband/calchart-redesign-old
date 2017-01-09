@@ -26,9 +26,6 @@ html, body {
 
 body {
     padding: 20px;
-    &.no-scroll {
-        overflow: hidden;
-    }
 }
 
 h1, h2, h3 {
@@ -152,51 +149,27 @@ header {
     }
 }
 
-// any menu that hovers over content
-.hover-menu {
-    @include unselectable;
-    position: absolute;
-    padding: 5px 0;
-    z-index: z-index(menu);
-    background: $light-gray;
-    border: 1px solid rgba($black, 0.2);
+
+.controller-menu {
+    @include hover-menu;
+    padding: 0;
+    background: $white;
+    ul.menu-group {
+        padding: 5px 0;
+        border-bottom: 1px solid $light-gray;
+    }
     li {
-        padding: 5px 10px;
-        padding-right: 20px;
-        cursor: pointer;
-        color: $blue;
+        color: $dark-gray;
         &:hover, &.active {
-            background: $blue;
-            color: $light-gray;
-        }
-        &.has-submenu:after {
-            @include vertically-center-self;
-            content: "\5c";
-            font-family: "icons";
-            font-size: 0.9em;
-            vertical-align: middle;
-            right: 0;
-        }
-    }
-    &.submenu {
-        display: none;
-        padding: 0;
-        background: $white;
-        ul.menu-group {
-            padding: 5px 0;
-            border-bottom: 1px solid $light-gray;
-        }
-        li {
+            background: $light-gray;
             color: $dark-gray;
-            &:hover, &.active {
-                background: $light-gray;
-                color: $dark-gray;
-            }
         }
     }
-    &.context-menu {
-        z-index: z-index(context-menu);
-    }
+}
+
+.context-menu {
+    @include hover-menu;
+    z-index: z-index(context-menu);
 }
 
 .toolbar {
@@ -273,6 +246,10 @@ header {
 }
 
 /**** COMPONENTS ****/
+
+.no-scroll {
+    overflow: hidden !important;
+}
 
 form.post-action {
     display: none;

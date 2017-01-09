@@ -120,13 +120,18 @@ UIUtils.bindSubmenu = function(container, parent, submenu) {
 UIUtils.showContextMenu = function(e, items) {
     e.preventDefault();
 
+    // prevent all parent elements from scrolling
+    var parents = $(e.target).parents();
+
     var closeMenus = function() {
         $(".context-menu").remove();
+        parents.removeClass("no-scroll");
     };
 
     // close any existing menus
     closeMenus();
-    var menu = HTMLBuilder.make("ul.context-menu.hover-menu").appendTo("body");
+    parents.addClass("no-scroll");
+    var menu = HTMLBuilder.make("ul.context-menu").appendTo("body");
 
     var makeMenu = function(parent, items) {
         $.each(items, function(label, action) {
@@ -137,7 +142,7 @@ UIUtils.showContextMenu = function(e, items) {
                     closeMenus();
                 });
             } else {
-                var submenu = HTMLBuilder.make("ul.context-menu.hover-menu");
+                var submenu = HTMLBuilder.make("ul.context-menu.submenu");
                 makeMenu(submenu, action);
                 UIUtils.bindSubmenu(parent, item, submenu);
             }

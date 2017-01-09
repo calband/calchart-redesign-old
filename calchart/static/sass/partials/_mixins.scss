@@ -20,6 +20,37 @@
     }
 }
 
+// any menu that hovers over content
+@mixin hover-menu {
+    @include unselectable;
+    position: absolute;
+    padding: 5px 0;
+    z-index: z-index(menu);
+    background: $light-gray;
+    border: 1px solid rgba($black, 0.2);
+    li {
+        padding: 5px 10px;
+        padding-right: 20px;
+        cursor: pointer;
+        color: $blue;
+        &:hover, &.active {
+            background: $blue;
+            color: $light-gray;
+        }
+        &.has-submenu:after {
+            @include vertically-center-self;
+            content: "\5c";
+            font-family: "icons";
+            font-size: 0.9em;
+            vertical-align: middle;
+            right: 0;
+        }
+    }
+    &.submenu {
+        display: none;
+    }
+}
+
 // make user unable to highlight text in element
 @mixin unselectable {
     -moz-user-select: none;

@@ -56,7 +56,7 @@ $sidebar-width: 200px;
         display: inline-block;
         height: 100%;
         vertical-align: top;
-        overflow: scroll;
+        overflow: auto;
     }
     .sidebar {
         width: $sidebar-width;
@@ -251,6 +251,7 @@ $sidebar-width: 200px;
 }
 
 .panel-dropdown {
+    @include hover-menu;
     z-index: z-index(popup);
     border-radius: 3px;
     li {

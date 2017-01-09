@@ -21,7 +21,7 @@ HTMLBuilder.make = function(elem, appendTo) {
     var match = elem.match(/^(\w+)(?:#([\w-]+))?((?:\.[\w-]+)+)?$/);
     var tag = "<" + match[1] + ">";
     var id = match[2];
-    var classes = (match[3] || "").slice(1).replace(".", " ");
+    var classes = (match[3] || "").slice(1).replace(/\./g, " ");
 
     var element = $(tag).attr("id", id).addClass(classes);
     if (appendTo) {

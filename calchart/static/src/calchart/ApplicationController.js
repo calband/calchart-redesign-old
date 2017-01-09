@@ -304,7 +304,7 @@ ApplicationController.prototype._setupMenu = function(menu) {
     // close all submenus
     var closeSubmenus = function() {
         $(menu).children().removeClass("active");
-        $(".hover-menu").hide();
+        $(".submenu").hide();
         $(window).off(".close-submenus");
     };
 
@@ -319,7 +319,7 @@ ApplicationController.prototype._setupMenu = function(menu) {
                 });
             }
 
-            var subsubmenu = $(this).children(".hover-menu");
+            var subsubmenu = $(this).children(".submenu");
             if (subsubmenu.exists()) {
                 UIUtils.bindSubmenu(submenu, this, subsubmenu);
                 setupMenuItems(subsubmenu);
@@ -330,7 +330,7 @@ ApplicationController.prototype._setupMenu = function(menu) {
     var menuTabs = $(menu).children();
     menuTabs.each(function() {
         var menuTab = this;
-        var submenu = $(this).children(".hover-menu").appendTo("body");
+        var submenu = $(this).children(".submenu").appendTo("body");
 
         // clicking toggles active menu
         $(this).click(function() {
@@ -342,7 +342,7 @@ ApplicationController.prototype._setupMenu = function(menu) {
                 // clicking outside of menu and its submenus closes them
                 $(window).on("click.close-submenus", function(e) {
                     var target = $(e.target);
-                    if (target.notIn(menuTabs) && target.notIn(".hover-menu")) {
+                    if (target.notIn(menuTabs) && target.notIn(".submenu")) {
                         closeSubmenus();
                         $(this).off(e);
                     }
