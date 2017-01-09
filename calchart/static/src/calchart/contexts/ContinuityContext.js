@@ -256,7 +256,7 @@ ContinuityContext.prototype._init = function() {
         e.preventDefault();
 
         var select = this;
-        var dropdown = HTMLBuilder.make("ul.panel-dropdown", "body");
+        var dropdown = HTMLBuilder.make("ul.panel-dropdown.hover-menu", "body");
 
         $(this).children().each(function() {
             var val = $(this).attr("value");

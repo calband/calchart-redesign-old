@@ -53,7 +53,7 @@ class SubMenu(object):
 
     <li>
         {{ name }}
-        <div class="submenu">
+        <div class="submenu hover-menu">
             # for each group
             <ul class="menu-group">
                 # for each menu item, either SubMenu or MenuItem
@@ -69,7 +69,7 @@ class SubMenu(object):
     def render(self):
         menu_groups = mark_safe(''.join(self.render_group(group) for group in self.groups))
         return format_html(
-            '<li>{}<div class="submenu">{}</div></li>',
+            '<li>{}<div class="submenu hover-menu">{}</div></li>',
             self.name, menu_groups
         )
 

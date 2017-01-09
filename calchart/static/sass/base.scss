@@ -152,42 +152,49 @@ header {
     }
 }
 
-.submenu {
+// any menu that hovers over content
+.hover-menu {
     @include unselectable;
-    display: none;
     position: absolute;
-    border: 1px solid rgba($black, 0.2);
-    background: $white;
+    padding: 5px 0;
     z-index: z-index(menu);
-    ul.menu-group {
-        padding: 5px 0;
-        border-bottom: 1px solid $light-gray;
-    }
+    background: $light-gray;
+    border: 1px solid rgba($black, 0.2);
     li {
-        cursor: pointer;
-        width: 100%;
         padding: 5px 10px;
-        color: $dark-gray;
+        padding-right: 20px;
+        cursor: pointer;
+        color: $blue;
         &:hover, &.active {
-            background: $light-gray;
+            background: $blue;
+            color: $light-gray;
+        }
+        &.has-submenu:after {
+            content: "\5c";
+            font-family: "icons";
+            position: absolute;
+            vertical-align: middle;
+            right: 0;
         }
     }
-    // TODO: add arrow to has-submenu
-}
-
-.context-menu {
-    @include hover-menu;
-    z-index: z-index(context-menu);
     &.submenu {
-        background: $light-gray;
-        border-color: $medium-gray;
-        z-index: z-index(context-menu);
+        display: none;
+        padding: 0;
+        background: $white;
+        ul.menu-group {
+            padding: 5px 0;
+            border-bottom: 1px solid $light-gray;
+        }
         li {
-            color: $blue;
-            &:hover {
-                color: $light-gray;
+            color: $dark-gray;
+            &:hover, &.active {
+                background: $light-gray;
+                color: $dark-gray;
             }
         }
+    }
+    &.context-menu {
+        z-index: z-index(context-menu);
     }
 }
 

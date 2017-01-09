@@ -250,7 +250,7 @@ $sidebar-width: 200px;
 }
 
 .panel-dropdown {
-    @include hover-menu;
+    z-index: z-index(popup);
     border-radius: 3px;
     li {
         padding: 5px;

@@ -20,24 +20,6 @@
     }
 }
 
-// create a menu that shows near the user's mouse
-@mixin hover-menu {
-    @include unselectable;
-    position: absolute;
-    padding: 5px 0;
-    z-index: z-index(menu);
-    background: $light-gray;
-    border: 1px solid $medium-gray;
-    li {
-        padding: 5px 10px;
-        cursor: pointer;
-        &:hover, &.active {
-            background: $blue;
-            color: $light-gray;
-        }
-    }
-}
-
 // make user unable to highlight text in element
 @mixin unselectable {
     -moz-user-select: none;

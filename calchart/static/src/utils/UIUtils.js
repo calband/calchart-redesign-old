@@ -126,7 +126,7 @@ UIUtils.showContextMenu = function(e, items) {
 
     // close any existing menus
     closeMenus();
-    var menu = HTMLBuilder.make("ul.context-menu").appendTo("body");
+    var menu = HTMLBuilder.make("ul.context-menu.hover-menu").appendTo("body");
 
     var makeMenu = function(parent, items) {
         $.each(items, function(label, action) {
@@ -137,7 +137,7 @@ UIUtils.showContextMenu = function(e, items) {
                     closeMenus();
                 });
             } else {
-                var submenu = HTMLBuilder.make("ul.context-menu.submenu");
+                var submenu = HTMLBuilder.make("ul.context-menu.hover-menu");
                 makeMenu(submenu, action);
                 UIUtils.bindSubmenu(parent, item, submenu);
             }
