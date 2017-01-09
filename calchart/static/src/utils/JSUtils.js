@@ -28,10 +28,10 @@ export default class JSUtils {
      * Get the value from an optional object, returning the given default if
      * the object or value is undefined.
      *
-     * @param {Object} obj -- the object to retrieve from
-     * @param {string} key -- the key of the value to retrieve
-     * @param {} defaultVal -- the default value to return
-     * @return {} the value of the object, or the default if undefined
+     * @param {Object} obj - The object to retrieve from.
+     * @param {string} key - The key of the value to retrieve.
+     * @param {} defaultVal - The default value to return.
+     * @return {} The value of the object, or the default if undefined.
      */
     static get(obj, key, defaultVal) {
         let val = obj[key];
@@ -53,14 +53,14 @@ export default class JSUtils {
      * @param {Array} args - The arguments passed to the original function, with
      *   either an object passed as the only argument (to be used as all the
      *   arguments), or the arguments in order as defined by labels.
-     * @param {string[]} labels - The names of each argument, in order
+     * @param {string[]} labels - The names of each argument, in order.
      * @return {Object} The arguments passed in, with the keys specified by
-     *   labels and the values either undefined or the parsed argument
+     *   labels and the values either undefined or the parsed argument.
      */
     static parseArgs(args, labels) {
         if (args.length === 1 && args[0] !== null) {
             let kwargs = args[0];
-            for (var key in kwargs) {
+            for (let key in kwargs) {
                 if (labels.indexOf(key) === -1) {
                     kwargs = null;
                     break;
@@ -77,36 +77,31 @@ export default class JSUtils {
         });
         return kwargs;
     };
+
+    /**
+     * Generate an array containing numbers within a certain range. Like
+     * Python's range() function, can take in one to three parameters.
+     *
+     * @param {float} start - If one parameter, the end of the range
+     *   (exclusive). Otherwise, the start of the range (inclusive).
+     * @param {float} [end] - The end of the range (exclusive).
+     * @param {float} [interval=1] - The interval between each number.
+     * @return {float[]} A list of numbers in the range [start, end),
+     *   incrementing according to interval.
+     */
+    static range(start, end, interval=1) {
+        if (end === undefined) {
+            end = start;
+            start = 0;
+        }
+
+        let arr = [];
+        for (let i = start; i < end; i += interval) {
+            arr.push(i);
+        }
+        return arr;
+    };
 }
-
-/**
- * Generate an array containing numbers within a certain range. Like
- * Python's range() function, can take in one to three parameters.
- *
- * @param {float} start -- if one parameter, the end of the range (exclusive).
- *   Otherwise, the start of the range (inclusive)
- * @param {float} end -- the end of the range (exclusive)
- * @param {float|undefined} interval -- the interval between each number
- *   (defaults to 1)
- * @return {Array<float>} a list of numbers in the range [start, end)
- *   incrementing according to interval
- */
-JSUtils.range = function() {
-    if (arguments.length === 1) {
-        var start = 0;
-        var end = arguments[0];
-    } else {
-        var start = arguments[0];
-        var end = arguments[1];
-    }
-
-    var arr = [];
-    var inc = arguments[2] || 1;
-    for (var i = start; i < end; i += inc) {
-        arr.push(i);
-    }
-    return arr;
-};
 
 /**
  * Return the given options, setting undefined keys according to the given
