@@ -36,6 +36,17 @@ export default class ApplicationController {
     }
 
     /**
+     * Class variable holding all keyboard shortcuts for the controller, mapping
+     * keyboard shortcut to the name of the ApplicationController function. Separate
+     * keys with "+", e.g. "ctrl+s" or "ctrl+shift+s". Meta keys need to be in this
+     * order: ctrl (alias for cmd on Mac), alt, shift. Non-character keys can be mapped
+     * as: top, left, down, right, enter, tab, backspace, delete.
+     */
+    get shortcuts() {
+        return {};
+    }
+
+    /**
      * Runs the action with the given name, either a method on this instance or a
      * method in this class's actions. @see ApplicationController#_parseAction.
      *
@@ -55,7 +66,7 @@ export default class ApplicationController {
      */
     getAllShortcutCommands() {
         let commands = {};
-        $.each(this.shortcuts, function(command, action) {
+        $.each(this.shortcuts, (command, action) => {
             commands[action] = command;
         });
         return commands;
@@ -86,7 +97,7 @@ export default class ApplicationController {
         let controller = this;
 
         // set up keyboard shortcuts
-        $(window).keydown(function(e) {
+        $(window).keydown(e => {
             // ignore keypresses when typing into an input field
             if ($("input:focus").exists()) {
                 return;
@@ -209,7 +220,7 @@ export default class ApplicationController {
             actionArgs.push(buffer);
 
             // parse arguments
-            actionArgs = $.map(actionArgs, function(arg) {
+            actionArgs = $.map(actionArgs, arg => {
                 arg = arg.trim();
 
                 // float or array
@@ -221,13 +232,9 @@ export default class ApplicationController {
                 if (arg.indexOf("=") !== -1) {
                     let [key, val] = arg.split("=");
                     let floatVal = parseFloat(val);
-                    if (!isNaN(floatVal)) {
-                        val = floatVal;
-                    }
-
-                    let obj = {};
-                    obj[key] = val;
-                    return obj;
+                    return {
+                        [key]: isNaN(floatVal) ? val : floatVal,
+                    };
                 }
 
                 // string
@@ -241,12 +248,3 @@ export default class ApplicationController {
         };
     };
 }
-
-/**
- * Holds all keyboard shortcuts for the controller, mapping keyboard shortcut
- * to the name of the ApplicationController function. Separate keys with "+".
- * e.g. "ctrl+s" or "ctrl+shift+s". Meta keys need to be in this order:
- * ctrl (alias for cmd on Mac), alt, shift. Non-character keys can be mapped
- * as: top, left, down, right, enter, tab, backspace, delete.
- */
-ApplicationController.prototype.shortcuts = {};

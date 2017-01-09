@@ -19,9 +19,7 @@ export default class JSUtils {
      * @return {string}
      */
     static fromCamelCase(str) {
-        return str.replace(/([A-Z])/g, " $1").replace(/^./, function(first) {
-            return first.toUpperCase();
-        });
+        return str.replace(/([A-Z])/g, " $1").replace(/^./, first => first.toUpperCase());
     };
 
     /**
@@ -72,7 +70,7 @@ export default class JSUtils {
         }
 
         let kwargs = {};
-        $.each(labels, function(i, label) {
+        $.each(labels, (i, label) => {
             kwargs[label] = args[i];
         });
         return kwargs;
@@ -101,45 +99,45 @@ export default class JSUtils {
         }
         return arr;
     };
+
+    /**
+     * Return the given options, setting undefined keys according to the given
+     * defaults
+     *
+     * @param {Object} options
+     * @param {Object} defaults
+     * @return {Object}
+     */
+    static setDefaults(options, defaults) {
+        return $.extend({}, defaults, options);
+    };
+
+    /**
+     * Convert the given value to camel case
+     *
+     * @param {string} value
+     * @return {string}
+     */
+    static toCamelCase(value) {
+        return value.toLowerCase().replace(/\s*(\w+)/g, str =>
+            str[1].toUpperCase() + str.slice(2)
+        );
+    };
+
+    /**
+     * Validate that the given input is a positive value, setting the input
+     * to 0 if negative
+     *
+     * @param {jQuery} input
+     * @return {int}
+     */
+    static validatePositive(input) {
+        var value = parseInt($(input).val());
+        if (value < 0) {
+            $(input).val(0);
+            return 0;
+        } else {
+            return value;
+        }
+    };
 }
-
-/**
- * Return the given options, setting undefined keys according to the given
- * defaults
- *
- * @param {object|undefined} options -- the options to return
- * @param {object} defaults -- the defaults to set
- * @return {object} the given defaults, overridden with the given options
- */
-JSUtils.setDefaults = function(options, defaults) {
-    return $.extend({}, defaults, options);
-};
-
-/**
- * Convert the given value to camel case
- *
- * @param {string} value -- the value to convert
- * @return {string} the value as camel case
- */
-JSUtils.toCamelCase = function(value) {
-    return value.toLowerCase().replace(/ (\w+)/g, function(str) {
-        return str[1].toUpperCase() + str.slice(2);
-    });
-};
-
-/**
- * Validate that the given input is a positive value, setting the input
- * to 0 if negative
- *
- * @param {jQuery} input -- the input to validate
- * @return {int} the value of the input
- */
-JSUtils.validatePositive = function(input) {
-    var value = parseInt($(input).val());
-    if (value < 0) {
-        $(input).val(0);
-        return 0;
-    } else {
-        return value;
-    }
-};

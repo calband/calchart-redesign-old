@@ -9,13 +9,13 @@
  * - Helpers (prefixed with an underscore)
  */
 
-var ApplicationController = require("calchart/ApplicationController");
+import ApplicationController from "calchart/ApplicationController";
 var Context = require("calchart/Context");
 var Dot = require("calchart/Dot");
 var errors = require("calchart/errors");
 var Grapher = require("calchart/Grapher");
 var HTMLBuilder = require("utils/HTMLBuilder");
-var JSUtils = require("utils/JSUtils");
+import JSUtils from "utils/JSUtils";
 var Sheet = require("calchart/Sheet");
 var UIUtils = require("utils/UIUtils");
 
