@@ -89,12 +89,12 @@ EditorController.prototype.init = function() {
             }
         });
 
-    this.loadContext("dot");
-
     var sheets = this._show.getSheets();
     if (sheets.length > 0) {
         this.loadSheet(sheets[0]);
     }
+
+    this.loadContext("dot");
 };
 
 /**** INSTANCE METHODS ****/
@@ -428,7 +428,10 @@ EditorController.prototype.refresh = function() {
         this._grapher.draw(this._activeSheet, this._currBeat, this._selectedDots);
     }
 
-    this._context.refresh();
+    // refresh context
+    if (this._context) {
+        this._context.refresh();
+    }
 };
 
 /**

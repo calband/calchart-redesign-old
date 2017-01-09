@@ -85,7 +85,7 @@ ContinuityContext.prototype.load = function(options) {
     $(".toolbar .edit-continuity").addClass("active");
     $(".toolbar .edit-continuity-group").removeClass("hide");
 
-    this._setupSeek(".toolbar .seek");
+    this._setupSeek();
 };
 
 ContinuityContext.prototype.unload = function() {
@@ -343,12 +343,11 @@ ContinuityContext.prototype._init = function() {
 };
 
 /**
- * Sets up the seek interface in the toolbar
- *
- * @param {jQuery} seek -- the seek interface
+ * Sets up the seek interface in the toolbar. Adds events to ".toolbar .seek"
+ * and document.
  */
-ContinuityContext.prototype._setupSeek = function(seek) {
-    seek = $(seek);
+ContinuityContext.prototype._setupSeek = function() {
+    seek = $(".toolbar .seek");
     var _this = this;
     var isDrag = false;
     var marker = seek.find(".marker");

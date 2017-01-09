@@ -37,174 +37,8 @@ var DotContext = function(controller) {
 JSUtils.extends(DotContext, BaseContext);
 
 DotContext.prototype.load = function(options) {
-    var _this = this;
-    var scale = this._grapher.getScale();
-
-    var workspace = $(".workspace").offset();
-    var graph = this._grapher.getGraph();
-    var svg = {
-        width: graph.outerWidth(),
-        height: graph.outerHeight(),
-    };
-
-    // variables to track state when dragging dots
-    var dragState = "none"; // none, drag, select
-    var dragStart = null;
-    var scrollStart = {};
-
-    this._addEvents(".workspace", {
-        contextmenu: function(e) {
-            var menu = {};
-            var target = $(e.target);
-
-            if (target.is(".dot-marker")) {
-                var dot = target.parent().data("dot");
-                var dotType = _this._sheet.getDotType(dot);
-
-                $.extend(menu, {
-                    "Edit continuity...": "loadContext(continuity, dotType=" + dotType + ")",
-                    "Change dot type": {
-                        "Plain": "changeDotType(plain)",
-                        "Solid": "changeDotType(solid)",
-                        "Plain Forwardslash": "changeDotType(plain-forwardslash)",
-                        "Solid Forwardslash": "changeDotType(solid-forwardslash)",
-                        "Plain Backslash": "changeDotType(plain-backslash)",
-                        "Solid Backslash": "changeDotType(solid-backslash)",
-                        "Plain Cross": "changeDotType(plain-x)",
-                        "Solid Cross": "changeDotType(solid-x)",
-                    },
-                });
-            } else {
-                $.extend(menu, {
-                    "Edit continuity...": "loadContext(continuity)",
-                });
-            }
-
-            UIUtils.showContextMenu(e, menu);
-        },
-        mousedown: function(e) {
-            var target = $(e.target);
-
-            if (target.is(".dot-marker")) {
-                var dot = target.parent();
-
-                if (e.shiftKey || e.ctrlKey || e.metaKey) {
-                    _this._controller.toggleDots(dot);
-                    this._dragState = "none";
-                    return;
-                }
-
-                if (!_this._grapher.isSelected(dot)) {
-                    _this._controller.selectDots(dot, {
-                        append: false,
-                    });
-                }
-
-                dragState = "drag";
-                _this._scrollOffset.top = 0;
-                _this._scrollOffset.left = 0;
-                _this._moveOffset.x = 0;
-                _this._moveOffset.y = 0;
-            } else {
-                _this._controller.deselectDots();
-                HTMLBuilder.div("selection-box", null, $(".workspace"));
-                dragState = "select";
-            }
-
-            dragStart = e;
-            scrollStart = {
-                top: $(".workspace").scrollTop(),
-                left: $(".workspace").scrollLeft(),
-            };
-        },
-    });
-
-    this._addEvents(document, {
-        mousemove: function(e) {
-            if (dragState === "none") {
-                return;
-            }
-
-            e.preventDefault();
-
-            // change from beginning of move to now
-            var deltaX = e.pageX - dragStart.pageX;
-            var deltaY = e.pageY - dragStart.pageY;
-
-            switch (dragState) {
-                case "drag":
-                    // snap deltaX and deltaY to grid; dots can themselves be off
-                    // the grid, but they move in a consistent interval
-                    var snap = scale.toDistance(_this._grid);
-                    deltaX = MathUtils.round(_this._scrollOffset.left + deltaX, snap);
-                    deltaY = MathUtils.round(_this._scrollOffset.top + deltaY, snap);
-                    _this.moveSelection(deltaX, deltaY);
-                    _this._moveOffset.x = deltaX;
-                    _this._moveOffset.y = deltaY;
-                    break;
-                case "select":
-                    // relative to workspace
-                    var width = Math.abs(deltaX);
-                    var height = Math.abs(deltaY);
-
-                    var minX = Math.min(e.pageX, dragStart.pageX) - workspace.left + scrollStart.left;
-                    var minY = Math.min(e.pageY, dragStart.pageY) - workspace.top + scrollStart.top;
-
-                    // contain in graph
-                    var maxX = Math.min(minX + width, svg.width);
-                    var maxY = Math.min(minY + height, svg.height);
-                    width = maxX - minX;
-                    height = maxY - minY;
-
-                    // update dimensions of the selection box
-                    $(".selection-box")
-                        .css({
-                            top: minY,
-                            left: minX,
-                            width: width,
-                            height: height,
-                        })
-                        .scrollIntoView(".workspace", {
-                            callback: function(deltaX, deltaY) {
-                                scrollStart.top += deltaY;
-                                scrollStart.left += deltaX;
-                            },
-                        });
-
-                    // select dots within the selection box
-                    _this._controller.deselectDots();
-                    _this._grapher.getDots().each(function() {
-                        var dot = $(this);
-                        var position = dot.data("position");
-                        if (
-                            position.x >= minX &&
-                            position.x <= maxX &&
-                            position.y >= minY &&
-                            position.y <= maxY
-                        ) {
-                            _this._controller.selectDots(dot);
-                        }
-                    });
-            }
-        },
-        mouseup: function() {
-            switch (dragState) {
-                case "drag":
-                    if (_this._moveOffset.x === 0 && _this._moveOffset.y === 0) {
-                        break;
-                    }
-                    var deltaX = scale.toSteps(_this._moveOffset.x);
-                    var deltaY = scale.toSteps(_this._moveOffset.y);
-                    _this._controller.doAction("moveDots", [deltaX, deltaY]);
-                    break;
-                case "select":
-                    $(".selection-box").remove();
-                    break;
-            }
-
-            dragState = "none";
-        },
-    });
+    this._setupDrag();
+    this._setupContextMenus();
 
     $(".toolbar .edit-dots").addClass("active");
     $(".toolbar .edit-dots-group").removeClass("hide");
@@ -213,7 +47,7 @@ DotContext.prototype.load = function(options) {
 };
 
 DotContext.prototype.unload = function() {
-    this._removeEvents(document, ".workspace");
+    this._removeEvents(document, ".workspace", ".dot-marker");
     this._controller.deselectDots();
 
     $(".toolbar .edit-dots").removeClass("active");
@@ -399,5 +233,194 @@ ContextActions.moveDots = function(deltaX, deltaY, sheet, dots) {
 };
 
 DotContext.prototype.actions = ContextActions;
+
+/**** HELPERS ****/
+
+/**
+ * Set up the events for showing context menus. Adds events to ".workspace"
+ * and ".dot-marker".
+ */
+DotContext.prototype._setupContextMenus = function() {
+    var _this = this;
+
+    this._addEvents(".workspace", {
+        contextmenu: function(e) {
+            var menu = {
+                "Edit continuity...": "loadContext(continuity)",
+            };
+
+            UIUtils.showContextMenu(e, menu);
+        },
+    });
+
+    this._addEvents(".dot-marker", {
+        contextmenu: function(e) {
+            var dot = $(this).parent().data("dot");
+            var dotType = _this._sheet.getDotType(dot);
+            var menu = {
+                "Edit continuity...": "loadContext(continuity, dotType=" + dotType + ")",
+                "Change dot type": {
+                    "Plain": "changeDotType(plain)",
+                    "Solid": "changeDotType(solid)",
+                    "Plain Forwardslash": "changeDotType(plain-forwardslash)",
+                    "Solid Forwardslash": "changeDotType(solid-forwardslash)",
+                    "Plain Backslash": "changeDotType(plain-backslash)",
+                    "Solid Backslash": "changeDotType(solid-backslash)",
+                    "Plain Cross": "changeDotType(plain-x)",
+                    "Solid Cross": "changeDotType(solid-x)",
+                },
+            };
+
+            UIUtils.showContextMenu(e, menu);
+            return false;
+        },
+    });
+};
+
+/**
+ * Set up the events for selecting/dragging dots. Adds events to ".workspace"
+ * and document.
+ */
+DotContext.prototype._setupDrag = function() {
+    var _this = this;
+    var scale = this._grapher.getScale();
+
+    var workspace = $(".workspace").offset();
+    var graph = this._grapher.getGraph();
+    var svg = {
+        width: graph.outerWidth(),
+        height: graph.outerHeight(),
+    };
+
+    // variables to track state when dragging dots
+    var dragState = "none"; // none, drag, select
+    var dragStart = null;
+    var scrollStart = {};
+
+    this._addEvents(".workspace", {
+        mousedown: function(e) {
+            var target = $(e.target);
+
+            if (target.is(".dot-marker")) {
+                var dot = target.parent();
+
+                if (e.shiftKey || e.ctrlKey || e.metaKey) {
+                    _this._controller.toggleDots(dot);
+                    this._dragState = "none";
+                    return;
+                }
+
+                if (!_this._grapher.isSelected(dot)) {
+                    _this._controller.selectDots(dot, {
+                        append: false,
+                    });
+                }
+
+                dragState = "drag";
+                _this._scrollOffset.top = 0;
+                _this._scrollOffset.left = 0;
+                _this._moveOffset.x = 0;
+                _this._moveOffset.y = 0;
+            } else {
+                _this._controller.deselectDots();
+                HTMLBuilder.div("selection-box", null, $(".workspace"));
+                dragState = "select";
+            }
+
+            dragStart = e;
+            scrollStart = {
+                top: $(".workspace").scrollTop(),
+                left: $(".workspace").scrollLeft(),
+            };
+        },
+    });
+
+    this._addEvents(document, {
+        mousemove: function(e) {
+            if (dragState === "none") {
+                return;
+            }
+
+            e.preventDefault();
+
+            // change from beginning of move to now
+            var deltaX = e.pageX - dragStart.pageX;
+            var deltaY = e.pageY - dragStart.pageY;
+
+            switch (dragState) {
+                case "drag":
+                    // snap deltaX and deltaY to grid; dots can themselves be off
+                    // the grid, but they move in a consistent interval
+                    var snap = scale.toDistance(_this._grid);
+                    deltaX = MathUtils.round(_this._scrollOffset.left + deltaX, snap);
+                    deltaY = MathUtils.round(_this._scrollOffset.top + deltaY, snap);
+                    _this.moveSelection(deltaX, deltaY);
+                    _this._moveOffset.x = deltaX;
+                    _this._moveOffset.y = deltaY;
+                    break;
+                case "select":
+                    // relative to workspace
+                    var width = Math.abs(deltaX);
+                    var height = Math.abs(deltaY);
+
+                    var minX = Math.min(e.pageX, dragStart.pageX) - workspace.left + scrollStart.left;
+                    var minY = Math.min(e.pageY, dragStart.pageY) - workspace.top + scrollStart.top;
+
+                    // contain in graph
+                    var maxX = Math.min(minX + width, svg.width);
+                    var maxY = Math.min(minY + height, svg.height);
+                    width = maxX - minX;
+                    height = maxY - minY;
+
+                    // update dimensions of the selection box
+                    $(".selection-box")
+                        .css({
+                            top: minY,
+                            left: minX,
+                            width: width,
+                            height: height,
+                        })
+                        .scrollIntoView(".workspace", {
+                            callback: function(deltaX, deltaY) {
+                                scrollStart.top += deltaY;
+                                scrollStart.left += deltaX;
+                            },
+                        });
+
+                    // select dots within the selection box
+                    _this._controller.deselectDots();
+                    _this._grapher.getDots().each(function() {
+                        var dot = $(this);
+                        var position = dot.data("position");
+                        if (
+                            position.x >= minX &&
+                            position.x <= maxX &&
+                            position.y >= minY &&
+                            position.y <= maxY
+                        ) {
+                            _this._controller.selectDots(dot);
+                        }
+                    });
+            }
+        },
+        mouseup: function() {
+            switch (dragState) {
+                case "drag":
+                    if (_this._moveOffset.x === 0 && _this._moveOffset.y === 0) {
+                        break;
+                    }
+                    var deltaX = scale.toSteps(_this._moveOffset.x);
+                    var deltaY = scale.toSteps(_this._moveOffset.y);
+                    _this._controller.doAction("moveDots", [deltaX, deltaY]);
+                    break;
+                case "select":
+                    $(".selection-box").remove();
+                    break;
+            }
+
+            dragState = "none";
+        },
+    });
+};
 
 module.exports = DotContext;
