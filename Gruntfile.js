@@ -1,66 +1,73 @@
-var fs = require("fs");
 var path = require("path");
 
-var getEntryPoints = function() {
-    var dir = "calchart/static/src";
-    var files = {};
-    
-    fs.readdirSync(dir).forEach(function(file) {
-        var match = file.match(/(.*)\.js$/);
-        if (match !== null) {
-            files[match[1]] = "./" + dir + "/" + file;
-        }
-    });
-
-    return files;
-};
-
 module.exports = function (grunt) {
-    grunt.loadNpmTasks("grunt-contrib-sass");
     grunt.loadNpmTasks("grunt-webpack");
+    grunt.loadNpmTasks("grunt-contrib-sass");
     grunt.loadNpmTasks("grunt-contrib-watch");
 
-    var entryPoints = getEntryPoints();
+    // will map name (e.g. "base") to file 
+    var entryPoints = {};
+    var base = path.resolve("calchart/static/src");
+    grunt.file.expand({ cwd: base }, "*.js").forEach(function(filename) {
+        filename = path.basename(filename, ".js");
+        entryPoints[filename] = path.join(base, filename);
+    });
 
     grunt.initConfig({
+        webpack: {
+            build: {
+                entry: entryPoints,
+                output: {
+                    path: "calchart/static/js/",
+                    filename: "[name].js",
+                },
+                // set require(...) relative to given path
+                resolve: {
+                    root: [
+                        path.resolve("./calchart/static/src")
+                    ],
+                },
+                // convert ES6 to ES5
+                module: {
+                    loaders: [{
+                        test: /\.js$/,
+                        exclude: "node_modules",
+                        loader: "babel-loader",
+                        query: {
+                            presets: ["es2015"],
+                            minified: true,
+                            comments: false,
+                        },
+                    }],
+                },
+                // emit source maps
+                devtool: "source-map",
+            },
+        },
         sass: {
             dist: {
                 options: {
-                    style: "compressed"
+                    style: "compressed",
                 },
                 files: [{
                     expand: true,
                     cwd: "calchart/static/sass",
                     src: "**/*.scss",
                     dest: "calchart/static/css",
-                    ext: ".css"
-                }]
-            }
-        },
-        webpack: {
-            build: {
-                entry: entryPoints,
-                output: {
-                    path: "calchart/static/js/",
-                    filename: "[name].js"
-                },
-                resolve: {
-                    root: [
-                        path.resolve("./calchart/static/src")
-                    ]
-                }
+                    ext: ".css",
+                }],
             },
         },
         watch: {
             sass: {
                 files: "calchart/static/sass/**/*.scss",
-                tasks: "sass"
+                tasks: "sass",
             },
             js: {
                 files: ["calchart/static/src/**/*.js"],
-                tasks: "webpack:build"
-            }
-        }
+                tasks: "webpack:build",
+            },
+        },
     });
 
     grunt.registerTask("build", ["sass", "webpack:build"]);

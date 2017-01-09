@@ -1,96 +1,83 @@
-var util = require("util");
-
 /**
  * A collection of Javascript utility/helper functions.
  */
-var JSUtils = {};
-
-/**
- * Empties an array. Source: http://stackoverflow.com/a/1232046/4966649
- *
- * @param {Array} array -- array to be emptied
- */
-JSUtils.empty = function(array) {
-    array.splice(0, array.length);
-};
- 
-/**
- * Causes a child class to inherit from a parent class.
- *
- * @param {function} ChildClass The class that will inherit
- *   from another.
- * @param {function} ParentClass The class to inherit from.
- */
-JSUtils.extends = util.inherits;
-
-/**
- * Convert the given string from camel case into a capitalized string.
- * Ex. "someFunc" -> "Some Func".
- * Source: http://stackoverflow.com/a/4149393/4966649
- *
- * @param {string} s -- the string to convert
- * @return {string} the given string capitalized and split by caps
- */
-JSUtils.fromCamelCase = function(s) {
-    return s.replace(/([A-Z])/g, " $1").replace(/^./, function(first) {
-        return first.toUpperCase();
-    });
-};
-
-/**
- * Get the value from an optional object, returning the given default if
- * the object or value is undefined.
- *
- * @param {object|undefined} obj -- the object to retrieve from
- * @param {string} key -- the key of the value to retrieve
- * @param {*} defaultVal -- the default value to return
- * @return {*} the value of the object, or the default if undefined
- */
-JSUtils.get = function(obj, key, defaultVal) {
-    return (obj !== undefined && obj[key] !== undefined) ? obj[key] : defaultVal;
-};
-
-/**
- * @return {boolean} true if the user is on a Mac OS, false otherwise
- */
-JSUtils.isMac = function() {
-    // https://css-tricks.com/snippets/javascript/test-mac-pc-javascript/
-    return navigator.userAgent.indexOf("Mac OS X") !== -1;
-};
-
-/**
- * Parse the arguments passed to a function as either positional arguments
- * or as keyword arguments, passed as an object.
- *
- * @param {Array} args -- the arguments passed to the original function, with
- *   either an object passed as the only argument (to be used as all the
- *   arguments), or the arguments in order as defined by labels.
- * @param {Array<string>} labels -- the names of each argument, in order
- * @return {object} the arguments passed in, with the keys specified by
- *   labels and the values either undefined or the parsed argument
- */
-JSUtils.parseArgs = function(args, labels) {
-    if (args.length === 1 && args[0] !== null) {
-        var _checkArg = function(arg) {
-            for (var key in arg) {
-                if (labels.indexOf(key) === -1) {
-                    return;
-                }
-            }
-            return arg;
-        };
-        var kwargs = _checkArg(args[0]);
-        if (kwargs !== undefined) {
-            return kwargs;
-        }
+export default class JSUtils {
+    /**
+     * Empty the given array. Source: http://stackoverflow.com/a/1232046/4966649
+     *
+     * @param {Array} array
+     */
+    static empty(array) {
+        array.splice(0, array.length);
     }
 
-    var _args = {};
-    $.each(labels, function(i, label) {
-        _args[label] = args[i];
-    });
-    return _args;
-};
+    /**
+     * Convert the given string from camel case into a capitalized string, e.g.
+     * "someFunc" -> "Some Func". Source: http://stackoverflow.com/a/4149393/4966649
+     *
+     * @param {string} str
+     * @return {string}
+     */
+    static fromCamelCase(str) {
+        return str.replace(/([A-Z])/g, " $1").replace(/^./, function(first) {
+            return first.toUpperCase();
+        });
+    };
+
+    /**
+     * Get the value from an optional object, returning the given default if
+     * the object or value is undefined.
+     *
+     * @param {Object} obj -- the object to retrieve from
+     * @param {string} key -- the key of the value to retrieve
+     * @param {} defaultVal -- the default value to return
+     * @return {} the value of the object, or the default if undefined
+     */
+    static get(obj, key, defaultVal) {
+        let val = obj[key];
+        return val === undefined ? defaultVal : val;
+    };
+
+    /**
+     * @return {boolean} True if the user is on a Mac, false otherwise.
+     */
+    static isMac() {
+        // https://css-tricks.com/snippets/javascript/test-mac-pc-javascript/
+        return navigator.userAgent.indexOf("Mac OS X") !== -1;
+    }
+
+    /**
+     * Parse the arguments passed to a function as either positional arguments
+     * or as keyword arguments, passed as an object.
+     *
+     * @param {Array} args - The arguments passed to the original function, with
+     *   either an object passed as the only argument (to be used as all the
+     *   arguments), or the arguments in order as defined by labels.
+     * @param {string[]} labels - The names of each argument, in order
+     * @return {Object} The arguments passed in, with the keys specified by
+     *   labels and the values either undefined or the parsed argument
+     */
+    static parseArgs(args, labels) {
+        if (args.length === 1 && args[0] !== null) {
+            let kwargs = args[0];
+            for (var key in kwargs) {
+                if (labels.indexOf(key) === -1) {
+                    kwargs = null;
+                    break;
+                }
+            }
+            if (kwargs) {
+                return kwargs;
+            }
+        }
+
+        let kwargs = {};
+        $.each(labels, function(i, label) {
+            kwargs[label] = args[i];
+        });
+        return kwargs;
+    };
+}
 
 /**
  * Generate an array containing numbers within a certain range. Like
@@ -161,5 +148,3 @@ JSUtils.validatePositive = function(input) {
         return value;
     }
 };
-
-module.exports = JSUtils;
