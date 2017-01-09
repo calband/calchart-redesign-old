@@ -1,150 +1,141 @@
 /**
- * A collection of various utility functions and constants that are
+ * @file A collection of various utility functions and constants that are
  * useful in mathematical calculations. For explanations on the coordinate
  * system, see docs/Coordinate_System.md
  */
-var MathUtils = {};
-
-/**** CONSTANTS ****/
  
-/* π/2 */
-MathUtils.PI_OVER_TWO = Math.PI / 2;
+/** @const {float} */
+export const PI_OVER_TWO = Math.PI / 2;
 
-/* 2π */
-MathUtils.TWO_PI = Math.PI * 2;
-
-/**** UTILITIES ****/
+/** @const {float} */
+export const TWO_PI = Math.PI * 2;
 
 /**
- * Bounds the given value to be at least low and at most high.
+ * Bound the given value to be at least low and at most high.
  *
- * @param {float} x -- the value to bound
- * @param {float} low -- the lower bound
- * @param {float} high -- the higher bound
- * @return {float} low if x < low, high if x > high, else x
+ * @param {number} val
+ * @param {number} low
+ * @param {number} high
+ * @return {number} low if val < low, high if val > high, else val.
  */
-MathUtils.bound = function(x, low, high) {
-    return Math.min(Math.max(x, low), high);
-};
+export function bound(val, low, high) {
+    return Math.min(Math.max(val, low), high);
+}
 
 /**
- * Calculates the distance between two points
+ * Calculate the distance between two points
  *
- * @param {float} x1 -- the x coordinate of the first point
- * @param {float} y1 -- the y coordinate of the first point
- * @param {float} x2 -- the x coordinate of the second point
- * @param {float} y2 -- the y coordinate of the second point
- * @return {float} the distance between points (x1,y1) and (x2,y2)
+ * @param {number} x1 - The x coordinate of the first point.
+ * @param {number} y1 - The y coordinate of the first point.
+ * @param {number} x2 - The x coordinate of the second point.
+ * @param {number} y2 - The y coordinate of the second point.
+ * @return {number} The distance between points (x1,y1) and (x2,y2).
  */
-MathUtils.calcDistance = function(x1, y1, x2, y2) {
+export function calcDistance(x1, y1, x2, y2) {
     var deltaX = x2 - x1;
     var deltaY = y2 - y1;
     return Math.sqrt((deltaX * deltaX) + (deltaY * deltaY));
-};
+}
 
 /**
- * Calculates the angle toward which the given vector is facing
+ * Calculate the angle toward which the given vector is facing
  *
- * @param {float} x1 -- the x coordinate of the vector's start
- * @param {float} y1 -- the y coordinate of the vector's start
- * @param {float} x2 -- the x coordinate of the vector's end
- * @param {float} y2 -- the y coordinate of the vector's end
- * @return {float} the angle the vector (x1,y1) -> (x2,y2) is
- *   facing, in Calchart degrees
+ * @param {number} x1 - The x coordinate of the vector's start.
+ * @param {number} y1 - The y coordinate of the vector's start.
+ * @param {number} x2 - The x coordinate of the vector's end.
+ * @param {number} y2 - The y coordinate of the vector's end.
+ * @return {number} The angle the vector (x1,y1) -> (x2,y2) is
+ *   facing, in Calchart degrees.
  */
-MathUtils.calcAngle = function(x1, y1, x2, y2) {
+export function calcAngle(x1, y1, x2, y2) {
     var deltaX = x2 - x1;
     var deltaY = y2 - y1;
     var angle = Math.atan(-deltaX / deltaY);
     if (deltaY < 0) {
         angle += Math.PI;
     }
-    return this.toDegrees(angle);
-};
+    return toDegrees(angle);
+}
 
 /**
- * Calculates the x position of a point rotated along the unit
+ * Calculate the x position of a point rotated along the unit
  * circle by the given angle
  *
- * @param {float} angle -- the angle to rotate the point, in Calchart
- *   degrees
- * @return {float} the final x position of the point, rotated along the
- *   unit circle
+ * @param {number} angle - The angle to rotate the point, in Calchart
+ *   degrees.
+ * @return {number} The final x position of the point, rotated along the
+ *   unit circle.
  */
-MathUtils.calcRotatedXPos = function(angle) {
-    return -Math.sin(this.toRadians(angle));
-};
+export function calcRotatedXPos(angle) {
+    return -Math.sin(toRadians(angle));
+}
 
 /**
- * Calculates the y position of a point rotated along the unit
+ * Calculate the y position of a point rotated along the unit
  * circle by the given angle
  *
- * @param {float} angle -- the angle to rotate the point, in Calchart
- *   degrees
- * @return {float} the final y position of the point, rotated along the
- *   unit circle
+ * @param {number} angle - The angle to rotate the point, in Calchart
+ *   degrees.
+ * @return {number} The final y position of the point, rotated along the
+ *   unit circle.
  */
-MathUtils.calcRotatedYPos = function(angle) {
-    return Math.cos(this.toRadians(angle));
-};
+export function calcRotatedYPos(angle) {
+    return Math.cos(toRadians(angle));
+}
 
 /**
- * Rotates an angle by a quarter-turn in a specified direction.
+ * Rotate the given angle by a quarter-turn in the specified direction.
  *
- * @param {float} angle -- the angle to rotate, in radians
- * @param {boolean} isCW -- true if the angle should be rotated
- *   clockwise; otherwise, rotate counter-clockwise
- * @return the angle rotated by a quarter turn, in radians
+ * @param {float} angle - The angle to rotate, in radians.
+ * @param {boolean} isCW - true if the angle should be rotated
+ *   clockwise; otherwise, rotate counter-clockwise.
+ * @return The angle rotated by a quarter turn, in radians.
  */
-MathUtils.quarterTurn = function(angle, isCW) {
+export function quarterTurn(angle, isCW) {
     var orientation = isCW ? 1 : -1;
-    return angle + orientation * this.PI_OVER_TWO;
-};
+    return angle + orientation * PI_OVER_TWO;
+}
 
 /**
  * Round the given number to the nearest interval, rounding up.
  *
- * Ex. MathUtils.round(11, 2) == 12
- *
- * @param {float} x -- the number to round
- * @param {float} interval -- the number to round to
- * @return {float} x rounded to the nearest interval
+ * @param {float} x - The number to round.
+ * @param {float} interval - The number to round to.
+ * @return {float} x rounded to the nearest interval.
  */
-MathUtils.round = function(x, interval) {
+export function round(x, interval) {
     return Math.round(x / interval) * interval;
-};
+}
 
 /**
  * Round the given number to the nearest 1e-10 (for rounding
  * errors)
  *
- * @param {float} x -- the number to round
- * @return {float} x rounded to the nearest 1e-10
+ * @param {number} x - The number to round.
+ * @return {number} x rounded to the nearest 1e-10.
  */
-MathUtils.roundSmall = function(x) {
-    return this.round(x, 1e-10);
-};
+export function roundSmall(x) {
+    return round(x, 1e-10);
+}
 
 /**
- * Converts an angle measured in degrees to one
+ * Convert an angle measured in degrees to one
  * measured in radians.
  *
- * @param {float} angle -- the angle, measured in degrees.
- * @return {float} the angle, measured in radians.
+ * @param {number} angle - The angle, measured in degrees.
+ * @return {number} The angle, measured in radians.
  */
-MathUtils.toRadians = function(angle) {
+export function toRadians(angle) {
     return angle * Math.PI / 180;
-};
+}
 
 /**
  * Converts an angle measured in radians to one
  * measured in degrees.
  *
- * @param {float} angle -- the angle, measured in radians.
- * @return {float} the angle, measured in degrees.
+ * @param {number} angle - The angle, measured in radians.
+ * @return {number} The angle, measured in degrees.
  */
-MathUtils.toDegrees = function(angle) {
+export function toDegrees(angle) {
     return angle * 180 / Math.PI;
-};
-
-module.exports = MathUtils;
+}
