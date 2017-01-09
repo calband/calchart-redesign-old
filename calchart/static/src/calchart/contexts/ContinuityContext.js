@@ -92,6 +92,7 @@ ContinuityContext.prototype.unload = function() {
     this._panel.hide();
     this._removeEvents(window, document, ".workspace", ".toolbar .seek");
     this._controller.setBeat(0);
+    this._controller.deselectDots();
 
     $(".toolbar .edit-continuity").removeClass("active");
     $(".toolbar .edit-continuity-group").addClass("hide");
@@ -177,6 +178,12 @@ ContinuityContext.prototype.refresh = function() {
         var continuityHTML = continuity.panelHTML(this._controller);
         continuities.append(continuityHTML);
     }, this);
+
+    // select dots of the active dot type
+    var dots = $(".dot." + this._dotType);
+    this._controller.selectDots(dots, {
+        append: false
+    });
 
     // update seek bar
     var beat = this._controller.getCurrentBeat();
