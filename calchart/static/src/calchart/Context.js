@@ -27,4 +27,21 @@ module.exports = {
         context.load(options);
         return context;
     },
+    /**
+     * @return {object} an object mapping shortcut action (e.g. "saveShow")
+     *   to shortcut command (e.g. "ctrl+s").
+     */
+    getAllShortcutCommands: function() {
+        var commands = {};
+        var contexts = [
+            ContinuityContext,
+            DotContext,
+        ];
+        contexts.forEach(function(Context) {
+            $.each(Context.prototype.shortcuts, function(command, action) {
+                commands[action] = command;
+            });
+        });
+        return commands;
+    },
 };

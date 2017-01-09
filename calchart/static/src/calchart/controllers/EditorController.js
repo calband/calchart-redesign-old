@@ -277,6 +277,11 @@ EditorController.prototype.getActiveSheet = function() {
     return this._activeSheet;
 };
 
+EditorController.prototype.getAllShortcutCommands = function() {
+    var commands = ApplicationController.prototype.getAllShortcutCommands.call(this);
+    return $.extend(commands, Context.getAllShortcutCommands());
+};
+
 /**
  * Get the current beat number
  *
@@ -307,6 +312,11 @@ EditorController.prototype.getSelectedDots = function() {
     return this._selectedDots.map(function() {
         return $(this).data("dot");
     }).toArray();
+};
+
+EditorController.prototype.getShortcut = function(shortcut) {
+    var action = ApplicationController.prototype.getShortcut.call(this, shortcut);
+    return action || this._context.shortcuts[shortcut];
 };
 
 /**
@@ -624,14 +634,6 @@ EditorController.prototype._getAction = function(name) {
     } else {
         return action;
     }
-};
-
-/**
- * Allow retrieving shortcuts from the context also
- */
-EditorController.prototype._getShortcut = function(shortcut) {
-    var action = ApplicationController.prototype._getShortcut.call(this, shortcut);
-    return action || this._context.shortcuts[shortcut];
 };
 
 module.exports = EditorController;

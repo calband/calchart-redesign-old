@@ -51,6 +51,14 @@ JSUtils.get = function(obj, key, defaultVal) {
 };
 
 /**
+ * @return {boolean} true if the user is on a Mac OS, false otherwise
+ */
+JSUtils.isMac = function() {
+    // https://css-tricks.com/snippets/javascript/test-mac-pc-javascript/
+    return navigator.userAgent.indexOf("Mac OS X") !== -1;
+};
+
+/**
  * Parse the arguments passed to a function as either positional arguments
  * or as keyword arguments, passed as an object.
  *

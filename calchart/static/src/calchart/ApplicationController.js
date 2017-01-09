@@ -81,6 +81,29 @@ ApplicationController.prototype.doAction = function(name, args) {
 };
 
 /**
+ * @return {object} an object mapping shortcut action (e.g. "saveShow") to
+ *   shortcut command (e.g. "ctrl+s").
+ */
+ApplicationController.prototype.getAllShortcutCommands = function() {
+    var commands = {};
+    $.each(this.shortcuts, function(command, action) {
+        commands[action] = command;
+    });
+    return commands;
+};
+
+/**
+ * Get the shortcut action for the given shortcut key binding
+ *
+ * @param {string} shortcut -- the shortcut keys, e.g. "ctrl+z"
+ * @return {string|undefined} the shortcut action, if there is one (to be
+ *   passed to ApplicationController.doAction)
+ */
+ApplicationController.prototype.getShortcut = function(shortcut) {
+    return this.shortcuts[shortcut];
+};
+
+/**
  * Get the show stored in the controller
  *
  * @return {Show} the show stored in the controller
@@ -140,7 +163,7 @@ ApplicationController.prototype.init = function() {
                 pressedKeys.push(character);
         }
 
-        var _function = _this._getShortcut(pressedKeys.join("+"));
+        var _function = _this.getShortcut(pressedKeys.join("+"));
         if (_function) {
             _this.doAction(_function);
             e.preventDefault();
@@ -172,16 +195,6 @@ ApplicationController.prototype._getAction = function(name) {
     } else {
         throw new errors.ActionError("No action with the name: " + data.name);
     }
-};
-
-/**
- * Get the shortcut function for the given shortcut key binding
- *
- * @param {string} shortcut -- the shortcut keys, e.g. "ctrl+z"
- * @return {function|undefined} the shortcut function, if there is one
- */
-ApplicationController.prototype._getShortcut = function(shortcut) {
-    return this.shortcuts[shortcut];
 };
 
 /**
@@ -367,59 +380,106 @@ ApplicationController.prototype._setupMenu = function(menu) {
  * @param {jQuery|string} toolbar -- jQuery object or toolbar to setup
  */
 ApplicationController.prototype._setupToolbar = function(toolbar) {
-    var _this = this;
-    var tooltipTimeout = null;
+    var controller = this;
 
-    // set up click
-    $(toolbar).find("li")
-        .mousedown(function(e) {
-            if (!$(this).hasClass("disabled")) {
-                $(this).addClass("focus");
+    var isMac = JSUtils.isMac();
+    var shortcutCommands = this.getAllShortcutCommands();
+    var convertShortcut = function(shortcut) {
+        // HTML codes: http://apple.stackexchange.com/a/55729
+        shortcut = shortcut.split("+").map(function(key) {
+            switch (key) {
+                case "ctrl":
+                    return isMac ? "&#8984;" : "Ctrl";
+                case "alt":
+                    return isMac ? "&#8997;" : "Alt";
+                case "shift":
+                    return isMac ? "&#8679;" : "Shift";
+                case "backspace":
+                    return isMac ? "&#9003;" : "Backspace";
+                case "tab":
+                    return isMac ? "&#8677;" : "Tab";
+                case "enter":
+                    return isMac ? "&crarr;" : "Enter";
+                case "left":
+                    return isMac ? "&larr;" : "Left";
+                case "up":
+                    return isMac ? "&uarr;" : "Up";
+                case "right":
+                    return isMac ? "&rarr;" : "Right";
+                case "down":
+                    return isMac ? "&darr;" : "Down";
+                case "delete":
+                    return isMac ? "&#8998;" : "Del";
+                default:
+                    return key.toUpperCase();
             }
-        })
-        .mouseup(function() {
-            if (!$(this).hasClass("focus")) {
-                return;
-            }
+        });
+        if (isMac) {
+            return shortcut.join("");
+        } else {
+            return shortcut.join("+");
+        }
+    };
 
-            $(this).removeClass("focus");
-            var name = $(this).data("action");
-            if (name !== undefined) {
-                _this.doAction(name);
-            }
-        })
-        .hover(function() {
-            // tooltip above item
-            var offset = $(this).offset();
-            var width = $(this).outerWidth();
-            var name = $(this).data("name");
+    // set up click and tooltip
+    $(toolbar).find("li").each(function() {
+        var toolbarItem = this;
+        var name = $(this).data("name");
+        var action = $(this).data("action");
+        var shortcut = shortcutCommands[action];
 
-            if (name === undefined) {
-                return;
-            }
-
-            tooltipTimeout = setTimeout(function() {
-                var tooltip = HTMLBuilder.span(name, "tooltip").appendTo("body");
-
-                var arrow = HTMLBuilder
-                    .make("span.tooltip-arrow")
-                    .appendTo(tooltip);
-
-                var left = offset.left - tooltip.outerWidth() / 2 + width / 2;
-                if (left < 0) {
-                    left = 0;
-                    arrow.css("left", offset.left + width / 2);
+        $(this)
+            .mousedown(function() {
+                if (!$(this).hasClass("disabled")) {
+                    $(this).addClass("focus");
+                }
+            })
+            .mouseup(function() {
+                if (!$(this).hasClass("focus")) {
+                    return;
                 }
 
-                tooltip.css({
-                    top: offset.top - tooltip.outerHeight() - arrow.outerHeight(),
-                    left: left,
-                });
-            }, 750);
-        }, function() {
-            clearTimeout(tooltipTimeout);
-            $(".tooltip").remove();
-        });
+                $(this).removeClass("focus");
+                if (action !== undefined) {
+                    controller.doAction(action);
+                }
+            });
+
+        if (name !== undefined) {
+            // update name with shortcut
+            if (shortcut !== undefined) {
+                name += " (" + convertShortcut(shortcut) + ")";
+            }
+
+            var tooltipTimeout = null;
+            var tooltip = HTMLBuilder.span("", "tooltip").html(name);
+            var arrow = HTMLBuilder.make("span.tooltip-arrow").appendTo(tooltip);
+
+            $(this).hover(function() {
+                tooltipTimeout = setTimeout(function() {
+                    tooltip.appendTo("body");
+
+                    var offset = $(toolbarItem).offset();
+                    var width = $(toolbarItem).outerWidth();
+                    var left = offset.left - tooltip.outerWidth() / 2 + width / 2;
+                    if (left < 0) {
+                        left = 0;
+                        arrow.css("left", offset.left + width / 2);
+                    } else {
+                        arrow.css("left", "");
+                    }
+
+                    tooltip.css({
+                        top: offset.top - tooltip.outerHeight() - arrow.outerHeight() + 2,
+                        left: left,
+                    });
+                }, 750);
+            }, function() {
+                clearTimeout(tooltipTimeout);
+                tooltip.remove();
+            });
+        }
+    });
 };
 
 module.exports = ApplicationController;

@@ -39,6 +39,7 @@ ContinuityContext.prototype.shortcuts = {
     "right": "nextBeat",
     "down": "firstBeat",
     "up": "lastBeat",
+    "ctrl+enter": "checkContinuities",
 };
 
 ContinuityContext.prototype.load = function(options) {
