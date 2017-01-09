@@ -47,6 +47,13 @@
     }
 }
 
+// make this element vertically centered
+@mixin vertically-center-self {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
 // Remove the small space between children caused by whitespace
 @mixin remove-children-space {
     font-size: 0;

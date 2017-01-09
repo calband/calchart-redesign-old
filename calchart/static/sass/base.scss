@@ -170,9 +170,10 @@ header {
             color: $light-gray;
         }
         &.has-submenu:after {
+            @include vertically-center-self;
             content: "\5c";
             font-family: "icons";
-            position: absolute;
+            font-size: 0.9em;
             vertical-align: middle;
             right: 0;
         }
@@ -304,10 +305,8 @@ ul.messages {
             color: $red;
         }
         .close-message {
-            position: absolute;
+            @include vertically-center-self;
             right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
             color: $gold;
             cursor: pointer;
         }
