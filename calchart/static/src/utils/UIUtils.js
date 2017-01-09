@@ -276,7 +276,7 @@ UIUtils.setupToolbar = function(toolbar) {
 
             var tooltipTimeout = null;
             var tooltip = HTMLBuilder.span("", "tooltip").html(name);
-            var arrow = HTMLBuilder.make("span.tooltip-arrow").appendTo(tooltip);
+            var arrow = HTMLBuilder.make("span.tooltip-arrow", tooltip);
 
             $(this).hover(function() {
                 tooltipTimeout = setTimeout(function() {
@@ -327,7 +327,7 @@ UIUtils.showContextMenu = function(e, items) {
     // close any existing menus
     closeMenus();
     parents.addClass("no-scroll");
-    var menu = HTMLBuilder.make("ul.context-menu").appendTo("body");
+    var menu = HTMLBuilder.make("ul.context-menu", "body");
 
     var makeMenu = function(parent, items) {
         $.each(items, function(label, action) {
@@ -506,7 +506,7 @@ UIUtils.hidePopup = function() {
 UIUtils.showMessage = function(message, isError) {
     var container = $("ul.messages");
     if (!container.exists()) {
-        container = HTMLBuilder.make("ul.messages").appendTo("body");
+        container = HTMLBuilder.make("ul.messages", "body");
     }
 
     var li = HTMLBuilder.li(message, "message").appendTo(container);

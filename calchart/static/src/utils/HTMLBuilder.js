@@ -1,34 +1,37 @@
-var JSUtils = require("./JSUtils");
-
 /**
- * A collection of helper functions that simplify creating HTML elements.
+ * @file A collection of helper functions that simplify creating HTML elements.
  * Every function's arguments are optional, so can either be called with
  * those arguments in order, or passed in as an object. All functions return
  * a jQuery object.
  */
-var HTMLBuilder = {};
+
+import * as JSUtils from "./JSUtils";
 
 /**
- * Make an HTML element as specified
+ * Make an HTML element as specified.
  *
- * @param {string} elem -- the HTML element to make of the format
+ * @param {string} elem - The HTML element to make of the format:
  *   [TAG]#[ID].[CLASS]
  *   where ID and CLASS are optional and multiple classes may be
- *   specified. Examples: "p.message", "div#sidebar", "span.foo.bar"
- * @param {jQuery} appendTo -- the element to append the element to
+ *   specified. Examples: "p.message", "div#sidebar", "span.foo.bar".
+ * @param {jQuery} appendTo - The element to append the element to.
  */
-HTMLBuilder.make = function(elem, appendTo) {
-    var match = elem.match(/^(\w+)(?:#([\w-]+))?((?:\.[\w-]+)+)?$/);
-    var tag = "<" + match[1] + ">";
-    var id = match[2];
-    var classes = (match[3] || "").slice(1).replace(/\./g, " ");
+export function make(elem, appendTo) {
+    let [match, tag, id, classes=""] = elem.match(/^(\w+)(?:#([\w-]+))?((?:\.[\w-]+)+)?$/);
 
-    var element = $(tag).attr("id", id).addClass(classes);
+    if (match === null) {
+        throw new Error(`Invalid format: ${elem}`);
+    }
+
+    tag = `<${tag}>`;
+    classes = classes.slice(1).replace(/\./g, " ");
+
+    let element = $(tag).attr("id", id).addClass(classes);
     if (appendTo) {
         element.appendTo(appendTo);
     }
     return element;
-};
+}
 
 /**** TAG SPECIFIC ****/
 
@@ -39,10 +42,10 @@ HTMLBuilder.make = function(elem, appendTo) {
  * @param {jQuery|Array<jQuery>} append -- the contents to append to the <div>
  * @param {jQuery} appendTo -- the element to append the <div> to
  */
-HTMLBuilder.div = function() {
-    var args = JSUtils.parseArgs(arguments, ["class", "append", "appendTo"]);
+export function div() {
+    let args = JSUtils.parseArgs(arguments, ["class", "append", "appendTo"]);
 
-    var div = $("<div>")
+    let div = $("<div>")
         .addClass(args.class)
         .append(args.append);
 
@@ -51,7 +54,7 @@ HTMLBuilder.div = function() {
     }
 
     return div;
-};
+}
 
 /**
  * Builds a <div> element for a form field
@@ -61,9 +64,9 @@ HTMLBuilder.div = function() {
  *    the HTML element itself or a string to pass to HTMLBuilder.make
  * @param {string} name -- the name attribute for the field (defaults to label as camel case)
  */
-HTMLBuilder.formfield = function() {
-    var args = JSUtils.parseArgs(arguments, ["label", "field", "name"]);
-    var name = args.name || JSUtils.toCamelCase(args.label);
+export function formfield() {
+    let args = JSUtils.parseArgs(arguments, ["label", "field", "name"]);
+    let name = args.name || JSUtils.toCamelCase(args.label);
 
     if (typeof args.field === "string") {
         args.field = this.make(args.field);
@@ -72,14 +75,14 @@ HTMLBuilder.formfield = function() {
         .attr("name", name)
         .attr("id", name);
 
-    var label = $("<label>")
+    let label = $("<label>")
         .attr("for", name)
-        .text(args.label + ":");
+        .text(`${args.label}:`);
 
     return $("<div>")
-        .addClass("field " + name)
+        .addClass(`field ${name}`)
         .append([label, args.field]);
-};
+}
 
 /**
  * Builds an <i> element
@@ -87,20 +90,20 @@ HTMLBuilder.formfield = function() {
  * @param {string} name -- the name of the icon, without the "icon-" prefix
  * @param {string} class -- the class to add to the <i>
  */
-HTMLBuilder.icon = function() {
-    var args = JSUtils.parseArgs(arguments, ["name", "class"]);
+export function icon() {
+    let args = JSUtils.parseArgs(arguments, ["name", "class"]);
 
-    return $("<i>").addClass("icon-" + args.name + " " + args.class);
-};
+    return $("<i>").addClass(`icon-${args.name} ${args.class}`);
+}
 
 /**
  * Builds an <img> element
  *
  * @param {string} src -- the image source
  */
-HTMLBuilder.img = function(src) {
+export function img(src) {
     return $("<img>").attr("src", src);
-};
+}
 
 /**
  * Builds an <input> element
@@ -111,8 +114,8 @@ HTMLBuilder.img = function(src) {
  * @param {string|float} initial -- the initial value of the input
  * @param {function} change -- the callback to run when the value is changed
  */
-HTMLBuilder.input = function() {
-    var args = JSUtils.parseArgs(arguments, ["class", "type", "name", "initial", "change"]);
+export function input() {
+    let args = JSUtils.parseArgs(arguments, ["class", "type", "name", "initial", "change"]);
 
     return $("<input>")
         .addClass(args.class)
@@ -120,7 +123,7 @@ HTMLBuilder.input = function() {
         .attr("name", args.name)
         .attr("value", args.initial)
         .change(args.change);
-};
+}
 
 /**
  * Builds a <label> element
@@ -128,13 +131,13 @@ HTMLBuilder.input = function() {
  * @param {string} text -- the text to show in the element
  * @param {string} class -- the class to add to the element
  */
-HTMLBuilder.label = function() {
-    var args = JSUtils.parseArgs(arguments, ["text", "class"]);
+export function label() {
+    let args = JSUtils.parseArgs(arguments, ["text", "class"]);
 
     return $("<label>")
         .text(args.text)
         .addClass(args.class);
-};
+}
 
 /**
  * Builds an <li> element
@@ -142,13 +145,13 @@ HTMLBuilder.label = function() {
  * @param {string} text -- the text to show in the element
  * @param {string} class -- the class to add to the element
  */
-HTMLBuilder.li = function() {
-    var args = JSUtils.parseArgs(arguments, ["text", "class"]);
+export function li() {
+    let args = JSUtils.parseArgs(arguments, ["text", "class"]);
 
     return $("<li>")
         .text(args.text)
         .addClass(args.class);
-};
+}
 
 /**
  * Builds a <select> element
@@ -159,10 +162,10 @@ HTMLBuilder.li = function() {
  * @param {function} change -- the callback to run when an option is selected
  * @param {string} initial -- the value of the option to initially mark selected
  */
-HTMLBuilder.select = function() {
-    var args = JSUtils.parseArgs(arguments, ["options", "class", "change", "initial"]);
+export function select() {
+    let args = JSUtils.parseArgs(arguments, ["options", "class", "change", "initial"]);
 
-    var select = $("<select>").addClass(args.class).change(args.change);
+    let select = $("<select>").addClass(args.class).change(args.change);
 
     $.each(args.options, function(value, label) {
         $("<option>")
@@ -173,7 +176,7 @@ HTMLBuilder.select = function() {
     });
 
     return select;
-};
+}
 
 /**
  * Builds a <span> element
@@ -181,12 +184,10 @@ HTMLBuilder.select = function() {
  * @param {string} text -- the text to put in the span
  * @param {string} class -- the class to add to the <span>
  */
-HTMLBuilder.span = function() {
-    var args = JSUtils.parseArgs(arguments, ["text", "class"]);
+export function span() {
+    let args = JSUtils.parseArgs(arguments, ["text", "class"]);
 
     return $("<span>")
         .addClass(args.class)
         .text(args.text);
-};
-
-module.exports = HTMLBuilder;
+}

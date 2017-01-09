@@ -166,9 +166,9 @@ export default class ApplicationController {
                 args: data.args,
             };
         } else {
-            throw new ActionError("No action with the name: " + data.name);
+            throw new ActionError(`No action with the name: ${data.name}`);
         }
-    };
+    }
 
     /**
      * Parse the given function name.
@@ -187,7 +187,7 @@ export default class ApplicationController {
         let actionMatch = name.match(/^(\w+)(\((.+)\))?$/);
 
         if (actionMatch === null) {
-            throw new Error("Action name in an invalid format: " + name);
+            throw new Error(`Action name in an invalid format: ${name}`);
         }
 
         let actionName = actionMatch[1];
@@ -246,5 +246,5 @@ export default class ApplicationController {
             name: actionName,
             args: actionArgs,
         };
-    };
+    }
 }

@@ -32,8 +32,8 @@ export function bound(val, low, high) {
  * @return {number} The distance between points (x1,y1) and (x2,y2).
  */
 export function calcDistance(x1, y1, x2, y2) {
-    var deltaX = x2 - x1;
-    var deltaY = y2 - y1;
+    let deltaX = x2 - x1;
+    let deltaY = y2 - y1;
     return Math.sqrt((deltaX * deltaX) + (deltaY * deltaY));
 }
 
@@ -48,9 +48,9 @@ export function calcDistance(x1, y1, x2, y2) {
  *   facing, in Calchart degrees.
  */
 export function calcAngle(x1, y1, x2, y2) {
-    var deltaX = x2 - x1;
-    var deltaY = y2 - y1;
-    var angle = Math.atan(-deltaX / deltaY);
+    let deltaX = x2 - x1;
+    let deltaY = y2 - y1;
+    let angle = Math.atan(-deltaX / deltaY);
     if (deltaY < 0) {
         angle += Math.PI;
     }
@@ -92,7 +92,7 @@ export function calcRotatedYPos(angle) {
  * @return The angle rotated by a quarter turn, in radians.
  */
 export function quarterTurn(angle, isCW) {
-    var orientation = isCW ? 1 : -1;
+    let orientation = isCW ? 1 : -1;
     return angle + orientation * PI_OVER_TWO;
 }
 
