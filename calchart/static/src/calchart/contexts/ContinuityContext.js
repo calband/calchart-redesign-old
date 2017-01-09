@@ -99,6 +99,55 @@ ContinuityContext.prototype.unload = function() {
 
 /**** INSTANCE METHODS ****/
 
+/**
+ * Delete the given continuity.
+ *
+ * @param {jQuery|int} continuity -- the continuity to delete, either
+ *   the continuity HTML element in the panel, or the index of the
+ *   continuity in the panel.
+ */
+ContinuityContext.prototype.deleteContinuity = function(continuity) {
+    if (typeof continuity === "number") {
+        continuity = this._panel.find(".continuity").get(continuity);
+    }
+
+    continuity = $(continuity).data("continuity");
+    this._controller.doAction("removeContinuity", [continuity]);
+};
+
+/**
+ * Edit the given continuity.
+ *
+ * @param {jQuery|int} continuity -- the continuity to edit, either
+ *   the continuity HTML element in the panel, or the index of the
+ *   continuity in the panel.
+ */
+ContinuityContext.prototype.editContinuity = function(continuity) {
+    if (typeof continuity === "number") {
+        continuity = this._panel.find(".continuity").get(continuity);
+    }
+
+    continuity = $(continuity).data("continuity");
+    var controller = this._controller;
+    var html = continuity.popupHTML();
+
+    UIUtils.showPopup("edit-continuity", {
+        init: function(popup) {
+            popup.find(".continuity-title").text(html.name);
+            popup.find("form").prepend(html.fields);
+            popup.find("select").dropdown();
+        },
+        onHide: function(popup) {
+            popup.find("form .field").remove();
+        },
+        onSubmit: function(popup) {
+            var data = UIUtils.getData(popup);
+            controller.doAction("saveContinuity", [continuity, data]);
+            UIUtils.hidePopup();
+        },
+    });
+};
+
 ContinuityContext.prototype.refresh = function() {
     BaseContext.prototype.refresh.call(this);
 
@@ -287,11 +336,11 @@ ContinuityContext.prototype._init = function() {
         if (top > max) {
             dropdown.css("top", max);
         }
-    });
-    $(window).click(function(e) {
-        if (!$(e.target).is(".panel select")) {
-            $(".panel-dropdown").remove();
-        }
+
+        $(window).click(function(e) {
+            $(dropdown).remove();
+            $(this).off(e);
+        });
     });
 
     // changing tabs
@@ -315,30 +364,22 @@ ContinuityContext.prototype._init = function() {
 
     // edit continuity popup
     this._panel.on("click", ".continuity .edit", function() {
-        var continuity = $(this).parents(".continuity").data("continuity");
-        var html = continuity.popupHTML();
-
-        UIUtils.showPopup("edit-continuity", {
-            init: function(popup) {
-                popup.find(".continuity-title").text(html.name);
-                popup.find("form").prepend(html.fields);
-                popup.find("select").dropdown();
-            },
-            onHide: function(popup) {
-                popup.find("form .field").remove();
-            },
-            onSubmit: function(popup) {
-                var data = UIUtils.getData(popup);
-                _this._controller.doAction("saveContinuity", [continuity, data]);
-                UIUtils.hidePopup();
-            },
-        });
+        _this.editContinuity($(this).parents(".continuity"));
     });
 
     // remove continuity link
     this._panel.on("click", ".continuity .delete", function() {
-        var continuity = $(this).parents(".continuity").data("continuity");
-        _this._controller.doAction("removeContinuity", [continuity]);
+        _this.deleteContinuity($(this).parents(".continuity"));
+    });
+
+    // context menus
+    this._panel.on("contextmenu", ".continuity", function(e) {
+        var index = $(this).index();
+
+        UIUtils.showContextMenu(e, {
+            "Edit...": "editContinuity(" + index + ")",
+            "Delete": "deleteContinuity(" + index + ")",
+        });
     });
 };
 

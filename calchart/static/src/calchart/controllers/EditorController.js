@@ -160,7 +160,7 @@ EditorController.prototype.checkContinuities = function() {
     if (args.dots === undefined) {
         var dots = this._show.getDots();
     } else if (typeof args.dots === "string") {
-        var dots = sheet.getDotType(args.dots);
+        var dots = sheet.getDotsOfType(args.dots);
     } else if (args.dots instanceof Dot) {
         var dots = [args.dots];
     } else {

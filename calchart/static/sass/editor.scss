@@ -220,6 +220,7 @@ $sidebar-width: 200px;
             }
         }
         .dot-types {
+            @include unselectable;
             height: 35px;
             padding: 0 10px;
             border-top: 2px solid $black;
