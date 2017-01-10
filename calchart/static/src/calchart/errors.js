@@ -1,8 +1,8 @@
 /**
- * @fileOverview This file defines all of the custom Error classes that
- * can be thrown in the code. The built-in Error class may be used for most
- * cases. Write a custom Error class if it reduces boilerplate messages or
- * if the Error is expected to be caught within the application.
+ * @file This file defines all of the custom Error classes that can be
+ * thrown in the code. The built-in Error class may be used for most
+ * cases. Write a custom Error class if it reduces boilerplate messages
+ * or if the Error is expected to be caught within the application.
  */
 
 /**

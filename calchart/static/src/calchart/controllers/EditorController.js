@@ -11,13 +11,13 @@
 
 import ApplicationController from "calchart/ApplicationController";
 var Context = require("calchart/Context");
-var Dot = require("calchart/Dot");
-var errors = require("calchart/errors");
+import Dot from "calchart/Dot";
+import {ActionError, AnimationStateError} from "calchart/errors";
 var Grapher = require("calchart/Grapher");
-var HTMLBuilder = require("utils/HTMLBuilder");
-import JSUtils from "utils/JSUtils";
 var Sheet = require("calchart/Sheet");
-var UIUtils = require("utils/UIUtils");
+import * as HTMLBuilder from "utils/HTMLBuilder";
+import * as JSUtils from "utils/JSUtils";
+import * as UIUtils from "utils/UIUtils";
 
 /**** CONSTRUCTORS ****/
 
@@ -167,7 +167,7 @@ EditorController.prototype.checkContinuities = function() {
         var dots = args.dots;
     }
 
-    var moveErrors = {
+    var errors = {
         lackMoves: [],
         wrongPosition: [],
     };
@@ -176,10 +176,10 @@ EditorController.prototype.checkContinuities = function() {
         try {
             var final = sheet.getAnimationState(dot, duration);
         } catch (e) {
-            if (e instanceof errors.AnimationStateError) {
+            if (e instanceof AnimationStateError) {
                 // ignore if no movements
                 if (sheet.getDotInfo(dot).movements.length !== 0) {
-                    moveErrors.lackMoves.push(dot.getLabel());
+                    errors.lackMoves.push(dot.getLabel());
                 }
             } else {
                 throw e;
@@ -190,17 +190,17 @@ EditorController.prototype.checkContinuities = function() {
         if (nextSheet) {
             var position = nextSheet.getDotInfo(dot).position;
             if (final.x !== position.x || final.y !== position.y) {
-                moveErrors.wrongPosition.push(dot.getLabel());
+                errors.wrongPosition.push(dot.getLabel());
             }
         }
     });
 
     var errorMessages = [];
-    if (moveErrors.lackMoves.length > 0) {
-        errorMessages.push("Dots did not have enough to do: " + moveErrors.lackMoves.join(", "));
+    if (errors.lackMoves.length > 0) {
+        errorMessages.push("Dots did not have enough to do: " + errors.lackMoves.join(", "));
     }
-    if (moveErrors.wrongPosition.length > 0) {
-        errorMessages.push("Dots did not make it to their next spot: " + moveErrors.wrongPosition.join(", "));
+    if (errors.wrongPosition.length > 0) {
+        errorMessages.push("Dots did not make it to their next spot: " + errors.wrongPosition.join(", "));
     }
 
     if (errorMessages.length > 0) {
@@ -630,7 +630,7 @@ EditorController.prototype._getAction = function(name) {
     );
 
     if (action === undefined) {
-        throw new errors.ActionError("No action with the name: " + data.name);
+        throw new ActionError("No action with the name: " + data.name);
     } else {
         return action;
     }
