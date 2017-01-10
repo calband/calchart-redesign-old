@@ -16,6 +16,12 @@
     "grunt-contrib-watch": "latest",
     "babel-loader": "latest",
     "babel-core": "latest",
-    "babel-preset-es2015": "latest"
+    "babel-preset-es2015": "latest",
+    "imports-loader": "latest"
+  },
+  "dependencies": {
+    "jquery": "=3.1.1",
+    "d3": "=4.4.1",
+    "chosen-js": "=1.6.2"
   }
 }

@@ -3,6 +3,13 @@
  */
 
 /**
+ * true if the user is on a Mac, false otherwise.
+ * https://css-tricks.com/snippets/javascript/test-mac-pc-javascript/
+ * @const {boolean}
+ */
+export const IS_MAC = navigator.userAgent.indexOf("Mac OS X") !== -1;
+
+/**
  * Empty the given array. Source: http://stackoverflow.com/a/1232046/4966649
  *
  * @param {Array} array
@@ -20,28 +27,6 @@ export function empty(array) {
  */
 export function fromCamelCase(str) {
     return str.replace(/([A-Z])/g, " $1").replace(/^./, first => first.toUpperCase());
-}
-
-/**
- * Get the value from an optional object, returning the given default if
- * the object or value is undefined.
- *
- * @param {Object} obj - The object to retrieve from.
- * @param {string} key - The key of the value to retrieve.
- * @param {} defaultVal - The default value to return.
- * @return {} The value of the object, or the default if undefined.
- */
-export function get(obj, key, defaultVal) {
-    let val = obj[key];
-    return val === undefined ? defaultVal : val;
-}
-
-/**
- * @return {boolean} True if the user is on a Mac, false otherwise.
- */
-export function isMac() {
-    // https://css-tricks.com/snippets/javascript/test-mac-pc-javascript/
-    return navigator.userAgent.indexOf("Mac OS X") !== -1;
 }
 
 /**
@@ -74,6 +59,17 @@ export function parseArgs(args, labels) {
         kwargs[label] = args[i];
     });
     return kwargs;
+}
+
+/**
+ * Parse the given value as a number if possible
+ *
+ * @param {string} value
+ * @return {(string|number)}
+ */
+export function parseNumber(value) {
+    let float = parseFloat(value);
+    return isNaN(float) ? value : float;
 }
 
 /**

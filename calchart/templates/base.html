@@ -5,7 +5,7 @@
         <title>Calchart{% block title %}{% endblock %}</title>
         <link rel="icon" type="image/png" href="{% static 'img/favicon.png' %}">
         {% add_style "vendor/reset.css" "vendor/chosen.min.css" "vendor/icons.css" "base.css" %}
-        {% add_script "vendor/jquery-1.11.2.min.js" "vendor/chosen.jquery.min.js" "vendor/d3.min.js" "base.js" %}
+        {% add_script "base.js" %}
         {% block head %}{% endblock %}
     </head>
     <body>

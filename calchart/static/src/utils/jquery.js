@@ -1,55 +1,66 @@
-var JSUtils = require("./JSUtils");
-var MathUtils = require("./MathUtils");
-
 /**
- * Contains functions to add to the jQuery API. Maps name of function to the function.
+ * @file Exposes the jQuery operator from the jquery package, with
+ * additional methods defined in the jQueryUtils object, and puts
+ * the operator in the global scope. Usage:
+ *
+ * import "utils/jquery";
+ * $(function() {
+ *    // actions to run when document is ready
+ * });
  */
-var jQueryUtils = {};
+
+import $ from "jquery";
+import "chosen-js";
+import * as JSUtils from "./JSUtils";
+import * as MathUtils from "./MathUtils";
 
 /**
- * Runs a callback function if the user clicks off this element. If run without
+ * Contains functions to add to the jQuery API.
+ * @type {Object.<string, function>}
+ */
+let jQueryUtils = {};
+
+/**
+ * Run a callback function if the user clicks off this element. If run without
  * arguments, triggers the callback.
  *
- * @param {function} callback -- the function to run when anything besides this element
- *   is clicked on. The click event is passed into the function. After the callback runs
- *   once, it is removed.
- * @param {jQuery} parent -- the parent to listen for clicks. Defaults to window.
+ * @param {function(Event)} [callback] - The function to run when anything
+ *   besides this element is clicked on. After the callback runs once, it is
+ *   removed.
+ * @param {jQuery} [parent=Window] - The parent to listen for clicks
+ * @return {jQuery} @this
  */
 jQueryUtils.clickOff = function() {
-    var _this = this;
-
     if (arguments.length === 0) {
-        var callback = $(this).data("callback");
-        callback.call(this);
+        this.data("callback").call(this);
         $(parent).off(".clickOff");
-    } else {
-        var callback = arguments[0];
-        var parent = arguments[1] || window;
+        return;
     }
 
-    $(parent).on("click.clickOff", function(e) {
-        if ($(e.target).notIn(_this)) {
-            callback.call(_this, e);
+    let [callback, parent=window] = arguments;
+
+    $(parent).on("click.clickOff", (e) => {
+        if ($(e.target).notIn(this)) {
+            callback.call(this, e);
             $(parent).off(e);
         }
     });
 
-    $(this).data("callback", callback);
+    this.data("callback", callback);
 
     return this;
 };
 
 /**
- * Convert a <select> element into a fancy dropdown. We use the Chosen library
- * (http://harvesthq.github.io/chosen/) to convert the selects and we style it
- * on our own in _mixins.scss. In order to support re-initializing Chosen dropdowns,
- * use this function to destroy any existing Chosen elements before initializing.
+ * Convert a <select> element into a fancy dropdown. We use the
+ * [Chosen library]{@link http://harvesthq.github.io/chosen/} to
+ * convert the selects.
  *
- * @param {Object} options -- additional options to pass to the Chosen
+ * @param {Object} [options] - Additional options to pass to the Chosen
  *      constructor, which override any defaults we set for all dropdowns.
  *      The full list of Chosen options can be found at
- *      https://harvesthq.github.io/chosen/options.html
- * @return {jQuery} this
+ *      {@link https://harvesthq.github.io/chosen/options.html}.
+ * @return {jQuery} @this
  */
 jQueryUtils.dropdown = function(options) {
     if (this.length > 1) {
@@ -59,7 +70,7 @@ jQueryUtils.dropdown = function(options) {
     }
 
     // set default options
-    var defaults = {
+    let defaults = {
         placeholder_text_single: "------",
         disable_search_threshold: 10,
     };
@@ -87,7 +98,7 @@ jQueryUtils.exists = function() {
 /**
  * Check that clicking on this element is not clicking in the given element
  *
- * @param {jQuery} element -- the element to test
+ * @param {jQuery} element
  * @return {boolean} true if this element is not in the given element
  */
 jQueryUtils.notIn = function(element) {
@@ -97,35 +108,34 @@ jQueryUtils.notIn = function(element) {
 /**
  * Scroll this element(s) if it's hidden inside the given parent
  *
- * @param {jQuery|undefined} parent -- the parent element to scroll
- *   if necessary. Defaults to parent of this element (or the first
- *   parent if multiple elements).
- * @param {object|undefined} options -- options, including:
- *   - {int} tolerance -- the distance from the edge needed to
- *     trigger scrolling, in pixels (default 0).
- *   - {int} margin -- the amount of space beyond the object to
- *     scroll (defaults to tolerance).
- *   - {function} callback -- a callback function that takes in
- *     the change in x/y positions
+ * @param {jQuery} [parent] - The parent element to scroll if necessary.
+ *   Defaults to parent of this element (or the first parent if @this is
+ *   multiple elements).
+ * @param {Object} [options] - Additional options, including:
+ *   - {int} [tolerance=0] - The distance from the edge needed to
+ *     trigger scrolling, in pixels.
+ *   - {int} [margin=tolerance] - The amount of space beyond the object
+ *     to scroll.
+ *   - {function(number, number)} [callback] - A callback function that
+ *     takes in the change in x/y positions.
  */
-jQueryUtils.scrollIntoView = function(parent, options) {
+jQueryUtils.scrollIntoView = function(parent, options={}) {
     // in case passing in options, with default parent
-    if (typeof parent === "object" && !(parent instanceof jQuery)) {
+    if (!(parent instanceof jQuery)) {
         options = parent;
         parent = undefined;
     }
 
     parent = $(parent || this.parent()).first();
-    var tolerance = JSUtils.get(options, "tolerance", 0);
-    var margin = JSUtils.get(options, "margin", tolerance);
+    let {tolerance=0, margin=tolerance} = options;
 
     // top/left of the visible part of the parent
-    var parentOffset = parent.offset();
-    var parentHeight = parent.outerHeight();
-    var parentWidth = parent.outerWidth();
+    let parentOffset = parent.offset();
+    let parentHeight = parent.outerHeight();
+    let parentWidth = parent.outerWidth();
 
     // track furthest distance needed to scroll
-    var scroll = {
+    let scroll = {
         top: tolerance,
         bottom: -tolerance,
         left: tolerance,
@@ -134,15 +144,16 @@ jQueryUtils.scrollIntoView = function(parent, options) {
 
     this.each(function() {
         // relative to document; i.e. accounts for scroll
-        var thisOffset = $(this).offset();
+        let thisOffset = $(this).offset();
+        let dimensions;
 
         // http://stackoverflow.com/a/20749186/4966649
         if (this instanceof SVGElement) {
             // SVG elements don't have an outerWidth or outerHeight
             // http://stackoverflow.com/a/9131261/4966649
-            var dimensions = this.getBBox();
+            dimensions = this.getBBox();
         } else {
-            var dimensions = {
+            dimensions = {
                 width: $(this).outerWidth(),
                 height: $(this).outerHeight(),
             };
@@ -150,10 +161,10 @@ jQueryUtils.scrollIntoView = function(parent, options) {
 
         // distance from left/right/top/bottom of the visible part of
         // the parent to the corresponding edge of this element
-        var top = thisOffset.top - parentOffset.top;
-        var bottom = top + dimensions.height - parentHeight;
-        var left = thisOffset.left - parentOffset.left;
-        var right = left + dimensions.width - parentWidth;
+        let top = thisOffset.top - parentOffset.top;
+        let bottom = top + dimensions.height - parentHeight;
+        let left = thisOffset.left - parentOffset.left;
+        let right = left + dimensions.width - parentWidth;
 
         scroll.top = Math.min(scroll.top, top);
         scroll.bottom = Math.max(scroll.bottom, bottom);
@@ -161,8 +172,8 @@ jQueryUtils.scrollIntoView = function(parent, options) {
         scroll.right = Math.max(scroll.right, right);
     });
 
-    var deltaX = 0;
-    var deltaY = 0;
+    let deltaX = 0;
+    let deltaY = 0;
 
     if (scroll.top < tolerance && scroll.bottom > -tolerance) {
         // if elements hidden on both top and bottom, don't scroll
@@ -180,12 +191,12 @@ jQueryUtils.scrollIntoView = function(parent, options) {
         deltaX = scroll.right + margin;
     }
 
-    var parentScroll = {
+    let parentScroll = {
         top: parent.scrollTop(),
         left: parent.scrollLeft(),
     };
-    var scrollY = MathUtils.bound(parentScroll.top + deltaY, 0, parent.prop("scrollHeight") - parentHeight);
-    var scrollX = MathUtils.bound(parentScroll.left + deltaX, 0, parent.prop("scrollWidth") - parentWidth);
+    let scrollY = MathUtils.bound(parentScroll.top + deltaY, 0, parent.prop("scrollHeight") - parentHeight);
+    let scrollX = MathUtils.bound(parentScroll.left + deltaX, 0, parent.prop("scrollWidth") - parentWidth);
     parent.scrollTop(scrollY);
     parent.scrollLeft(scrollX);
 
@@ -200,18 +211,14 @@ jQueryUtils.scrollIntoView = function(parent, options) {
  * instead. If the element goes below the screen, position the element so
  * that its bottom edge is on the bottom of the screen.
  *
- * @param {float} top -- the position of the top edge of the element, unless
- *   offscreen
- * @param {float} left -- the position of the left edge of the element,
- *   unless offscreen
- * @param {float|undefined} right -- the position of the right edge of the
- *   element, if it goes offscreen. (Default same as left)
+ * @param {float} top - The position of the top edge of the element, unless
+ *   offscreen.
+ * @param {float} left - The position of the left edge of the element,
+ *   unless offscreen.
+ * @param {float} [right=left] - The position of the right edge of the
+ *   element, if it goes offscreen.
  */
-jQueryUtils.smartPosition = function(top, left, right) {
-    if (right === undefined) {
-        right = left;
-    }
-
+jQueryUtils.smartPosition = function(top, left, right=left) {
     var position = {
         top: top,
         left: left,
@@ -232,10 +239,5 @@ jQueryUtils.smartPosition = function(top, left, right) {
     return this.css(position);
 };
 
-/**
- * Exports a function that takes in the jQuery operator and adds the
- * functions defined in jQueryUtils to the $.fn API
- */
-module.exports = function($) {
-    $.extend($.fn, jQueryUtils);
-};
+$.extend($.fn, jQueryUtils);
+window.$ = $;

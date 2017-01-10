@@ -87,7 +87,7 @@ ForwardContinuity.prototype.panelHTML = function(controller) {
         options: CalchartUtils.DIRECTIONS,
         initial: this._direction,
         change: function() {
-            _this._direction = $(this).val();
+            _this._direction = JSUtils.parseNumbe($(this).val());
             _this._updateMovements(controller);
         },
     });

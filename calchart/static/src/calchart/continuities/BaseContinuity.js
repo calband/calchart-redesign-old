@@ -141,7 +141,7 @@ BaseContinuity.prototype.savePopup = function(data) {
         var old = _this["_" + key];
         if (old !== val) {
             changed[key] = old;
-            _this["_" + key] = val;
+            _this["_" + key] = JSUtils.parseNumber(val);
         }
     });
 

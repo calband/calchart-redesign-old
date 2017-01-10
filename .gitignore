@@ -14,5 +14,4 @@ calchart/static/css/**/*.css
 !calchart/static/css/fonts/**/*.css
 
 # JS
-calchart/static/js/**/*.js
-!calchart/static/js/vendor/**/*.js
+calchart/static/js/

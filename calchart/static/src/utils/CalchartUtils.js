@@ -1,40 +1,40 @@
 /**
- * Contains all utility functions related to charting or shows
+ * @file A collection of utility functions related to charting or shows
  */
-var CalchartUtils = {};
 
-/**** CONSTANTS ****/
-
-/* Options for direction */
-CalchartUtils.DIRECTIONS = {
+/** @const {Object.<string, string>} */
+export const DIRECTIONS = {
     0: "E",
     90: "S",
     180: "W",
     270: "N",
 };
 
-/* Options for ending a move */
-CalchartUtils.ENDINGS = {
+/** @const {Object.<string, string>} */
+export const ENDINGS = {
     MT: "Mark Time",
     CL: "Close",
 };
 
-/* Options for orientation */
-CalchartUtils.ORIENTATIONS = {
+/** @const {Object.<string, string>} */
+export const ORIENTATIONS = {
     default: "Default",
     east: "East",
     west: "West",
 };
 
-/* Multipliers for converting steps into standard step sizes */
-CalchartUtils.STEP_SIZES = {
+/**
+ * Multipliers for converting steps into standard step sizes
+ * @const {Object.<string, number>}
+ */
+export const STEP_SIZES = {
     STANDARD: 8/8,
     TUNNEL: 8/6,
     DIAGONAL: Math.SQRT2,
 };
 
-/* Options for step types */
-CalchartUtils.STEP_TYPES = {
+/** @const{Object.<string, string>} */
+export const STEP_TYPES = {
     default: "Default",
     HS: "High Step",
     MM: "Mini Military",
@@ -43,18 +43,16 @@ CalchartUtils.STEP_TYPES = {
     JS: "Jerky Step",
 };
 
-/**** UTILITIES ****/
-
 /**
- * Returns the orientation of the given angle. Will return a single
+ * Return the orientation of the given angle. Will return a single
  * direction (E,S,W,N) if the angle is exactly 0/90/180/270, otherwise
  * will return a compound direction (SE,SW,NW,NE).
  *
- * @param {float} angle -- the angle, in Calchart degrees
- * @return {string} the orientation
+ * @param {number} angle - The angle, in Calchart degrees.
+ * @return {string}
  */
-CalchartUtils.getOrientation = function(angle) {
-    var dir = "";
+export function getOrientation(angle) {
+    let dir = "";
     if (angle > 0 && angle < 180) {
         dir = "S";
     } else if (angle > 180 && angle < 360) {
@@ -68,16 +66,16 @@ CalchartUtils.getOrientation = function(angle) {
     } else {
         return dir;
     }
-};
+}
 
 /**
- * Returns the nearest orientation of the given angle, which will be selected
+ * Return the nearest orientation of the given angle, which will be selected
  * and colored in the CSS.
  *
- * @param {float} angle -- the angle, in Calchart degrees
+ * @param {number} angle - The angle, in Calchart degrees
  * @return {string} one of: "facing-east", "facing-south", "facing-west", "facing-north"
  */
-CalchartUtils.getNearestOrientation = function(angle) {
+export function getNearestOrientation(angle) {
     // exactly half counts as east/west
     if (angle <= 45 || angle >= 315) {
         return "facing-east";
@@ -88,6 +86,4 @@ CalchartUtils.getNearestOrientation = function(angle) {
     } else {
         return "facing-north";
     }
-};
-
-module.exports = CalchartUtils;
+}

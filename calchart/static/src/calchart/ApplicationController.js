@@ -1,4 +1,5 @@
 import {ActionError} from "calchart/errors";
+import * as JSUtils from "utils/JSUtils";
 
 // The singleton instance of the ApplicationController
 window.controller = null;
@@ -36,13 +37,26 @@ export default class ApplicationController {
     }
 
     /**
+     * @return {Object.<string, string>} An object mapping shortcut action; e.g.
+     *   "saveShow") to shortcut command (e.g. "ctrl+s"). In other words, the
+     *   reverse lookup for shortcuts.
+     */
+    static getAllShortcutCommands() {
+        let commands = {};
+        $.each(this.shortcuts, (command, action) => {
+            commands[action] = command;
+        });
+        return commands;
+    }
+
+    /**
      * Class variable holding all keyboard shortcuts for the controller, mapping
      * keyboard shortcut to the name of the ApplicationController function. Separate
      * keys with "+", e.g. "ctrl+s" or "ctrl+shift+s". Meta keys need to be in this
      * order: ctrl (alias for cmd on Mac), alt, shift. Non-character keys can be mapped
      * as: top, left, down, right, enter, tab, backspace, delete.
      */
-    get shortcuts() {
+    static get shortcuts() {
         return {};
     }
 
@@ -51,25 +65,13 @@ export default class ApplicationController {
      * method in this class's actions. @see ApplicationController#_parseAction.
      *
      * @param {string} name - The function to call.
-     * @param {Array} [args=[]] - Arguments to pass to the action. Can also be passed
+     * @param {Array} [args] - Arguments to pass to the action. Can also be passed
      *   via name, which will override any arguments passed in as a parameter.
      */
     doAction(name, args=[]) {
         let action = this._getAction(name);
         args = action.args || args;
         action.function.apply(this, args);
-    }
-
-    /**
-     * @return {Object.<string, string>} An object mapping shortcut action (e.g.
-     *   "saveShow") to shortcut command (e.g. "ctrl+s").
-     */
-    getAllShortcutCommands() {
-        let commands = {};
-        $.each(this.shortcuts, (command, action) => {
-            commands[action] = command;
-        });
-        return commands;
     }
 
     /**
@@ -80,7 +82,7 @@ export default class ApplicationController {
      *   should be passed to {@link ApplicationController#doAction}.
      */
     getShortcut(shortcut) {
-        return this.shortcuts[shortcut] || null;
+        return this.constructor.shortcuts[shortcut] || null;
     }
 
     /**
@@ -94,12 +96,10 @@ export default class ApplicationController {
      * Initialize this controller.
      */
     init() {
-        let controller = this;
-
         // set up keyboard shortcuts
         $(window).keydown(e => {
             // ignore keypresses when typing into an input field
-            if ($("input:focus").exists()) {
+            if ($(e.target).is("input")) {
                 return;
             }
 
@@ -141,9 +141,9 @@ export default class ApplicationController {
                     pressedKeys.push(character);
             }
 
-            let _function = controller.getShortcut(pressedKeys.join("+"));
+            let _function = this.getShortcut(pressedKeys.join("+"));
             if (_function) {
-                controller.doAction(_function);
+                this.doAction(_function);
                 e.preventDefault();
             }
         });
@@ -231,9 +231,8 @@ export default class ApplicationController {
                 // object
                 if (arg.indexOf("=") !== -1) {
                     let [key, val] = arg.split("=");
-                    let floatVal = parseFloat(val);
                     return {
-                        [key]: isNaN(floatVal) ? val : floatVal,
+                        [key]: JSUtils.parseNumber(val),
                     };
                 }
 

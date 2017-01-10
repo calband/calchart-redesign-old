@@ -27,18 +27,26 @@ module.exports = function (grunt) {
                         path.resolve("./calchart/static/src")
                     ],
                 },
-                // convert ES6 to ES5
                 module: {
-                    loaders: [{
-                        test: /\.js$/,
-                        exclude: "node_modules",
-                        loader: "babel-loader",
-                        query: {
-                            presets: ["es2015"],
-                            minified: true,
-                            comments: false,
+                    loaders: [
+                        // convert ES6 to ES5
+                        {
+                            test: /\.js$/,
+                            exclude: "node_modules",
+                            loader: "babel-loader",
+                            query: {
+                                presets: ["es2015"],
+                                minified: true,
+                                comments: false,
+                            },
                         },
-                    }],
+                        // add jQuery to namespace when loading chosen-js
+                        // http://reactkungfu.com/2015/10/integrating-jquery-chosen-with-webpack-using-imports-loader/
+                        {
+                            test: /chosen\.jquery\.js$/,
+                            loader: "imports?jQuery=jquery,$=jquery,this=>window",
+                        },
+                    ],
                 },
                 // emit source maps
                 devtool: "source-map",

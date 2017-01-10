@@ -1,9 +1,7 @@
-var jQueryUtils = require("utils/jQueryUtils");
-var UIUtils = require("utils/UIUtils");
+import "utils/jquery";
+import * as UIUtils from "utils/UIUtils";
 
-jQueryUtils(jQuery);
-
-$(document).ready(function() {
+$(function() {
     $("select").dropdown();
 
     $(".popup")

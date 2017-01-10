@@ -1,5 +1,7 @@
 /**
- * @fileOverview This file is organized in the following sections:
+ * @file This file contains utility functions useful for interacting
+ * with UI elements consistent across Calchart. The file is organized
+ * in the following sections:
  *
  * - Form utilities
  * - Menu utilities
@@ -8,13 +10,9 @@
  * - Message utilities
  */
 
-var HTMLBuilder = require("./HTMLBuilder");
-
-/**
- * Contains all utility functions for interacting with UI elements
- * of the application
- */
-var UIUtils = {};
+import * as HTMLBuilder from "./HTMLBuilder";
+import * as JSUtils from "./JSUtils";
+import * as MathUtils from "./MathUtils";
 
 /**** FORMS ****/
 
@@ -22,21 +20,21 @@ var UIUtils = {};
  * Send an AJAX POST action to the server with the given
  * action name and the given parameters
  *
- * @param {string} action -- the name of the action
- * @param {object|undefined} params -- an optional object mapping
- *   key/value pairs to send to the server
- * @param {function|undefined} success -- an optional function to run after
- *   successfully doing action
+ * @param {string} action - The name of the action.
+ * @param {Object} [params] - An optional object mapping
+ *   key/value pairs to send to the server.
+ * @param {function} [success] - An optional function to run after
+ *   successfully doing action.
  */
-UIUtils.doAction = function(action, params, success) {
+export function doAction(action, params={}, success=null) {
+    // params is optional, and was left out in this case, with the success
+    // function being passed as this argument
     if (typeof params === "function") {
-        // params is optional, and was left out in this case, with the success
-        // function being passed as this argument
         success = params;
-        params = undefined;
+        params = {};
     }
 
-    var data = {
+    let data = {
         csrfmiddlewaretoken: $("input[name=csrfmiddlewaretoken]").val(),
         action: action,
     };
@@ -48,39 +46,39 @@ UIUtils.doAction = function(action, params, success) {
         success: success,
         error: function(xhr) {
             console.error(xhr);
-            UIUtils.showError("An error occurred.");
+            showError("An error occurred.");
         },
     });
-};
+}
 
 /**
  * Get data from any form elements that are children of the given element
  *
- * @param {jQuery} parent -- the parent element to start looking for form elements
- * @return {object} key/value pairs mapping name to value
+ * @param {jQuery} parent - The parent element to start looking for form elements.
+ * @return {Object} Key/value pairs mapping name to value.
  */
-UIUtils.getData = function(parent) {
-    var data = {};
+export function getData(parent) {
+    let data = {};
     $(parent).find("input, select, textarea").each(function() {
-        var name = $(this).attr("name");
+        let name = $(this).attr("name");
         if (name) {
-            var value = $(this).val();
+            let value = $(this).val();
             data[name] = value;
         }
     });
     return data;
-};
+}
 
 /**** MENUS ****/
 
 /**
  * Bind the given submenu to the parent.
  *
- * @param {jQuery} container -- the parent's container
- * @param {jQuery} parent -- the menu item that shows the submenu
- * @param {jQuery} submenu -- the submenu that will be shown
+ * @param {jQuery} container - The parent's container.
+ * @param {jQuery} parent - The menu item that shows the submenu.
+ * @param {jQuery} submenu - The submenu that will be shown.
  */
-UIUtils.bindSubmenu = function(container, parent, submenu) {
+export function bindSubmenu(container, parent, submenu) {
     $(parent)
         .addClass("has-submenu")
         .mouseenter(function() {
@@ -107,12 +105,52 @@ UIUtils.bindSubmenu = function(container, parent, submenu) {
         });
 
     $(submenu).appendTo("body");
-};
-
-
+}
 
 /**
- * Sets up the given menu element.
+ * Open the given menu tab.
+ *
+ * @param {jQuery} menuTab
+ * @param {jQuery} submenu
+ */
+function openSubmenu(menuTab, submenu) {
+    closeSubmenus();
+    $(menuTab).addClass("active");
+
+    var offset = $(menuTab).offset();
+    $(submenu)
+        .css({
+            top: offset.top + $(menuTab).outerHeight(),
+            left: offset.left,
+        })
+        .show();
+}
+
+/**
+ * Recursively set up the menu items in the given submenu
+ *
+ * @param {jQuery} submenu
+ */
+function setupMenuItems(submenu) {
+    $(submenu).find("li").each(function() {
+        var action = $(this).data("action");
+        if (action) {
+            $(this).click(function() {
+                window.controller.doAction(action);
+                closeSubmenus();
+            });
+        }
+
+        var subsubmenu = $(this).children(".submenu");
+        if (subsubmenu.exists()) {
+            bindSubmenu(submenu, this, subsubmenu);
+            setupMenuItems(subsubmenu);
+        }
+    });
+}
+
+/**
+ * Set up the given menu element.
  *
  * - "menu" refers to the main menu container, which contain the menu tabs
  * - "menu tab" refers to the elements in the main menu container that can
@@ -124,50 +162,16 @@ UIUtils.bindSubmenu = function(container, parent, submenu) {
  * @param {(jQuery|string)} menu - The jQuery selector or object to setup as
  *   a menu.
  */
-UIUtils.setupMenu = function(menu) {
-    // open the given menu tab
-    var openSubmenu = function(menuTab, submenu) {
-        closeSubmenus();
-        $(menuTab).addClass("active");
+export function setupMenu(menu) {
+    var menuTabs = $(menu).children();
 
-        var offset = $(menuTab).offset();
-        $(submenu)
-            .css({
-                top: offset.top + $(menuTab).outerHeight(),
-                left: offset.left,
-            })
-            .show();
-    };
-
-    // close all submenus
-    var closeSubmenus = function() {
-        $(menu).children().removeClass("active");
+    function closeSubmenus() {
+        menuTabs.removeClass("active");
         $(".submenu").hide();
         $(window).off(".close-submenus");
-    };
+    }
 
-    // recursively set up submenu items
-    var setupMenuItems = function(submenu) {
-        $(submenu).find("li").each(function() {
-            var action = $(this).data("action");
-            if (action) {
-                $(this).click(function() {
-                    window.controller.doAction(action);
-                    closeSubmenus();
-                });
-            }
-
-            var subsubmenu = $(this).children(".submenu");
-            if (subsubmenu.exists()) {
-                UIUtils.bindSubmenu(submenu, this, subsubmenu);
-                setupMenuItems(subsubmenu);
-            }
-        });
-    };
-
-    var menuTabs = $(menu).children();
     menuTabs.each(function() {
-        var menuTab = this;
         var submenu = $(this).children(".submenu").appendTo("body");
 
         // clicking toggles active menu
@@ -175,7 +179,7 @@ UIUtils.setupMenu = function(menu) {
             if ($(menu).children(".active").exists()) {
                 closeSubmenus();
             } else {
-                openSubmenu(menuTab, submenu);
+                openSubmenu(this, submenu);
 
                 // clicking outside of menu and its submenus closes them
                 $(window).on("click.close-submenus", function(e) {
@@ -190,63 +194,72 @@ UIUtils.setupMenu = function(menu) {
 
         // activate submenu when hovered over
         $(this).mouseenter(function() {
-            if ($(menu).children(".active").not(menuTab).exists()) {
-                openSubmenu(menuTab, submenu);
+            if ($(menu).children(".active").not(this).exists()) {
+                openSubmenu(this, submenu);
             }
         });
 
         setupMenuItems(submenu);
     });
-};
+}
+
+let shortcutMap, shortcutSep;
+if (JSUtils.IS_MAC) {
+    // HTML codes: http://apple.stackexchange.com/a/55729
+    shortcutMap = {
+        ctrl: "&#8984;",
+        alt: "&#8997;",
+        shift: "&#8679;",
+        backspace: "&#9003;",
+        tab: "&#8677;",
+        enter: "&crarr;",
+        left: "&larr;",
+        up: "&uarr;",
+        right: "&rarr;",
+        down: "&darr;",
+        delete: "&#8998;",
+    };
+    shortcutSep = "";
+} else {
+    shortcutMap = {
+        ctrl: "Ctrl",
+        alt: "Alt",
+        shift: "Shift",
+        backspace: "Backspace",
+        tab: "Tab",
+        enter: "Enter",
+        left: "Left",
+        up: "Up",
+        right: "Right",
+        down: "Down",
+        delete: "Del",
+    };
+    shortcutSep = "+";
+}
 
 /**
- * Sets up the given toolbar element
+ * Convert the given shortcut key binding to a human readable hint.
  *
- * @param {jQuery|string} toolbar -- jQuery object or toolbar to setup
+ * @param {string} shortcut - The shortcut key binding, e.g. "ctrl+s".
+ * @return {string} The human readable shortcut hint.
  */
-UIUtils.setupToolbar = function(toolbar) {
-    var isMac = JSUtils.isMac();
-    var shortcutCommands = this.getAllShortcutCommands();
-    var convertShortcut = function(shortcut) {
-        // HTML codes: http://apple.stackexchange.com/a/55729
-        shortcut = shortcut.split("+").map(function(key) {
-            switch (key) {
-                case "ctrl":
-                    return isMac ? "&#8984;" : "Ctrl";
-                case "alt":
-                    return isMac ? "&#8997;" : "Alt";
-                case "shift":
-                    return isMac ? "&#8679;" : "Shift";
-                case "backspace":
-                    return isMac ? "&#9003;" : "Backspace";
-                case "tab":
-                    return isMac ? "&#8677;" : "Tab";
-                case "enter":
-                    return isMac ? "&crarr;" : "Enter";
-                case "left":
-                    return isMac ? "&larr;" : "Left";
-                case "up":
-                    return isMac ? "&uarr;" : "Up";
-                case "right":
-                    return isMac ? "&rarr;" : "Right";
-                case "down":
-                    return isMac ? "&darr;" : "Down";
-                case "delete":
-                    return isMac ? "&#8998;" : "Del";
-                default:
-                    return key.toUpperCase();
-            }
-        });
-        if (isMac) {
-            return shortcut.join("");
-        } else {
-            return shortcut.join("+");
-        }
-    };
+function convertShortcut(shortcut) {
+    return shortcut.split("+").map(key => {
+        let hint = shortcutMap[key];
+        return hint === undefined ? key.toUpperCase() : hint;
+    }).join(shortcutSep);
+}
+
+/**
+ * Set up the given toolbar element.
+ *
+ * @param {jQuery|string} toolbar - jQuery object or toolbar to setup.
+ */
+export function setupToolbar(toolbar) {
+    var shortcutCommands = window.controller.constructor.getAllShortcutCommands();
 
     // set up click and tooltip
     $(toolbar).find("li").each(function() {
-        var toolbarItem = this;
         var name = $(this).data("name");
         var action = $(this).data("action");
         var shortcut = shortcutCommands[action];
@@ -271,7 +284,8 @@ UIUtils.setupToolbar = function(toolbar) {
         if (name !== undefined) {
             // update name with shortcut
             if (shortcut !== undefined) {
-                name += " (" + convertShortcut(shortcut) + ")";
+                let shortcutHint = convertShortcut(shortcut);
+                name = `${name} (${shortcutHint})`;
             }
 
             var tooltipTimeout = null;
@@ -282,8 +296,8 @@ UIUtils.setupToolbar = function(toolbar) {
                 tooltipTimeout = setTimeout(function() {
                     tooltip.appendTo("body");
 
-                    var offset = $(toolbarItem).offset();
-                    var width = $(toolbarItem).outerWidth();
+                    var offset = $(this).offset();
+                    var width = $(this).outerWidth();
                     var left = offset.left - tooltip.outerWidth() / 2 + width / 2;
                     if (left < 0) {
                         left = 0;
@@ -303,23 +317,23 @@ UIUtils.setupToolbar = function(toolbar) {
             });
         }
     });
-};
+}
 
 /**
- * Show a context menu with the given items
+ * Show a context menu with the given items.
  *
- * @param {Event} e -- the click event that activated the context menu
- * @param {object} items -- the items to show in the context menu,
- *   mapping label to action. Can also map to another object, which
- *   will be a submenu
+ * @param {Event} e - The click event that activated the context menu.
+ * @param {Object.<string, (string|Object)>} items - The items to show
+ *   in the context menu, mapping label to action. Can also map to
+ *   another object, which will be a submenu.
  */
-UIUtils.showContextMenu = function(e, items) {
+export function showContextMenu(e, items) {
     e.preventDefault();
 
     // prevent all parent elements from scrolling
-    var parents = $(e.target).parents();
+    let parents = $(e.target).parents();
 
-    var closeMenus = function() {
+    function closeMenus() {
         $(".context-menu").remove();
         parents.removeClass("no-scroll");
     };
@@ -327,61 +341,58 @@ UIUtils.showContextMenu = function(e, items) {
     // close any existing menus
     closeMenus();
     parents.addClass("no-scroll");
-    var menu = HTMLBuilder.make("ul.context-menu", "body");
+    let menu = HTMLBuilder.make("ul.context-menu", "body");
 
-    var makeMenu = function(parent, items) {
+    // recursively setup menu items
+    function makeMenu(parent, items) {
         $.each(items, function(label, action) {
-            var item = HTMLBuilder.li(label).appendTo(parent);
+            let item = HTMLBuilder.li(label).appendTo(parent);
             if (typeof action === "string") {
                 item.click(function() {
                     window.controller.doAction(action);
                     closeMenus();
                 });
             } else {
-                var submenu = HTMLBuilder.make("ul.context-menu.submenu");
+                let submenu = HTMLBuilder.make("ul.context-menu.submenu");
                 makeMenu(submenu, action);
-                UIUtils.bindSubmenu(parent, item, submenu);
+                bindSubmenu(parent, item, submenu);
             }
         });
     };
 
-    menu.empty();
     makeMenu(menu, items);
 
     menu.smartPosition(e.pageY, e.pageX);
 
     // clicking outside of context menu and its submenus closes them
     $(window).mousedown(function(e) {
-        var target = $(e.target);
-        if (target.notIn(".context-menu")) {
+        if ($(e.target).notIn(".context-menu")) {
             closeMenus();
             $(this).off(e);
         }
     });
-};
+}
 
 /**** PANELS ****/
 
 /**
- * Set up a moveable panel
+ * Set up a moveable panel.
  *
- * @param {jQuery} panel -- the panel to set up
- * @param {object|undefined} options -- options to create a panel. Can include
- *   - {float} top -- the top of the initial position for the panel (defaults
- *     to center)
- *   - {float} left -- the left of the initial position for the panel (defaults
- *     to center)
- *   - {float} bottom -- the bottom of the initial position for the panel (defaults
- *     to center)
- *   - {float} right -- the right of the initial position for the panel (defaults
- *     to center)
+ * @param {jQuery} panel - The panel to set up.
+ * @param {Object} [options] - Options to create a panel. Can include:
+ *   - {float} top - The top of the initial position for the panel. (defaults
+ *     to center of the screen)
+ *   - {float} left - The left of the initial position for the panel. (defaults
+ *     to center of the screen)
+ *   - {float} bottom - The bottom of the initial position for the panel. (defaults
+ *     to center of the screen)
+ *   - {float} right - The right of the initial position for the panel. (defaults
+ *     to center of the screen)
  */
-UIUtils.setupPanel = function(panel, options) {
-    options = options || {};
-
+export function setupPanel(panel, options={}) {
     // set up initial position
 
-    var position = {};
+    let position = {};
 
     if (options.top) {
         position.top = options.top;
@@ -390,6 +401,7 @@ UIUtils.setupPanel = function(panel, options) {
     } else {
         position.top = $(window).height() / 2 - $(panel).outerHeight() / 2;
     }
+
     if (options.left) {
         position.left = options.left;
     } else if (options.right) {
@@ -402,59 +414,51 @@ UIUtils.setupPanel = function(panel, options) {
 
     // make draggable
 
+    function movePanel(e) {
+        e.preventDefault();
+
+        let offset = $(panel).data("offset");
+        let top = e.pageY + offset.top;
+        let left = e.pageX + offset.left;
+
+        // don't go out of window
+        let maxX = $(window).width() - $(panel).outerWidth();
+        let maxY = $(window).height() - $(panel).outerHeight();
+
+        $(panel).css({
+            top: MathUtils.bound(top, 0, maxY),
+            left: MathUtils.bound(left, 0, maxX),
+        });
+    }
+
     $(panel).find(".panel-handle").on({
         mousedown: function(e) {
-            var offset = $(this).offset();
-            $(panel).data({
-                drag: true,
-                offset: {
-                    top: offset.top - e.pageY,
-                    left: offset.left - e.pageX,
-                },
+            let offset = $(this).offset();
+            $(panel).data("offset", {
+                top: offset.top - e.pageY,
+                left: offset.left - e.pageX,
             });
+            $(window).on("mousemove", movePanel);
         },
         mouseup: function() {
-            $(panel).data("drag", false);
+            $(window).off("mousemove", movePanel);
         },
     });
-
-    $(window).on({
-        mousemove: function(e) {
-            var data = $(panel).data();
-            if (data.drag) {
-                e.preventDefault();
-
-                var top = e.pageY + data.offset.top;
-                var left = e.pageX + data.offset.left;
-
-                // don't go out of window
-                var maxX = $(window).width() - $(panel).outerWidth();
-                var maxY = $(window).height() - $(panel).outerHeight();
-                top = Math.min(Math.max(0, top), maxY);
-                left = Math.min(Math.max(0, left), maxX);
-
-                $(panel).css({
-                    top: top,
-                    left: left,
-                });
-            }
-        },
-    });
-};
+}
 
 /**** POPUPS ****/
 
 /**
- * Shows the popup with the given name
+ * Show the popup with the given name.
  *
- * @param {string} name -- the name of the popup to show
- * @param {object} options -- an object containing additional parameters, such as:
- *   - {function} init -- optional function to run before the popup is shown
- *   - {function} onSubmit -- optional function to run when the Save button is pressed
- *   - {function} onHide -- optional function to run after the popup is hidden
+ * @param {string} name - The name of the popup to show.
+ * @param {object} [options] - An object containing optional parameters, such as:
+ *   - {function(jQuery)} init - Function to run before the popup is shown.
+ *   - {function(jQuery)} onSubmit - Function to run when the Save button is pressed.
+ *   - {function(jQuery)} onHide - Function to run after the popup is hidden.
  */
-UIUtils.showPopup = function(name, options) {
-    var popup = $(".popup-box." + name).addClass("active");
+export function showPopup(name, options={}) {
+    let popup = $(`.popup-box.${name}`).addClass("active");
 
     // clear inputs
     popup.find("input, select, textarea").val("");
@@ -464,7 +468,7 @@ UIUtils.showPopup = function(name, options) {
     }
 
     popup.find("form")
-        .off("submit.popup")
+        .off(".popup")
         .on("submit.popup", function(e) {
             e.preventDefault();
 
@@ -478,38 +482,39 @@ UIUtils.showPopup = function(name, options) {
 
     // auto focus on first input
     popup.find("input, select, textarea").first().focus();
-};
+}
 
 /**
- * Hides the currently active popup
+ * Hide the currently active popup.
  */
-UIUtils.hidePopup = function() {
-    var popup = $(".popup-box.active");
+export function hidePopup() {
+    let popup = $(".popup-box.active");
 
-    $(".popup").hide();
-    popup.removeClass("active");
+    popup.removeClass("active")
+        .parent()
+        .hide();
 
-    var onHide = popup.data("onHide");
+    let onHide = popup.data("onHide");
     if (onHide) {
         onHide(popup);
     }
-};
+}
 
 /**** MESSAGES ****/
 
 /**
- * Show a message at the top of the screen
+ * Show a message at the top of the screen.
  *
- * @param {string} message -- the message to show
- * @param {boolean} isError -- true if message is an error message
+ * @param {string} message
+ * @param {boolean} isError - true if message is an error message.
  */
-UIUtils.showMessage = function(message, isError) {
-    var container = $("ul.messages");
+export function showMessage(message, isError) {
+    let container = $("ul.messages");
     if (!container.exists()) {
         container = HTMLBuilder.make("ul.messages", "body");
     }
 
-    var li = HTMLBuilder.li(message, "message").appendTo(container);
+    let li = HTMLBuilder.li(message, "message").appendTo(container);
     if (isError) {
         li.addClass("error");
     }
@@ -523,13 +528,11 @@ UIUtils.showMessage = function(message, isError) {
             });
         })
         .appendTo(li);
-};
+}
 
 /**
- * Helper function to show an error message at the top of the screen
+ * Show an error message at the top of the screen.
  */
-UIUtils.showError = function(message) {
-    UIUtils.showMessage(message, true);
-};
-
-module.exports = UIUtils;
+export function showError(message) {
+    showMessage(message, true);
+}
