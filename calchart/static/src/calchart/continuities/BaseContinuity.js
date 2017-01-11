@@ -50,18 +50,20 @@ export default class BaseContinuity {
     }
 
     /**
-     * Return the JSONified version of the BaseContinuity. The data needs
-     * to define `type`, which is needed to deserialize (@see
-     * Continuity.deserialize).
+     * Return the JSONified version of the BaseContinuity.
      *
+     * @param {string} type - The type of the Continuity (@see Continuity.deserialize).
+     * @param {Object} [data] - Additional data to add to the serialized data.
+     *   Can be used by subclasses to easily add data to the serialization.
      * @return {Object}
      */
-    serialize() {
-        return {
+    serialize(type, data={}) {
+        return $.extend({}, data, {
+            type: type,
             stepType: this._stepType,
             beatsPerStep: this._beatsPerStep,
             orientation: this._orientation,
-        };
+        });
     }
 
     /**

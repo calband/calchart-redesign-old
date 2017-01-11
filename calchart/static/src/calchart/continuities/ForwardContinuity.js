@@ -1,132 +1,107 @@
-var BaseContinuity = require("./BaseContinuity");
-var CalchartUtils = require("utils/CalchartUtils");
-var HTMLBuilder = require("utils/HTMLBuilder");
-var JSUtils = require("utils/JSUtils");
-var MovementCommandMove = require("calchart/movements/MovementCommandMove");
+import BaseContinuity from "calchart/continuities/BaseContinuity";
+import MovementCommandMove from "calchart/movements/MovementCommandMove";
+
+import { DIRECTIONS } from "utils/CalchartUtils";
+import HTMLBuilder from "utils/HTMLBuilder";
+import { validatePositive, parseNumber } from "utils/JSUtils";
 
 /**
  * A simple forward march continuity, taking the given number
  * of steps in a given direction
- *
- * @param {Sheet} sheet -- the sheet the continuity is for
- * @param {string} dotType -- the dot type the continuity is for
- * @param {int} steps -- the number of steps
- * @param {int} direction -- the direction to march, in Calchart degrees
- * @param {object|undefined} options -- options for the continuity, including:
- *   - {string} stepType
- *   - {int} beatsPerStep
  */
-var ForwardContinuity = function(sheet, dotType, steps, direction, options) {
-    BaseContinuity.call(this, sheet, dotType, options);
+export default class ForwardContinuity extends BaseContinuity {
+    /**
+     * @param {Sheet} sheet
+     * @param {string} dotType
+     * @param {int} steps - The number of steps to move.
+     * @param {int} direction - The direction to march, in Calchart degrees.
+     * @param {object} [options] - Options for the continuity, including:
+     *   - {string} stepType
+     *   - {int} beatsPerStep
+     */
+    constructor(sheet, dotType, steps, direction, options) {
+        super(sheet, dotType, options);
 
-    this._numSteps = steps;
-    this._direction = direction;
-};
+        this._numSteps = steps;
+        this._direction = direction;
+    }
 
-JSUtils.extends(ForwardContinuity, BaseContinuity);
+    static deserialize(sheet, dotType, data) {
+        return new ForwardContinuity(sheet, dotType, data.steps, data.direction, data);
+    }
 
-/**
- * Create a ForwardContinuity from the given serialized data
- *
- * @param {Sheet} sheet -- the sheet the continuity is for
- * @param {string} dotType -- the dot type the continuity is for
- * @param {object} data -- the JSON data to initialize the
- *   ForwardContinuity with
- * @return {ForwardContinuity} the ForwardContinuity reconstructed
- *   from the given data
- */
-ForwardContinuity.deserialize = function(sheet, dotType, data) {
-    return new ForwardContinuity(sheet, dotType, data.steps, data.direction, data);
-};
+    serialize() {
+        return super.serialize("FORWARD", {
+            steps: this._numSteps,
+            direction: this._direction,
+        });
+    }
 
-/**
- * Return the JSONified version of the ForwardContinuity
- *
- * @return {object} a JSON object containing this ForwardContinuity's data
- */
-ForwardContinuity.prototype.serialize = function() {
-    return $.extend(BaseContinuity.prototype.serialize.call(this), {
-        type: "FORWARD",
-        steps: this._numSteps,
-        direction: this._direction,
-    });
-};
+    getMovements(dot, data) {
+        let options = {
+            beatsPerStep: this.getBeatsPerStep(),
+        };
+        let move = new MovementCommandMove(
+            data.position.x,
+            data.position.y,
+            this._direction,
+            this._numSteps * options.beatsPerStep,
+            options
+        );
+        return [move];
+    }
 
-/**** INSTANCE METHODS ****/
+    panelHTML(controller) {
+        let _this = this;
 
-ForwardContinuity.prototype.getMovements = function(dot, data) {
-    var options = {
-        beatsPerStep: this.getBeatsPerStep(),
-    };
-    var move = new MovementCommandMove(
-        data.position.x,
-        data.position.y,
-        this._direction,
-        this._numSteps * options.beatsPerStep,
-        options
-    );
-    return [move];
-};
+        let label = HTMLBuilder.span("Move");
 
-ForwardContinuity.prototype.panelHTML = function(controller) {
-    var _this = this;
+        let steps = HTMLBuilder.input({
+            class: "panel-continuity-duration",
+            type: "number",
+            initial: this._numSteps,
+            change: function() {
+                _this._numSteps = validatePositive(this);
+                _this._updateMovements(controller);
+            },
+        });
 
-    var label = HTMLBuilder.span("Move");
+        let direction = HTMLBuilder.select({
+            options: DIRECTIONS,
+            initial: this._direction,
+            change: function() {
+                _this._direction = parseNumber($(this).val());
+                _this._updateMovements(controller);
+            },
+        });
 
-    var steps = HTMLBuilder.input({
-        class: "panel-continuity-duration",
-        type: "number",
-        initial: this._numSteps,
-        change: function() {
-            _this._numSteps = JSUtils.validatePositive(this);
-            _this._updateMovements(controller);
-        },
-    });
+        return this._wrapPanel("fm", [label, steps, direction]);
+    }
 
-    var direction = HTMLBuilder.select({
-        options: CalchartUtils.DIRECTIONS,
-        initial: this._direction,
-        change: function() {
-            _this._direction = JSUtils.parseNumbe($(this).val());
-            _this._updateMovements(controller);
-        },
-    });
+    popupHTML() {
+        let { steps, direction, stepType, beatsPerStep } = this._getPopupFields();
 
-    return this._wrapPanel("fm", [label, steps, direction]);
-};
+        return {
+            name: "Forward March",
+            fields: [steps, direction, stepType, beatsPerStep],
+        };
+    }
 
-ForwardContinuity.prototype.popupHTML = function() {
-    var fields = this._getPopupFields();
+    _getPopupFields() {
+        let fields = super._getPopupFields();
 
-    return {
-        name: "Forward March",
-        fields: [
-            fields.steps,
-            fields.direction,
-            fields.stepType,
-            fields.beatsPerStep,
-        ],
-    };
-};
+        fields.steps = HTMLBuilder.formfield("Number of steps", HTMLBuilder.input({
+            type: "number",
+            initial: this._numSteps,
+        }), "numSteps");
 
-/**** HELPERS ****/
+        fields.direction = HTMLBuilder.formfield("Direction", HTMLBuilder.select({
+            options: CalchartUtils.DIRECTIONS,
+            initial: this._direction,
+        }));
 
-ForwardContinuity.prototype._getPopupFields = function() {
-    var fields = BaseContinuity.prototype._getPopupFields.call(this);
+        delete fields.orientation;
 
-    fields.steps = HTMLBuilder.formfield("Number of steps", HTMLBuilder.input({
-        type: "number",
-        initial: this._numSteps,
-    }), "numSteps");
-
-    fields.direction = HTMLBuilder.formfield("Direction", HTMLBuilder.select({
-        options: CalchartUtils.DIRECTIONS,
-        initial: this._direction,
-    }));
-
-    delete fields.orientation;
-
-    return fields;
-};
-
-module.exports = ForwardContinuity;
+        return fields;
+    }
+}
