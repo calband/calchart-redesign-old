@@ -1,157 +1,139 @@
-var BaseContinuity = require("./BaseContinuity");
-var CalchartUtils = require("utils/CalchartUtils");
-var HTMLBuilder = require("utils/HTMLBuilder");
-var JSUtils = require("utils/JSUtils");
-var MovementCommandMove = require("calchart/movements/MovementCommandMove");
-var MovementCommandStop = require("calchart/movements/MovementCommandStop");
+import BaseContinuity from "calchart/continuities/BaseContinuity";
+import MovementCommandMove from "calchart/movements/MovementCommandMove";
+import MovementCommandStop from "calchart/movements/MovementCommandStop";
+
+import { ENDINGS } from "utils/CalchartUtils";
+import { setDefaults } from "utils/JSUtils";
+import HTMLBuilder from "utils/HTMLBuilder";
 
 /**
  * An EWNS or NSEW continuity, where dots move as far EW or NS as possible,
  * then move NS or EW to get to their next position.
- *
- * @param {Sheet} sheet -- the sheet the continuity is for
- * @param {string} dotType -- the dot type the continuity is for
- * @param {boolean} isEWNS -- true if EWNS, otherwise NSEW
- * @param {object|undefined} options -- options for the continuity, including:
- *   - {string} stepType
- *   - {int} beatsPerStep
- *   - {string} orientation -- the direction to face at the end
- *   - {string} end -- whether to marktime or close at the end (default mark time)
  */
-var FountainGridContinuity = function(sheet, dotType, isEWNS, options) {
-    BaseContinuity.call(this, sheet, dotType, options);
+export default class FountainGridContinuity extends BaseContinuity {
+    /**
+     * @param {Sheet} sheet
+     * @param {DotType} dotType
+     * @param {boolean} isEWNS - true if EWNS, otherwise NSEW.
+     * @param {Object} [options] - Options for the continuity, including:
+     *   - {string} stepType
+     *   - {int} beatsPerStep
+     *   - {string} orientation - The direction to face at the end.
+     *   - {string} end - Whether to marktime or close at the end (default MT).
+     */
+    constructor(sheet, dotType, isEWNS, options={}) {
+        super(sheet, dotType, options);
 
-    this._isEWNS = isEWNS;
-    this._end = JSUtils.get(options, "end", "MT");
-};
+        this._isEWNS = isEWNS;
 
-JSUtils.extends(FountainGridContinuity, BaseContinuity);
+        options = setDefaults(options, {
+            end: "MT",
+        });
 
-/**
- * Create a FountainGridContinuity from the given serialized data
- *
- * @param {Sheet} sheet -- the sheet the continuity is for
- * @param {string} dotType -- the dot type the continuity is for
- * @param {object} data -- the JSON data to initialize the
- *   FountainGridContinuity with
- * @return {FountainGridContinuity} the FountainGridContinuity reconstructed
- *   from the given data
- */
-FountainGridContinuity.deserialize = function(sheet, dotType, data) {
-    return new FountainGridContinuity(sheet, dotType, data.ewns, data);
-};
-
-/**
- * Return the JSONified version of the FountainGridContinuity
- *
- * @return {object} a JSON object containing this FountainGridContinuity's data
- */
-FountainGridContinuity.prototype.serialize = function() {
-    return $.extend(BaseContinuity.prototype.serialize.call(this), {
-        type: "FOUNTAIN",
-        ewns: this._isEWNS,
-        end: this._end,
-    });
-};
-
-/**** INSTANCE METHODS ****/
-
-FountainGridContinuity.prototype.getMovements = function(dot, data) {
-    var start = data.position;
-    var nextSheet = this._sheet.getNextSheet();
-    if (nextSheet === null) {
-        return [];
-    }
-    var end = nextSheet.getPosition(dot);
-
-    var deltaX = end.x - start.x;
-    var deltaY = end.y - start.y;
-    var dirX = deltaX < 0 ? 90 : 270;
-    var dirY = deltaY < 0 ? 180 : 0;
-
-    var movements = [];
-    var options = {
-        beatsPerStep: this.getBeatsPerStep(),
-    };
-    var addMovement = function(x, y, dir, steps) {
-        var duration = Math.abs(steps) * options.beatsPerStep;
-        var movement = new MovementCommandMove(x, y, dir, duration, options);
-        movements.push(movement);
-    };
-
-    if (this._isEWNS) {
-        if (deltaY !== 0) {
-            addMovement(start.x, start.y, dirY, deltaY);
-        }
-        if (deltaX !== 0) {
-            addMovement(start.x, end.y, dirX, deltaX);
-        }
-    } else {
-        if (deltaX !== 0) {
-            addMovement(start.x, start.y, dirX, deltaX);
-        }
-        if (deltaY !== 0) {
-            addMovement(end.x, start.y, dirY, deltaY);
-        }
+        this._end = options.end;
     }
 
-    var remaining = this._sheet.getDuration() - Math.abs(deltaX) - Math.abs(deltaY);
-    if (remaining > 0) {
-        var orientation = this.getOrientation();
-        var marktime = this._end === "MT";
-        var stop = new MovementCommandStop(end.x, end.y, orientation, remaining, marktime, options);
-        movements.push(stop);
+    static deserialize(sheet, dotType, data) {
+        return new FountainGridContinuity(sheet, dotType, data.ewns, data);
     }
 
-    return movements;
-};
+    serialize() {
+        return $.extend(super.serialize(), {
+            type: "FOUNTAIN",
+            ewns: this._isEWNS,
+            end: this._end,
+        });
+    }
 
-FountainGridContinuity.prototype.panelHTML = function(controller) {
-    var _this = this;
-    var type = this._isEWNS ? "EWNS" : "NSEW";
+    getMovements(dot, data) {
+        let start = data.position;
+        let nextSheet = this._sheet.getNextSheet();
+        if (nextSheet === null) {
+            return [];
+        }
+        let end = nextSheet.getPosition(dot);
 
-    var label = HTMLBuilder.span(type);
+        let deltaX = end.x - start.x;
+        let deltaY = end.y - start.y;
+        let dirX = deltaX < 0 ? 90 : 270;
+        let dirY = deltaY < 0 ? 180 : 0;
 
-    var endLabel = HTMLBuilder.label("End:");
-    var endChoices = HTMLBuilder.select({
-        options: CalchartUtils.ENDINGS,
-        change: function() {
-            _this._end = $(this).val();
-            _this._updateMovements(controller);
-        },
-        initial: this._end,
-    });
+        let movements = [];
+        let options = {
+            beatsPerStep: this.getBeatsPerStep(),
+        };
 
-    return this._wrapPanel(type, [label, endLabel, endChoices]);
-};
+        function addMovement(x, y, dir, steps) {
+            let duration = Math.abs(steps) * options.beatsPerStep;
+            let movement = new MovementCommandMove(x, y, dir, duration, options);
+            movements.push(movement);
+        }
 
-FountainGridContinuity.prototype.popupHTML = function() {
-    var fields = this._getPopupFields();
+        if (this._isEWNS) {
+            if (deltaY !== 0) {
+                addMovement(start.x, start.y, dirY, deltaY);
+            }
+            if (deltaX !== 0) {
+                addMovement(start.x, end.y, dirX, deltaX);
+            }
+        } else {
+            if (deltaX !== 0) {
+                addMovement(start.x, start.y, dirX, deltaX);
+            }
+            if (deltaY !== 0) {
+                addMovement(end.x, start.y, dirY, deltaY);
+            }
+        }
 
-    return {
-        name: this._isEWNS ? "EWNS" : "NSEW",
-        fields: [
-            fields.end,
-            fields.stepType,
-            fields.orientation,
-            fields.beatsPerStep,
-        ],
-    };
-};
+        let remaining = this._sheet.getDuration() - Math.abs(deltaX) - Math.abs(deltaY);
+        if (remaining > 0) {
+            let orientation = this.getOrientation();
+            let marktime = this._end === "MT";
+            let stop = new MovementCommandStop(end.x, end.y, orientation, remaining, marktime, options);
+            movements.push(stop);
+        }
 
-/**** HELPERS ****/
+        return movements;
+    }
 
-FountainGridContinuity.prototype._getPopupFields = function() {
-    var fields = BaseContinuity.prototype._getPopupFields.call(this);
+    panelHTML(controller) {
+        let _this = this;
+        let type = this._isEWNS ? "EWNS" : "NSEW";
 
-    fields.end = HTMLBuilder.formfield("End", HTMLBuilder.select({
-        options: CalchartUtils.ENDINGS,
-        initial: this._end,
-    }));
+        let label = HTMLBuilder.span(type);
 
-    fields.orientation.find("label").text("Final Orientation:");
+        let endLabel = HTMLBuilder.label("End:");
+        let endChoices = HTMLBuilder.select({
+            options: ENDINGS,
+            change: function() {
+                _this._end = $(this).val();
+                _this._updateMovements(controller);
+            },
+            initial: this._end,
+        });
 
-    return fields;
-};
+        return this._wrapPanel(type, [label, endLabel, endChoices]);
+    }
 
-module.exports = FountainGridContinuity;
+    popupHTML() {
+        let { end, stepType, orientation, beatsPerStep } = this._getPopupFields();
+
+        return {
+            name: this._isEWNS ? "EWNS" : "NSEW",
+            fields: [end, stepType, orientation, beatsPerStep],
+        };
+    }
+
+    _getPopupFields() {
+        let fields = super._getPopupFields();
+
+        fields.end = HTMLBuilder.formfield("End", HTMLBuilder.select({
+            options: ENDINGS,
+            initial: this._end,
+        }));
+
+        fields.orientation.find("label").text("Final Orientation:");
+
+        return fields;
+    }
+}

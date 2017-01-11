@@ -1,4 +1,4 @@
-import AnimationState from "./AnimationState";
+import AnimationState from "calchart/AnimationState";
 
 /**
  * A Dot represents a marcher in a Show, containing the following information:
@@ -13,7 +13,7 @@ export default class Dot {
     }
 
     /**
-     * Create a Dot from the given serialized data
+     * Create a Dot from the given serialized data.
      *
      * @param {Object} data - The JSON data to initialize the Dot with.
      * @return {Dot}
@@ -23,7 +23,7 @@ export default class Dot {
     }
 
     /**
-     * Return the JSONified version of the Dot
+     * Return the JSONified version of the Dot.
      *
      * @return {Object}
      */

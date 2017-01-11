@@ -1,5 +1,5 @@
 import "utils/jquery";
-import * as UIUtils from "utils/UIUtils";
+import { hidePopup } from "utils/UIUtils";
 
 $(function() {
     $("select").dropdown();
@@ -7,17 +7,17 @@ $(function() {
     $(".popup")
         .on("click", function(e) {
             if (!$(e.target).closest(".popup-box").exists()) {
-                UIUtils.hidePopup();
+                hidePopup();
             }
         })
         .on("click", ".popup-box button.cancel", function() {
-            UIUtils.hidePopup();
+            hidePopup();
         });
 
     // ESC closes active popups
     $(window).keydown(function(e) {
         if (e.which === 27) {
-            UIUtils.hidePopup();
+            hidePopup();
         }
     });
 });

@@ -9,10 +9,10 @@
  * });
  */
 
-import $ from "jquery";
 import "chosen-js";
-import * as JSUtils from "./JSUtils";
-import * as MathUtils from "./MathUtils";
+import $ from "jquery";
+
+import { bound } from "utils/MathUtils";
 
 /**
  * Contains functions to add to the jQuery API.
@@ -195,8 +195,8 @@ jQueryUtils.scrollIntoView = function(parent, options={}) {
         top: parent.scrollTop(),
         left: parent.scrollLeft(),
     };
-    let scrollY = MathUtils.bound(parentScroll.top + deltaY, 0, parent.prop("scrollHeight") - parentHeight);
-    let scrollX = MathUtils.bound(parentScroll.left + deltaX, 0, parent.prop("scrollWidth") - parentWidth);
+    let scrollY = bound(parentScroll.top + deltaY, 0, parent.prop("scrollHeight") - parentHeight);
+    let scrollX = bound(parentScroll.left + deltaX, 0, parent.prop("scrollWidth") - parentWidth);
     parent.scrollTop(scrollY);
     parent.scrollLeft(scrollX);
 

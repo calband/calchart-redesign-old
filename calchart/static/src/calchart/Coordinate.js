@@ -7,35 +7,36 @@
  *
  * If in pixels, x is the number of pixels from the left edge and y
  * is the number of pixels from the top edge.
- *
- * @param {float} x -- the x-coordinate of the position
- * @param {float} y -- the y-coordinate of the position
  */
-var Coordinate = function(x, y) {
-    this.x = x;
-    this.y = y;
-};
+export default class Coordinate {
+    /**
+     * @param {number} x
+     * @param {number} y
+     */
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+    }
 
-/**
- * Create a Coordinate from the given serialized data
- *
- * @param {object} data -- the JSON data to initialize the Coordinate with
- * @return {Coordinate} the Coordinate reconstructed from the given data
- */
-Coordinate.deserialize = function(data) {
-    return new Coordinate(data.x, data.y);
-};
+    /**
+     * Create a Coordinate from the given serialized data.
+     *
+     * @param {Object} data - The JSON data to initialize the Coordinate with.
+     * @return {Coordinate}
+     */
+    static deserialize(data) {
+        return new Coordinate(data.x, data.y);
+    }
 
-/**
- * Return the JSONified version of this Coordinate
- *
- * @return {object} a JSON object containing this Coordinate's data
- */
-Coordinate.prototype.serialize = function() {
-    return {
-        x: this.x,
-        y: this.y,
-    };
-};
-
-module.exports = Coordinate;
+    /**
+     * Return the JSONified version of the Coordinate.
+     *
+     * @return {Object}
+     */
+    serialize() {
+        return {
+            x: this.x,
+            y: this.y,
+        };
+    }
+}

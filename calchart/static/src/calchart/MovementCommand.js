@@ -1,16 +1,21 @@
-var MovementCommandMove = require("./movements/MovementCommandMove");
-var MovementCommandEven = require("./movements/MovementCommandEven");
-var MovementCommandStop = require("./movements/MovementCommandStop");
+import MovementCommandMove from "./movements/MovementCommandMove";
+import MovementCommandEven from "./movements/MovementCommandEven";
+import MovementCommandStop from "./movements/MovementCommandStop";
 
-module.exports = {
+/**
+ * A proxy class for creating/deserializing all MovementCommand types, although
+ * all MovementCommand types actually inherit from {@link BaseMovementCommand}.
+ * This proxy class allows for ease of abstraction and prevents circular
+ * dependencies.
+ */
+export default class MovementCommand {
     /**
-     * Routes the deserialization to the appropriate movement command
+     * Route the deserialization to the appropriate MovementCommand.
      *
-     * @param {object} data -- the JSON data to initialize the
-     *   MovementCommand with
-     * @return {BaseMovementCommand} the appropriate movement command
+     * @param {Object} data - The JSON data to initialize the MovementCommand with.
+     * @return {MovementCommand}
      */
-    deserialize: function(data) {
+    static deserialize(sheet, dotType, data) {
         switch (data.type) {
             case "MovementCommandMove":
                 return MovementCommandMove.deserialize(data);
@@ -19,5 +24,6 @@ module.exports = {
             case "MovementCommandStop":
                 return MovementCommandStop.deserialize(data);
         }
-    },
-};
+        throw new Error("No movement of the type: " + data.type);
+    }
+}

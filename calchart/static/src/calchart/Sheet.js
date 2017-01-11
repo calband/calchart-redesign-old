@@ -1,5 +1,5 @@
 /**
- * @fileOverview This file defines the Sheet class, which contains information
+ * @file This file defines the Sheet class, which contains information
  * for a stuntsheet in a show. Functions in this file are organized alphabetically
  * in the following sections:
  *
@@ -7,15 +7,15 @@
  * - Instance methods
  */
 
-var errors = require("calchart/errors");
-var JSUtils = require("utils/JSUtils");
-var UIUtils = require("utils/UIUtils");
-import AnimationState from "./AnimationState";
-var Coordinate = require("./Coordinate");
-var Continuity = require("./Continuity");
-import Dot from "./Dot";
-var DotType = require("./DotType");
-var MovementCommand = require("./MovementCommand");
+import AnimationState from "calchart/AnimationState";
+import Coordinate from "calchart/Coordinate";
+import Continuity from "calchart/Continuity";
+import Dot from "calchart/Dot";
+import DotType from "calchart/DotType";
+import { AnimationStateError } from "calchart/errors";
+import MovementCommand from "calchart/MovementCommand";
+
+import { setDefaults } from "utils/JSUtils";
 
 /**** CONSTRUCTORS ****/
 
@@ -49,7 +49,7 @@ var Sheet = function(show, index, numBeats, options) {
     this._index = index;
     this._numBeats = numBeats;
 
-    options = JSUtils.setDefaults(options, {
+    options = setDefaults(options, {
         label: null,
         fieldType: null,
         beatsPerStep: "default",
@@ -221,7 +221,7 @@ Sheet.prototype.getAnimationState = function(dot, beatNum) {
         }
     }
 
-    throw new errors.AnimationStateError(
+    throw new AnimationStateError(
         "Ran out of movements for " + label + ": " + remaining + " beats remaining"
     );
 };

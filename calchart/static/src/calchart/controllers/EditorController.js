@@ -12,12 +12,20 @@
 import ApplicationController from "calchart/ApplicationController";
 var Context = require("calchart/Context");
 import Dot from "calchart/Dot";
-import {ActionError, AnimationStateError} from "calchart/errors";
+import { ActionError, AnimationStateError } from "calchart/errors";
 var Grapher = require("calchart/Grapher");
 var Sheet = require("calchart/Sheet");
-import * as HTMLBuilder from "utils/HTMLBuilder";
-import * as JSUtils from "utils/JSUtils";
-import * as UIUtils from "utils/UIUtils";
+import HTMLBuilder from "utils/HTMLBuilder";
+import { empty, parseArgs } from "utils/JSUtils";
+import {
+    doAction,
+    showContextMenu,
+    showPopup,
+    getData,
+    hidePopup,
+    showError,
+    showMessage
+} from "utils/UIUtils";
 
 /**** CONSTRUCTORS ****/
 
@@ -64,7 +72,7 @@ EditorController.prototype.init = function() {
 
     $(".content .sidebar")
         .contextmenu(function(e) {
-            UIUtils.showContextMenu(e, {
+            showContextMenu(e, {
                 "Add Sheet...": "addStuntsheet",
             });
         })
@@ -72,7 +80,7 @@ EditorController.prototype.init = function() {
             var sheet = $(this).data("sheet");
             _this.loadSheet(sheet);
 
-            UIUtils.showContextMenu(e, {
+            showContextMenu(e, {
                 "Duplicate Sheet": "duplicateSheet",
                 "Delete Sheet": "deleteSheet",
                 "Properties...": "showProperties",
@@ -112,26 +120,26 @@ EditorController.prototype.shortcuts = {
  */
 EditorController.prototype.addStuntsheet = function() {
     var _this = this;
-    UIUtils.showPopup("add-stuntsheet", {
+    showPopup("add-stuntsheet", {
         onSubmit: function(popup) {
-            var data = UIUtils.getData(popup);
+            var data = getData(popup);
 
             // validate data
 
             if (data.num_beats == "") {
-                UIUtils.showError("Please provide the number of beats in the stuntsheet.");
+                showError("Please provide the number of beats in the stuntsheet.");
                 return;
             }
 
             data.num_beats = parseInt(data.num_beats);
             if (data.num_beats <= 0) {
-                UIUtils.showError("Need to have a positive number of beats.");
+                showError("Need to have a positive number of beats.");
                 return;
             }
 
             // hide popup and add sheet to show
 
-            UIUtils.hidePopup();
+            hidePopup();
             _this.doAction("addSheet", [data.num_beats]);
         },
     });
@@ -151,7 +159,7 @@ EditorController.prototype.addStuntsheet = function() {
  * @return {boolean} true if no errors in checking continuities
  */
 EditorController.prototype.checkContinuities = function() {
-    var args = JSUtils.parseArgs(arguments, ["dots", "sheet", "quiet"]);
+    var args = parseArgs(arguments, ["dots", "sheet", "quiet"]);
 
     var sheet = args.sheet || this._activeSheet;
     var duration = sheet.getDuration();
@@ -206,11 +214,11 @@ EditorController.prototype.checkContinuities = function() {
     if (errorMessages.length > 0) {
         var sheetInfo = " (SS " + sheet.getLabel() + ")";
         errorMessages.forEach(function(msg) {
-            UIUtils.showError(msg + sheetInfo);
+            showError(msg + sheetInfo);
         });
         return false;
     } else if (!args.quiet) {
-        UIUtils.showMessage("Continuities valid!");
+        showMessage("Continuities valid!");
         return true;
     }
 };
@@ -256,7 +264,7 @@ EditorController.prototype.doAction = function(name, args) {
         this._undoHistory.push(actionData);
 
         // after doing an action, can't redo previous actions
-        JSUtils.empty(this._redoHistory);
+        empty(this._redoHistory);
     }
 };
 
@@ -458,11 +466,11 @@ EditorController.prototype.saveShow = function(callback) {
 
     if (callback === undefined) {
         callback = function() {
-            UIUtils.showMessage("Saved!");
+            showMessage("Saved!");
         }
     }
 
-    UIUtils.doAction("save_show", params, callback);
+    doAction("save_show", params, callback);
 };
 
 /**

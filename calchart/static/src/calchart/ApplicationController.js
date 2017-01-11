@@ -1,5 +1,6 @@
-import {ActionError} from "calchart/errors";
-import * as JSUtils from "utils/JSUtils";
+import { ActionError } from "calchart/errors";
+
+import { parseNumber } from "utils/JSUtils";
 
 // The singleton instance of the ApplicationController
 window.controller = null;
@@ -232,7 +233,7 @@ export default class ApplicationController {
                 if (arg.indexOf("=") !== -1) {
                     let [key, val] = arg.split("=");
                     return {
-                        [key]: JSUtils.parseNumber(val),
+                        [key]: parseNumber(val),
                     };
                 }
 

@@ -10,9 +10,9 @@
  * - Message utilities
  */
 
-import * as HTMLBuilder from "./HTMLBuilder";
-import * as JSUtils from "./JSUtils";
-import * as MathUtils from "./MathUtils";
+import HTMLBuilder from "utils/HTMLBuilder";
+import { IS_MAC } from "utils/JSUtils";
+import { bound } from "utils/MathUtils";
 
 /**** FORMS ****/
 
@@ -204,7 +204,7 @@ export function setupMenu(menu) {
 }
 
 let shortcutMap, shortcutSep;
-if (JSUtils.IS_MAC) {
+if (IS_MAC) {
     // HTML codes: http://apple.stackexchange.com/a/55729
     shortcutMap = {
         ctrl: "&#8984;",
@@ -426,8 +426,8 @@ export function setupPanel(panel, options={}) {
         let maxY = $(window).height() - $(panel).outerHeight();
 
         $(panel).css({
-            top: MathUtils.bound(top, 0, maxY),
-            left: MathUtils.bound(left, 0, maxX),
+            top: bound(top, 0, maxY),
+            left: bound(left, 0, maxX),
         });
     }
 

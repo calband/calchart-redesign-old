@@ -212,7 +212,7 @@ ContextActions.addContinuity = function(type, sheet, dotType) {
     sheet = sheet || this._sheet;
     dotType = dotType || this._dotType;
 
-    var continuity = new Continuity(type, sheet, dotType);
+    var continuity = Continuity.create(type, sheet, dotType);
     sheet.addContinuity(dotType, continuity);
     this._controller.refresh();
 
