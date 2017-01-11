@@ -1,47 +1,52 @@
-var ContinuityContext = require("./contexts/ContinuityContext");
-var DotContext = require("./contexts/DotContext");
+import ContinuityContext from "calchart/contexts/ContinuityContext";
+import DotContext from "calchart/contexts/DotContext";
 
-module.exports = {
+/**
+ * A proxy class for knowing and loading all Context types, although all Context
+ * types actually inherit from {@link BaseContext}. This proxy class allows for
+ * ease of abstraction and prevents circular dependencies.
+ */
+export default class Context {
     /**
-     * Return an instance of BaseContext to load into the editor
-     * application. Contexts available:
-     *  - dot: DotContext
-     *  - continuity: ContinuityContext
+     * Load a Context into the editor application.
      *
-     * @param {string} name -- the name of the context to load
-     * @param {EditorController} controller -- the editor controller
-     * @param {object|undefined} options -- any options to pass to .load()
-     * @return {BaseContext} the context that was loaded
+     * @param {string} name - The name of the context to load.
+     * @param {EditorController} controller
+     * @param {Object} [options] - Any options to pass to the context.
+     * @return {Context}
      */
-    load: function(name, controller, options) {
+    static load(name, controller, options) {
+        let context;
         switch (name) {
             case "continuity":
-                var context = new ContinuityContext(controller);
+                context = new ContinuityContext(controller);
                 break;
             case "dot":
-                var context = new DotContext(controller);
+                context = new DotContext(controller);
                 break;
             default:
-                throw new Error("No context named: " + name);
+                throw new Error(`No context named: ${name}`);
         }
         context.load(options);
         return context;
-    },
+    }
+
     /**
-     * @return {object} an object mapping shortcut action (e.g. "saveShow")
-     *   to shortcut command (e.g. "ctrl+s").
+     * @return {Object.<string, string>} an object mapping shortcut action (e.g.
+     *   "saveShow") to shortcut command (e.g. "ctrl+s").
      */
-    getAllShortcutCommands: function() {
-        var commands = {};
-        var contexts = [
+    static getAllShortcutCommands() {
+        let commands = {};
+        let contexts = [
             ContinuityContext,
             DotContext,
         ];
         contexts.forEach(function(Context) {
-            $.each(Context.prototype.shortcuts, function(command, action) {
+            $.each(Context.shortcuts, function(command, action) {
                 commands[action] = command;
             });
         });
         return commands;
-    },
-};
+    }
+}
+    

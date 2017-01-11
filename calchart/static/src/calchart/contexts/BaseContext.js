@@ -1,112 +1,96 @@
-/**
- * @fileOverview This file defines the BaseContext class, the abstract
- * super class for contexts that define the actions that can be run in
- * the editor application when the context is loaded. Functions in this
- * file are organized alphabetically in the following sections:
- *
- * - Constructors (including loading/unloading functions)
- * - Instance methods
- * - Actions (methods that modify the Show)
- * - Helpers (prefixed with an underscore)
- */
+import { NotImplementedError } from "utils/errors";
 
-var errors = require("utils/errors");
-
-/**** CONSTRUCTORS ****/
+// Maps Context constructor names to whether they've been initialized yet
+let initializedContexts = {};
 
 /**
- * Subclasses of this class define how the mouse cursor interacts with
- * the editor application.
- *
- * @param {EditorController} controller -- the Editor Controller
+ * Represents a Context that defines a state of the editor application and
+ * the actions that can be run when the editor application is in the
+ * given state.
  */
-var BaseContext = function(controller) {
-    this._controller = controller;
-    this._sheet = controller.getActiveSheet();
+export default class BaseContext {
+    /**
+     * @param {EditorController} controller
+     */
+    constructor(controller) {
+        this._controller = controller;
+        this._sheet = controller.getActiveSheet();
+        this._eventListeners = new Set();
 
-    if (!this._initialized[this.constructor.name]) {
-        this._init();
-        this._initialized[this.constructor.name] = true;
+        if (!initializedContexts[this.constructor.name]) {
+            this._init();
+            initializedContexts[this.constructor.name] = true;
+        }
     }
-};
 
-// Maps BaseContext constructor names to whether they've been initialized yet
-BaseContext.prototype._initialized = {};
+    /**
+     * Shortcuts that the user can press to run actions in the EditorController.
+     */
+    static get shortcuts() {
+        return {};
+    }
 
-/**
- * Runs any actions to initialize this context
- *
- * @param {object|undefined} options -- options to customize loading of the Context
- */
-BaseContext.prototype.load = function(options) {
-    throw new errors.NotImplementedError(this);
-};
+    get shortcuts() { return this.constructor.shortcuts; }
 
-/**
- * Runs any necessary actions to unload the context
- */
-BaseContext.prototype.unload = function() {
-};
+    /**
+     * All actions in the context. Actions are any methods that modify the Show and
+     * can be undone/redone. All actions must return an object containing:
+     *   - {function(this:Context)} undo - The function that will undo this action.
+     *   - {string} [label] -- optional label to use for the Undo/Redo menu item.
+     *     Defaults to the name of the action, capitalized and spaced out.
+     *
+     * @type {Object.<string, function(this:Context)>}
+     */
+    get actions() {
+        return {};
+    }
 
-/**** INSTANCE METHODS ****/
+    /**
+     * Runs any actions to load this context in the editor application.
+     *
+     * @param {object} [options] - Options to customize loading of the Context.
+     */
+    load(options) {
+        throw new NotImplementedError(this);
+    }
 
-// Shortcuts that the user can press to run actions in the EditorController
-BaseContext.prototype.shortcuts = {};
+    /**
+     * Runs any necessary actions to unload the context. Defaults to removing all events
+     * set by _addEvents.
+     */
+    unload() {
+        for (let element of this._eventListeners) {
+            $(element).off(".app-context");
+        }
+    }
 
-/**
- * Refreshes the UI according to the state of the controller and context
- */
-BaseContext.prototype.refresh = function() {
-    this._sheet = this._controller.getActiveSheet();
-};
+    /**
+     * Refresh the UI according to the state of the controller and context.
+     */
+    refresh() {
+        this._sheet = this._controller.getActiveSheet();
+    }
 
-/**** ACTIONS ****/
+    /**
+     * Add the given events to the given element
+     *
+     * @param {jQuery|string} element - The jQuery selector or element to add events to.
+     * @param {Object.<string, function(Event)>} events - The events to add, mapping event
+     *   name to handler.
+     */
+    _addEvents(element, events) {
+        // namespace events
+        $.each(events, function(name, handler) {
+            events[name + ".app-context"] = handler;
+            delete events[name];
+        });
 
-/**
- * Contains all actions in the context. Actions are any methods that modify the
- * Show and can be undone/redone. All actions must return an object containing:
- *   - {function} undo -- the function that will undo this action. `this` will be
- *     set to the context instance
- *   - {undefined|string} label -- optional label to use for the Undo/Redo menu item.
- *     Defaults to the name of the action, capitalized and spaced out
- *
- * Actions are also passed the context instance as `this`.
- */
-BaseContext.prototype.actions = {};
+        $(element).on(events);
+        this._eventListeners.add(element);
+    }
 
-/**** HELPERS ****/
-
-/**
- * Add the given events to the given element
- *
- * @param {jQuery|string} element -- the element to add events to
- * @param {object} events -- the events to add, mapping event name to handler
- */
-BaseContext.prototype._addEvents = function(element, events) {
-    // namespace events
-    $.each(events, function(name, handler) {
-        events[name + ".app-context"] = handler;
-        delete events[name];
-    });
-
-    $(element).on(events);
-};
-
-/**
- * Any actions to run when the context is initialized the first time.
- */
-BaseContext.prototype._init = function() {
-};
-
-/**
- * Remove all namespaced events on the given elements. Usage:
- *
- * this._removeEvents(document, ".workspace");
- */
-BaseContext.prototype._removeEvents = function() {
-    $.each(arguments, function(i, element) {
-        $(element).off(".app-context");
-    });
-};
-
-module.exports = BaseContext;
+    /**
+     * Any actions to run when the context is initialized the first time.
+     */
+    _init() {}
+}

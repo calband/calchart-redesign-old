@@ -60,6 +60,8 @@ export default class ApplicationController {
         return {};
     }
 
+    get shortcuts() { return this.constructor.shortcuts; }
+
     /**
      * Runs the action with the given name, either a method on this instance or a
      * method in this class's actions. @see ApplicationController#_parseAction.
@@ -82,7 +84,7 @@ export default class ApplicationController {
      *   should be passed to {@link ApplicationController#doAction}.
      */
     getShortcut(shortcut) {
-        return this.constructor.shortcuts[shortcut] || null;
+        return this.shortcuts[shortcut] || null;
     }
 
     /**

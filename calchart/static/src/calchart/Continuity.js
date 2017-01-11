@@ -1,7 +1,7 @@
-import EvenContinuity from "./continuities/EvenContinuity";
-import FountainGridContinuity from "./continuities/FountainGridContinuity";
-import ForwardContinuity from "./continuities/ForwardContinuity";
-import StopContinuity from "./continuities/StopContinuity";
+import EvenContinuity from "calchart/continuities/EvenContinuity";
+import FountainGridContinuity from "calchart/continuities/FountainGridContinuity";
+import ForwardContinuity from "calchart/continuities/ForwardContinuity";
+import StopContinuity from "calchart/continuities/StopContinuity";
 
 /**
  * A proxy class for creating/deserializing all Continuity types, although
