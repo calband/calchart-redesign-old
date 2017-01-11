@@ -1,6 +1,5 @@
-import { NotImplementedError } from "calchart/errors";
-
 import { STEP_TYPES, ORIENTATIONS } from "utils/CalchartUtils";
+import { NotImplementedError } from "utils/errors";
 import HTMLBuilder from "utils/HTMLBuilder";
 import { parseNumber, setDefaults } from "utils/JSUtils";
 
@@ -42,7 +41,7 @@ export default class BaseContinuity {
      *
      * @param {Sheet} sheet
      * @param {DotType} dotType
-     * @param {object} data - The JSON data to initialize the Continuity with.
+     * @param {Object} data - The JSON data to initialize the Continuity with.
      * @return {Continuity}
      */
     static deserialize(sheet, dotType, data) {

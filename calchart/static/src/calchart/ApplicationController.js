@@ -1,5 +1,4 @@
-import { ActionError } from "calchart/errors";
-
+import { ActionError } from "utils/errors";
 import { parseNumber } from "utils/JSUtils";
 
 // The singleton instance of the ApplicationController

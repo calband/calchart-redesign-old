@@ -1,114 +1,121 @@
-var CalchartUtils = require("utils/CalchartUtils");
-var Coordinate = require("calchart/Coordinate");
-var errors = require("calchart/errors");
-var JSUtils = require("utils/JSUtils");
+import Coordinate from "calchart/Coordinate";
+
+import { getOrientation } from "utils/CalchartUtils";
+import { NotImplementedError } from "utils/errors";
+import { setDefaults } from "utils/JSUtils";
 
 /**
  * Represents an individual movement that a dot executes during a
  * show. Needs to be subclassed by a class representing a specific
  * type of movement command.
- *
- * @param {int} startX -- the x-coordinate where the movement starts
- * @param {int} startY -- the y-coordinate where the movement starts
- * @param {int} endX -- the x-coordinate where the movement ends
- * @param {int} endY -- the y-coordinate where the movement ends
- * @param {int} duration -- the duration of the movement, in beats
- * @param {object} options -- options for most/all movements, including:
- *   - {float} orientation -- the direction toward which the dot will face,
- *     while moving, in Calchart degrees. (default undefined)
- *   - {int} beatsPerStep -- the number of beats per each step of the movement.
- *     (default 1)
- **/
-var BaseMovementCommand = function(startX, startY, endX, endY, duration, options) {
-    this._startX = startX;
-    this._startY = startY;
-    this._endX = endX;
-    this._endY = endY;
-    this._duration = duration;
-
-    this._orientation = options.orientation;
-    this._beatsPerStep = JSUtils.get(options, "beatsPerStep", 1);
-};
-
-/**
- * Return the JSONified version of this MovementCommand. The data needs
- * to define `type`, which is needed to deserialize (see
- * MovementCommand.deserialize)
- *
- * @return {object} a JSON object containing this MovementCommand's data
  */
-BaseMovementCommand.prototype.serialize = function() {
-    return {
-        startX: this._startX,
-        startY: this._startY,
-        endX: this._endX,
-        endY: this._endY,
-        duration: this._duration,
-        orientation: this._orientation,
-        beatsPerStep: this._beatsPerStep,
-    };
-};
+export default class BaseMovementCommand {
+    /**
+     * @param {number} startX - The x-coordinate where the movement starts.
+     * @param {number} startY - The y-coordinate where the movement starts.
+     * @param {number} endX - The x-coordinate where the movement ends.
+     * @param {number} endY - The y-coordinate where the movement ends.
+     * @param {int} duration - The duration of the movement, in beats.
+     * @param {object} [options] - Options for all/most movements, including:
+     *   - {float} [orientation] - The direction toward which the dot will face,
+     *     while moving, in Calchart degrees.
+     *   - {int} [beatsPerStep=1] - The number of beats per each step of the movement.
+     */
+    constructor(startX, startY, endX, endY, duration, options={}) {
+        this._startX = startX;
+        this._startY = startY;
+        this._endX = endX;
+        this._endY = endY;
+        this._duration = duration;
 
-/**
- * Returns the position at which this movement starts
- *
- * @return {Coordinate} the position where the movement begins
- */
-BaseMovementCommand.prototype.getStartPosition = function() {
-    return new Coordinate(this._startX, this._startY);
-};
+        options = setDefaults(options, {
+            orientation: undefined,
+            beatsPerStep: 1,
+        });
 
-/**
- * Returns the position at which this movement ends
- *
- * @return {Coordinate} the position where the movement ends
- */
-BaseMovementCommand.prototype.getEndPosition = function() {
-    return new Coordinate(this._endX, this._endY);
-};
-
-/**
- * Returns the number of beats required to complete this command
- *
- * @return {int} The duration of this command, in beats
- */
-BaseMovementCommand.prototype.getDuration = function() {
-    return this._duration;
-};
-
-/**
- * Returns this movement's orientation, if applicable.
- *
- * @return {string|undefined} the orientation of this movement, if
- *   applicable
- */
-BaseMovementCommand.prototype.getOrientation = function() {
-    if (this._orientation !== undefined) {
-        return CalchartUtils.getOrientation(this._orientation);
+        this._orientation = options.orientation;
+        this._beatsPerStep = options.beatsPerStep;
     }
-};
 
-/**
- * Returns an AnimationState describing a dot who is executing this movement
- *
- * @param {int} beatNum -- the number of beats relative to the start of
- *   the movement
- * @return {AnimationState|null} An AnimationState that describes a dot at a
- *   moment of the show. If the Dot has no movement at the specified beat,
- *   returns null.
- */
-BaseMovementCommand.prototype.getAnimationState = function(beatNum) {
-    throw new errors.NotImplementedError(this);
-};
+    /**
+     * Create a MovementCommand from the given serialized data.
+     *
+     * @param {Object} data - The JSON data to initialize the MovementCommand with.
+     * @return {MovementCommand}
+     */
+    static deserialize(data) {
+        throw new NotImplementedError(this);
+    }
 
-/**
- * Returns the continuity text associated with this movement. Used for
- * individual continuities; use Continuity for dot type continuities
- *
- * @return {string} the text displayed for this movement
- */
-BaseMovementCommand.prototype.getContinuityText = function() {
-    throw new errors.NotImplementedError(this);
-};
+    /**
+     * Return the JSONified version of this MovementCommand.
+     *
+     * @param {string} type - The type of the MovementCommmand (@see MovementCommand.deserialize).
+     * @param {Object} [data] - Additional data to add to the serialized data.
+     * @return {Object}
+     */
+    serialize(type, data) {
+        return $.extend({}, data, {
+            type: type,
+            startX: this._startX,
+            startY: this._startY,
+            endX: this._endX,
+            endY: this._endY,
+            duration: this._duration,
+            orientation: this._orientation,
+            beatsPerStep: this._beatsPerStep,
+        });
+    }
 
-module.exports = BaseMovementCommand;
+    /**
+     * @return {Coordinate} The position where the movement begins.
+     */
+    getStartPosition() {
+        return new Coordinate(this._startX, this._startY);
+    }
+
+    /**
+     * @return {Coordinate} The position where the movement ends.
+     */
+    getEndPosition() {
+        return new Coordinate(this._endX, this._endY);
+    }
+
+    /**
+     * @return {int} The duration of this command, in beats.
+     */
+    getDuration() {
+        return this._duration;
+    }
+
+    /**
+     * @return {string=} The orientation of this movement, if applicable.
+     */
+    getOrientation() {
+        if (this._orientation !== undefined) {
+            return getOrientation(this._orientation);
+        }
+    }
+
+    /**
+     * Return an AnimationState describing the state of a dot that is executing
+     * this movement.
+     *
+     * @param {int} beatNum - The number of beats relative to the start of
+     *   the movement.
+     * @return {?AnimationState} An AnimationState that describes a dot at a
+     *   moment of the show. If the Dot has no movement at the specified beat,
+     *   returns null.
+     */
+    getAnimationState(beatNum) {
+        throw new NotImplementedError(this);
+    }
+
+    /**
+     * @return {string} The continuity text to be displayed for this movement. Used
+     * for individual continuities; use Continuity for dot type continuities.
+     */
+    getContinuityText() {
+        throw new NotImplementedError(this);
+    }
+}

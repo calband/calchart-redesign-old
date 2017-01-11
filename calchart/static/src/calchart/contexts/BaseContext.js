@@ -10,7 +10,7 @@
  * - Helpers (prefixed with an underscore)
  */
 
-var errors = require("calchart/errors");
+var errors = require("utils/errors");
 
 /**** CONSTRUCTORS ****/
 

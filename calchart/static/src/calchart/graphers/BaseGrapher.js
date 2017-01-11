@@ -11,7 +11,7 @@
 
 var CalchartUtils = require("utils/CalchartUtils");
 var Coordinate = require("calchart/Coordinate");
-var errors = require("calchart/errors");
+var errors = require("utils/errors");
 var GrapherScale = require("calchart/GrapherScale");
 var JSUtils = require("utils/JSUtils");
 var MathUtils = require("utils/MathUtils");

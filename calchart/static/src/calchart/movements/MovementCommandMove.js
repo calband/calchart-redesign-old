@@ -1,106 +1,103 @@
-var AnimationState = require("calchart/AnimationState");
-var BaseMovementCommand = require("./BaseMovementCommand");
-var CalchartUtils = require("utils/CalchartUtils");
-var Coordinate = require("calchart/Coordinate");
-var JSUtils = require("utils/JSUtils");
-var MathUtils = require("utils/MathUtils");
+import AnimationState from "calchart/AnimationState";
+import BaseMovementCommand from "calchart/movements/BaseMovementCommand";
+import Coordinate from "calchart/Coordinate";
+
+import { STEP_SIZES } from "utils/CalchartUtils";
+import { setDefaults } from "utils/JSUtils";
+import { calcRotatedXPos, calcRotatedYPos, roundSmall } from "utils/MathUtils";
  
 /**
  * A MovementCommand which represents a constant movement in the given direction.
- *
- * @param {float} startX -- the x-coordinate of the movement's start position
- * @param {float} startY -- the y-coordinate of the movement's start position
- * @param {float} direction -- the direction toward which the dot will move,
- *   in Calchart degrees
- * @param {int} duration -- the duration of the movement, in beats
- * @param {object} options -- options for the movement, including:
- *   - {float} stepSize -- the multiplier for converting steps into standard step
- *     sizes. See CalchartUtils.STEP_SIZES. (default CalchartUtils.STEP_SIZES.STANDARD)
- *   - {float} orientation -- default same as direction
- *   - {int} beatsPerStep
- */ 
-var MovementCommandMove = function(startX, startY, direction, duration, options) {
-    this._stepSize = JSUtils.get(options, "stepSize", CalchartUtils.STEP_SIZES.STANDARD);
-    options.orientation = JSUtils.get(options, "orientation", direction);
-
-    this._direction = direction;
-    this._deltaXPerStep = MathUtils.calcRotatedXPos(direction) * this._stepSize;
-    this._deltaYPerStep = MathUtils.calcRotatedYPos(direction) * this._stepSize;
-
-    BaseMovementCommand.call(this, startX, startY, null, null, duration, options);
-
-    var end = this._getPosition(duration);
-    this._endX = end.x;
-    this._endY = end.y;
-};
-
-JSUtils.extends(MovementCommandMove, BaseMovementCommand);
-
-/**
- * Create a MovementCommandMove from the given serialized data
- *
- * @param {object} data -- the JSON data to initialize the
- *   MovementCommandMove with
- * @return {MovementCommandMove} the MovementCommandMove reconstructed
- *   from the given data
  */
-MovementCommandMove.deserialize = function(data) {
-    return new MovementCommandMove(
-        data.startX,
-        data.startY,
-        data.direction,
-        data.duration,
-        data
-    );
-};
+export default class MovementCommandMove extends BaseMovementCommand {
+    /**
+     * @param {number} startX
+     * @param {number} startY
+     * @param {number} direction - The direction toward which the dot will move,
+     *   in Calchart degrees.
+     * @param {int} duration - The duration of the movement, in beats.
+     * @param {object} [options] - Options for the movement, including:
+     *   - {number} [stepSize=STEP_SIZES.STANDARD] - The multiplier for converting steps
+     *     into standard step sizes. @see STEP_SIZES.
+     *   - {number} [orientation=direction]
+     *   - {int} beatsPerStep
+     */ 
+    constructor(startX, startY, direction, duration, options={}) {
+        options = setDefaults(options, {
+            stepSize: STEP_SIZES.STANDARD,
+            orientation: direction,
+        });
 
-/**
- * Return the JSONified version of the MovementCommandMove
- *
- * @return {object} a JSON object containing this MovementCommandMove's data
- */
-MovementCommandMove.prototype.serialize = function() {
-    return $.extend(BaseMovementCommand.prototype.serialize.call(this), {
-        type: "MovementCommandMove",
-        direction: this._direction,
-        stepSize: this._stepSize,
-    });
-};
+        super(startX, startY, null, null, duration, options);
 
-MovementCommandMove.prototype.getAnimationState = function(beatNum) {
-    var position = this._getPosition(beatNum);
-    return new AnimationState(position, this._orientation);
-};
+        this._stepSize = options.stepSize;
+        this._direction = direction;
+        this._deltaXPerStep = calcRotatedXPos(direction) * this._stepSize;
+        this._deltaYPerStep = calcRotatedYPos(direction) * this._stepSize;
 
-/**
- * Get the coordinate the dot will be at at the given beat
- *
- * @param {int} beatNum -- the number of beats relative to the start of the movement
- * @return {Coordinate} the position of the dot
- */
-MovementCommandMove.prototype._getPosition = function(beatNum) {
-    var numSteps = Math.floor(beatNum / this._beatsPerStep);
-    var x = this._startX + this._deltaXPerStep * numSteps;
-    var y = this._startY + this._deltaYPerStep * numSteps;
-    x = MathUtils.roundSmall(x);
-    y = MathUtils.roundSmall(y);
-    return new Coordinate(x, y);
-};
-
-/**
- * @return {string} the continuity text in the form "Move 4 E"
- */
-MovementCommandMove.prototype.getContinuityText = function() {
-    var deltaX = this._endX - this._startX;
-    var deltaY = this._endY - this._startY;
-    var dirX = (deltaX < 0) ? "S" : "N";
-    var dirY = (deltaY < 0) ? "W" : "E";
-    // This movement can only move in one direction
-    if (deltaX == 0) {
-        return "Move " + Math.abs(deltaY) + " " + dirY;
-    } else {
-        return "Move " + Math.abs(deltaX) + " " + dirX;
+        let end = this._getPosition(duration);
+        this._endX = end.x;
+        this._endY = end.y;
     }
-};
 
-module.exports = MovementCommandMove;
+    static deserialize(data) {
+        return new MovementCommandMove(
+            data.startX,
+            data.startY,
+            data.direction,
+            data.duration,
+            data
+        );
+    }
+
+    serialize() {
+        return super.serialize("MovementCommandMove", {
+            direction: this._direction,
+            stepSize: this._stepSize,
+        });
+    }
+
+    getAnimationState(beatNum) {
+        if (beatNum < 0 || beatNum > this._duration) {
+            return null;
+        }
+
+        let position = this._getPosition(beatNum);
+        return new AnimationState(position, this._orientation);
+    }
+
+    /**
+     * @return {string} The continuity text in the form "Move 4 E".
+     */
+    getContinuityText() {
+        let deltaX = Math.abs(this._endX - this._startX);
+        let deltaY = Math.abs(this._endY - this._startY);
+        let dirX = (deltaX < 0) ? "S" : "N";
+        let dirY = (deltaY < 0) ? "W" : "E";
+
+        // This movement can only move in one direction
+        if (deltaX === 0) {
+            return `Move ${deltaY} ${dirY}`;
+        } else {
+            return `Move ${deltaX} ${dirX}`;
+        }
+    }
+
+    /**
+     * Get the coordinate the dot will be at at the given beat
+     *
+     * @param {int} beatNum - The number of beats relative to the start of the movement.
+     * @return {Coordinate}
+     */
+    _getPosition(beatNum) {
+        let numSteps = Math.floor(beatNum / this._beatsPerStep);
+        let x = this._startX + this._deltaXPerStep * numSteps;
+        let y = this._startY + this._deltaYPerStep * numSteps;
+
+        // rounding errors
+        x = roundSmall(x);
+        y = roundSmall(y);
+
+        return new Coordinate(x, y);
+    }
+}

@@ -11,7 +11,7 @@
 
 var BaseContext = require("./BaseContext");
 var Continuity = require("calchart/Continuity");
-var errors = require("calchart/errors");
+var errors = require("utils/errors");
 var HTMLBuilder = require("utils/HTMLBuilder");
 var JSUtils = require("utils/JSUtils");
 var MathUtils = require("utils/MathUtils");

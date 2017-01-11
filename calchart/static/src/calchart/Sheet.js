@@ -12,9 +12,9 @@ import Coordinate from "calchart/Coordinate";
 import Continuity from "calchart/Continuity";
 import Dot from "calchart/Dot";
 import DotType from "calchart/DotType";
-import { AnimationStateError } from "calchart/errors";
 import MovementCommand from "calchart/MovementCommand";
 
+import { AnimationStateError } from "utils/errors";
 import { setDefaults } from "utils/JSUtils";
 
 /**** CONSTRUCTORS ****/
