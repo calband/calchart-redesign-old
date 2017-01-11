@@ -172,9 +172,7 @@ Show.prototype.getStepType = function() {
  * @return {Array<Dot>} all Dots in the show
  */
 Show.prototype.getDots = function() {
-    return $.map(this._dots, function(dot) {
-        return dot;
-    });
+    return Object.values(this._dots);
 };
 
 /**
@@ -184,15 +182,6 @@ Show.prototype.getDots = function() {
  */
 Show.prototype.getDotLabels = function() {
     return Object.keys(this._dots);
-};
-
-/**
- * Get the object mapping dot labels to the dot
- *
- * @return {object} dictionary mapping dot labels to Dot
- */
-Show.prototype.getDotMapping = function() {
-    return this._dots;
 };
 
 /**

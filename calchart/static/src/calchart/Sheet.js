@@ -7,15 +7,15 @@
  * - Instance methods
  */
 
-var AnimationState = require("./AnimationState");
-var Coordinate = require("./Coordinate");
-var Continuity = require("./Continuity");
-var Dot = require("./Dot");
-var DotType = require("./DotType");
 var errors = require("calchart/errors");
 var JSUtils = require("utils/JSUtils");
-var MovementCommand = require("./MovementCommand");
 var UIUtils = require("utils/UIUtils");
+import AnimationState from "./AnimationState";
+var Coordinate = require("./Coordinate");
+var Continuity = require("./Continuity");
+import Dot from "./Dot";
+var DotType = require("./DotType");
+var MovementCommand = require("./MovementCommand");
 
 /**** CONSTRUCTORS ****/
 
@@ -144,8 +144,8 @@ Sheet.prototype.serialize = function() {
     };
     
     data.dots = {};
-    $.each(this._dots, function(dot, dot_data) {
-        data.dots[dot] = {
+    $.each(this._dots, function(label, dot_data) {
+        data.dots[label] = {
             type: dot_data.type,
             position: dot_data.position.serialize(),
             movements: dot_data.movements.map(function(movement) {
@@ -268,12 +268,11 @@ Sheet.prototype.getDotInfo = function(dot) {
  * @return {Array<Dot>} all dots of the given type
  */
 Sheet.prototype.getDotsOfType = function(dotType) {
-    var dots = this._show.getDotMapping();
     var dotTypeDots = [];
 
-    $.each(this._dots, function(label, info) {
+    $.each(this._dots, (label, info) => {
         if (info.type === dotType) {
-            dotTypeDots.push(dots[label]);
+            dotTypeDots.push(this._show.getDotByLabel(label));
         }
     });
 
