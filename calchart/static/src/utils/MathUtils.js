@@ -11,18 +11,6 @@ export const PI_OVER_TWO = Math.PI / 2;
 export const TWO_PI = Math.PI * 2;
 
 /**
- * Bound the given value to be at least low and at most high.
- *
- * @param {number} val
- * @param {number} low
- * @param {number} high
- * @return {number} low if val < low, high if val > high, else val.
- */
-export function bound(val, low, high) {
-    return Math.min(Math.max(val, low), high);
-}
-
-/**
  * Calculate the distance between two points
  *
  * @param {number} x1 - The x coordinate of the first point.

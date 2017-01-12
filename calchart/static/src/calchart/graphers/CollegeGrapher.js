@@ -1,3 +1,4 @@
+import * as _ from "lodash";
 var BaseGrapher = require("./BaseGrapher");
 var JSUtils = require("utils/JSUtils");
 
@@ -45,7 +46,7 @@ CollegeGrapher.prototype.drawField = function() {
         return;
     }
 
-    var yardlineSteps = JSUtils.range(8, 160, 8);
+    var yardlineSteps = _.range(8, 160, 8);
 
     // append the yardlines, excluding the 0 yardlines
     field.selectAll("line.yardline")
@@ -61,7 +62,7 @@ CollegeGrapher.prototype.drawField = function() {
     if (this._options.drawYardlineNumbers) {
         var yardlineLabels = field
             .selectAll("text.yardline-label")
-            .data(JSUtils.range(0, 210, 5))
+            .data(_.range(0, 210, 5))
             .enter()
             .append("text")
             .classed("yardline-label", true)

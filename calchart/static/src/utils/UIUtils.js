@@ -10,9 +10,10 @@
  * - Message utilities
  */
 
+import * as _ from "lodash";
+
 import HTMLBuilder from "utils/HTMLBuilder";
 import { IS_MAC } from "utils/JSUtils";
-import { bound } from "utils/MathUtils";
 
 /**** FORMS ****/
 
@@ -426,8 +427,8 @@ export function setupPanel(panel, options={}) {
         let maxY = $(window).height() - $(panel).outerHeight();
 
         $(panel).css({
-            top: bound(top, 0, maxY),
-            left: bound(left, 0, maxX),
+            top: _.clamp(top, 0, maxY),
+            left: _.clamp(left, 0, maxX),
         });
     }
 

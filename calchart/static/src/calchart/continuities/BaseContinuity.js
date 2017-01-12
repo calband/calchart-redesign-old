@@ -1,3 +1,5 @@
+import * as _ from "lodash";
+
 import { STEP_TYPES, ORIENTATIONS } from "utils/CalchartUtils";
 import { NotImplementedError } from "utils/errors";
 import HTMLBuilder from "utils/HTMLBuilder";
@@ -25,7 +27,7 @@ export default class BaseContinuity {
         this._sheet = sheet;
         this._dotType = dotType;
 
-        options = setDefaults(options, {
+        options = _.defaults(options, {
             stepType: "default",
             beatsPerStep: "default",
             orientation: "default",

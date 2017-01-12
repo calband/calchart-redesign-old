@@ -7,6 +7,8 @@
  * - Instance methods
  */
 
+import * as _ from "lodash";
+
 import AnimationState from "calchart/AnimationState";
 import Coordinate from "calchart/Coordinate";
 import Continuity from "calchart/Continuity";
@@ -15,7 +17,6 @@ import DotType from "calchart/DotType";
 import MovementCommand from "calchart/MovementCommand";
 
 import { AnimationStateError } from "utils/errors";
-import { setDefaults } from "utils/JSUtils";
 
 /**** CONSTRUCTORS ****/
 
@@ -49,7 +50,7 @@ var Sheet = function(show, index, numBeats, options) {
     this._index = index;
     this._numBeats = numBeats;
 
-    options = setDefaults(options, {
+    options = _.defaults(options, {
         label: null,
         fieldType: null,
         beatsPerStep: "default",

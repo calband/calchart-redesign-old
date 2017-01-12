@@ -1,8 +1,9 @@
+import * as _ from "lodash";
+
 import Coordinate from "calchart/Coordinate";
 
 import { getOrientation } from "utils/CalchartUtils";
 import { NotImplementedError } from "utils/errors";
-import { setDefaults } from "utils/JSUtils";
 
 /**
  * Represents an individual movement that a dot executes during a
@@ -28,7 +29,7 @@ export default class BaseMovementCommand {
         this._endY = endY;
         this._duration = duration;
 
-        options = setDefaults(options, {
+        options = _.defaults(options, {
             orientation: undefined,
             beatsPerStep: 1,
         });

@@ -9,6 +9,8 @@
  * - Helpers (prefixed with an underscore)
  */
 
+import * as _ from "lodash";
+
 var BaseContext = require("./BaseContext");
 var Continuity = require("calchart/Continuity");
 var errors = require("utils/errors");
@@ -411,7 +413,7 @@ ContinuityContext.prototype._setupSeek = function() {
         var interval = seekWidth / numBeats;
 
         // snap to beat
-        var x = MathUtils.bound(pageX - seekLeft - offset, 0, seekWidth);
+        var x = _.clamp(pageX - seekLeft - offset, 0, seekWidth);
         var beat = MathUtils.round(x, interval) / interval;
 
         // don't redraw screen if the beat didn't change

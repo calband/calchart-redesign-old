@@ -73,42 +73,6 @@ export function parseNumber(value) {
 }
 
 /**
- * Generate an array containing numbers within a certain range. Like
- * Python's range() function, can take in one to three parameters.
- *
- * @param {number} start - If one parameter, the end of the range
- *   (exclusive). Otherwise, the start of the range (inclusive).
- * @param {number} [end] - The end of the range (exclusive).
- * @param {number} [interval=1] - The interval between each number.
- * @return {number[]} A list of numbers in the range [start, end),
- *   incrementing according to interval.
- */
-export function range(start, end, interval=1) {
-    if (end === undefined) {
-        end = start;
-        start = 0;
-    }
-
-    let arr = [];
-    for (let i = start; i < end; i += interval) {
-        arr.push(i);
-    }
-    return arr;
-}
-
-/**
- * Return the given options, setting undefined keys according to the given
- * defaults
- *
- * @param {Object} options
- * @param {Object} defaults
- * @return {Object}
- */
-export function setDefaults(options, defaults) {
-    return $.extend({}, defaults, options);
-}
-
-/**
  * Convert the given value to camel case
  *
  * @param {string} value

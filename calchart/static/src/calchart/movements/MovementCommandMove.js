@@ -1,9 +1,10 @@
+import * as _ from "lodash";
+
 import AnimationState from "calchart/AnimationState";
 import BaseMovementCommand from "calchart/movements/BaseMovementCommand";
 import Coordinate from "calchart/Coordinate";
 
 import { STEP_SIZES } from "utils/CalchartUtils";
-import { setDefaults } from "utils/JSUtils";
 import { calcRotatedXPos, calcRotatedYPos, roundSmall } from "utils/MathUtils";
  
 /**
@@ -23,7 +24,7 @@ export default class MovementCommandMove extends BaseMovementCommand {
      *   - {int} beatsPerStep
      */ 
     constructor(startX, startY, direction, duration, options={}) {
-        options = setDefaults(options, {
+        options = _.defaults(options, {
             stepSize: STEP_SIZES.STANDARD,
             orientation: direction,
         });

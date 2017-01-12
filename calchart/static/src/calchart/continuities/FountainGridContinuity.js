@@ -1,9 +1,10 @@
+import * as _ from "lodash";
+
 import BaseContinuity from "calchart/continuities/BaseContinuity";
 import MovementCommandMove from "calchart/movements/MovementCommandMove";
 import MovementCommandStop from "calchart/movements/MovementCommandStop";
 
 import { ENDINGS } from "utils/CalchartUtils";
-import { setDefaults } from "utils/JSUtils";
 import HTMLBuilder from "utils/HTMLBuilder";
 
 /**
@@ -26,7 +27,7 @@ export default class FountainGridContinuity extends BaseContinuity {
 
         this._isEWNS = isEWNS;
 
-        options = setDefaults(options, {
+        options = _.defaults(options, {
             end: "MT",
         });
 

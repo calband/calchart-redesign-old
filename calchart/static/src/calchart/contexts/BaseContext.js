@@ -25,6 +25,8 @@ export default class BaseContext {
 
     /**
      * Shortcuts that the user can press to run actions in the EditorController.
+     *
+     * @return {Object.<string, string>}
      */
     static get shortcuts() {
         return {};
@@ -39,11 +41,15 @@ export default class BaseContext {
      *   - {string} [label] -- optional label to use for the Undo/Redo menu item.
      *     Defaults to the name of the action, capitalized and spaced out.
      *
-     * @type {Object.<string, function(this:Context)>}
+     * @return {function} A class that defines static functions that run undoable
+     *   actions on the controller/context. Functions have `this` defined as the
+     *   Context instance.
      */
-    get actions() {
+    static get actions() {
         return {};
     }
+
+    get actions() { return this.constructor.actions; }
 
     /**
      * Runs any actions to load this context in the editor application.
