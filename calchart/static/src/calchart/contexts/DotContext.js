@@ -312,7 +312,7 @@ class ContextActions {
 
         selected.forEach(function(dot) {
             let dotType = sheet.getDotType(dot);
-            if (oldTypes[dotType] === undefined) {
+            if (_.isUndefined(oldTypes[dotType])) {
                 oldTypes[dotType] = [];
             }
             oldTypes[dotType].push(dot);
@@ -345,7 +345,7 @@ class ContextActions {
      *   currently selected dots.
      */
     static moveDots(deltaX, deltaY, sheet=this._sheet, dots) {
-        if (dots === undefined) {
+        if (_.isUndefined(dots)) {
             dots = this._controller.getSelectedDots();
         }
 

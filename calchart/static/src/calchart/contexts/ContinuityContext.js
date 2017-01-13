@@ -143,7 +143,7 @@ export default class ContinuityContext extends BaseContext {
     refresh() {
         super.refresh();
 
-        if (this._sheet === null) {
+        if (_.isNull(this._sheet)) {
             return;
         }
 
@@ -160,7 +160,7 @@ export default class ContinuityContext extends BaseContext {
         });
 
         // activate dot type tab
-        if (this._dotType === null) {
+        if (_.isNull(this._dotType)) {
             this._dotType = tabs.find("li.tab:first").data("dotType");
         }
         let tab = tabs.find(`.${this._dotType}`).addClass("active");
@@ -192,7 +192,7 @@ export default class ContinuityContext extends BaseContext {
      * @return {Continuity}
      */
     _getContinuity(continuity) {
-        if (typeof continuity === "number") {
+        if (_.isNumber(continuity)) {
             continuity = this._panel.find(".continuity").get(continuity);
         }
         return continuity.data("continuity");

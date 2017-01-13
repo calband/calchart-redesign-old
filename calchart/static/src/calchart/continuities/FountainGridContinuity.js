@@ -48,7 +48,7 @@ export default class FountainGridContinuity extends BaseContinuity {
     getMovements(dot, data) {
         let start = data.position;
         let nextSheet = this._sheet.getNextSheet();
-        if (nextSheet === null) {
+        if (_.isNull(nextSheet)) {
             return [];
         }
         let end = nextSheet.getPosition(dot);

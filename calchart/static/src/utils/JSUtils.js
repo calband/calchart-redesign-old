@@ -2,6 +2,8 @@
  * @file A collection of Javascript utility/helper functions.
  */
 
+import * as _ from "lodash";
+
 /**
  * true if the user is on a Mac, false otherwise.
  * https://css-tricks.com/snippets/javascript/test-mac-pc-javascript/
@@ -41,7 +43,7 @@ export function fromCamelCase(str) {
  *   labels and the values either undefined or the parsed argument.
  */
 export function parseArgs(args, labels) {
-    if (args.length === 1 && args[0] !== null) {
+    if (args.length === 1 && !_.isNull(args[0])) {
         let kwargs = args[0];
         for (let key in kwargs) {
             if (labels.indexOf(key) === -1) {
@@ -55,7 +57,7 @@ export function parseArgs(args, labels) {
     }
 
     let kwargs = {};
-    $.each(labels, (i, label) => {
+    _.each(labels, (label, i) => {
         kwargs[label] = args[i];
     });
     return kwargs;

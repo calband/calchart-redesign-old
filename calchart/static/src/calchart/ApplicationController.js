@@ -1,3 +1,5 @@
+import * as _ from "lodash";
+
 import { ActionError } from "utils/errors";
 import { parseNumber } from "utils/JSUtils";
 
@@ -162,7 +164,7 @@ export default class ApplicationController {
         let data = this._parseAction(name);
         let action = this[data.name];
 
-        if (typeof action === "function") {
+        if (_.isFunction(action)) {
             return {
                 function: action,
                 args: data.args,
@@ -188,7 +190,7 @@ export default class ApplicationController {
     _parseAction(name) {
         let actionMatch = name.match(/^(\w+)(\((.+)\))?$/);
 
-        if (actionMatch === null) {
+        if (_.isNull(actionMatch)) {
             throw new Error(`Action name in an invalid format: ${name}`);
         }
 

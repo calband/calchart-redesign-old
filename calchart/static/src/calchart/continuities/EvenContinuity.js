@@ -1,3 +1,5 @@
+import * as _ from "lodash";
+
 import BaseContinuity from "calchart/continuities/BaseContinuity";
 import MovementCommandEven from "calchart/movements/MovementCommandEven";
 
@@ -32,7 +34,7 @@ export default class EvenContinuity extends BaseContinuity {
 
     getMovements(dot, data) {
         let nextSheet = this._sheet.getNextSheet();
-        if (nextSheet === null) {
+        if (_.isNull(nextSheet)) {
             return [];
         }
         let end = nextSheet.getPosition(dot);

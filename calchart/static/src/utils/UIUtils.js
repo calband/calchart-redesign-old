@@ -30,7 +30,7 @@ import { IS_MAC } from "utils/JSUtils";
 export function doAction(action, params={}, success=null) {
     // params is optional, and was left out in this case, with the success
     // function being passed as this argument
-    if (typeof params === "function") {
+    if (_.isFunction(params)) {
         success = params;
         params = {};
     }
@@ -247,7 +247,7 @@ if (IS_MAC) {
 function convertShortcut(shortcut) {
     return shortcut.split("+").map(key => {
         let hint = shortcutMap[key];
-        return hint === undefined ? key.toUpperCase() : hint;
+        return _.isUndefined(hint) ? key.toUpperCase() : hint;
     }).join(shortcutSep);
 }
 
@@ -348,7 +348,7 @@ export function showContextMenu(e, items) {
     function makeMenu(parent, items) {
         $.each(items, function(label, action) {
             let item = HTMLBuilder.li(label).appendTo(parent);
-            if (typeof action === "string") {
+            if (_.isString(action)) {
                 item.click(function() {
                     window.controller.doAction(action);
                     closeMenus();

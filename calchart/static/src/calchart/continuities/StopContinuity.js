@@ -1,3 +1,5 @@
+import * as _ from "lodash";
+
 import BaseContinuity from "calchart/continuities/BaseContinuity";
 import MovementCommandStop from "calchart/movements/MovementCommandStop";
 
@@ -67,7 +69,7 @@ export default class StopContinuity extends BaseContinuity {
             // close
             let label = HTMLBuilder.span("Close");
             return this._wrapPanel("close", [label]);
-        } else if (this._duration === null) {
+        } else if (_.isNull(this._duration)) {
             // mark time remaining
             let label = HTMLBuilder.span("MTRM");
 
@@ -108,7 +110,7 @@ export default class StopContinuity extends BaseContinuity {
                 name: "Close",
                 fields: [orientation],
             };
-        } else if (this._duration === null) {
+        } else if (_.isNull(this._duration)) {
             return {
                 name: "Mark Time Remaining",
                 fields: [orientation, stepType, beatsPerStep],

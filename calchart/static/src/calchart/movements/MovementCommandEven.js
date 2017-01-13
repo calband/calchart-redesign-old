@@ -1,3 +1,5 @@
+import * as _ from "lodash";
+
 import MovementCommandMove from "calchart/movements/MovementCommandMove";
 
 import { calcAngle, calcDistance } from "utils/MathUtils";
@@ -81,7 +83,7 @@ export default class MovementCommandEven extends MovementCommandMove {
         }
 
         // Error checking for an even move without movement in any direction
-        if (text === undefined) {
+        if (_.isUndefined(text)) {
             text = "0";
         }
 

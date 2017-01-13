@@ -175,7 +175,7 @@ export default class Sheet {
             this._dots[label].type = dotType;
         });
 
-        if (this._continuities[dotType] === undefined) {
+        if (_.isUndefined(this._continuities[dotType])) {
             this._continuities[dotType] = [];
         }
 
@@ -307,7 +307,7 @@ export default class Sheet {
     getFinalPosition(dot) {
         let dotInfo = this.getDotInfo(dot);
         let movement = _.last(dotInfo.movements);
-        if (movement === undefined) {
+        if (_.isUndefined(movement)) {
             return dotInfo.position;
         } else {
             return movement.getEndPosition();
@@ -414,12 +414,12 @@ export default class Sheet {
      *   either the dot type, the Dot, or a list of Dots. If undefined, updates all dots.
      */
     updateMovements(dots) {
-        if (typeof dots === "string") {
+        if (_.isString(dots)) {
             dots = this.getDotsOfType(dots);
+        } else if (_.isUndefined(dots)) {
+            dots = this._show.getDots();
         } else if (dots instanceof Dot) {
             dots = [dots];
-        } else if (dots === undefined) {
-            dots = this._show.getDots();
         }
 
         dots.forEach(dot => {

@@ -5,6 +5,8 @@
  * a jQuery object.
  */
 
+import * as _ from "lodash";
+
 import { parseArgs, toCamelCase } from "utils/JSUtils";
 
 /**
@@ -26,7 +28,7 @@ export default class HTMLBuilder {
     static make(elem, appendTo) {
         let [match, tag, id, classes=""] = elem.match(/^(\w+)(?:#([\w-]+))?((?:\.[\w-]+)+)?$/);
 
-        if (match === null) {
+        if (_.isNull(match)) {
             throw new Error(`Invalid format: ${elem}`);
         }
 
@@ -73,7 +75,7 @@ export default class HTMLBuilder {
         let args = JSUtils.parseArgs(arguments, ["label", "field", "name"]);
         let name = args.name || JSUtils.toCamelCase(args.label);
 
-        if (typeof args.field === "string") {
+        if (_.isString(args.field)) {
             args.field = this.make(args.field);
         }
         args.field
