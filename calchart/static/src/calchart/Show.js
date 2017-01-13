@@ -16,9 +16,9 @@ import Song from "calchart/Song";
  */
 export default class Show {
     /**
-     * @param {Dot[]} dots - Every Dot marching in the Show.
-     * @param {Sheet[]} sheets - Every Sheet contained in the Show.
-     * @param {Song[]} songs - Every Song in the Show.
+     * @param {Object[]} dots - The serialized data for every Dot marching in the Show.
+     * @param {Object[]} sheets - The serialized data for every Sheet contained in the Show.
+     * @param {Object[]} songs - The serialized data for every Song in the Show.
      * @param {string} fieldType - The show's field type (see base/constants.py).
      * @param {Object} [options] - Other options to customize the Show:
      *   - {int} [beatsPerStep=1] - The default number of beats per step for the
@@ -29,12 +29,13 @@ export default class Show {
      *     Show (@see CalchartUtils.ORIENTATIONS).
      */
     constructor(dots, sheets, songs, fieldType, options={}) {
-        this._dots = _.fromPairs(dots.map(
-            dot => [dot.getLabel(), dot]
-        ));
+        this._dots = _.fromPairs(dots.map(data => {
+            let dot = Dot.deserialize(data);
+            return [dot.getLabel(), dot];
+        }));
 
-        this._sheets = sheets;
-        this._songs = songs;
+        this._sheets = sheets.map(data => Sheet.deserialize(this, data));
+        this._songs = songs.map(data => Song.deserialize(data));
         this._fieldType = fieldType;
 
         options = _.defaults(options, {
@@ -74,7 +75,7 @@ export default class Show {
         }
 
         let dots = _.range(data.num_dots).map(
-            i => new Dot(getLabel(i))
+            i => new Dot(getLabel(i)).serialize()
         );
 
         return new Show(dots, [], [], data.field_type);
@@ -87,10 +88,7 @@ export default class Show {
      * @return {Show}
      */
     static deserialize(data) {
-        let dots = data.dots.map(data => Dot.deserialize(data));
-        let sheets = data.sheets.map(data => Sheet.deserialize(this, data));
-        let songs = data.songs.map(data => Song.deserialize(data));
-        return new Show(dots, sheets, songs, data.fieldType, data);
+        return new Show(data.dots, data.sheets, data.songs, data.fieldType, data);
     }
 
     /**

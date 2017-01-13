@@ -11,7 +11,10 @@
 
 import "chosen-js";
 import * as _ from "lodash";
-import $ from "jquery";
+import jQuery from "jquery";
+
+window.$ = jQuery;
+window.jQuery = jQuery;
 
 /**
  * Contains functions to add to the jQuery API.
@@ -239,4 +242,3 @@ jQueryUtils.smartPosition = function(top, left, right=left) {
 };
 
 $.extend($.fn, jQueryUtils);
-window.$ = $;

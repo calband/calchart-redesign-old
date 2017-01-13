@@ -93,13 +93,14 @@ export default class CollegeGrapher extends FieldGrapher {
                 })
                 .each(function(d) {
                     let label = d3.select(this);
+                    let y;
 
                     if (d > 100) {
                         let height = parseFloat(label.style("height"));
-                        let y = EAST + height;
+                        y = EAST + height;
                         d -= 105;
                     } else {
-                        let y = WEST - 5;
+                        y = WEST - 5;
                     }
 
                     let width = parseFloat(label.style("width"));
