@@ -5,7 +5,7 @@ import Coordinate from "calchart/Coordinate";
  */
 export default class GrapherScale {
     /**
-     * @param {Grapher} grapher - The grapher to get the scale of.
+     * @param {FieldGrapher} grapher - The grapher to get the scale of.
      * @param {number} svgWidth - The width of the svg.
      * @param {number} svgHeight - The height of the svg.
      * @param {number} padding - The minimum amount of space between the
