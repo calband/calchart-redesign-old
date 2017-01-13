@@ -1,3 +1,5 @@
+import * as _ from "lodash";
+
 import ContinuityContext from "calchart/contexts/ContinuityContext";
 import DotContext from "calchart/contexts/DotContext";
 
@@ -36,17 +38,13 @@ export default class Context {
      *   "saveShow") to shortcut command (e.g. "ctrl+s").
      */
     static getAllShortcutCommands() {
-        let commands = {};
         let contexts = [
             ContinuityContext,
             DotContext,
         ];
-        contexts.forEach(function(Context) {
-            $.each(Context.shortcuts, function(command, action) {
-                commands[action] = command;
-            });
-        });
-        return commands;
+        return _.extend({}, ... contexts.map(
+            Context => _.invert(Context.shortcuts)
+        ));
     }
 }
     

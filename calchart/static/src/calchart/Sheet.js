@@ -136,17 +136,17 @@ export default class Sheet {
         };
         
         data.dots = {};
-        _.each(this._dots, function(dot_data, label) {
+        _.each(this._dots, function(data, label) {
             data.dots[label] = {
-                type: dot_data.type,
-                position: dot_data.position.serialize(),
-                movements: dot_data.movements.map(movement => movement.serialize()),
+                type: data.type,
+                position: data.position.serialize(),
+                movements: data.movements.map(movement => movement.serialize()),
             };
         });
 
         data.continuities = {};
-        _.each(this._continuities, function(continuities, dot_type) {
-            data.continuities[dot_type] = continuities.map(continuity => continuity.serialize());
+        _.each(this._continuities, function(continuities, dotType) {
+            data.continuities[dotType] = continuities.map(continuity => continuity.serialize());
         });
 
         return data;
