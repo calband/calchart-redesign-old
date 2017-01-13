@@ -56,11 +56,9 @@ export function parseArgs(args, labels) {
         }
     }
 
-    let kwargs = {};
-    _.each(labels, (label, i) => {
-        kwargs[label] = args[i];
-    });
-    return kwargs;
+    return _.fromPairs(labels.map(
+        (label, i) => [label, args[i]]
+    ));
 }
 
 /**

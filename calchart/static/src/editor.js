@@ -10,8 +10,7 @@ import { getData, hidePopup, showError, showPopup } from "utils/UIUtils";
  */
 $(function() {
     if (!_.isNull(window.show)) {
-        let show = new Show(window.show);
-        EditorController.init(show);
+        EditorController.init(Show.deserialize(window.show));
         return;
     }
 

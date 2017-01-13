@@ -44,11 +44,7 @@ export default class ApplicationController {
      *   reverse lookup for shortcuts.
      */
     static getAllShortcutCommands() {
-        let commands = {};
-        $.each(this.shortcuts, (command, action) => {
-            commands[action] = command;
-        });
-        return commands;
+        return _.invert(this.shortcuts);
     }
 
     /**

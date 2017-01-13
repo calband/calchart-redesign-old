@@ -1,12 +1,11 @@
+import * as _ from "lodash";
+
 import Dot from "calchart/Dot";
 import Sheet from "calchart/Sheet";
 import Song from "calchart/Song";
 
-/**** CONSTRUCTORS ****/
-
 /**
- * A Show object contains all the data for a Calchart show, containing
- * the following information:
+ * A Show represents a Calchart show, containing the following information:
  *  - a Dot object for each dot in the show
  *  - a Sheet object for each stuntsheet in the show
  *  - a Song object for each song in the show
@@ -14,229 +13,219 @@ import Song from "calchart/Song";
  *  - the number of beats per step for the show
  *  - the step type for the Show (see CalchartUtils.STEP_TYPES)
  *  - the orientation of the Show (east-facing or west-facing)
- *
- * @param {object} show_data -- the JSON data to initialize the Show with
  */
-var Show = function(show_data) {
-    var _this = this;
+export default class Show {
+    /**
+     * @param {Dot[]} dots - Every Dot marching in the Show.
+     * @param {Sheet[]} sheets - Every Sheet contained in the Show.
+     * @param {Song[]} songs - Every Song in the Show.
+     * @param {string} fieldType - The show's field type (see base/constants.py).
+     * @param {Object} [options] - Other options to customize the Show:
+     *   - {int} [beatsPerStep=1] - The default number of beats per step for the
+     *     entire Show.
+     *   - {string} [stepType=HS] - The default step type for the entire Show
+     *     (@see CalchartUtils.STEP_TYPES).
+     *   - {string} [orientation=east] - The default orientation for the entire
+     *     Show (@see CalchartUtils.ORIENTATIONS).
+     */
+    constructor(dots, sheets, songs, fieldType, options={}) {
+        this._dots = _.fromPairs(dots.map(
+            dot => [dot.getLabel(), dot]
+        ));
 
-    this._dots = {};
-    show_data.dots.forEach(function(dot_data) {
-        var dot = Dot.deserialize(dot_data);
-        this._dots[dot.getLabel()] = dot;
-    }, this);
+        this._sheets = sheets;
+        this._songs = songs;
+        this._fieldType = fieldType;
 
-    this._sheets = show_data.sheets.map(function(sheet_data) {
-        return Sheet.deserialize(_this, sheet_data);
-    });
-    this._songs = show_data.songs.map(function(song_data) {
-        return Song.deserialize(song_data);
-    });
+        options = _.defaults(options, {
+            beatsPerStep: 1,
+            stepType: "HS",
+            orientation: "east",
+        });
 
-    this._fieldType = show_data.fieldType;
-    this._beatsPerStep = show_data.beatsPerStep;
-    this._stepType = show_data.stepType;
-    this._orientation = show_data.orientation;
-};
-
-/**
- * Create a new Show from the given data, parsed from the Set Up Show
- * popup.
- *
- * @param {object} data -- form data from the setup-show popup
- * @return {Show} the newly created Show object
- */
-Show.create = function(data) {
-    var dots = [];
-
-    switch (data.dot_format) {
-        case "combo":
-            var getLabel = function(n) {
-                // 65 = "A"
-                var charCode = 65 + (n / 10);
-                var num = n % 10;
-                return String.fromCharCode(charCode) + num;
-            };
-            break;
-        case "number":
-            var getLabel = function(n) {
-                return String(n);
-            };
-            break;
-    }
-    for (var i = 0; i < data.num_dots; i++) {
-        var label = getLabel(i);
-        var dot = new Dot(label);
-        dots.push(dot.serialize());
+        this._beatsPerStep = options.beatsPerStep;
+        this._stepType = options.stepType;
+        this._orientation = options.orientation;
     }
 
-    return new Show({
-        dots: dots,
-        sheets: [],
-        songs: [],
-        fieldType: data.field_type,
-        beatsPerStep: 1,
-        stepType: "HS",
-        orientation: "east",
-    });
-};
+    /**
+     * Create a new Show from the given data, parsed from the Set Up Show
+     * popup.
+     *
+     * @param {Object} data - The form data from the setup-show popup.
+     * @return {Show}
+     */
+    static create(data) {
+        let getLabel;
+        switch (data.dot_format) {
+            case "combo":
+                getLabel = function(n) {
+                    // 65 = "A"
+                    let charCode = 65 + (n / 10);
+                    let num = n % 10;
+                    return String.fromCharCode(charCode) + num;
+                };
+                break;
+            case "number":
+                getLabel = function(n) {
+                    return String(n);
+                };
+                break;
+        }
 
-/**
- * Return the JSONified version of the Show
- *
- * @return {object} a JSON object containing this Show's data
- */
-Show.prototype.serialize = function() {
-    var data = {
-        fieldType: this._fieldType,
-        beatsPerStep: this._beatsPerStep,
-        stepType: this._stepType,
-        orientation: this._orientation,
-    };
+        let dots = _.range(data.num_dots).map(
+            i => new Dot(getLabel(i))
+        );
 
-    data.dots = [];
-    $.each(this._dots, function(label, dot) {
-        data.dots.push(dot.serialize());
-    });
-    data.sheets = this._sheets.map(function(sheet) {
-        return sheet.serialize();
-    });
-    data.songs = this._songs.map(function(song) {
-        return song.serialize();
-    });
-
-    return data;
-};
-
-/**** INSTANCE METHODS ****/
-
-/**
- * Get the number of beats per step for the show
- *
- * @return {int} beats per step
- */
-Show.prototype.getBeatsPerStep = function() {
-    return this._beatsPerStep;
-};
-
-/**
- * Get the field type of the show
- *
- * @return {string} the field type
- */
-Show.prototype.getFieldType = function() {
-    return this._fieldType;
-};
-
-/**
- * Get the orientation of the show
- *
- * @return {int} orientation, in Calchart degrees
- */
-Show.prototype.getOrientation = function() {
-    switch (this._orientation) {
-        case "east":
-            return 0;
-        case "west":
-            return 90;
+        return new Show(dots, [], [], data.field_type);
     }
-    throw new Error("Invalid orientation: " + this._orientation);
-};
 
-/**
- * Get the step type of the show
- *
- * @return {string} step type (see CalchartUtils.STEP_TYPES)
- */
-Show.prototype.getStepType = function() {
-    return this._stepType;
-};
-
-/**** DOTS ****/
-
-/**
- * Get all Dots in the show
- *
- * @return {Array<Dot>} all Dots in the show
- */
-Show.prototype.getDots = function() {
-    return Object.values(this._dots);
-};
-
-/**
- * Get all dot labels
- *
- * @return {Array<string>} labels of all dots in show
- */
-Show.prototype.getDotLabels = function() {
-    return Object.keys(this._dots);
-};
-
-/**
- * Get dot by its label
- *
- * @param {string} label -- the label of the dot to get
- * @return {Dot} the dot with the given label
- */
-Show.prototype.getDotByLabel = function(label) {
-    return this._dots[label];
-};
-
-/**** SHEETS ****/
-
-/**
- * Add a stuntsheet to the show with the given number of beats
- *
- * @param {int} numBeats -- the number of beats for the stuntsheet
- * @return {Sheet} the newly created stuntsheet
- */
-Show.prototype.addSheet = function(numBeats) {
-    var index = this._sheets.length;
-    var sheet = Sheet.create(this, index, numBeats, this.getDotLabels());
-    this._sheets.push(sheet);
-    return sheet;
-};
-
-/**
- * Get all stuntsheets in the Show
- *
- * @return {Array<Sheet>} the list of stuntsheets in the show
- */
-Show.prototype.getSheets = function() {
-    return this._sheets;
-};
-
-/**
- * Insert the given stuntsheet at the given index
- *
- * @param {Sheet} sheet -- the sheet to insert
- * @param {int} index -- the index to insert the sheet into
- */
-Show.prototype.insertSheet = function(sheet, index) {
-    this._sheets.splice(index, 0, sheet);
-    for (var i = index + 1; i < this._sheets.length; i++) {
-        this._sheets[i].setIndex(i);
+    /**
+     * Create a Show from the given serialized data
+     *
+     * @param {Object} data - The JSON data to initialize the Show with.
+     * @return {Show}
+     */
+    static deserialize(data) {
+        let dots = data.dots.map(data => Dot.deserialize(data));
+        let sheets = data.sheets.map(data => Sheet.deserialize(data));
+        let songs = data.songs.map(data => Song.deserialize(data));
+        return new Show(dots, sheets, songs, data.fieldType, data);
     }
-};
 
-/**
- * Remove a stuntsheet from the show
- *
- * @param {Sheet} sheet -- the sheet to remove
- */
-Show.prototype.removeSheet = function(sheet) {
-    for (var i = 0; i < this._sheets.length; i++) {
-        var _sheet = this._sheets[i];
-        if (_sheet === sheet) {
-            this._sheets.splice(i, 1);
-            i--;
-        } else {
-            _sheet.setIndex(i);
+    /**
+     * Return the JSONified version of the Show.
+     *
+     * @return {Object}
+     */
+    serialize() {
+        let data = {
+            fieldType: this._fieldType,
+            beatsPerStep: this._beatsPerStep,
+            stepType: this._stepType,
+            orientation: this._orientation,
+        };
+
+        data.dots = _.values(this._dots).map(dot => dot.serialize());
+        data.sheets = this._sheets.map(sheet => sheet.serialize());
+        data.songs = this._songs.map(song => song.serialize());
+
+        return data;
+    }
+
+    /**
+     * @return {int} The default number of beats per step for the entire show.
+     */
+    getBeatsPerStep() {
+        return this._beatsPerStep;
+    }
+
+    /**
+     * @return {string} The default field type for the entire show.
+     */
+    getFieldType() {
+        return this._fieldType;
+    }
+
+    /**
+     * @return {int} The default orientation of the entire Show, in Calchart degrees.
+     */
+    getOrientation() {
+        switch (this._orientation) {
+            case "east":
+                return 0;
+            case "west":
+                return 90;
+        }
+        throw new Error(`Invalid orientation: ${this._orientation}`);
+    }
+
+    /**
+     * @return {string} The default step type for the entire show. (see
+     *   CalchartUtils.STEP_TYPES)
+     */
+    getStepType() {
+        return this._stepType;
+    }
+
+    /**** DOTS ****/
+
+    /**
+     * @return {Dot[]} Every Dot in the show.
+     */
+    getDots() {
+        return _.values(this._dots);
+    }
+
+    /**
+     * @return {string[]} The labels of every dots in show.
+     */
+    getDotLabels() {
+        return _.keys(this._dots);
+    }
+
+    /**
+     * Get dot by its label.
+     *
+     * @param {string} label - The label of the dot to get.
+     * @return {Dot}
+     */
+    getDotByLabel(label) {
+        return this._dots[label];
+    }
+
+    /**** SHEETS ****/
+
+    /**
+     * @return {Sheet[]} All stuntsheets in the Show.
+     */
+    getSheets() {
+        return this._sheets;
+    }
+
+    /**
+     * Add a stuntsheet to the show with the given number of beats.
+     *
+     * @param {int} numBeats - The number of beats for the stuntsheet.
+     * @return {Sheet}
+     */
+    addSheet(numBeats) {
+        let index = this._sheets.length;
+        let sheet = Sheet.create(this, index, numBeats, this.getDotLabels());
+        this._sheets.push(sheet);
+        return sheet;
+    }
+
+    /**
+     * Insert the given stuntsheet at the given index.
+     *
+     * @param {Sheet} sheet
+     * @param {int} index
+     */
+    insertSheet(sheet, index) {
+        this._sheets.splice(index, 0, sheet);
+        _.range(index + 1, this._sheets.length).forEach(
+            i => this._sheets[i].setIndex(i)
+        );
+    }
+
+    /**
+     * Remove the given stuntsheet from the show.
+     *
+     * @param {Sheet} sheet
+     */
+    removeSheet(sheet) {
+        for (let i = 0; i < this._sheets.length; i++) {
+            let _sheet = this._sheets[i];
+            if (_sheet === sheet) {
+                _.pullAt(this._sheets, i);
+                i--;
+            } else {
+                _sheet.setIndex(i);
+            }
         }
     }
-};
 
-/**** SONGS ****/
-// TODO
-
-module.exports = Show;
+    /**** SONGS ****/
+    // TODO
+}
