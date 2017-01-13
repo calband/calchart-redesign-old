@@ -341,7 +341,7 @@ class ContextActions {
      *   y-direction, in steps.
      * @param {Sheet} [sheet] - The sheet to move dots for. Defaults
      *   to the currently loaded stunt sheet.
-     * @param {Array<Dot>} [dots] - The dots to move. Defaults to the
+     * @param {Dot[]} [dots] - The dots to move. Defaults to the
      *   currently selected dots.
      */
     static moveDots(deltaX, deltaY, sheet=this._sheet, dots) {

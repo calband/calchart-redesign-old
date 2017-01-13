@@ -44,7 +44,7 @@ export default class HTMLBuilder {
      * Build a <div> element
      *
      * @param {string} class -- the class to add to the <div>
-     * @param {jQuery|Array<jQuery>} append -- the contents to append to the <div>
+     * @param {(jQuery|jQuery[])} append -- the contents to append to the <div>
      * @param {jQuery} appendTo -- the element to append the <div> to
      */
     static div() {

@@ -315,7 +315,7 @@ EditorController.prototype.getSelection = function() {
 };
 
 /**
- * @return {Array<Dot>} the selected dots as Dot objects
+ * @return {Dot[]} the selected dots as Dot objects
  */
 EditorController.prototype.getSelectedDots = function() {
     return this._selectedDots.map(function() {

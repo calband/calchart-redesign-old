@@ -85,7 +85,7 @@ export default class BaseContinuity {
      *   continuity. Includes:
      *     - {Coordinate} position - The starting position of the dot.
      *     - {int} remaining - The number of beats left in the Sheet.
-     * @return {Array<MovementCommand>}
+     * @return {MovementCommand[]}
      */
     getMovements(dot, data) {
         throw new NotImplementedError(this);
@@ -133,7 +133,7 @@ export default class BaseContinuity {
     /**
      * @return {Object} The data to populate the Edit Continuity popup, with the values:
      *   - {string} name - The name of the continuity.
-     *   - {Array<jQuery>} fields - The fields to add to the form. The fields need
+     *   - {jQuery[]} fields - The fields to add to the form. The fields need
      *     to have their name match the instance variable, e.g. "orientation" for
      *     this._orientation.
      */
@@ -227,7 +227,7 @@ export default class BaseContinuity {
      * Wrap the given contents to add to the edit continuity panel.
      *
      * @param {string} type - The type of the continuity to add.
-     * @param {Array<jQuery>} contents - The jQuery contents.
+     * @param {jQuery[]} contents - The jQuery contents.
      * @return {jQuery} The HTML element to add to the panel, in the format:
      *
      *   <div class="continuity {type}">

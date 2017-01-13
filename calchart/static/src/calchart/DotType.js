@@ -12,7 +12,7 @@ export default class DotType {
      * @return {string[]} The sorted dot types
      */
     static sort(dotTypes) {
-        var types = new Set(dotTypes);
+        let types = new Set(dotTypes);
         return this.values.map(function(dotType) {
             if (types.has(dotType)) {
                 return dotType;
