@@ -21,7 +21,7 @@ module.exports = function (grunt) {
                     path: "calchart/static/js/",
                     filename: "[name].js",
                 },
-                // set require(...) relative to given path
+                // set import paths relative to src/ directory
                 resolve: {
                     root: [
                         path.resolve("./calchart/static/src")

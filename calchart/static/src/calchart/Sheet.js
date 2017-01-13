@@ -279,7 +279,7 @@ export default class Sheet {
      * @return {DotType[]} The dot types in this sheet, sorted by DotType.
      */
     getDotTypes() {
-        let dotTypes = _.mapValues(this._dots, "type");
+        let dotTypes = _.map(_.values(this._dots), "type");
         return DotType.sort(new Set(dotTypes));
     }
 

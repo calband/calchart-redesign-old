@@ -229,7 +229,7 @@ export default class ApplicationController {
                 } catch (e) {}
 
                 // object
-                if (arg.indexOf("=") !== -1) {
+                if (_.includes(arg, "=")) {
                     let [key, val] = arg.split("=");
                     return {
                         [key]: parseNumber(val),

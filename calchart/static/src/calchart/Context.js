@@ -17,7 +17,7 @@ export default class Context {
      * @param {Object} [options] - Any options to pass to the context.
      * @return {Context}
      */
-    static load(name, controller, options) {
+    static load(name, controller, options={}) {
         let context;
         switch (name) {
             case "continuity":

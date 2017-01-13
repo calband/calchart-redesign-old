@@ -38,7 +38,7 @@ export default class ContinuityContext extends BaseContext {
     }
 
     /**
-     * @param {Object} [options] - Options to customize loading the Context:
+     * @param {Object} options - Options to customize loading the Context:
      *    - {string} [dotType=null] - The dot type to initially load.
      */
     load(options) {
