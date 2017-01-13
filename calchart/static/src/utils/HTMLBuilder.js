@@ -50,7 +50,7 @@ export default class HTMLBuilder {
      * @param {jQuery} appendTo -- the element to append the <div> to
      */
     static div() {
-        let args = JSUtils.parseArgs(arguments, ["class", "append", "appendTo"]);
+        let args = parseArgs(arguments, ["class", "append", "appendTo"]);
 
         let div = $("<div>")
             .addClass(args.class)
@@ -72,8 +72,8 @@ export default class HTMLBuilder {
      * @param {string} name -- the name attribute for the field (defaults to label as camel case)
      */
     static formfield() {
-        let args = JSUtils.parseArgs(arguments, ["label", "field", "name"]);
-        let name = args.name || JSUtils.toCamelCase(args.label);
+        let args = parseArgs(arguments, ["label", "field", "name"]);
+        let name = args.name || toCamelCase(args.label);
 
         if (_.isString(args.field)) {
             args.field = this.make(args.field);
@@ -98,7 +98,7 @@ export default class HTMLBuilder {
      * @param {string} class -- the class to add to the <i>
      */
     static icon() {
-        let args = JSUtils.parseArgs(arguments, ["name", "class"]);
+        let args = parseArgs(arguments, ["name", "class"]);
 
         return $("<i>").addClass(`icon-${args.name} ${args.class}`);
     }
@@ -122,7 +122,7 @@ export default class HTMLBuilder {
      * @param {function} change -- the callback to run when the value is changed
      */
     static input() {
-        let args = JSUtils.parseArgs(arguments, ["class", "type", "name", "initial", "change"]);
+        let args = parseArgs(arguments, ["class", "type", "name", "initial", "change"]);
 
         return $("<input>")
             .addClass(args.class)
@@ -139,7 +139,7 @@ export default class HTMLBuilder {
      * @param {string} class -- the class to add to the element
      */
     static label() {
-        let args = JSUtils.parseArgs(arguments, ["text", "class"]);
+        let args = parseArgs(arguments, ["text", "class"]);
 
         return $("<label>")
             .text(args.text)
@@ -153,7 +153,7 @@ export default class HTMLBuilder {
      * @param {string} class -- the class to add to the element
      */
     static li() {
-        let args = JSUtils.parseArgs(arguments, ["text", "class"]);
+        let args = parseArgs(arguments, ["text", "class"]);
 
         return $("<li>")
             .text(args.text)
@@ -170,7 +170,7 @@ export default class HTMLBuilder {
      * @param {string} initial -- the value of the option to initially mark selected
      */
     static select() {
-        let args = JSUtils.parseArgs(arguments, ["options", "class", "change", "initial"]);
+        let args = parseArgs(arguments, ["options", "class", "change", "initial"]);
 
         let select = $("<select>").addClass(args.class).change(args.change);
 
@@ -192,7 +192,7 @@ export default class HTMLBuilder {
      * @param {string} class -- the class to add to the <span>
      */
     static span() {
-        let args = JSUtils.parseArgs(arguments, ["text", "class"]);
+        let args = parseArgs(arguments, ["text", "class"]);
 
         return $("<span>")
             .addClass(args.class)

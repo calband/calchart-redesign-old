@@ -1,13 +1,4 @@
-/**
- * @fileOverview This file defines the EditorController, the singleton instance that
- * controls the entire editor application. Functions defined by the EditorController
- * are organized alphabetically in the following sections:
- *
- * - Constructors (including initialization functions)
- * - Instance methods
- * - Actions (anything that modifies the Show and can be undone)
- * - Helpers (prefixed with an underscore)
- */
+import * as _ from "lodash";
 
 import ApplicationController from "calchart/ApplicationController";
 import Context from "calchart/Context";
@@ -24,91 +15,543 @@ import {
     showPopup,
     getData,
     hidePopup,
+    setupMenu,
+    setupToolbar,
     showError,
     showMessage,
 } from "utils/UIUtils";
 
-/**** CONSTRUCTORS ****/
-
 /**
- * The class that stores the current state of the editor and contains all
- * of the actions that can be run in the editor page. (details in the
- * actions section below)
- *
- * @param {Show} show -- the show being edited in the application
+ * The controller that stores the state of the editor application and contains
+ * all of the actions that can be run in the editor page.
  */
-var EditorController = function(show) {
-    ApplicationController.call(this, show);
+export default class EditorController extends ApplicationController {
+    /**
+     * @param {Show} show - The show being edited in the application.
+     */
+    constructor(show) {
+        super(show);
 
-    this._grapher = null;
-    this._context = null;
-    this._activeSheet = null;
-    this._currBeat = null;
-    this._selectedDots = $(); // dots selected to edit, used with DotContext
+        this._grapher = null;
+        this._context = null;
+        this._activeSheet = null;
+        this._currBeat = null;
+        this._selectedDots = $(); // dots selected to edit, used with DotContext
 
-    this._undoHistory = [];
-    this._redoHistory = [];
-};
+        this._undoHistory = [];
+        this._redoHistory = [];
+    }
 
-// ApplicationController.extend(EditorController);
+    static get actions() {
+        return EditorActions;
+    }
 
-/**
- * Initializes the editor application
- */
-EditorController.prototype.init = function() {
-    ApplicationController.prototype.init.call(this);
+    get actions() { return this.constructor.actions; }
 
-    var _this = this;
-    this._setupMenu(".menu");
-    this._setupToolbar(".toolbar");
+    static get shortcuts() {
+        return EditorShortcuts;
+    }
 
-    var grapherOptions = {
-        showLabels: true,
-        drawYardlineNumbers: true,
-        draw4Step: true,
-        drawDotType: true,
-    };
-    this._grapher = new Grapher(this._show, $(".grapher-draw-target"), grapherOptions);
-    this._grapher.drawField();
+    init() {
+        super.init();
 
-    $(".content .sidebar")
-        .contextmenu(function(e) {
-            showContextMenu(e, {
-                "Add Sheet...": "addStuntsheet",
+        let controller = this;
+        setupMenu(".menu");
+        setupToolbar(".toolbar");
+
+        this._grapher = new Grapher(this._show, $(".grapher-draw-target"), {
+            showLabels: true,
+            drawYardlineNumbers: true,
+            draw4Step: true,
+            drawDotType: true,
+        });
+        this._grapher.drawField();
+
+        $(".content .sidebar")
+            .contextmenu(function(e) {
+                showContextMenu(e, {
+                    "Add Sheet...": "addStuntsheet",
+                });
+            })
+            .on("contextmenu", ".stuntsheet", function(e) {
+                let sheet = $(this).data("sheet");
+                controller.loadSheet(sheet);
+
+                showContextMenu(e, {
+                    "Duplicate Sheet": "duplicateSheet",
+                    "Delete Sheet": "deleteSheet",
+                    "Properties...": "showProperties",
+                });
+
+                return false;
+            })
+            .on("click", ".stuntsheet", function() {
+                let sheet = $(this).data("sheet");
+
+                // only load if the sheet isn't already loaded
+                if (sheet !== this._activeSheet) {
+                    controller.loadSheet(sheet);
+                }
             });
-        })
-        .on("contextmenu", ".stuntsheet", function(e) {
-            var sheet = $(this).data("sheet");
-            _this.loadSheet(sheet);
 
-            showContextMenu(e, {
-                "Duplicate Sheet": "duplicateSheet",
-                "Delete Sheet": "deleteSheet",
-                "Properties...": "showProperties",
-            });
+        let sheet = _.first(this._show.getSheets());
+        if (sheet) {
+            this.loadSheet(sheet);
+        }
 
-            return false;
-        })
-        .on("click", ".stuntsheet", function() {
-            var sheet = $(this).data("sheet");
+        this.loadContext("dot");
+    }
 
-            // only load if the sheet isn't already loaded
-            if (sheet !== this._activeSheet) {
-                _this.loadSheet(sheet);
+    /**
+     * Show the popup that adds a stuntsheet to the Show
+     */
+    addStuntsheet() {
+        let controller = this;
+        showPopup("add-stuntsheet", {
+            onSubmit: function(popup) {
+                let data = getData(popup);
+
+                // validate data
+
+                if (data.num_beats == "") {
+                    showError("Please provide the number of beats in the stuntsheet.");
+                    return;
+                }
+
+                data.num_beats = parseInt(data.num_beats);
+                if (data.num_beats <= 0) {
+                    showError("Need to have a positive number of beats.");
+                    return;
+                }
+
+                // hide popup and add sheet to show
+
+                hidePopup();
+                controller.doAction("addSheet", [data.num_beats]);
+            },
+        });
+    }
+
+    /**
+     * Check if any of the given dots have continuity errors in the currently
+     * active sheet, showing a UI error if so. Can also pass arguments in as
+     * an Object of keyword arguments.
+     *
+     * @param {(Dot[]|Dot|string)} [dots] - The dots to check continuities of,
+     *   the dot type of the dots to check, or all the dots by default.
+     * @param {Sheet} [sheet] - The Sheet to check continuities for (defaults to
+     *   currently active Sheet).
+     * @param {boolean} [quiet=false] - if true, don't show a success message
+     *   if there are no errors (default false).
+     * @return {boolean} true if no errors in checking continuities
+     */
+    checkContinuities() {
+        let args = parseArgs(arguments, ["dots", "sheet", "quiet"]);
+
+        let sheet = _.defaultTo(args.sheet, this._activeSheet);
+        let duration = sheet.getDuration();
+        let nextSheet = sheet.getNextSheet();
+
+        let dots = args.dots;
+        if (_.isUndefined(dots)) {
+            dots = this._show.getDots();
+        } else if (_.isString(dots)) {
+            dots = sheet.getDotsOfType(dots);
+        } else if (dots instanceof Dot) {
+            dots = [dots];
+        }
+
+        let errors = {
+            lackMoves: [],
+            wrongPosition: [],
+        };
+
+        dots.forEach(dot => {
+            let final;
+            try {
+                final = sheet.getAnimationState(dot, duration);
+            } catch (e) {
+                if (e instanceof AnimationStateError) {
+                    // ignore if no movements
+                    if (sheet.getDotInfo(dot).movements.length !== 0) {
+                        errors.lackMoves.push(dot.getLabel());
+                    }
+                    return;
+                } else {
+                    throw e;
+                }
+            }
+
+            if (nextSheet) {
+                let position = nextSheet.getPosition(dot);
+                if (final.x !== position.x || final.y !== position.y) {
+                    errors.wrongPosition.push(dot.getLabel());
+                }
             }
         });
 
-    var sheets = this._show.getSheets();
-    if (sheets.length > 0) {
-        this.loadSheet(sheets[0]);
+        let errorMessages = [];
+        if (errors.lackMoves.length > 0) {
+            errorMessages.push("Dots did not have enough to do: " + errors.lackMoves.join(", "));
+        }
+        if (errors.wrongPosition.length > 0) {
+            errorMessages.push("Dots did not make it to their next spot: " + errors.wrongPosition.join(", "));
+        }
+
+        if (errorMessages.length > 0) {
+            let label = sheet.getLabel();
+            errorMessages.forEach(msg => {
+                showError(`${msg} (SS ${label})`);
+            });
+            return false;
+        } else if (!args.quiet) {
+            showMessage("Continuities valid!");
+            return true;
+        }
     }
 
-    this.loadContext("dot");
-};
+    /**
+     * Deselect the given dots.
+     *
+     * @param {jQuery} [dots] - Dots to deselect (defaults to all dots).
+     */
+    deselectDots(dots=this._selectedDots) {
+        this._selectedDots = this._selectedDots.not(dots);
+        this._grapher.deselectDots(dots);
+    }
 
-/**** INSTANCE METHODS ****/
+    /**
+     * Run the method with the given name.
+     *
+     * The method can either be an instance method or an action. An action is
+     * anything that modifies the Show. All actions can be undone and redone.
+     * All other methods (things that update the controller, context, etc.) are
+     * instance methods.
+     *
+     * @param {string} name - The function to call (@see EditorController#_parseAction).
+     * @param {Array} [args] - Arguments to pass to the action. Can also be passed in name
+     *   (see _parseAction), which will override any arguments passed in as a parameter
+     */
+    doAction(name, args=[]) {
+        let action = this._getAction(name);
+        action.args = _.defaultTo(action.args, args);
 
-EditorController.prototype.shortcuts = {
+        let data = action.function.apply(action.context, action.args);
+
+        if (action.canUndo) {
+            let actionData = _.extend({}, data, action);
+            // if data was returned from the action, use it for redos instead
+            // of the initial args
+            actionData.args = _.defaultTo(data.data, action.args);
+            this._undoHistory.push(actionData);
+
+            // after doing an action, can't redo previous actions
+            empty(this._redoHistory);
+        }
+    }
+
+    /**
+     * Go to the zero-th beat of the sheet.
+     */
+    firstBeat() {
+        this._currBeat = 0;
+        this.refresh();
+    }
+
+    /**
+     * @param {?Sheet} The currently active sheet, or null if there is no active Sheet (i.e.
+     *   there are no Sheets in the Show).
+     */
+    getActiveSheet() {
+        return this._activeSheet;
+    }
+
+    getAllShortcutCommands() {
+        return _.extend(super.getAllShortcutCommands(), Context.getAllShortcutCommands());
+    }
+
+    /**
+     * @param {int}
+     */
+    getCurrentBeat() {
+        return this._currBeat;
+    }
+
+    /**
+     * @return {Grapher}
+     */
+    getGrapher() {
+        return this._grapher;
+    }
+
+    /**
+     * @return {jQuery} The selected dots.
+     */
+    getSelection() {
+        return this._selectedDots;
+    }
+
+    /**
+     * @return {Dot[]} The selected dots, as Dot objects.
+     */
+    getSelectedDots() {
+        return this._selectedDots.map(function() {
+            return $(this).data("dot");
+        }).toArray();
+    }
+
+    getShortcut(shortcut) {
+        let action = super.getShortcut(shortcut);
+        return _.defaultTo(action, this._context.shortcuts[shortcut]);
+    }
+
+    /**
+     * Go to the last beat of the sheet.
+     */
+    lastBeat() {
+        this._currBeat = this._activeSheet.getDuration();
+        this.refresh();
+    }
+
+    /**
+     * Loads a Context for the application.
+     *
+     * @param {string} name - The name of the Context to load.
+     * @param {Object} [options] - Any options to pass Context.load
+     */
+    loadContext(name, options) {
+        if (this._context) {
+            this._context.unload();
+        }
+
+        $("body").addClass(`context-${name}`);
+        this._context = Context.load(name, this, options);
+        this.refresh();
+    }
+
+    /**
+     * Load the given Sheet.
+     *
+     * @param {Sheet} sheet
+     */
+    loadSheet(sheet) {
+        this._activeSheet = sheet;
+        this._currBeat = 0;
+
+        this.refresh();
+    }
+
+    /**
+     * Increment the current beat.
+     */
+    nextBeat() {
+        this._currBeat++;
+        let duration = this._activeSheet.getDuration();
+
+        if (this._currBeat > duration) {
+            this._currBeat = duration;
+        } else {
+            this.refresh();
+        }
+    }
+
+    /**
+     * Decrement the current beat.
+     */
+    prevBeat() {
+        this._currBeat--;
+
+        if (this._currBeat < 0) {
+            this._currBeat = 0;
+        } else {
+            this.refresh();
+        }
+    }
+
+    /**
+     * Redo the last undone action.
+     */
+    redo() {
+        if (this._redoHistory.length === 0) {
+            return;
+        }
+
+        let actionData = this._redoHistory.pop();
+        newData = actionData.function.apply(actionData.context, actionData.args);
+        // update undo function
+        actionData.undo = newData.undo;
+
+        this._undoHistory.push(actionData);
+    }
+
+    /**
+     * Refresh the UI according to the current state of the editor
+     * and Show.
+     */
+    refresh() {
+        // refresh sidebar
+        let sidebar = $(".sidebar").empty();
+        this._show.getSheets().forEach(sheet => {
+            let label = HTMLBuilder.span(sheet.getLabel(), "label");
+
+            let preview = HTMLBuilder.div("preview");
+            let $sheet = HTMLBuilder
+                .div("stuntsheet", [label, preview], sidebar)
+                .data("sheet", sheet);
+
+            // field preview
+            let grapher = new Grapher(this._show, preview, {
+                drawOrientation: false,
+                drawYardlines: false,
+                fieldPadding: 5,
+            })
+            grapher.draw(sheet);
+
+            if (sheet === this._activeSheet) {
+                $sheet
+                    .addClass("active")
+                    .scrollIntoView({
+                        margin: 10,
+                    });
+            }
+        });
+
+        // refresh grapher
+        if (this._activeSheet) {
+            this._grapher.draw(this._activeSheet, this._currBeat, this._selectedDots);
+        }
+
+        // refresh context
+        if (this._context) {
+            this._context.refresh();
+        }
+    }
+
+    /**
+     * Save the Show to the server.
+     *
+     * @param {function} [callback] - Optional callback to run after saving show. By default,
+     *   shows a saved message.
+     */
+    saveShow(callback) {
+        let data = this._show.serialize();
+        let params = {
+            viewer: JSON.stringify(data),
+        };
+
+        if (_.isUndefined(callback)) {
+            callback = function() {
+                showMessage("Saved!");
+            }
+        }
+
+        doAction("save_show", params, callback);
+    }
+
+    /**
+     * Select all dots in the graph.
+     */
+    selectAll() {
+        this.selectDots(this._grapher.getDots());
+    }
+
+    /**
+     * Add the given dots to the list of selected dots.
+     *
+     * @param {jQuery} dots - The dots to select.
+     * @param {Object} [options] - Options to customize selection:
+     *   - {boolean} [append=true] - If false, deselect all dots before selecting.
+     */
+    selectDots(dots, options={}) {
+        if (_.defaultTo(options.append, false)) {
+            this.deselectDots();
+        }
+
+        this._selectedDots = this._selectedDots.add(dots);
+        this._grapher.selectDots(this._selectedDots);
+    }
+
+    /**
+     * Set the current beat to the given beat.
+     *
+     * @param {int} beat
+     */
+    setBeat(beat) {
+        this._currBeat = beat;
+    }
+
+    /**
+     * For each dot, if it's selected, deselect it; otherwise, select it.
+     *
+     * @param {jQuery} dots
+     */
+    toggleDots(dots) {
+        let select = dots.not(this._selectedDots);
+        let deselect = dots.filter(this._selectedDots);
+
+        this.selectDots(select);
+        this.deselectDots(deselect);
+    }
+
+    /**
+     * Undo the last action in history.
+     */
+    undo() {
+        if (this._undoHistory.length === 0) {
+            return;
+        }
+
+        let actionData = this._undoHistory.pop();
+        actionData.undo.apply(actionData.context);
+
+        this._redoHistory.push(actionData);
+    }
+
+    /**
+     * Get the action represented by the given parameter. Overriding
+     * ApplicationController's _getAction to allow looking up methods
+     * in EditorActions and the active Context.
+     *
+     * @param {string} name
+     * @return {Object} An object of the form:
+     *   {
+     *       context: Object,
+     *       function: function,
+     *       args: ?Array,
+     *       canUndo: boolean,
+     *   }
+     */
+    _getAction(name) {
+        let data = this._parseAction(name);
+
+        function getAction(context, container, canUndo) {
+            let action = container[data.name];
+            if (_.isFunction(action)) {
+                return {
+                    context: context,
+                    function: action,
+                    args: data.args,
+                    canUndo: canUndo,
+                };
+            }
+        };
+
+        let action = (
+            getAction(this, this, false) ||
+            getAction(this, this.actions, true) ||
+            getAction(this._context, this._context, false) ||
+            getAction(this._context, this._context.actions, true)
+        );
+
+        if (_.isUndefined(action)) {
+            throw new ActionError(`No action with the name: ${data.name}`);
+        } else {
+            return action;
+        }
+    }
+}
+
+let EditorShortcuts = {
     "alt+n": "addStuntsheet", // can't capture ctrl+n: http://stackoverflow.com/a/7296303/4966649
     "ctrl+backspace": "deleteSheet",
     "ctrl+shift+z": "redo",
@@ -117,532 +560,62 @@ EditorController.prototype.shortcuts = {
 };
 
 /**
- * Shows the popup that adds a stuntsheet to the Show
- */
-EditorController.prototype.addStuntsheet = function() {
-    var _this = this;
-    showPopup("add-stuntsheet", {
-        onSubmit: function(popup) {
-            var data = getData(popup);
-
-            // validate data
-
-            if (data.num_beats == "") {
-                showError("Please provide the number of beats in the stuntsheet.");
-                return;
-            }
-
-            data.num_beats = parseInt(data.num_beats);
-            if (data.num_beats <= 0) {
-                showError("Need to have a positive number of beats.");
-                return;
-            }
-
-            // hide popup and add sheet to show
-
-            hidePopup();
-            _this.doAction("addSheet", [data.num_beats]);
-        },
-    });
-};
-
-/**
- * Check if any of the given dots have continuity errors in the currently
- * active sheet, showing a UI error if so.
- *
- * @param {string|Array<Dot>|Dot|undefined} dots -- the dots to check
- *   continuities of, the dot type of the dots to check, or all the
- *   dots by default
- * @param {Sheet|undefined} sheet -- the Sheet to check continuities for (default
- *   currently active Sheet)
- * @param {boolean|undefined} quiet -- if true, don't show a success message
- *   if there are no errors (default false)
- * @return {boolean} true if no errors in checking continuities
- */
-EditorController.prototype.checkContinuities = function() {
-    var args = parseArgs(arguments, ["dots", "sheet", "quiet"]);
-
-    var sheet = args.sheet || this._activeSheet;
-    var duration = sheet.getDuration();
-    var nextSheet = sheet.getNextSheet();
-
-    if (args.dots === undefined) {
-        var dots = this._show.getDots();
-    } else if (typeof args.dots === "string") {
-        var dots = sheet.getDotsOfType(args.dots);
-    } else if (args.dots instanceof Dot) {
-        var dots = [args.dots];
-    } else {
-        var dots = args.dots;
-    }
-
-    var errors = {
-        lackMoves: [],
-        wrongPosition: [],
-    };
-
-    dots.forEach(function(dot) {
-        try {
-            var final = sheet.getAnimationState(dot, duration);
-        } catch (e) {
-            if (e instanceof AnimationStateError) {
-                // ignore if no movements
-                if (sheet.getDotInfo(dot).movements.length !== 0) {
-                    errors.lackMoves.push(dot.getLabel());
-                }
-            } else {
-                throw e;
-            }
-            return;
-        }
-
-        if (nextSheet) {
-            var position = nextSheet.getDotInfo(dot).position;
-            if (final.x !== position.x || final.y !== position.y) {
-                errors.wrongPosition.push(dot.getLabel());
-            }
-        }
-    });
-
-    var errorMessages = [];
-    if (errors.lackMoves.length > 0) {
-        errorMessages.push("Dots did not have enough to do: " + errors.lackMoves.join(", "));
-    }
-    if (errors.wrongPosition.length > 0) {
-        errorMessages.push("Dots did not make it to their next spot: " + errors.wrongPosition.join(", "));
-    }
-
-    if (errorMessages.length > 0) {
-        var sheetInfo = " (SS " + sheet.getLabel() + ")";
-        errorMessages.forEach(function(msg) {
-            showError(msg + sheetInfo);
-        });
-        return false;
-    } else if (!args.quiet) {
-        showMessage("Continuities valid!");
-        return true;
-    }
-};
-
-/**
- * Deselects the given dots. If no dots are given, deselects all dots.
- *
- * @param {jQuery|undefined} dots -- dots to deselect (defaults to all dots)
- */
-EditorController.prototype.deselectDots = function(dots) {
-    if (dots === undefined) {
-        dots = this._selectedDots;
-    }
-
-    this._selectedDots = this._selectedDots.not(dots);
-    this._grapher.deselectDots(dots);
-};
-
-/**
- * Runs the method on this instance with the given name.
- *
- * The method can either be an instance method or an action. An action is
- * anything that modifies the Show. All actions can be undone and redone.
- * All other methods (things that update the controller, context, etc.) are
- * instance methods.
- *
- * @param {string} name -- the function to call (see _parseAction)
- * @param {Array|undefined} args -- arguments to pass to the action. Can also
- *   be passed in name (see _parseAction), which will override any arguments
- *   passed in as a parameter
- */
-EditorController.prototype.doAction = function(name, args) {
-    var action = this._getAction(name);
-    action.args = action.args || args || [];
-
-    var data = action.function.apply(action.context, action.args);
-
-    if (action.canUndo) {
-        var actionData = $.extend({}, data, action);
-        // if data was returned from the action, use it for redos instead
-        // of the initial args
-        actionData.args = data.data || action.args;
-        this._undoHistory.push(actionData);
-
-        // after doing an action, can't redo previous actions
-        empty(this._redoHistory);
-    }
-};
-
-/**
- * Go to the zero-th beat of the sheet
- */
-EditorController.prototype.firstBeat = function() {
-    this._currBeat = 0;
-    this.refresh();
-};
-
-/**
- * Get the currently active Sheet
- *
- * @param {Sheet} the active sheet
- */
-EditorController.prototype.getActiveSheet = function() {
-    return this._activeSheet;
-};
-
-EditorController.prototype.getAllShortcutCommands = function() {
-    var commands = ApplicationController.prototype.getAllShortcutCommands.call(this);
-    return $.extend(commands, Context.getAllShortcutCommands());
-};
-
-/**
- * Get the current beat number
- *
- * @param {int} the current beat
- */
-EditorController.prototype.getCurrentBeat = function() {
-    return this._currBeat;
-};
-
-/**
- * @return {Grapher} the grapher for the workspace
- */
-EditorController.prototype.getGrapher = function() {
-    return this._grapher;
-};
-
-/**
- * @return {jQuery} the selected dots
- */
-EditorController.prototype.getSelection = function() {
-    return this._selectedDots;
-};
-
-/**
- * @return {Dot[]} the selected dots as Dot objects
- */
-EditorController.prototype.getSelectedDots = function() {
-    return this._selectedDots.map(function() {
-        return $(this).data("dot");
-    }).toArray();
-};
-
-EditorController.prototype.getShortcut = function(shortcut) {
-    var action = ApplicationController.prototype.getShortcut.call(this, shortcut);
-    return action || this._context.shortcuts[shortcut];
-};
-
-/**
- * Go to the last beat of the sheet
- */
-EditorController.prototype.lastBeat = function() {
-    this._currBeat = this._activeSheet.getDuration();
-    this.refresh();
-};
-
-/**
- * Loads an editing context for the controller
- *
- * @param {string} name -- the name of the context to load
- * @param {object|undefined} options -- any options to pass Context.load
- */
-EditorController.prototype.loadContext = function(name, options) {
-    if (this._context) {
-        this._context.unload();
-    }
-
-    $("body").addClass("context-" + name);
-    this._context = Context.load(name, this, options);
-    this.refresh();
-};
-
-/**
- * Load the given stuntsheet, either a stuntsheet in the sidebar
- * or a Sheet object
- *
- * @param {jQuery} sheet -- the sheet to load
- */
-EditorController.prototype.loadSheet = function(sheet) {
-    // update state
-    this._activeSheet = sheet;
-    this._currBeat = 0;
-
-    this.refresh();
-};
-
-/**
- * Increment the current beat
- */
-EditorController.prototype.nextBeat = function() {
-    this._currBeat++;
-    var duration = this._activeSheet.getDuration();
-
-    if (this._currBeat > duration) {
-        this._currBeat = duration;
-    } else {
-        this.refresh();
-    }
-};
-
-/**
- * Decrement the current beat
- */
-EditorController.prototype.prevBeat = function() {
-    this._currBeat--;
-
-    if (this._currBeat < 0) {
-        this._currBeat = 0;
-    } else {
-        this.refresh();
-    }
-};
-
-/**
- * Redoes the last undone action
- */
-EditorController.prototype.redo = function() {
-    if (this._redoHistory.length === 0) {
-        return;
-    }
-
-    var actionData = this._redoHistory.pop();
-    newData = actionData.function.apply(actionData.context, actionData.args);
-    // update undo function
-    actionData.undo = newData.undo;
-
-    this._undoHistory.push(actionData);
-};
-
-/**
- * Refresh the UI according to the current state of the editor
- * and Show
- */
-EditorController.prototype.refresh = function() {
-    // refresh sidebar
-    var sidebar = $(".sidebar").empty();
-    this._show.getSheets().forEach(function(sheet) {
-        var label = HTMLBuilder.span(sheet.getLabel(), "label");
-
-        var preview = HTMLBuilder.div("preview");
-        var options = {
-            drawOrientation: false,
-            drawYardlines: false,
-            fieldPadding: 5,
-        };
-
-        var $sheet = HTMLBuilder
-            .div("stuntsheet", [label, preview], sidebar)
-            .data("sheet", sheet);
-
-        // field preview
-        new Grapher(this._show, preview, options).draw(sheet, 0, $());
-
-        if (sheet === this._activeSheet) {
-            $sheet
-                .addClass("active")
-                .scrollIntoView({
-                    margin: 10,
-                });
-        }
-    }, this);
-
-    // refresh grapher
-    if (this._activeSheet) {
-        this._grapher.draw(this._activeSheet, this._currBeat, this._selectedDots);
-    }
-
-    // refresh context
-    if (this._context) {
-        this._context.refresh();
-    }
-};
-
-/**
- * Saves the show to the server
- *
- * @param {function|undefined} callback -- optional callback to run after saving
- *   show. By default, shows a saved message.
- */
-EditorController.prototype.saveShow = function(callback) {
-    var data = this._show.serialize();
-    var params = {
-        viewer: JSON.stringify(data),
-    };
-
-    if (callback === undefined) {
-        callback = function() {
-            showMessage("Saved!");
-        }
-    }
-
-    doAction("save_show", params, callback);
-};
-
-/**
- * Select all dots in the graph
- */
-EditorController.prototype.selectAll = function() {
-    this.selectDots(this._grapher.getDots());
-};
-
-/**
- * Add the given dots to the list of selected dots
- *
- * @param {jQuery} dots -- the dots to select
- * @param {object|undefined} options -- optional dictionary with the given options:
- *   - {boolean} append -- if false, deselect all dots before selecting (default true)
- */
-EditorController.prototype.selectDots = function(dots, options) {
-    options = options || {};
-
-    if (options.append === false) {
-        this.deselectDots();
-    }
-
-    this._selectedDots = this._selectedDots.add(dots);
-    this._grapher.selectDots(this._selectedDots);
-};
-
-/**
- * Set the current beat to the given beat
- *
- * @param {int} beat -- the beat to set to
- */
-EditorController.prototype.setBeat = function(beat) {
-    this._currBeat = beat;
-};
-
-/**
- * For each dot, if it's selected, deselect it; otherwise, select it.
- *
- * @param {jQuery} dots -- the dots to toggle selection
- */
-EditorController.prototype.toggleDots = function(dots, options) {
-    var select = dots.not(this._selectedDots);
-    var deselect = dots.filter(this._selectedDots);
-
-    this.selectDots(select);
-    this.deselectDots(deselect);
-};
-
-/**
- * Restores the state of the application to the previous state
- */
-EditorController.prototype.undo = function() {
-    if (this._undoHistory.length === 0) {
-        return;
-    }
-
-    var actionData = this._undoHistory.pop();
-    actionData.undo.apply(actionData.context);
-    this._redoHistory.push(actionData);
-};
-
-/**** ACTIONS ****/
-
-/**
  * Contains all actions in the EditorController. Actions are any methods that modify
  * the Show and can be undone/redone. All actions must return an object containing:
- *   - {function} undo -- the function that will undo this action. `this` will be
- *     set to the EditorController instance
- *   - {undefined|object} data -- optional data to pass to the redo function. Defaults
- *     to any arguments initially passed to the function
- *   - {undefined|string} label -- optional label to use for the Undo/Redo menu item.
- *     Defaults to the name of the action, capitalized and spaced out
+ *   - {function} undo - The function that will undo this action. `this` will be
+ *     set to the EditorController instance.
+ *   - {Object} [data] - Optional data to pass to the redo function. Defaults
+ *     to any arguments initially passed to the function.
+ *   - {string} [label] - Optional label to use for the Undo/Redo menu item.
+ *     Defaults to the name of the action, capitalized and spaced out.
  *
  * Actions are also passed the EditorController instance as `this`.
  */
-var EditorActions = {};
-
-/**
- * Adds a Sheet to the Show
- *
- * @this {EditorController}
- * @param {int} numBeats -- the number of beats for the stuntsheet
- */
-EditorActions.addSheet = function(numBeats) {
-    var sheet = this._show.addSheet(numBeats);
-    var prevSheet = sheet.getPrevSheet();
-    if (prevSheet) {
-        prevSheet.updateMovements();
-    }
-    this.loadSheet(sheet);
-    return {
-        undo: function() {
-            this._show.removeSheet(sheet);
-            if (prevSheet) {
-                prevSheet.updateMovements();
-            }
-            this.loadSheet(prevSheet);
-        },
-    };
-};
-
-/**
- * Deletes the currently active sheet
- */
-EditorActions.deleteSheet = function() {
-    var sheet = this._activeSheet;
-    var prevSheet = sheet.getPrevSheet();
-    var nextSheet = sheet.getNextSheet();
-    this._show.removeSheet(sheet);
-    if (prevSheet) {
-        prevSheet.updateMovements();
-    }
-    this.loadSheet(prevSheet || nextSheet);
-    return {
-        undo: function() {
-            this._show.insertSheet(sheet, sheet.getIndex());
-            if (prevSheet) {
-                prevSheet.updateMovements();
-            }
-            this.loadSheet(sheet);
-        },
-    };
-};
-
-EditorController.prototype._actions = EditorActions;
-
-/**** HELPERS ****/
-
-/**
- * Get the action represented by the given parameter
- *
- * Overriding ApplicationController's _getAction to allow looking up
- * methods in EditorActions and the active Context.
- *
- * @param {string} name -- the function name (see _parseAction)
- * @return {object} an object of the form
- *   {
- *       context: object,
- *       function: function,
- *       args: Array|null,
- *       canUndo: boolean,
- *   }
- */
-EditorController.prototype._getAction = function(name) {
-    var data = this._parseAction(name);
-
-    var getAction = function(context, container, canUndo) {
-        var action = container[data.name];
-        if (typeof action === "function") {
-            return {
-                context: context,
-                function: action,
-                args: data.args,
-                canUndo: canUndo,
-            };
+class EditorActions {
+    /**
+     * Add a Sheet to the Show.
+     *
+     * @param {int} numBeats - The number of beats for the stuntsheet.
+     */
+    static addSheet(numBeats) {
+        let sheet = this._show.addSheet(numBeats);
+        let prevSheet = sheet.getPrevSheet();
+        if (prevSheet) {
+            prevSheet.updateMovements();
         }
-    };
+        this.loadSheet(sheet);
 
-    var action = (
-        getAction(this, this, false) ||
-        getAction(this, this._actions, true) ||
-        getAction(this._context, this._context, false) ||
-        getAction(this._context, this._context.actions, true)
-    );
-
-    if (action === undefined) {
-        throw new ActionError("No action with the name: " + data.name);
-    } else {
-        return action;
+        return {
+            undo: function() {
+                this._show.removeSheet(sheet);
+                if (prevSheet) {
+                    prevSheet.updateMovements();
+                }
+                this.loadSheet(prevSheet);
+            },
+        };
     }
-};
 
-module.exports = EditorController;
+    /**
+     * Delete the currently active Sheet.
+     */
+    static deleteSheet() {
+        let sheet = this._activeSheet;
+        let prevSheet = sheet.getPrevSheet();
+        let nextSheet = sheet.getNextSheet();
+        this._show.removeSheet(sheet);
+        if (prevSheet) {
+            prevSheet.updateMovements();
+        }
+        this.loadSheet(_.defaultTo(prevSheet, nextSheet));
+        return {
+            undo: function() {
+                this._show.insertSheet(sheet, sheet.getIndex());
+                if (prevSheet) {
+                    prevSheet.updateMovements();
+                }
+                this.loadSheet(sheet);
+            },
+        };
+    }
+}

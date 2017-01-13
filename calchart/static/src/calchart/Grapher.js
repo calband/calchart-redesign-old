@@ -72,34 +72,49 @@ export default class Grapher {
      * particular stuntsheet.
      *
      * @param {Sheet} sheet - The stuntsheet to draw.
-     * @param {int} currentBeat - The beat to draw, relative to the start
+     * @param {int} [currentBeat=0] - The beat to draw, relative to the start
      *   of the Sheet.
-     * @param {jQuery} selectedDots - The selected dots.
+     * @param {jQuery} [selectedDots] - The selected dots, defaults to none.
      */
-    draw(sheet, currentBeat, selectedDots) {
+    draw(sheet, currentBeat=0, selectedDots=null) {
         let fieldType = sheet.getFieldType();
         let field = this._svg.select(".field");
 
         // re-draw field if no field is drawn or if the drawn field is of the wrong type
         if (field.empty() || !field.classed(`field-${fieldType}`)) {
             field.remove();
-            this._svg.append("g").classed(`field field-${fieldType}`, true);
-
-            let fieldGrapher;
-            switch (fieldType) {
-                case "college":
-                    fieldGrapher = new CollegeGrapher(this._svg, this._options);
-                    break;
-                default:
-                    throw new Error(`No Grapher of type: ${fieldType}`);
-            }
-
-            fieldGrapher.drawField();
-            this._scale = fieldGrapher.getScale();
-            this._dotRadius = this._scale.toDistance(3/4);
+            this.drawField(fieldType);
         }
 
-        this._drawDots(sheet, currentBeat, selectedDots);
+        this._drawDots(sheet, currentBeat);
+        this.selectDots(selectedDots);
+    }
+
+    /**
+     * Draw the field using the appropriate FieldGrapher
+     *
+     * @param {string} [fieldType] - The field type to draw. Defaults to using the
+     *   default field type of the Show.
+     */
+    drawField(fieldType) {
+        if (_.isUndefined(fieldType)) {
+            fieldType = this._show.getFieldType();
+        }
+
+        this._svg.insert("g", ":first-child").classed(`field field-${fieldType}`, true);
+
+        let fieldGrapher;
+        switch (fieldType) {
+            case "college":
+                fieldGrapher = new CollegeGrapher(this._svg, this._options);
+                break;
+            default:
+                throw new Error(`No Grapher of type: ${fieldType}`);
+        }
+
+        fieldGrapher.drawField();
+        this._scale = fieldGrapher.getScale();
+        this._dotRadius = this._scale.toDistance(3/4);
     }
 
     /**
@@ -107,6 +122,7 @@ export default class Grapher {
      */
     getDots() {
         return $(this._svg.selectAll("g.dot")[0]);
+
     }
 
     /**
@@ -148,7 +164,7 @@ export default class Grapher {
      * Select the given dots. Use to select dots without having to refresh the
      * entire graph.
      *
-     * @param {jQuery} dots
+     * @param {?jQuery} dots
      */
     selectDots(dots) {
         d3.selectAll(dots).classed("selected", true);
@@ -178,9 +194,8 @@ export default class Grapher {
      *
      * @param {Sheet} sheet - The sheet to draw.
      * @param {int} currentBeat - Beat to draw, relative to the start of the Sheet.
-     * @param {jQuery} selectedDots - The selected dots.
      */
-    _drawDots(sheet, currentBeat, selectedDots) {
+    _drawDots(sheet, currentBeat) {
         let _this = this;
         let options = this._options;
         let dotRadius = this._dotRadius;
@@ -293,7 +308,5 @@ export default class Grapher {
             let y = _this._scale.yScale(state.y);
             _this.moveDotTo(this, x, y);
         });
-
-        this.selectDots(selectedDots);
     }
 }

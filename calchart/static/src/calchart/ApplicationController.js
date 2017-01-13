@@ -61,38 +61,6 @@ export default class ApplicationController {
     get shortcuts() { return this.constructor.shortcuts; }
 
     /**
-     * Runs the action with the given name, either a method on this instance or a
-     * method in this class's actions. @see ApplicationController#_parseAction.
-     *
-     * @param {string} name - The function to call.
-     * @param {Array} [args] - Arguments to pass to the action. Can also be passed
-     *   via name, which will override any arguments passed in as a parameter.
-     */
-    doAction(name, args=[]) {
-        let action = this._getAction(name);
-        args = action.args || args;
-        action.function.apply(this, args);
-    }
-
-    /**
-     * Get the shortcut action for the given shortcut key binding.
-     *
-     * @param {string} shortcut - the shortcut keys; e.g. "ctrl+z".
-     * @return {?string} The shortcut action, if there is one. This action
-     *   should be passed to {@link ApplicationController#doAction}.
-     */
-    getShortcut(shortcut) {
-        return this.shortcuts[shortcut] || null;
-    }
-
-    /**
-     * @return {Show} The show stored in the controller.
-     */
-    getShow() {
-        return this._show;
-    }
-
-    /**
      * Initialize this controller.
      */
     init() {
@@ -147,6 +115,38 @@ export default class ApplicationController {
                 e.preventDefault();
             }
         });
+    }
+
+    /**
+     * Runs the action with the given name, either a method on this instance or a
+     * method in this class's actions. @see ApplicationController#_parseAction.
+     *
+     * @param {string} name - The function to call.
+     * @param {Array} [args] - Arguments to pass to the action. Can also be passed
+     *   via name, which will override any arguments passed in as a parameter.
+     */
+    doAction(name, args=[]) {
+        let action = this._getAction(name);
+        args = action.args || args;
+        action.function.apply(this, args);
+    }
+
+    /**
+     * Get the shortcut action for the given shortcut key binding.
+     *
+     * @param {string} shortcut - the shortcut keys; e.g. "ctrl+z".
+     * @return {?string} The shortcut action, if there is one. This action
+     *   should be passed to {@link ApplicationController#doAction}.
+     */
+    getShortcut(shortcut) {
+        return this.shortcuts[shortcut] || null;
+    }
+
+    /**
+     * @return {Show} The show stored in the controller.
+     */
+    getShow() {
+        return this._show;
     }
 
     /**

@@ -16,8 +16,8 @@ export default class FieldGrapher {
      */
     constructor(svg, options) {
         this._svg = svg;
-        this._svgWidth = svg.width();
-        this._svgHeight = svg.height();
+        this._svgWidth = parseFloat(svg.style("width"));
+        this._svgHeight = parseFloat(svg.style("height"));
         this._options = options;
 
         this._field = svg.select(".field");

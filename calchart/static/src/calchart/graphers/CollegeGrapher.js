@@ -73,7 +73,7 @@ export default class CollegeGrapher extends FieldGrapher {
         });
 
         if (this._options.drawYardlineNumbers) {
-            let yardlineLabels = field
+            this._field
                 .selectAll("text.yardline-label")
                 .data(_.range(0, 210, 5))
                 .enter()
