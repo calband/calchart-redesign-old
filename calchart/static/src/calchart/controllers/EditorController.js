@@ -10,10 +10,10 @@
  */
 
 import ApplicationController from "calchart/ApplicationController";
-var Context = require("calchart/Context");
+import Context from "calchart/Context";
 import Dot from "calchart/Dot";
-var Grapher = require("calchart/Grapher");
-var Sheet = require("calchart/Sheet");
+import Grapher from "calchart/Grapher";
+import Sheet from "calchart/Sheet";
 
 import { ActionError, AnimationStateError } from "utils/errors";
 import HTMLBuilder from "utils/HTMLBuilder";

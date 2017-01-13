@@ -38,6 +38,7 @@ module.exports = function (grunt) {
                                 presets: ["es2015"],
                                 minified: true,
                                 comments: false,
+                                cacheDirectory: true,
                             },
                         },
                         // add jQuery to namespace when loading chosen-js

@@ -1,18 +1,6 @@
-/**
- * @fileOverview This file defines the Show class, which contains information
- * for a Calchart show. Functions in this file are organized in the following
- * sections:
- *
- * - Constructors (including serialization functions)
- * - General instance methods
- * - Dot instance methods (methods related to dots)
- * - Sheet instance methods (methods related to sheets)
- * - Song instance methods (methods related to songs)
- */
-
-var Dot = require("./Dot");
-var Sheet = require("./Sheet");
-var Song = require("./Song");
+import Dot from "calchart/Dot";
+import Sheet from "calchart/Sheet";
+import Song from "calchart/Song";
 
 /**** CONSTRUCTORS ****/
 
