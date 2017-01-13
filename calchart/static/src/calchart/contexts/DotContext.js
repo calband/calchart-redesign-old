@@ -324,9 +324,7 @@ class ContextActions {
         return {
             data: [dotType, sheet],
             undo: function() {
-                $.each(oldTypes, function(dotType, dots) {
-                    sheet.changeDotTypes(dots, dotType);
-                });
+                _.each(oldTypes, sheet.changeDotTypes);
                 this._controller.loadSheet(sheet);
             },
         };

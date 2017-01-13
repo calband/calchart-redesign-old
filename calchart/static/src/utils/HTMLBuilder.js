@@ -174,7 +174,7 @@ export default class HTMLBuilder {
 
         let select = $("<select>").addClass(args.class).change(args.change);
 
-        $.each(args.options, function(value, label) {
+        _.each(args.options, function(label, value) {
             $("<option>")
                 .attr("value", value)
                 .prop("selected", value === args.initial)

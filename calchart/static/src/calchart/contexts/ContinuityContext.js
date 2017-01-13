@@ -150,7 +150,7 @@ export default class ContinuityContext extends BaseContext {
         // update tabs list in panel
         let tabs = this._panel.find(".dot-types").empty();
         let path = tabs.data("path");
-        $.each(this._sheet.getDotTypes(), function(i, dotType) {
+        this._sheet.getDotTypes().forEach(dotType => {
             let dot = HTMLBuilder.img(path.replace("DOT_TYPE", dotType));
 
             HTMLBuilder.make("li.tab", tabs)

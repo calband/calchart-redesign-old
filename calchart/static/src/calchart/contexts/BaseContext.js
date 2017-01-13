@@ -1,3 +1,5 @@
+import * as _ from "lodash";
+
 import { NotImplementedError } from "utils/errors";
 
 // Maps Context constructor names to whether they've been initialized yet
@@ -86,10 +88,7 @@ export default class BaseContext {
      */
     _addEvents(element, events) {
         // namespace events
-        $.each(events, function(name, handler) {
-            events[name + ".app-context"] = handler;
-            delete events[name];
-        });
+        events = _.mapKeys(events, name => `${name}.app-context`);
 
         $(element).on(events);
         this._eventListeners.add(element);

@@ -56,7 +56,7 @@ export default class BaseMovementCommand {
      * @return {Object}
      */
     serialize(type, data) {
-        return $.extend({}, data, {
+        return _.extend({}, data, {
             type: type,
             startX: this._startX,
             startY: this._startY,

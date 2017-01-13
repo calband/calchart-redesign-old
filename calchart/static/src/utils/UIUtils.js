@@ -39,7 +39,7 @@ export function doAction(action, params={}, success=null) {
         csrfmiddlewaretoken: $("input[name=csrfmiddlewaretoken]").val(),
         action: action,
     };
-    $.extend(data, params);
+    _.extend(data, params);
 
     $.ajax("", {
         method: "POST",
@@ -346,7 +346,7 @@ export function showContextMenu(e, items) {
 
     // recursively setup menu items
     function makeMenu(parent, items) {
-        $.each(items, function(label, action) {
+        _.each(items, function(action, label) {
             let item = HTMLBuilder.li(label).appendTo(parent);
             if (_.isString(action)) {
                 item.click(function() {

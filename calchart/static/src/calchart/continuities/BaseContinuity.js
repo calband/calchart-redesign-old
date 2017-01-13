@@ -59,7 +59,7 @@ export default class BaseContinuity {
      * @return {Object}
      */
     serialize(type, data={}) {
-        return $.extend({}, data, {
+        return _.extend({}, data, {
             type: type,
             stepType: this._stepType,
             beatsPerStep: this._beatsPerStep,
@@ -156,8 +156,8 @@ export default class BaseContinuity {
 
         let changed = {};
 
-        $.each(data, (key, val) => {
-            var old = this["_" + key];
+        _.each(data, (val, key) => {
+            let old = this["_" + key];
             if (old !== val) {
                 changed[key] = old;
                 this["_" + key] = parseNumber(val);

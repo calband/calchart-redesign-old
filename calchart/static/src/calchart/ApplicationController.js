@@ -220,7 +220,7 @@ export default class ApplicationController {
             actionArgs.push(buffer);
 
             // parse arguments
-            actionArgs = $.map(actionArgs, arg => {
+            actionArgs = actionArgs.map(arg => {
                 arg = arg.trim();
 
                 // float or array
