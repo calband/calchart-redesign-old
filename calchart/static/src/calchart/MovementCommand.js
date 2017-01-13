@@ -15,7 +15,7 @@ export default class MovementCommand {
      * @param {Object} data - The JSON data to initialize the MovementCommand with.
      * @return {MovementCommand}
      */
-    static deserialize(sheet, dotType, data) {
+    static deserialize(data) {
         switch (data.type) {
             case "MovementCommandMove":
                 return MovementCommandMove.deserialize(data);

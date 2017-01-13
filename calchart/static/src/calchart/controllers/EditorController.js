@@ -50,7 +50,7 @@ var EditorController = function(show) {
     this._redoHistory = [];
 };
 
-ApplicationController.extend(EditorController);
+// ApplicationController.extend(EditorController);
 
 /**
  * Initializes the editor application

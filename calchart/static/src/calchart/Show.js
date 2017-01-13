@@ -88,7 +88,7 @@ export default class Show {
      */
     static deserialize(data) {
         let dots = data.dots.map(data => Dot.deserialize(data));
-        let sheets = data.sheets.map(data => Sheet.deserialize(data));
+        let sheets = data.sheets.map(data => Sheet.deserialize(this, data));
         let songs = data.songs.map(data => Song.deserialize(data));
         return new Show(dots, sheets, songs, data.fieldType, data);
     }
