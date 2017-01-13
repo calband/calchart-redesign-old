@@ -317,7 +317,7 @@ Sheet.prototype.getDuration = function() {
  * @return {string} the field type for the stuntsheet
  */
 Sheet.prototype.getFieldType = function() {
-    return this._fieldType || this._show.getFieldType();
+    return _.defaultTo(this._fieldType, this._show.getFieldType());
 };
 
 /**
@@ -332,7 +332,7 @@ Sheet.prototype.getFinalPosition = function(dot) {
     if (movements.length === 0) {
         return dotInfo.position;
     } else {
-        return movements[movements.length - 1].getEndPosition();
+        return _.last(movements).getEndPosition();
     }
 };
 

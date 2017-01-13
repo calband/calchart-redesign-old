@@ -54,7 +54,7 @@ export default class BaseContext {
     /**
      * Runs any actions to load this context in the editor application.
      *
-     * @param {object} [options] - Options to customize loading of the Context.
+     * @param {object} [options] - Options to customize loading the Context.
      */
     load(options) {
         throw new NotImplementedError(this);

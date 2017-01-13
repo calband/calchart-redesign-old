@@ -7,8 +7,8 @@ import { round } from "utils/MathUtils";
 import { showContextMenu } from "utils/UIUtils";
 
 /**
- * The default editor context, that allows a user to select dots with a rectangular
- * selection box, and also to drag and drop dots on the grid.
+ * The Context that allows a user to select and edit dots with a drag
+ * and drop interface.
  */
 export default class DotContext extends BaseContext {
     constructor(controller) {

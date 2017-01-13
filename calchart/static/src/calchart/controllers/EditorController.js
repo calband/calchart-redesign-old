@@ -25,7 +25,7 @@ import {
     getData,
     hidePopup,
     showError,
-    showMessage
+    showMessage,
 } from "utils/UIUtils";
 
 /**** CONSTRUCTORS ****/
