@@ -227,7 +227,7 @@ editor_menu = Menu(
     ]),
     SubMenu('View', [
         SubMenu('View Mode', [
-            MenuItem('Dot Editor', 'loadContext(default)'),
+            MenuItem('Dot Editor', 'loadContext(dot)'),
             MenuItem('Continuity Editor', 'loadContext(continuity)'),
             # MenuItem('Music Editor', 'loadContext(default)'),
             # MenuItem('3D View', 'loadContext(default)'),

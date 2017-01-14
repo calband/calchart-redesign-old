@@ -126,6 +126,7 @@ export function setupMenu(menu) {
 
     function closeSubmenus() {
         menuTabs.removeClass("active");
+        $(".has-submenu.active").removeClass("active");
         $(".submenu").hide();
         $(window).off(".close-submenus");
     }

@@ -377,7 +377,7 @@ export default class EditorController extends ApplicationController {
         }
 
         let actionData = this._redoHistory.pop();
-        newData = actionData.function.apply(actionData.context, actionData.args);
+        let newData = actionData.function.apply(actionData.context, actionData.args);
         // update undo function
         actionData.undo = newData.undo;
 
