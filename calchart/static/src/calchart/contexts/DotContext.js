@@ -92,7 +92,8 @@ export default class DotContext extends BaseContext {
                 let position = scale.toDistanceCoordinates(dotPosition);
                 _this._grapher.moveDotTo(this, position.x + deltaX, position.y + deltaY);
             })
-            .scrollIntoView(".workspace", {
+            .scrollIntoView({
+                parent: ".workspace",
                 tolerance: 10,
                 callback: function(deltaX, deltaY) {
                     _this._scrollOffset.top += deltaY;
@@ -120,7 +121,7 @@ export default class DotContext extends BaseContext {
                 let dot = $(this).parent().data("dot");
                 let dotType = _this._sheet.getDotType(dot);
 
-                UIUtils.showContextMenu(e, {
+                showContextMenu(e, {
                     "Edit continuity...": `loadContext(continuity, dotType=${dotType})`,
                     "Change dot type": {
                         "Plain": "changeDotType(plain)",
@@ -240,7 +241,8 @@ export default class DotContext extends BaseContext {
                                 width: width,
                                 height: height,
                             })
-                            .scrollIntoView(".workspace", {
+                            .scrollIntoView({
+                                parent: ".workspace",
                                 callback: function(deltaX, deltaY) {
                                     scrollStart.top += deltaY;
                                     scrollStart.left += deltaX;

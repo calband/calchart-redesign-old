@@ -52,6 +52,10 @@ export default class EditorController extends ApplicationController {
         return EditorShortcuts;
     }
 
+    static getAllShortcutCommands() {
+        return _.extend(super.getAllShortcutCommands(), Context.getAllShortcutCommands());
+    }
+
     init() {
         super.init();
 
@@ -264,10 +268,6 @@ export default class EditorController extends ApplicationController {
      */
     getActiveSheet() {
         return this._activeSheet;
-    }
-
-    getAllShortcutCommands() {
-        return _.extend(super.getAllShortcutCommands(), Context.getAllShortcutCommands());
     }
 
     /**

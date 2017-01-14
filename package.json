@@ -17,6 +17,7 @@
     "babel-loader": "latest",
     "babel-core": "latest",
     "babel-preset-es2015": "latest",
+    "babel-plugin-transform-builtin-extend": "latest",
     "imports-loader": "latest"
   },
   "dependencies": {

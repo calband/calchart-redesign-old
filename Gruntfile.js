@@ -36,6 +36,11 @@ module.exports = function (grunt) {
                             loader: "babel-loader",
                             query: {
                                 presets: ["es2015"],
+                                plugins: [
+                                    ["babel-plugin-transform-builtin-extend", {
+                                        globals: ["Error"],
+                                    }],
+                                ],
                                 minified: true,
                                 comments: false,
                                 cacheDirectory: true,

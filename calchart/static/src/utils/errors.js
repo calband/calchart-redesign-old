@@ -8,14 +8,12 @@
 /**
  * An error regarding ApplicationController actions
  */
-export class ActionError extends Error {
-}
+export class ActionError extends Error {}
 
 /**
  * An error thrown in the context of animating a show
  */
-export class AnimationStateError extends Error {
-}
+export class AnimationStateError extends Error {}
 
 /**
  * An error for abstract methods, which subclasses need to override.
@@ -35,5 +33,4 @@ export class NotImplementedError extends Error {
  * An error for errors when validating data. The error message will
  * be displayed in the UI.
  */
-export class ValidationError extends Error {
-}
+export class ValidationError extends Error {}

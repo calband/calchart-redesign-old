@@ -111,10 +111,9 @@ jQueryUtils.notIn = function(element) {
 /**
  * Scroll this element(s) if it's hidden inside the given parent
  *
- * @param {jQuery} [parent] - The parent element to scroll if necessary.
- *   Defaults to parent of this element (or the first parent if @this is
- *   multiple elements).
  * @param {Object} [options] - Additional options, including:
+ *   - {(jQuery|string)} parent - The parent element to scroll if
+ *     necessary. Defaults to the parent of this element.
  *   - {int} [tolerance=0] - The distance from the edge needed to
  *     trigger scrolling, in pixels.
  *   - {int} [margin=tolerance] - The amount of space beyond the object
@@ -122,17 +121,11 @@ jQueryUtils.notIn = function(element) {
  *   - {function(number, number)} [callback] - A callback function that
  *     takes in the change in x/y positions.
  */
-jQueryUtils.scrollIntoView = function(parent, options={}) {
-    // in case passing in options, with default parent
-    if (!(parent instanceof jQuery)) {
-        options = parent;
-        parent = undefined;
-    }
-
-    parent = $(parent || this.parent()).first();
-    let {tolerance=0, margin=tolerance} = options;
+jQueryUtils.scrollIntoView = function(options={}) {
+    let { tolerance=0, margin=tolerance } = options;
 
     // top/left of the visible part of the parent
+    let parent = $(_.defaultTo(options.parent, this.parent()));
     let parentOffset = parent.offset();
     let parentHeight = parent.outerHeight();
     let parentWidth = parent.outerWidth();

@@ -93,7 +93,7 @@ export default class StopContinuity extends BaseContinuity {
                 type: "number",
                 initial: this._duration,
                 change: function() {
-                    _this._duration = JSUtils.validatePositive(this);
+                    _this._duration = validatePositive(this);
                     _this._updateMovements(controller);
                 },
             });
