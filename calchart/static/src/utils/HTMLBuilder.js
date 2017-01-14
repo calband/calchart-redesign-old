@@ -7,7 +7,7 @@
 
 import * as _ from "lodash";
 
-import { parseArgs, toCamelCase } from "utils/JSUtils";
+import { parseArgs } from "utils/JSUtils";
 
 /**
  * A collection of helper functions that simplify creating HTML elements.
@@ -73,7 +73,7 @@ export default class HTMLBuilder {
      */
     static formfield() {
         let args = parseArgs(arguments, ["label", "field", "name"]);
-        let name = args.name || toCamelCase(args.label);
+        let name = args.name || _.camelCase(args.label);
 
         if (_.isString(args.field)) {
             args.field = this.make(args.field);

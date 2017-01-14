@@ -73,18 +73,6 @@ export function parseNumber(value) {
 }
 
 /**
- * Convert the given value to camel case
- *
- * @param {string} value
- * @return {string}
- */
-export function toCamelCase(value) {
-    return value.toLowerCase().replace(/\s*(\w+)/g, str =>
-        str[1].toUpperCase() + str.slice(2)
-    );
-}
-
-/**
  * Validate that the given input is a positive value, setting the input
  * to 0 if negative
  *

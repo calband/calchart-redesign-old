@@ -463,7 +463,7 @@ export default class EditorController extends ApplicationController {
      *   - {boolean} [append=true] - If false, deselect all dots before selecting.
      */
     selectDots(dots, options={}) {
-        if (_.defaultTo(options.append, false)) {
+        if (!_.defaultTo(options.append, true)) {
             this.deselectDots();
         }
 

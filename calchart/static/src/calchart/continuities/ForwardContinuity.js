@@ -96,7 +96,7 @@ export default class ForwardContinuity extends BaseContinuity {
         }), "numSteps");
 
         fields.direction = HTMLBuilder.formfield("Direction", HTMLBuilder.select({
-            options: CalchartUtils.DIRECTIONS,
+            options: DIRECTIONS,
             initial: this._direction,
         }));
 

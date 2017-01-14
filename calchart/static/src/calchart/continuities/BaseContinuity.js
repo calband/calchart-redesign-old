@@ -188,7 +188,7 @@ export default class BaseContinuity {
         let fields = {};
 
         fields.stepType = HTMLBuilder.formfield("Step Type", HTMLBuilder.select({
-            options: CalchartUtils.STEP_TYPES,
+            options: STEP_TYPES,
             initial: this._stepType,
         }));
 
@@ -216,7 +216,7 @@ export default class BaseContinuity {
         fields.beatsPerStep.find("select").change();
 
         fields.orientation = HTMLBuilder.formfield("Orientation", HTMLBuilder.select({
-            options: CalchartUtils.ORIENTATIONS,
+            options: ORIENTATIONS,
             initial: this._orientation,
         }));
 

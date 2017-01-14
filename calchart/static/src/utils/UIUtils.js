@@ -459,8 +459,18 @@ export function showPopup(name, options={}) {
         options.init(popup);
     }
 
-    // event listeners
+    // event listener to submit form
     popup
+        .on("submit.popup", "form", function(e) {
+            e.preventDefault();
+
+            if (!_.isUndefined(options.onSubmit)) {
+                options.onSubmit(popup);
+            }
+        });
+
+    // event listeners to close popup
+    $(".popup")
         .on("click.popup", function(e) {
             if (!$(e.target).closest(".popup-box").exists()) {
                 hidePopup();
@@ -468,13 +478,6 @@ export function showPopup(name, options={}) {
         })
         .on("click.popup", ".popup-box button.cancel", function() {
             hidePopup();
-        })
-        .on("submit.popup", "form", function(e) {
-            e.preventDefault();
-
-            if (!_.isUndefined(options.onSubmit)) {
-                options.onSubmit(popup);
-            }
         });
 
     // ESC closes popup
@@ -504,6 +507,7 @@ export function hidePopup() {
 
     // remove event listeners
     popup.off(".popup");
+    $(".popup").off(".popup");
     $(window).off(".popup");
 
     let onHide = popup.data("onHide");
