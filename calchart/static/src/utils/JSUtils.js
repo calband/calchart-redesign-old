@@ -92,7 +92,7 @@ export function toCamelCase(value) {
  * @return {int}
  */
 export function validatePositive(input) {
-    var value = parseInt($(input).val());
+    let value = parseInt($(input).val());
     if (value < 0) {
         $(input).val(0);
         return 0;

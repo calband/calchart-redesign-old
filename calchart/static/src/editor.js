@@ -3,6 +3,7 @@ import * as _ from "lodash";
 import EditorController from "calchart/controllers/EditorController";
 import Show from "calchart/Show";
 
+import "utils/jquery";
 import { getData, hidePopup, showError, showPopup } from "utils/UIUtils";
 
 /**

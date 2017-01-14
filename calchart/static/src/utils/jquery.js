@@ -13,6 +13,7 @@ import "chosen-js";
 import * as _ from "lodash";
 import jQuery from "jquery";
 
+// expose the jQuery operator to the global scope
 window.$ = jQuery;
 window.jQuery = jQuery;
 
@@ -221,19 +222,19 @@ jQueryUtils.scrollIntoView = function(parent, options={}) {
  *   element, if it goes offscreen.
  */
 jQueryUtils.smartPosition = function(top, left, right=left) {
-    var position = {
+    let position = {
         top: top,
         left: left,
     };
 
-    var width = this.outerWidth();
-    var maxWidth = $(window).width();
+    let width = this.outerWidth();
+    let maxWidth = $(window).width();
     if (left + width > maxWidth) {
         position.left = right - width;
     }
 
-    var height = this.outerHeight();
-    var maxHeight = $(window).height();
+    let height = this.outerHeight();
+    let maxHeight = $(window).height();
     if (top + height > maxHeight) {
         position.top = maxHeight - height;
     }

@@ -83,12 +83,12 @@ export function bindSubmenu(container, parent, submenu) {
     $(parent)
         .addClass("has-submenu")
         .mouseenter(function() {
-            var offset = $(parent).offset();
+            let offset = $(parent).offset();
 
             // manually offset a pixel to accentuate hover
-            var top = offset.top + 1;
-            var left = offset.left + $(parent).outerWidth() - 1;
-            var right = offset.left + 1;
+            let top = offset.top + 1;
+            let left = offset.left + $(parent).outerWidth() - 1;
+            let right = offset.left + 1;
 
             $(parent).addClass("active");
 
@@ -109,48 +109,6 @@ export function bindSubmenu(container, parent, submenu) {
 }
 
 /**
- * Open the given menu tab.
- *
- * @param {jQuery} menuTab
- * @param {jQuery} submenu
- */
-function openSubmenu(menuTab, submenu) {
-    closeSubmenus();
-    $(menuTab).addClass("active");
-
-    var offset = $(menuTab).offset();
-    $(submenu)
-        .css({
-            top: offset.top + $(menuTab).outerHeight(),
-            left: offset.left,
-        })
-        .show();
-}
-
-/**
- * Recursively set up the menu items in the given submenu
- *
- * @param {jQuery} submenu
- */
-function setupMenuItems(submenu) {
-    $(submenu).find("li").each(function() {
-        var action = $(this).data("action");
-        if (action) {
-            $(this).click(function() {
-                window.controller.doAction(action);
-                closeSubmenus();
-            });
-        }
-
-        var subsubmenu = $(this).children(".submenu");
-        if (subsubmenu.exists()) {
-            bindSubmenu(submenu, this, subsubmenu);
-            setupMenuItems(subsubmenu);
-        }
-    });
-}
-
-/**
  * Set up the given menu element.
  *
  * - "menu" refers to the main menu container, which contain the menu tabs
@@ -164,7 +122,7 @@ function setupMenuItems(submenu) {
  *   a menu.
  */
 export function setupMenu(menu) {
-    var menuTabs = $(menu).children();
+    let menuTabs = $(menu).children();
 
     function closeSubmenus() {
         menuTabs.removeClass("active");
@@ -172,8 +130,40 @@ export function setupMenu(menu) {
         $(window).off(".close-submenus");
     }
 
+    function openSubmenu(menuTab, submenu) {
+        closeSubmenus();
+        $(menuTab).addClass("active");
+
+        let offset = $(menuTab).offset();
+        $(submenu)
+            .css({
+                top: offset.top + $(menuTab).outerHeight(),
+                left: offset.left,
+            })
+            .show();
+    }
+
+    // recursively set up menu items
+    function setupMenuItems(submenu) {
+        $(submenu).find("li").each(function() {
+            let action = $(this).data("action");
+            if (action) {
+                $(this).click(function() {
+                    window.controller.doAction(action);
+                    closeSubmenus();
+                });
+            }
+
+            let subsubmenu = $(this).children(".submenu");
+            if (subsubmenu.exists()) {
+                bindSubmenu(submenu, this, subsubmenu);
+                setupMenuItems(subsubmenu);
+            }
+        });
+    }
+
     menuTabs.each(function() {
-        var submenu = $(this).children(".submenu").appendTo("body");
+        let submenu = $(this).children(".submenu").appendTo("body");
 
         // clicking toggles active menu
         $(this).click(function() {
@@ -184,7 +174,7 @@ export function setupMenu(menu) {
 
                 // clicking outside of menu and its submenus closes them
                 $(window).on("click.close-submenus", function(e) {
-                    var target = $(e.target);
+                    let target = $(e.target);
                     if (target.notIn(menuTabs) && target.notIn(".submenu")) {
                         closeSubmenus();
                         $(this).off(e);
@@ -257,13 +247,13 @@ function convertShortcut(shortcut) {
  * @param {jQuery|string} toolbar - jQuery object or toolbar to setup.
  */
 export function setupToolbar(toolbar) {
-    var shortcutCommands = window.controller.constructor.getAllShortcutCommands();
+    let shortcutCommands = window.controller.constructor.getAllShortcutCommands();
 
     // set up click and tooltip
     $(toolbar).find("li").each(function() {
-        var name = $(this).data("name");
-        var action = $(this).data("action");
-        var shortcut = shortcutCommands[action];
+        let name = $(this).data("name");
+        let action = $(this).data("action");
+        let shortcut = shortcutCommands[action];
 
         $(this)
             .mousedown(function() {
@@ -289,17 +279,18 @@ export function setupToolbar(toolbar) {
                 name = `${name} (${shortcutHint})`;
             }
 
-            var tooltipTimeout = null;
-            var tooltip = HTMLBuilder.span("", "tooltip").html(name);
-            var arrow = HTMLBuilder.make("span.tooltip-arrow", tooltip);
+            let tooltipTimeout = null;
+            let tooltip = HTMLBuilder.span("", "tooltip").html(name);
+            let arrow = HTMLBuilder.make("span.tooltip-arrow", tooltip);
 
             $(this).hover(function() {
+                let offset = $(this).offset();
+                let width = $(this).outerWidth();
+
                 tooltipTimeout = setTimeout(function() {
                     tooltip.appendTo("body");
 
-                    var offset = $(this).offset();
-                    var width = $(this).outerWidth();
-                    var left = offset.left - tooltip.outerWidth() / 2 + width / 2;
+                    let left = offset.left - tooltip.outerWidth() / 2 + width / 2;
                     if (left < 0) {
                         left = 0;
                         arrow.css("left", offset.left + width / 2);
@@ -468,13 +459,29 @@ export function showPopup(name, options={}) {
         options.init(popup);
     }
 
-    popup.find("form")
-        .off(".popup")
-        .on("submit.popup", function(e) {
+    // event listeners
+    popup
+        .on("click.popup", function(e) {
+            if (!$(e.target).closest(".popup-box").exists()) {
+                hidePopup();
+            }
+        })
+        .on("click.popup", ".popup-box button.cancel", function() {
+            hidePopup();
+        })
+        .on("submit.popup", "form", function(e) {
             e.preventDefault();
 
-            if (options.onSubmit !== undefined) {
+            if (!_.isUndefined(options.onSubmit)) {
                 options.onSubmit(popup);
+            }
+        });
+
+    // ESC closes popup
+    $(window)
+        .on("keydown.popup", function(e) {
+            if (e.which === 27) {
+                hidePopup();
             }
         });
 
@@ -494,6 +501,10 @@ export function hidePopup() {
     popup.removeClass("active")
         .parent()
         .hide();
+
+    // remove event listeners
+    popup.off(".popup");
+    $(window).off(".popup");
 
     let onHide = popup.data("onHide");
     if (onHide) {

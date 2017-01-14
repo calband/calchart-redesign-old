@@ -35,10 +35,10 @@ export default function makeEnum(cls, values) {
     });
 
     cls[Symbol.iterator] = function() {
-        var index = 0;
+        let index = 0;
         return {
             next: function() {
-                var i = index;
+                let i = index;
                 index++;
                 return {
                     value: values[i],

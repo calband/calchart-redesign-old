@@ -64,6 +64,9 @@ export default class ApplicationController {
      * Initialize this controller.
      */
     init() {
+        // all selects automatically converted to dropdowns
+        $("select").dropdown();
+
         // set up keyboard shortcuts
         $(window).keydown(e => {
             // ignore keypresses when typing into an input field
