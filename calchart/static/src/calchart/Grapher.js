@@ -121,7 +121,7 @@ export default class Grapher {
      * @return {jQuery} The dots in the grapher.
      */
     getDots() {
-        return $(this._svg.selectAll("g.dot")[0]);
+        return $(this._svg.selectAll("g.dot").nodes());
 
     }
 
@@ -129,7 +129,7 @@ export default class Grapher {
      * @return {jQuery} The SVG graph element.
      */
     getGraph() {
-        return $(this._svg[0]);
+        return $(this._svg.node());
     }
 
     /**

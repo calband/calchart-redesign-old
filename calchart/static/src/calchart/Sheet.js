@@ -136,11 +136,11 @@ export default class Sheet {
         };
         
         data.dots = {};
-        _.each(this._dots, function(data, label) {
+        _.each(this._dots, function(dotInfo, label) {
             data.dots[label] = {
-                type: data.type,
-                position: data.position.serialize(),
-                movements: data.movements.map(movement => movement.serialize()),
+                type: dotInfo.type,
+                position: dotInfo.position.serialize(),
+                movements: dotInfo.movements.map(movement => movement.serialize()),
             };
         });
 

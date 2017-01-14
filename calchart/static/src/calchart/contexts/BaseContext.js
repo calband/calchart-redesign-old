@@ -88,7 +88,7 @@ export default class BaseContext {
      */
     _addEvents(element, events) {
         // namespace events
-        events = _.mapKeys(events, name => `${name}.app-context`);
+        events = _.mapKeys(events, (handler, name) => `${name}.app-context`);
 
         $(element).on(events);
         this._eventListeners.add(element);
