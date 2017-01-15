@@ -651,19 +651,25 @@ class EditorActions {
 
     /**
      * Duplicate the currently active Sheet.
+     *
+     * @param {Sheet} [clone] - The cloned Sheet to readd, for redo.
      */
-    static duplicateSheet() {
+    static duplicateSheet(clone) {
         let sheet = this._activeSheet;
-        let newSheet = sheet.clone();
-        newSheet.setIndex(sheet.getIndex() + 1);
-        this._show.insertSheet(newSheet, newSheet.getIndex());
-        
+
+        if (_.isUndefined(clone)) {
+            clone = sheet.clone();
+            clone.setIndex(sheet.getIndex() + 1);
+        }
+
+        this._show.insertSheet(clone, clone.getIndex());
         sheet.updateMovements();
-        this.loadSheet(newSheet);
+        this.loadSheet(clone);
 
         return {
+            data: [clone],
             undo: function() {
-                this._show.removeSheet(newSheet);
+                this._show.removeSheet(clone);
                 sheet.updateMovements();
                 this.loadSheet(sheet);
             },
