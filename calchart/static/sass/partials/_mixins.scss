@@ -29,8 +29,8 @@
     background: $light-gray;
     border: 1px solid rgba($black, 0.2);
     li {
-        padding: 5px 10px;
-        padding-right: 25px;
+        padding: 5px 25px;
+        padding-left: 35px;
         cursor: pointer;
         color: $blue;
         &:hover, &.active {
@@ -47,6 +47,10 @@
             font-size: 0.9em;
             vertical-align: middle;
             right: 5px;
+        }
+        i {
+            position: absolute;
+            left: 7px;
         }
         span.hint {
             float: right;

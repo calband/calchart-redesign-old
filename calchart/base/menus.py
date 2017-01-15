@@ -52,6 +52,7 @@ class SubMenu(object):
     A Calchart SubMenu, in the format
 
     <li>
+        <i class="icon-{{ icon }}"></i>
         {{ name }}
         <div class="controller-menu submenu">
             # for each group
@@ -62,15 +63,21 @@ class SubMenu(object):
         </div>
     </li>
     """
-    def __init__(self, name, *groups):
+    def __init__(self, name, *groups, **kwargs):
         self.name = name
         self.groups = groups
+        self.icon = kwargs.get('icon')
 
     def render(self):
+        if self.icon is None:
+            icon = ''
+        else:
+            icon = format_html('<i class="icon-{}"></i>', self.icon)
+
         menu_groups = mark_safe(''.join(self.render_group(group) for group in self.groups))
         return format_html(
-            '<li>{}<div class="controller-menu submenu">{}</div></li>',
-            self.name, menu_groups
+            '<li>{}{}<div class="controller-menu submenu">{}</div></li>',
+            icon, self.name, menu_groups
         )
 
     def render_group(self, group):
@@ -83,16 +90,25 @@ class MenuItem(object):
     """
     A Calchart MenuItem, in the format
 
-    <li data-action="{{ action }}">{{ name }}</li>
+    <li data-action="{{ action }}">
+        <i class="icon-{{ icon }}"></i>
+        {{ name }}
+    </li>
     """
-    def __init__(self, name, action):
+    def __init__(self, name, action, icon=None):
         self.name = name
         self.action = action
+        self.icon = icon
 
     def render(self):
+        if self.icon is None:
+            icon = ''
+        else:
+            icon = format_html('<i class="icon-{}"></i>', self.icon)
+
         return format_html(
-            '<li data-action="{}">{}</li>',
-            self.action, self.name
+            '<li data-action="{}">{}{}</li>',
+            self.action, icon, self.name
         )
 
 class Toolbar(object):
@@ -219,50 +235,52 @@ class CustomToolbarItem(object):
 
 editor_menu = Menu(
     SubMenu('File', [
-        MenuItem('New stuntsheet', 'addStuntsheet'),
+        MenuItem('New stuntsheet', 'addStuntsheet', icon='file-o'),
         MenuItem('Rename show', 'promptRename'),
-        MenuItem('Save', 'saveShow'),
-        MenuItem('Print', 'print'),
+        MenuItem('Save', 'saveShow', icon='floppy-o'),
+        MenuItem('Print', 'print', icon='print'),
         SubMenu('Download as', [
-            MenuItem('JSON', 'download(json)'),
-            MenuItem('PDF', 'download(pdf)'),
+            MenuItem('JSON', 'download(json)', icon='file-code-o'),
+            MenuItem('PDF', 'download(pdf)', icon='file-pdf-o'),
         ]),
     ], [
         MenuItem('Preferences', 'editPreferences'),
         MenuItem('File properties...', 'editFileProperties'),
     ]),
     SubMenu('Edit', [
-        MenuItem('Undo', 'undo'),
-        MenuItem('Redo', 'redo'),
+        MenuItem('Undo', 'undo', icon='undo'),
+        MenuItem('Redo', 'redo', icon='repeat'),
     ]),
     SubMenu('View', [
         SubMenu('View mode', [
-            MenuItem('Dot editor', 'loadContext(dot)'),
-            MenuItem('Continuity editor', 'loadContext(continuity)'),
-            MenuItem('Music editor', 'loadContext(music)'),
+            MenuItem('Music editor', 'loadContext(music)', icon='music'),
+            MenuItem('Dot editor', 'loadContext(dot)', icon='dot-circle-o'),
+            MenuItem('Continuity editor', 'loadContext(continuity)', icon='pencil-square-o'),
             # MenuItem('3D View', 'loadContext(3d)'),
         ]),
     ], [
         SubMenu('Zoom', [
-            MenuItem('Zoom in', 'zoomIn'),
-            MenuItem('Zoom out', 'zoomOut'),
+            MenuItem('Zoom in', 'zoomIn', icon='search-plus'),
+            MenuItem('Zoom out', 'zoomOut', icon='search-minus'),
         ], [
             MenuItem('50%', 'zoom(0.5)'),
             MenuItem('75%', 'zoom(0.75)'),
             MenuItem('100%', 'zoom(1)'),
             MenuItem('150%', 'zoom(1.5)'),
             MenuItem('200%', 'zoom(2)'),
-        ]),
+        ], icon='search'),
     ]),
 )
 
 editor_toolbar = Toolbar(
     ToolbarGroup(
         ToolbarItem('Add Stuntsheet', 'file-o', 'addStuntsheet'),
+        ToolbarItem('Save', 'floppy-o', 'saveShow'),
         ToolbarItem('Undo', 'undo', 'undo'),
         ToolbarItem('Redo', 'repeat', 'redo'),
     ),
     ToolbarGroup(
+        ToolbarItem('Edit Music', 'music', 'loadContext(music)'),
         ToolbarItem('Edit Dots', 'dot-circle-o', 'loadContext(dot)'),
         ToolbarItem('Edit Continuity', 'pencil-square-o', 'loadContext(continuity)'),
     ),
