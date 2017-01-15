@@ -583,6 +583,7 @@ export default class EditorController extends ApplicationController {
 let EditorShortcuts = {
     "alt+n": "addStuntsheet", // can't capture ctrl+n: http://stackoverflow.com/a/7296303/4966649
     "ctrl+backspace": "deleteSheet",
+    "ctrl+d": "duplicateSheet",
     "ctrl+shift+z": "redo",
     "ctrl+s": "saveShow",
     "ctrl+z": "undo",
@@ -643,6 +644,27 @@ class EditorActions {
                 if (prevSheet) {
                     prevSheet.updateMovements();
                 }
+                this.loadSheet(sheet);
+            },
+        };
+    }
+
+    /**
+     * Duplicate the currently active Sheet.
+     */
+    static duplicateSheet() {
+        let sheet = this._activeSheet;
+        let newSheet = sheet.clone();
+        newSheet.setIndex(sheet.getIndex() + 1);
+        this._show.insertSheet(newSheet, newSheet.getIndex());
+        
+        sheet.updateMovements();
+        this.loadSheet(newSheet);
+
+        return {
+            undo: function() {
+                this._show.removeSheet(newSheet);
+                sheet.updateMovements();
                 this.loadSheet(sheet);
             },
         };

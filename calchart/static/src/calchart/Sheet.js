@@ -183,6 +183,27 @@ export default class Sheet {
     }
 
     /**
+     * Clone this sheet. The new Sheet's data should be completely disassociated
+     * from this sheet (a deep clone); e.g. changing the new Sheet's dot positions
+     * should not update this Sheet's dot positions.
+     *
+     * @return {Sheet}
+     */
+    clone() {
+        // dont clone show
+        let show = this._show;
+        this._show = null;
+
+        let sheet = _.cloneDeep(this);
+        this._show = show;
+
+        sheet._show = show;
+        sheet._index = undefined;
+
+        return sheet;
+    }
+
+    /**
      * Return an AnimationState object that describes the given Dot's position,
      * orientation, etc. for the Sheet.
      *
