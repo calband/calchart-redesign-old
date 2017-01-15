@@ -67,17 +67,6 @@ export function empty(array) {
 }
 
 /**
- * Convert the given string from camel case into a capitalized string, e.g.
- * "someFunc" -> "Some Func". Source: http://stackoverflow.com/a/4149393/4966649
- *
- * @param {string} str
- * @return {string}
- */
-export function fromCamelCase(str) {
-    return str.replace(/([A-Z])/g, " $1").replace(/^./, first => first.toUpperCase());
-}
-
-/**
  * Parse the arguments passed to a function as either positional arguments
  * or as keyword arguments, passed as an object.
  *

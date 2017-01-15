@@ -46,6 +46,11 @@ $editor-header-height: 100px;
     }
 }
 
+// undo/redo labels
+.controller-menu span.label {
+    color: $dark-gray;
+}
+
 $sidebar-width: 200px;
 .content {
     @include remove-children-space;

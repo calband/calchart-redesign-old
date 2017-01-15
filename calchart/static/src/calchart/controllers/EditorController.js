@@ -251,6 +251,8 @@ export default class EditorController extends ApplicationController {
 
             // after doing an action, can't redo previous actions
             empty(this._redoHistory);
+
+            this._updateHistory();
         }
     }
 
@@ -382,6 +384,7 @@ export default class EditorController extends ApplicationController {
         actionData.undo = newData.undo;
 
         this._undoHistory.push(actionData);
+        this._updateHistory();
     }
 
     /**
@@ -505,6 +508,7 @@ export default class EditorController extends ApplicationController {
         actionData.undo.apply(actionData.context);
 
         this._redoHistory.push(actionData);
+        this._updateHistory();
     }
 
     /**
@@ -528,6 +532,7 @@ export default class EditorController extends ApplicationController {
             let action = container[data.name];
             if (_.isFunction(action)) {
                 return {
+                    name: data.name,
                     context: context,
                     function: action,
                     args: data.args,
@@ -549,6 +554,30 @@ export default class EditorController extends ApplicationController {
             return action;
         }
     }
+
+    /**
+     * Update the Undo/Redo labels in the menu.
+     */
+    _updateHistory() {
+        function updateLabel(action, history) {
+            let li = $(`.controller-menu li[data-action=${action}]`);
+            let span = li.find("span.label");
+            let data = _.last(history);
+
+            if (_.isUndefined(data)) {
+                span.remove();
+            } else {
+                if (!span.exists()) {
+                    span = HTMLBuilder.span("", "label").appendTo(li);
+                }
+                let label = _.defaultTo(data.label, _.lowerCase(data.name));
+                span.text(` ${label}`);
+            }
+        }
+
+        updateLabel("undo", this._undoHistory);
+        updateLabel("redo", this._redoHistory);
+    }
 }
 
 let EditorShortcuts = {
@@ -567,7 +596,7 @@ let EditorShortcuts = {
  *   - {Object} [data] - Optional data to pass to the redo function. Defaults
  *     to any arguments initially passed to the function.
  *   - {string} [label] - Optional label to use for the Undo/Redo menu item.
- *     Defaults to the name of the action, capitalized and spaced out.
+ *     Defaults to the spaced-out name of the action.
  *
  * Actions are also passed the EditorController instance as `this`.
  */
