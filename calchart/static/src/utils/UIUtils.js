@@ -142,6 +142,14 @@ export function setupMenu(menu) {
                 left: offset.left,
             })
             .show();
+
+        // clicking outside of menu and its submenus closes them
+        $(window).on("click.close-submenus", function(e) {
+            let target = $(e.target);
+            if (target.notIn(menuTabs) && target.notIn(".submenu")) {
+                closeSubmenus();
+            }
+        });
     }
 
     // recursively set up menu items
@@ -172,15 +180,6 @@ export function setupMenu(menu) {
                 closeSubmenus();
             } else {
                 openSubmenu(this, submenu);
-
-                // clicking outside of menu and its submenus closes them
-                $(window).on("click.close-submenus", function(e) {
-                    let target = $(e.target);
-                    if (target.notIn(menuTabs) && target.notIn(".submenu")) {
-                        closeSubmenus();
-                        $(this).off(e);
-                    }
-                });
             }
         });
 

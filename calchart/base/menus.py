@@ -219,22 +219,38 @@ class CustomToolbarItem(object):
 
 editor_menu = Menu(
     SubMenu('File', [
+        MenuItem('New stuntsheet', 'addStuntsheet'),
         MenuItem('Save', 'saveShow'),
+        MenuItem('Print', 'print'),
+        SubMenu('Download as', [
+            MenuItem('JSON', 'download(json)'),
+            MenuItem('PDF', 'download(pdf)'),
+        ]),
+    ], [
+        MenuItem('File properties...', 'editFileProperties'),
+        MenuItem('Preferences', 'editPreferences'),
     ]),
     SubMenu('Edit', [
         MenuItem('Undo', 'undo'),
         MenuItem('Redo', 'redo'),
     ]),
     SubMenu('View', [
-        SubMenu('View Mode', [
-            MenuItem('Dot Editor', 'loadContext(dot)'),
-            MenuItem('Continuity Editor', 'loadContext(continuity)'),
-            # MenuItem('Music Editor', 'loadContext(default)'),
-            # MenuItem('3D View', 'loadContext(default)'),
+        SubMenu('View mode', [
+            MenuItem('Dot editor', 'loadContext(dot)'),
+            MenuItem('Continuity editor', 'loadContext(continuity)'),
+            MenuItem('Music editor', 'loadContext(music)'),
+            # MenuItem('3D View', 'loadContext(3d)'),
         ]),
     ], [
         SubMenu('Zoom', [
-            MenuItem('100%', ''), # TODO
+            MenuItem('Zoom in', 'zoomIn'),
+            MenuItem('Zoom out', 'zoomOut'),
+        ], [
+            MenuItem('50%', 'zoom(0.5)'),
+            MenuItem('75%', 'zoom(0.75)'),
+            MenuItem('100%', 'zoom(1)'),
+            MenuItem('150%', 'zoom(1.5)'),
+            MenuItem('200%', 'zoom(2)'),
         ]),
     ]),
 )
