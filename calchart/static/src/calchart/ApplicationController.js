@@ -48,6 +48,16 @@ export default class ApplicationController {
     }
 
     /**
+     * Retrieve and cache getAllShortcutCommands.
+     */
+    get shortcutCommands() {
+        if (_.isUndefined(this._shortcutCommands)) {
+            this._shortcutCommands = this.constructor.getAllShortcutCommands();
+        }
+        return this._shortcutCommands;
+    }
+
+    /**
      * Class variable holding all keyboard shortcuts for the controller, mapping
      * keyboard shortcut to the name of the ApplicationController function. Separate
      * keys with "+", e.g. "ctrl+s" or "ctrl+shift+s". Meta keys need to be in this

@@ -30,7 +30,7 @@
     border: 1px solid rgba($black, 0.2);
     li {
         padding: 5px 10px;
-        padding-right: 20px;
+        padding-right: 25px;
         cursor: pointer;
         color: $blue;
         &:hover, &.active {
@@ -43,7 +43,13 @@
             font-family: "icons";
             font-size: 0.9em;
             vertical-align: middle;
-            right: 0;
+            right: 5px;
+        }
+        span.hint {
+            float: right;
+            margin-left: 5px;
+            right: -15px; // align with .has-submenu arrow
+            color: $medium-gray;
         }
     }
     &.submenu {

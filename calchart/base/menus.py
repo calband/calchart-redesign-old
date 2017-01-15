@@ -220,6 +220,7 @@ class CustomToolbarItem(object):
 editor_menu = Menu(
     SubMenu('File', [
         MenuItem('New stuntsheet', 'addStuntsheet'),
+        MenuItem('Rename show', 'promptRename'),
         MenuItem('Save', 'saveShow'),
         MenuItem('Print', 'print'),
         SubMenu('Download as', [
@@ -227,8 +228,8 @@ editor_menu = Menu(
             MenuItem('PDF', 'download(pdf)'),
         ]),
     ], [
-        MenuItem('File properties...', 'editFileProperties'),
         MenuItem('Preferences', 'editPreferences'),
+        MenuItem('File properties...', 'editFileProperties'),
     ]),
     SubMenu('Edit', [
         MenuItem('Undo', 'undo'),

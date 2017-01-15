@@ -11,6 +11,52 @@ import * as _ from "lodash";
  */
 export const IS_MAC = navigator.userAgent.includes("Mac OS X");
 
+let shortcutMap, shortcutSep;
+if (IS_MAC) {
+    // HTML codes: http://apple.stackexchange.com/a/55729
+    shortcutMap = {
+        ctrl: "&#8984;",
+        alt: "&#8997;",
+        shift: "&#8679;",
+        backspace: "&#9003;",
+        tab: "&#8677;",
+        enter: "&crarr;",
+        left: "&larr;",
+        up: "&uarr;",
+        right: "&rarr;",
+        down: "&darr;",
+        delete: "&#8998;",
+    };
+    shortcutSep = "";
+} else {
+    shortcutMap = {
+        ctrl: "Ctrl",
+        alt: "Alt",
+        shift: "Shift",
+        backspace: "Backspace",
+        tab: "Tab",
+        enter: "Enter",
+        left: "Left",
+        up: "Up",
+        right: "Right",
+        down: "Down",
+        delete: "Del",
+    };
+    shortcutSep = "+";
+}
+
+/**
+ * Convert the given shortcut key binding to a human readable hint.
+ *
+ * @param {string} shortcut - The shortcut key binding, e.g. "ctrl+s".
+ * @return {string} The human readable shortcut hint.
+ */
+export function convertShortcut(shortcut) {
+    return shortcut.split("+").map(key => {
+        return _.defaultTo(shortcutMap[key], key.toUpperCase());
+    }).join(shortcutSep);
+}
+
 /**
  * Empty the given array. Source: http://stackoverflow.com/a/1232046/4966649
  *

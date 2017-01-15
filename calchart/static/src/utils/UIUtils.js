@@ -13,7 +13,7 @@
 import * as _ from "lodash";
 
 import HTMLBuilder from "utils/HTMLBuilder";
-import { IS_MAC } from "utils/JSUtils";
+import { convertShortcut } from "utils/JSUtils";
 
 /**** FORMS ****/
 
@@ -122,6 +122,7 @@ export function bindSubmenu(container, parent, submenu) {
  *   a menu.
  */
 export function setupMenu(menu) {
+    let controller = window.controller;
     let menuTabs = $(menu).children();
 
     function closeSubmenus() {
@@ -163,6 +164,13 @@ export function setupMenu(menu) {
                 });
             }
 
+            let shortcut = controller.shortcutCommands[action];
+            if (!_.isUndefined(shortcut)) {
+                HTMLBuilder.span("", "hint")
+                    .html(convertShortcut(shortcut))
+                    .appendTo(this);
+            }
+
             let subsubmenu = $(this).children(".submenu");
             if (subsubmenu.exists()) {
                 bindSubmenu(submenu, this, subsubmenu);
@@ -194,66 +202,19 @@ export function setupMenu(menu) {
     });
 }
 
-let shortcutMap, shortcutSep;
-if (IS_MAC) {
-    // HTML codes: http://apple.stackexchange.com/a/55729
-    shortcutMap = {
-        ctrl: "&#8984;",
-        alt: "&#8997;",
-        shift: "&#8679;",
-        backspace: "&#9003;",
-        tab: "&#8677;",
-        enter: "&crarr;",
-        left: "&larr;",
-        up: "&uarr;",
-        right: "&rarr;",
-        down: "&darr;",
-        delete: "&#8998;",
-    };
-    shortcutSep = "";
-} else {
-    shortcutMap = {
-        ctrl: "Ctrl",
-        alt: "Alt",
-        shift: "Shift",
-        backspace: "Backspace",
-        tab: "Tab",
-        enter: "Enter",
-        left: "Left",
-        up: "Up",
-        right: "Right",
-        down: "Down",
-        delete: "Del",
-    };
-    shortcutSep = "+";
-}
-
-/**
- * Convert the given shortcut key binding to a human readable hint.
- *
- * @param {string} shortcut - The shortcut key binding, e.g. "ctrl+s".
- * @return {string} The human readable shortcut hint.
- */
-function convertShortcut(shortcut) {
-    return shortcut.split("+").map(key => {
-        let hint = shortcutMap[key];
-        return _.isUndefined(hint) ? key.toUpperCase() : hint;
-    }).join(shortcutSep);
-}
-
 /**
  * Set up the given toolbar element.
  *
  * @param {jQuery|string} toolbar - jQuery object or toolbar to setup.
  */
 export function setupToolbar(toolbar) {
-    let shortcutCommands = window.controller.constructor.getAllShortcutCommands();
+    let controller = window.controller;
 
     // set up click and tooltip
     $(toolbar).find("li").each(function() {
         let name = $(this).data("name");
         let action = $(this).data("action");
-        let shortcut = shortcutCommands[action];
+        let shortcut = controller.shortcutCommands[action];
 
         $(this)
             .mousedown(function() {
