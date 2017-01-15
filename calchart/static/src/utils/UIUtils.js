@@ -73,6 +73,21 @@ export function getData(parent) {
 /**** MENUS ****/
 
 /**
+ * Add a shortcut hint for the given action to the given menu item.
+ *
+ * @param {jQuery} li - The menu item.
+ * @param {string} action
+ */
+function addShortcutHint(li, action) {
+    let shortcut = window.controller.shortcutCommands[action];
+    if (!_.isUndefined(shortcut)) {
+        HTMLBuilder.span("", "hint")
+            .html(convertShortcut(shortcut))
+            .appendTo(li);
+    }
+}
+
+/**
  * Bind the given submenu to the parent.
  *
  * @param {jQuery} container - The parent's container.
@@ -122,7 +137,6 @@ export function bindSubmenu(container, parent, submenu) {
  *   a menu.
  */
 export function setupMenu(menu) {
-    let controller = window.controller;
     let menuTabs = $(menu).children();
 
     function closeSubmenus() {
@@ -164,12 +178,7 @@ export function setupMenu(menu) {
                 });
             }
 
-            let shortcut = controller.shortcutCommands[action];
-            if (!_.isUndefined(shortcut)) {
-                HTMLBuilder.span("", "hint")
-                    .html(convertShortcut(shortcut))
-                    .appendTo(this);
-            }
+            addShortcutHint(this, action);
 
             let subsubmenu = $(this).children(".submenu");
             if (subsubmenu.exists()) {
@@ -233,9 +242,9 @@ export function setupToolbar(toolbar) {
                 }
             });
 
-        if (name !== undefined) {
+        if (!_.isUndefined(name)) {
             // update name with shortcut
-            if (shortcut !== undefined) {
+            if (!_.isUndefined(shortcut)) {
                 let shortcutHint = convertShortcut(shortcut);
                 name = `${name} (${shortcutHint})`;
             }
@@ -305,6 +314,8 @@ export function showContextMenu(e, items) {
                     window.controller.doAction(action);
                     closeMenus();
                 });
+
+                addShortcutHint(item, action);
             } else {
                 let submenu = HTMLBuilder.make("ul.context-menu.submenu");
                 makeMenu(submenu, action);

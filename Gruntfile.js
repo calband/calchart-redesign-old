@@ -26,7 +26,7 @@ module.exports = function (grunt) {
                         // convert ES6 to ES5
                         {
                             test: /\.js$/,
-                            exclude: "node_modules",
+                            include: ["./calchart/static/src"],
                             loader: "babel-loader",
                             query: {
                                 presets: ["es2015"],

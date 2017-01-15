@@ -36,6 +36,9 @@
         &:hover, &.active {
             background: $blue;
             color: $light-gray;
+            span.hint {
+                color: $semilight-gray;
+            }
         }
         &.has-submenu:after {
             @include vertically-center-self;
@@ -49,7 +52,7 @@
             float: right;
             margin-left: 5px;
             right: -15px; // align with .has-submenu arrow
-            color: $medium-gray;
+            color: lighten($blue, 10);
         }
     }
     &.submenu {

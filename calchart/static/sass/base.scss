@@ -163,6 +163,12 @@ header {
         &:hover, &.active {
             background: $light-gray;
             color: $dark-gray;
+            span.hint {
+                color: $medium-gray;
+            }
+        }
+        span.hint {
+            color: $medium-gray;
         }
     }
 }
