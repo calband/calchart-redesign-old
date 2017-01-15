@@ -5,18 +5,12 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks("grunt-contrib-sass");
     grunt.loadNpmTasks("grunt-contrib-watch");
 
-    // will map name (e.g. "base") to file 
-    var entryPoints = {};
-    var base = path.resolve("calchart/static/src");
-    grunt.file.expand({ cwd: base }, "*.js").forEach(function(filename) {
-        filename = path.basename(filename, ".js");
-        entryPoints[filename] = path.join(base, filename);
-    });
-
     grunt.initConfig({
         webpack: {
             build: {
-                entry: entryPoints,
+                entry: {
+                    editor: "./calchart/static/src/editor.js",
+                },
                 output: {
                     path: "calchart/static/js/",
                     filename: "[name].js",

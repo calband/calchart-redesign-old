@@ -9,7 +9,7 @@ import * as _ from "lodash";
  * https://css-tricks.com/snippets/javascript/test-mac-pc-javascript/
  * @const {boolean}
  */
-export const IS_MAC = _.includes(navigator.userAgent, "Mac OS X");
+export const IS_MAC = navigator.userAgent.includes("Mac OS X");
 
 /**
  * Empty the given array. Source: http://stackoverflow.com/a/1232046/4966649
