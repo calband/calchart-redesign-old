@@ -424,9 +424,6 @@ export function setupPanel(panel, options={}) {
 export function showPopup(name, options={}) {
     let popup = $(`.popup-box.${name}`).addClass("active");
 
-    // clear inputs
-    popup.find("input, select, textarea").val("");
-
     if (options.init !== undefined) {
         options.init(popup);
     }
@@ -476,6 +473,9 @@ export function hidePopup() {
     popup.removeClass("active")
         .parent()
         .hide();
+
+    // clear inputs
+    popup.find("input, select, textarea").val("");
 
     // remove event listeners
     popup.off(".popup");

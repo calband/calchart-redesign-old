@@ -72,8 +72,8 @@ class SetUpShowPopup(PopupForm):
     title = 'Set Up Show'
 
     num_dots = forms.IntegerField(label='Number of dots')
-    dot_format = forms.ChoiceField(choices=DOT_FORMATS)
-    field_type = forms.ChoiceField(choices=FIELD_TYPES)
+    dot_format = forms.ChoiceField(choices=DOT_FORMATS, initial='combo')
+    field_type = forms.ChoiceField(choices=FIELD_TYPES, initial='college')
 
 class AddStuntsheetPopup(PopupForm):
     """

@@ -16,6 +16,10 @@ $(function() {
     }
 
     showPopup("setup-show", {
+        init: function(popup) {
+            // dropdowns converted in EditorController.init(); not converted yet
+            popup.find("select").dropdown();
+        },
         onSubmit: function(popup) {
             let data = getData(popup);
 
@@ -30,14 +34,6 @@ $(function() {
             if (data.num_dots <= 0) {
                 showError("Need to have a positive number of dots.");
                 return;
-            }
-
-            if (_.isNull(data.dot_format)) {
-                data.dot_format = popup.find(".dot_format select option:first").val();
-            }
-
-            if (_.isNull(data.field_type)) {
-                data.field_type = popup.find(".field_type select option:first").val();
             }
 
             // save show and initialize controller
