@@ -14,7 +14,6 @@ import {
     showContextMenu,
     showPopup,
     getData,
-    hidePopup,
     setupMenu,
     setupToolbar,
     showError,
@@ -128,9 +127,6 @@ export default class EditorController extends ApplicationController {
                     return;
                 }
 
-                // hide popup and add sheet to show
-
-                hidePopup();
                 controller.doAction("addSheet", [data.num_beats]);
             },
         });
@@ -280,7 +276,6 @@ export default class EditorController extends ApplicationController {
                 }
 
                 controller.doAction("saveShowProperties", [data]);
-                hidePopup();
             },
         });
     }
@@ -461,23 +456,16 @@ export default class EditorController extends ApplicationController {
 
     /**
      * Save the Show to the server.
-     *
-     * @param {function} [callback] - Optional callback to run after saving show. By default,
-     *   shows a saved message.
      */
-    saveShow(callback) {
+    saveShow() {
         let data = this._show.serialize();
         let params = {
             viewer: JSON.stringify(data),
         };
 
-        if (_.isUndefined(callback)) {
-            callback = function() {
-                showMessage("Saved!");
-            }
-        }
-
-        doAction("save_show", params, callback);
+        doAction("save_show", params, function() {
+            showMessage("Saved!");
+        });
     }
 
     /**

@@ -8,7 +8,6 @@ import HTMLBuilder from "utils/HTMLBuilder";
 import { round } from "utils/MathUtils";
 import {
     getData,
-    hidePopup,
     setupPanel,
     showContextMenu,
     showError,
@@ -147,7 +146,6 @@ export default class ContinuityContext extends BaseContext {
                 }
 
                 controller.doAction("saveContinuity", [continuity, data]);
-                hidePopup();
             },
         });
     }

@@ -4,7 +4,7 @@ import EditorController from "calchart/controllers/EditorController";
 import Show from "calchart/Show";
 
 import "utils/jquery";
-import { getData, hidePopup, showError, showPopup } from "utils/UIUtils";
+import { getData, showError, showPopup } from "utils/UIUtils";
 
 /**
  * Setup show, prompting user for show details if the show is new
@@ -39,9 +39,7 @@ $(function() {
             // save show and initialize controller
 
             let controller = EditorController.init(Show.create(data));
-            controller.saveShow(function() {
-                hidePopup();
-            });
+            controller.saveShow();
         },
     });
 });

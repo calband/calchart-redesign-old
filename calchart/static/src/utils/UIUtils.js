@@ -436,6 +436,8 @@ export function showPopup(name, options={}) {
             if (!_.isUndefined(options.onSubmit)) {
                 options.onSubmit(popup);
             }
+
+            hidePopup();
         });
 
     // event listeners to close popup
