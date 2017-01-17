@@ -39,7 +39,7 @@ export default class EvenContinuity extends BaseContinuity {
         }
         let end = nextSheet.getPosition(dot);
         let options = {
-            orientation: this.getOrientation(),
+            orientation: this.getOrientationDegrees(),
             beatsPerStep: this.getBeatsPerStep(),
         };
 

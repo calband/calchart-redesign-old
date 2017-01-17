@@ -8,7 +8,7 @@ import Sheet from "calchart/Sheet";
 
 import { ActionError, AnimationStateError } from "utils/errors";
 import HTMLBuilder from "utils/HTMLBuilder";
-import { empty, parseArgs } from "utils/JSUtils";
+import { empty, parseArgs, update } from "utils/JSUtils";
 import {
     doAction,
     showContextMenu,
@@ -254,6 +254,35 @@ export default class EditorController extends ApplicationController {
 
             this._updateHistory();
         }
+    }
+
+    /**
+     * Show the popup for editing the show properties.
+     */
+    editShowProperties() {
+        let controller = this;
+        let show = this._show;
+
+        showPopup("edit-show", {
+            init: function(popup) {
+                popup.find(".field_type select").choose(show.getFieldType());
+                popup.find(".beats_per_step input").val(show.getBeatsPerStep());
+                popup.find(".step_type select").choose(show.getStepType());
+                popup.find(".orientation select").choose(show.getOrientation());
+            },
+            onSubmit: function(popup) {
+                let data = getData(popup);
+
+                // validate data
+                if (data.beats_per_step <= 0) {
+                    showError("Beats per step needs to be a positive integer.");
+                    return;
+                }
+
+                controller.doAction("saveShowProperties", [data]);
+                hidePopup();
+            },
+        });
     }
 
     /**
@@ -672,6 +701,33 @@ class EditorActions {
                 this._show.removeSheet(clone);
                 sheet.updateMovements();
                 this.loadSheet(sheet);
+            },
+        };
+    }
+
+    /**
+     * Save the Show properties.
+     *
+     * @param {object} data - The data from the edit-show popup.
+     */
+    static saveShowProperties(data) {
+        let changed = update(this._show, _.mapKeys(data, (val, key) => "_" + _.camelCase(key)));
+
+        this._show.getSheets().forEach(function(sheet) {
+            sheet.updateMovements();
+        });
+        this.checkContinuities({
+            quiet: true,
+        });
+        this.refresh();
+
+        return {
+            undo: function() {
+                update(this._show, changed);
+                this._show.getSheets().forEach(function(sheet) {
+                    sheet.updateMovements();
+                });
+                this.refresh();
             },
         };
     }

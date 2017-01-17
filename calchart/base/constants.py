@@ -22,3 +22,18 @@ DOT_TYPES = [
     ('Plain Cross Dot', 'plain-x'),
     ('Solid Cross Dot', 'solid-x'),
 ]
+
+# step types, copied from CalchartUtils.STEP_TYPES
+STEP_TYPES = [
+    ('HS', 'High Step'),
+    ('MM', 'Mini Military'),
+    ('FF', 'Full Field'),
+    ('SH', 'Show High'),
+    ('JS', 'Jerky Step'),
+]
+
+# orientations, copied from CalchartUtils.ORIENTATIONS
+ORIENTATIONS = [
+    ('east', 'East'),
+    ('west', 'West'),
+]

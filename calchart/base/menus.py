@@ -245,7 +245,7 @@ editor_menu = Menu(
         ]),
     ], [
         MenuItem('Preferences', 'editPreferences'),
-        MenuItem('File properties...', 'editFileProperties'),
+        MenuItem('Show properties', 'editShowProperties'),
     ]),
     SubMenu('Edit', [
         MenuItem('Undo', 'undo', icon='undo'),

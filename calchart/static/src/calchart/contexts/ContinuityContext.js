@@ -134,6 +134,18 @@ export default class ContinuityContext extends BaseContext {
             },
             onSubmit: function(popup) {
                 let data = getData(popup);
+
+                try {
+                    continuity.validatePopup(data);
+                } catch (e) {
+                    if (e instanceof ValidationError) {
+                        showError(e.message);
+                        return;
+                    } else {
+                        throw e;
+                    }
+                }
+
                 controller.doAction("saveContinuity", [continuity, data]);
                 hidePopup();
             },
@@ -272,7 +284,7 @@ export default class ContinuityContext extends BaseContext {
             .change(function() {
                 let type = $(this).val();
                 _this._controller.doAction("addContinuity", [type]);
-                $(this).val("").trigger("chosen:updated");
+                $(this).choose("");
             });
 
         // edit continuity popup
@@ -394,18 +406,7 @@ class ContextActions {
      * @param {string} [dotType=this._dotType] - The dot type to save continuity for.
      */
     static saveContinuity(continuity, data, sheet=this._sheet, dotType=this._dotType) {
-        let changed;
-
-        try {
-            changed = continuity.savePopup(data);
-        } catch (e) {
-            if (e instanceof ValidationError) {
-                showError(e.message);
-                return;
-            } else {
-                throw e;
-            }
-        }
+        let changed = continuity.savePopup(data);
 
         sheet.updateMovements(dotType);
         this._controller.checkContinuities({

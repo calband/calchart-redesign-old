@@ -75,6 +75,18 @@ class SetUpShowPopup(PopupForm):
     dot_format = forms.ChoiceField(choices=DOT_FORMATS, initial='combo')
     field_type = forms.ChoiceField(choices=FIELD_TYPES, initial='college')
 
+class EditShowPopup(PopupForm):
+    """
+    The popup to edit a show.
+    """
+    name = 'edit-show'
+    title = 'Show Properties'
+
+    field_type = forms.ChoiceField(choices=FIELD_TYPES)
+    beats_per_step = forms.IntegerField()
+    step_type = forms.ChoiceField(choices=STEP_TYPES)
+    orientation = forms.ChoiceField(choices=ORIENTATIONS)
+
 class AddStuntsheetPopup(PopupForm):
     """
     The popup to add a stuntsheet

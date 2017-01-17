@@ -24,6 +24,13 @@ window.jQuery = jQuery;
 let jQueryUtils = {};
 
 /**
+ * Helper function to set the value of a select and refresh the dropdown.
+ */
+jQueryUtils.choose = function(opt) {
+    return this.val(opt).trigger("chosen:updated");
+};
+
+/**
  * Run a callback function if the user clicks off this element. If run without
  * arguments, triggers the callback.
  *

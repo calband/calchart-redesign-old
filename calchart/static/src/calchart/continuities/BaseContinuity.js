@@ -1,9 +1,9 @@
 import * as _ from "lodash";
 
 import { STEP_TYPES, ORIENTATIONS } from "utils/CalchartUtils";
-import { NotImplementedError } from "utils/errors";
+import { NotImplementedError, ValidationError } from "utils/errors";
 import HTMLBuilder from "utils/HTMLBuilder";
-import { parseNumber, setDefaults } from "utils/JSUtils";
+import { parseNumber, setDefaults, update } from "utils/JSUtils";
 
 /**
  * Represents a Continuity for a dot type during a stuntsheet. This is
@@ -96,10 +96,10 @@ export default class BaseContinuity {
      *
      * @return {int} The orientation, in Calchart degrees
      */
-    getOrientation() {
+    getOrientationDegrees() {
         switch (this._orientation) {
             case "default":
-                return this._sheet.getOrientation();
+                return this._sheet.getOrientationDegrees();
             case "east":
                 return 0;
             case "west":
@@ -142,7 +142,7 @@ export default class BaseContinuity {
     }
 
     /**
-     * Update this continuity when saving the Edit Continuity popup
+     * Update this continuity when saving the Edit Continuity popup.
      *
      * @param {Object} data - The popup data.
      * @return {Object} The values that were changed, mapping name
@@ -154,17 +154,18 @@ export default class BaseContinuity {
             data.beatsPerStep = data.customBeatsPerStep;
         }
 
-        let changed = {};
+        return update(this, _.mapKeys(data, (val, key) => `_${key}`));
+    }
 
-        _.each(data, (val, key) => {
-            let old = this["_" + key];
-            if (old !== val) {
-                changed[key] = old;
-                this["_" + key] = parseNumber(val);
-            }
-        });
-
-        return changed;
+    /**
+     * Validate the data when saving the Edit Continuity popup.
+     *
+     * @param {Object} data
+     */
+    validatePopup(data) {
+        if (data.beatsPerStep === "custom" && data.customBeatsPerStep <= 0) {
+            throw new ValidationError("Beats per step needs to be a positive integer.");
+        }
     }
 
     /**

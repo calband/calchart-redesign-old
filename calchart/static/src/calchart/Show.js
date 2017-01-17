@@ -126,9 +126,16 @@ export default class Show {
     }
 
     /**
-     * @return {int} The default orientation of the entire Show, in Calchart degrees.
+     * @return {string} The default orientation of the entire Show.
      */
     getOrientation() {
+        return this._orientation;
+    }
+
+    /**
+     * @return {int} The default orientation of the entire Show, in Calchart degrees.
+     */
+    getOrientationDegrees() {
         switch (this._orientation) {
             case "east":
                 return 0;

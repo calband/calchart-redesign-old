@@ -359,13 +359,20 @@ export default class Sheet {
     }
 
     /**
-     * @return {int} The sheet's orientation, defaulting to the Show's orientation, in
-     *   Calchart degrees
+     * @return {string} The sheet's orientation.
      */
     getOrientation() {
+        return this._orientation;
+    }
+
+    /**
+     * @return {int} The sheet's orientation, defaulting to the Show's orientation, in
+     *   Calchart degrees.
+     */
+    getOrientationDegrees() {
         switch (this._orientation) {
             case "default":
-                return this._show.getOrientation();
+                return this._show.getOrientationDegrees();
             case "east":
                 return 0;
             case "west":

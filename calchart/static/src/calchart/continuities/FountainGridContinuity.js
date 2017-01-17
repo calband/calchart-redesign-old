@@ -87,7 +87,7 @@ export default class FountainGridContinuity extends BaseContinuity {
 
         let remaining = this._sheet.getDuration() - Math.abs(deltaX) - Math.abs(deltaY);
         if (remaining > 0) {
-            let orientation = this.getOrientation();
+            let orientation = this.getOrientationDegrees();
             let marktime = this._end === "MT";
             let stop = new MovementCommandStop(end.x, end.y, orientation, remaining, marktime, options);
             movements.push(stop);

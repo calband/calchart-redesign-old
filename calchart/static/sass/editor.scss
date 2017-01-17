@@ -125,6 +125,14 @@ $sidebar-width: 200px;
             width: initial;
         }
     }
+    &.edit-show {
+        label {
+            width: 90px;
+        }
+        .beats_per_step label {
+            width: initial;
+        }
+    }
     &.edit-continuity {
         label {
             width: 125px;

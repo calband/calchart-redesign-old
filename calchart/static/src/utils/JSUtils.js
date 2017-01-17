@@ -67,6 +67,28 @@ export function empty(array) {
 }
 
 /**
+ * Update the given object with the given data, returning an object mapping
+ * any keys that have been changed to the old value.
+ *
+ * @param {Object} obj - The object to be updated.
+ * @param {Object} data - The data to update the object with.
+ * @return {Object}
+ */
+export function update(obj, data) {
+    let changed = {};
+
+    _.each(data, function(value, key) {
+        let old = obj[key];
+        if (old !== key) {
+            changed[key] = old;
+            obj[key] = parseNumber(value);
+        }
+    });
+
+    return changed;
+}
+
+/**
  * Parse the arguments passed to a function as either positional arguments
  * or as keyword arguments, passed as an object.
  *

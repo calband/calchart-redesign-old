@@ -53,7 +53,7 @@ export default class StopContinuity extends BaseContinuity {
         let move = new MovementCommandStop(
             data.position.x,
             data.position.y,
-            this.getOrientation(),
+            this.getOrientationDegrees(),
             duration,
             this._marktime,
             options
