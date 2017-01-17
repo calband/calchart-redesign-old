@@ -338,6 +338,9 @@ export default class ContinuityContext extends BaseContext {
 
         this._addEvents(seek, {
             mousedown: function(e) {
+                // prevent text highlight
+                e.preventDefault();
+
                 isDrag = true;
 
                 if ($(e.target).is(marker)) {
