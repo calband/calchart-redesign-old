@@ -97,19 +97,19 @@ export default class Sheet {
     static deserialize(show, data) {
         let sheet = new Sheet(show, data.index, data.numBeats, data.options);
 
-        _.each(data.dots, function(dot_data, label) {
+        _.each(data.dots, function(dotData, label) {
             sheet._dots[label] = {
-                type: dot_data.type,
-                position: Coordinate.deserialize(dot_data.position),
-                movements: dot_data.movements.map(
-                    movement_data => MovementCommand.deserialize(movement_data)
+                type: dotData.type,
+                position: Coordinate.deserialize(dotData.position),
+                movements: dotData.movements.map(
+                    movementData => MovementCommand.deserialize(movementData)
                 ),
             };
         });
 
-        _.each(data.continuities, function(continuities_data, dot_type) {
-            sheet._continuities[dot_type] = continuities_data.map(
-                data => Continuity.deserialize(sheet, dot_type, data)
+        _.each(data.continuities, function(continuitiesData, dotType) {
+            sheet._continuities[dotType] = continuitiesData.map(
+                data => Continuity.deserialize(sheet, dotType, data)
             );
         });
 

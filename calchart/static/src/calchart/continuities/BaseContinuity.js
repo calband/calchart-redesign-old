@@ -3,7 +3,7 @@ import * as _ from "lodash";
 import { STEP_TYPES, ORIENTATIONS } from "utils/CalchartUtils";
 import { NotImplementedError, ValidationError } from "utils/errors";
 import HTMLBuilder from "utils/HTMLBuilder";
-import { parseNumber, setDefaults, update } from "utils/JSUtils";
+import { parseNumber, setDefaults, underscoreKeys, update } from "utils/JSUtils";
 
 /**
  * Represents a Continuity for a dot type during a stuntsheet. This is
@@ -154,7 +154,7 @@ export default class BaseContinuity {
             data.beatsPerStep = data.customBeatsPerStep;
         }
 
-        return update(this, _.mapKeys(data, (val, key) => `_${key}`));
+        return update(this, underscoreKeys(data));
     }
 
     /**
@@ -240,9 +240,9 @@ export default class BaseContinuity {
      *   </div>
      */
     _wrapPanel(type, contents) {
-        let icon_edit = HTMLBuilder.icon("pencil", "edit");
-        let icon_delete = HTMLBuilder.icon("times", "delete");
-        let actions = HTMLBuilder.div("actions", [icon_edit, icon_delete]);
+        let iconEdit = HTMLBuilder.icon("pencil", "edit");
+        let iconDelete = HTMLBuilder.icon("times", "delete");
+        let actions = HTMLBuilder.div("actions", [iconEdit, iconDelete]);
         let info = HTMLBuilder.div("info", contents);
 
         return HTMLBuilder.div("continuity " + type, [info, actions])

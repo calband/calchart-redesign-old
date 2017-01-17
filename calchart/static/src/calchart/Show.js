@@ -58,7 +58,7 @@ export default class Show {
      */
     static create(data) {
         let getLabel;
-        switch (data.dot_format) {
+        switch (data.dotFormat) {
             case "combo":
                 getLabel = function(n) {
                     // 65 = "A"
@@ -74,11 +74,11 @@ export default class Show {
                 break;
         }
 
-        let dots = _.range(data.num_dots).map(
+        let dots = _.range(data.numDots).map(
             i => new Dot(getLabel(i)).serialize()
         );
 
-        return new Show(dots, [], [], data.field_type);
+        return new Show(dots, [], [], data.fieldType);
     }
 
     /**

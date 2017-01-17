@@ -8,7 +8,7 @@ import Sheet from "calchart/Sheet";
 
 import { ActionError, AnimationStateError } from "utils/errors";
 import HTMLBuilder from "utils/HTMLBuilder";
-import { empty, parseArgs, update } from "utils/JSUtils";
+import { empty, parseArgs, underscoreKeys, update } from "utils/JSUtils";
 import {
     doAction,
     showContextMenu,
@@ -114,20 +114,16 @@ export default class EditorController extends ApplicationController {
             onSubmit: function(popup) {
                 let data = getData(popup);
 
-                // validate data
-
-                if (data.num_beats == "") {
+                data.numBeats = parseInt(data.numBeats);
+                if (_.isNaN(data.numBeats)) {
                     showError("Please provide the number of beats in the stuntsheet.");
                     return;
-                }
-
-                data.num_beats = parseInt(data.num_beats);
-                if (data.num_beats <= 0) {
+                } else if (data.numBeats <= 0) {
                     showError("Need to have a positive number of beats.");
                     return;
                 }
 
-                controller.doAction("addSheet", [data.num_beats]);
+                controller.doAction("addSheet", [data.numBeats]);
             },
         });
     }
@@ -261,16 +257,16 @@ export default class EditorController extends ApplicationController {
 
         showPopup("edit-show", {
             init: function(popup) {
-                popup.find(".field_type select").choose(show.getFieldType());
-                popup.find(".beats_per_step input").val(show.getBeatsPerStep());
-                popup.find(".step_type select").choose(show.getStepType());
+                popup.find(".fieldType select").choose(show.getFieldType());
+                popup.find(".beatsPerStep input").val(show.getBeatsPerStep());
+                popup.find(".stepType select").choose(show.getStepType());
                 popup.find(".orientation select").choose(show.getOrientation());
             },
             onSubmit: function(popup) {
                 let data = getData(popup);
 
                 // validate data
-                if (data.beats_per_step <= 0) {
+                if (data.beatsPerStep <= 0) {
                     showError("Beats per step needs to be a positive integer.");
                     return;
                 }
@@ -699,7 +695,7 @@ class EditorActions {
      * @param {object} data - The data from the edit-show popup.
      */
     static saveShowProperties(data) {
-        let changed = update(this._show, _.mapKeys(data, (val, key) => "_" + _.camelCase(key)));
+        let changed = update(this._show, underscoreKeys(data));
 
         this._show.getSheets().forEach(function(sheet) {
             sheet.updateMovements();

@@ -25,13 +25,11 @@ $(function() {
 
             // validate data
 
-            if (data.num_dots === "") {
+            data.numDots = parseInt(data.numDots);
+            if (_.isNaN(data.numDots)) {
                 showError("Please provide the number of dots in the show.");
                 return;
-            }
-
-            data.num_dots = parseInt(data.num_dots);
-            if (data.num_dots <= 0) {
+            } else if (data.numDots <= 0) {
                 showError("Need to have a positive number of dots.");
                 return;
             }

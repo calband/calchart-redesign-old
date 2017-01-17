@@ -126,7 +126,17 @@ export function parseArgs(args, labels) {
  */
 export function parseNumber(value) {
     let float = parseFloat(value);
-    return isNaN(float) ? value : float;
+    return _.isNaN(float) ? value : float;
+}
+
+/**
+ * Prepend an underscore to the keys in the given data.
+ *
+ * @param {Object} data
+ * @return {Object}
+ */
+export function underscoreKeys(data) {
+    return _.mapKeys(data, (val, key) => `_${key}`);
 }
 
 /**

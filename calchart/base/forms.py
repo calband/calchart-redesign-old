@@ -71,9 +71,9 @@ class SetUpShowPopup(PopupForm):
     template_name = 'partials/popup_setup_show.html'
     title = 'Set Up Show'
 
-    num_dots = forms.IntegerField(label='Number of dots')
-    dot_format = forms.ChoiceField(choices=DOT_FORMATS, initial='combo')
-    field_type = forms.ChoiceField(choices=FIELD_TYPES, initial='college')
+    numDots = forms.IntegerField(label='Number of dots')
+    dotFormat = forms.ChoiceField(choices=DOT_FORMATS, initial='combo')
+    fieldType = forms.ChoiceField(choices=FIELD_TYPES, initial='college')
 
 class EditShowPopup(PopupForm):
     """
@@ -82,9 +82,9 @@ class EditShowPopup(PopupForm):
     name = 'edit-show'
     title = 'Show Properties'
 
-    field_type = forms.ChoiceField(choices=FIELD_TYPES)
-    beats_per_step = forms.IntegerField()
-    step_type = forms.ChoiceField(choices=STEP_TYPES)
+    fieldType = forms.ChoiceField(choices=FIELD_TYPES)
+    beatsPerStep = forms.IntegerField()
+    stepType = forms.ChoiceField(choices=STEP_TYPES)
     orientation = forms.ChoiceField(choices=ORIENTATIONS)
 
 class AddStuntsheetPopup(PopupForm):
@@ -93,7 +93,7 @@ class AddStuntsheetPopup(PopupForm):
     """
     name = 'add-stuntsheet'
 
-    num_beats = forms.IntegerField(label='Number of beats')
+    numBeats = forms.IntegerField(label='Number of beats')
 
 class EditContinuityPopup(PopupForm):
     """
