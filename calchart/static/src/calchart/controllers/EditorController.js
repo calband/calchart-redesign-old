@@ -6,7 +6,7 @@ import Dot from "calchart/Dot";
 import Grapher from "calchart/Grapher";
 import Sheet from "calchart/Sheet";
 
-import { ActionError, AnimationStateError } from "utils/errors";
+import { ActionError, AnimationStateError, ValidationError } from "utils/errors";
 import HTMLBuilder from "utils/HTMLBuilder";
 import { empty, parseArgs, underscoreKeys, update } from "utils/JSUtils";
 import {
@@ -116,11 +116,9 @@ export default class EditorController extends ApplicationController {
 
                 data.numBeats = parseInt(data.numBeats);
                 if (_.isNaN(data.numBeats)) {
-                    showError("Please provide the number of beats in the stuntsheet.");
-                    return false;
+                    throw new ValidationError("Please provide the number of beats in the stuntsheet.");
                 } else if (data.numBeats <= 0) {
-                    showError("Need to have a positive number of beats.");
-                    return false;
+                    throw new ValidationError("Need to have a positive number of beats.");
                 }
 
                 controller.doAction("addSheet", [data.numBeats]);
@@ -278,21 +276,17 @@ export default class EditorController extends ApplicationController {
                 // validate data
                 data.numBeats = parseInt(data.numBeats);
                 if (_.isNaN(data.numBeats)) {
-                    showError("Please provide the number of beats.");
-                    return false;
+                    throw new ValidationError("Please provide the number of beats.");
                 } else if (data.numBeats <= 0) {
-                    showError("Need to have a positive number of beats.");
-                    return false;
+                    throw new ValidationError("Need to have a positive number of beats.");
                 }
 
                 if (data.beatsPerStep === "custom") {
                     data.beatsPerStep = parseInt(data.customBeatsPerStep);
                     if (_.isNaN(data.beatsPerStep)) {
-                        showError("Please provide the number of beats per step.");
-                        return false;
+                        throw new ValidationError("Please provide the number of beats per step.");
                     } else if (data.beatsPerStep <= 0) {
-                        showError("Beats per step needs to be a positive integer.");
-                        return false;
+                        throw new ValidationError("Beats per step needs to be a positive integer.");
                     }
                 }
 
@@ -321,11 +315,9 @@ export default class EditorController extends ApplicationController {
                 // validate data
                 data.beatsPerStep = parseInt(data.beatsPerStep);
                 if (_.isNaN(data.beatsPerStep)) {
-                    showError("Please provide the number of beats per step.");
-                    return false;
+                    throw new ValidationError("Please provide the number of beats per step.");
                 } else if (data.beatsPerStep <= 0) {
-                    showError("Beats per step needs to be a positive integer.");
-                    return false;
+                    throw new ValidationError("Beats per step needs to be a positive integer.");
                 }
 
                 controller.doAction("saveShowProperties", [data]);

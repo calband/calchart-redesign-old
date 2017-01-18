@@ -12,6 +12,7 @@
 
 import * as _ from "lodash";
 
+import { ValidationError } from "utils/errors";
 import HTMLBuilder from "utils/HTMLBuilder";
 import { convertShortcut } from "utils/JSUtils";
 
@@ -418,8 +419,9 @@ export function setupPanel(panel, options={}) {
  * @param {string} name - The name of the popup to show.
  * @param {object} [options] - An object containing optional parameters, such as:
  *   - {function(jQuery)} init - Function to run before the popup is shown.
- *   - {function(jQuery)} onSubmit - Function to run when the Save button is pressed. If
- *     false is returned, don't hide the popup.
+ *   - {function(jQuery)} onSubmit - Function to run when the Save button is pressed.
+ *     If any ValidationErrors are thrown, shows a UI error message and exits without
+ *     closing the popup.
  *   - {function(jQuery)} onHide - Function to run after the popup is hidden.
  */
 export function showPopup(name, options={}) {
@@ -435,9 +437,15 @@ export function showPopup(name, options={}) {
             e.preventDefault();
 
             if (!_.isUndefined(options.onSubmit)) {
-                let result = options.onSubmit(popup);
-                if (result === false) {
-                    return;
+                try {
+                    options.onSubmit(popup);
+                } catch (e) {
+                    if (e instanceof ValidationError) {
+                        showError(e.message);
+                        return;
+                    } else {
+                        throw e;
+                    }
                 }
             }
 

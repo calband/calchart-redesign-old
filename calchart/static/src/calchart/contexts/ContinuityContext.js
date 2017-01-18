@@ -3,14 +3,12 @@ import * as _ from "lodash";
 import BaseContext from "calchart/contexts/BaseContext";
 import Continuity from "calchart/Continuity";
 
-import { ValidationError } from "utils/errors";
 import HTMLBuilder from "utils/HTMLBuilder";
 import { round } from "utils/MathUtils";
 import {
     getData,
     setupPanel,
     showContextMenu,
-    showError,
     showPopup,
 } from "utils/UIUtils";
 
@@ -133,18 +131,7 @@ export default class ContinuityContext extends BaseContext {
             },
             onSubmit: function(popup) {
                 let data = getData(popup);
-
-                try {
-                    continuity.validatePopup(data);
-                } catch (e) {
-                    if (e instanceof ValidationError) {
-                        showError(e.message);
-                        return false;
-                    } else {
-                        throw e;
-                    }
-                }
-
+                continuity.validatePopup(data);
                 controller.doAction("saveContinuity", [continuity, data]);
             },
         });

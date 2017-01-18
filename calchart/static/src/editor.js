@@ -3,8 +3,9 @@ import * as _ from "lodash";
 import EditorController from "calchart/controllers/EditorController";
 import Show from "calchart/Show";
 
+import { ValidationError } from "utils/errors";
 import "utils/jquery";
-import { getData, showError, showPopup } from "utils/UIUtils";
+import { getData, showPopup } from "utils/UIUtils";
 
 /**
  * Setup show, prompting user for show details if the show is new
@@ -27,11 +28,9 @@ $(function() {
 
             data.numDots = parseInt(data.numDots);
             if (_.isNaN(data.numDots)) {
-                showError("Please provide the number of dots in the show.");
-                return false;
+                throw new ValidationError("Please provide the number of dots in the show.");
             } else if (data.numDots <= 0) {
-                showError("Need to have a positive number of dots.");
-                return false;
+                throw new ValidationError("Need to have a positive number of dots.");
             }
 
             // save show and initialize controller
