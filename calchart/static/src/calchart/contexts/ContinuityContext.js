@@ -139,7 +139,7 @@ export default class ContinuityContext extends BaseContext {
                 } catch (e) {
                     if (e instanceof ValidationError) {
                         showError(e.message);
-                        return;
+                        return false;
                     } else {
                         throw e;
                     }

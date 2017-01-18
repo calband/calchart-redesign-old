@@ -15,6 +15,9 @@ import { AnimationStateError } from "utils/errors";
  *  - the index of the Sheet in the Show
  *  - an optional label for the Sheet
  *  - the number of beats in the stuntsheet
+ *  - the default number of beats per step for continuities in the Sheet
+ *  - the default orientation for continuities in the Sheet
+ *  - the default step type for continuities in the Sheet
  *  - each dot's information (see Sheet.getDotInfo)
  *  - each dot type's continuities
  */
@@ -25,7 +28,8 @@ export default class Sheet {
      * @param {int} numBeats - The number of beats in the stuntsheet.
      * @param {Object} [options] - Optional information about a stuntsheet, such as:
      *   - {string} label - A label for the Sheet.
-     *   - {string} fieldType - The field type.
+     *   - {string} fieldType - The field type, or "default" to use the same field
+     *     type as the Show.
      *   - {(int|string)} beatsPerStep - The default number of beats per step for
      *       continuities in the Sheet, or "default" to get the number of beats per
      *       step from the Show.
@@ -40,8 +44,8 @@ export default class Sheet {
         this._numBeats = numBeats;
 
         options = _.defaults(options, {
-            label: null,
-            fieldType: null,
+            label: String(index + 1),
+            fieldType: "default",
             beatsPerStep: "default",
             orientation: "default",
             stepType: "default",
@@ -151,6 +155,12 @@ export default class Sheet {
 
         return data;
     }
+
+    // getter methods to access raw properties instead of resolving defaults
+    get beatsPerStep() { return this._beatsPerStep; }
+    get fieldType() { return this._fieldType; }
+    get orientation() { return this._orientation; }
+    get stepType() { return this._stepType; }
 
     /**
      * Add the given continuity to the given dot type.
@@ -316,7 +326,7 @@ export default class Sheet {
      *   type of the Show.
      */
     getFieldType() {
-        return _.defaultTo(this._fieldType, this._show.getFieldType());
+        return this._fieldType === "default" ? this._show.getFieldType() : this._fieldType;
     }
 
     /**
@@ -343,11 +353,10 @@ export default class Sheet {
     }
 
     /**
-     * @return {string} The label for this Sheet, either the custom label or
-     * the sheet index in the given Show.
+     * @return {string} The label for this Sheet.
      */
     getLabel() {
-        return _.defaultTo(this._label, String(this._index + 1));
+        return this._label;
     }
 
     /**
@@ -356,13 +365,6 @@ export default class Sheet {
      */
     getNextSheet() {
         return this._show.getSheets()[this._index + 1] || null;
-    }
-
-    /**
-     * @return {string} The sheet's orientation.
-     */
-    getOrientation() {
-        return this._orientation;
     }
 
     /**

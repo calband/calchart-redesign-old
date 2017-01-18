@@ -5,7 +5,7 @@ from django.http.response import JsonResponse
 
 import json
 
-from base.forms import *
+from base.forms import LoginForm, editor_popups
 from base.menus import *
 from base.mixins import CalchartMixin
 from base.models import Show
@@ -82,12 +82,7 @@ class EditorView(CalchartMixin, TemplateView):
     The editor view that can edit shows
     """
     template_name = 'editor.html'
-    popup_forms = [
-        SetUpShowPopup,
-        EditShowPopup,
-        AddStuntsheetPopup,
-        EditContinuityPopup,
-    ]
+    popup_forms = editor_popups
 
     def dispatch(self, request, *args, **kwargs):
         self.show = Show.objects.get(slug=kwargs['slug'])

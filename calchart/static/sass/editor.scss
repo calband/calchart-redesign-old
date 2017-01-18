@@ -117,36 +117,36 @@ $sidebar-width: 200px;
 }
 
 .popup-box {
-    &.setup-show {
+    label {
+        width: 90px;
+    }
+    .field.beatsPerStep {
         label {
+            width: initial;
+        }
+        select {
             width: 90px;
         }
-        .num_dots label {
+        & > input {
+            margin-left: 10px;
+            width: 50px;
+            vertical-align: middle;
+            text-align: center;
+        }
+    }
+    &.setup-show {
+        .numDots label {
             width: initial;
         }
     }
-    &.edit-show {
-        label {
-            width: 90px;
-        }
-        .beats_per_step label {
+    &.edit-stuntsheet {
+        .numBeats label {
             width: initial;
         }
     }
     &.edit-continuity {
         label {
             width: 125px;
-        }
-        .field.beatsPerStep {
-            select {
-                width: 90px;
-            }
-            input.custom-beats-per-step {
-                margin-left: 10px;
-                width: 50px;
-                vertical-align: middle;
-                text-align: center;
-            }
         }
     }
 }

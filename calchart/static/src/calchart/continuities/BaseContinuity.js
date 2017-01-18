@@ -149,11 +149,6 @@ export default class BaseContinuity {
      *   of the field to the old value.
      */
     savePopup(data) {
-        // validate beats per step
-        if (data.beatsPerStep === "custom") {
-            data.beatsPerStep = data.customBeatsPerStep;
-        }
-
         return update(this, underscoreKeys(data));
     }
 
@@ -163,8 +158,13 @@ export default class BaseContinuity {
      * @param {Object} data
      */
     validatePopup(data) {
-        if (data.beatsPerStep === "custom" && data.customBeatsPerStep <= 0) {
-            throw new ValidationError("Beats per step needs to be a positive integer.");
+        if (data.beatsPerStep === "custom") {
+            data.beatsPerStep = parseInt(data.customBeatsPerStep);
+            if (_.isNaN(data.beatsPerStep)) {
+                throw new ValidationError("Please provide the number of beats per step.");
+            } else if (data.beatsPerStep <= 0) {
+                throw new ValidationError("Beats per step needs to be a positive integer.");
+            }
         }
     }
 
@@ -188,28 +188,25 @@ export default class BaseContinuity {
     _getPopupFields() {
         let fields = {};
 
-        fields.stepType = HTMLBuilder.formfield("Step Type", HTMLBuilder.select({
+        fields.stepType = HTMLBuilder.formfield("Step type", HTMLBuilder.select({
             options: STEP_TYPES,
             initial: this._stepType,
         }));
 
         // beats per step is a select between default/custom, which disables/enables an
         // input for a custom beats per step
-        fields.beatsPerStep = HTMLBuilder.formfield("Beats per Step", HTMLBuilder.select({
+        fields.beatsPerStep = HTMLBuilder.formfield("Beats per step", HTMLBuilder.select({
             options: {
                 default: "Default",
                 custom: "Custom",
             },
             change: function() {
                 let disabled = $(this).val() !== "custom";
-                $(this).parent()
-                    .find(".custom-beats-per-step")
-                    .prop("disabled", disabled);
+                $(this).siblings("input").prop("disabled", disabled);
             },
             initial: this._beatsPerStep === "default" ? "default" : "custom",
         }));
         HTMLBuilder.input({
-            class: "custom-beats-per-step",
             name: "customBeatsPerStep",
             type: "number",
             initial: this.getBeatsPerStep(),

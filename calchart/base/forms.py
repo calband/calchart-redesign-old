@@ -1,10 +1,12 @@
 from django import forms
 from django.forms import modelform_factory
 from django.conf import settings
+from django.utils.text import camel_case_to_spaces
 
 import requests
 
 from base.constants import *
+from base.fields import *
 from base.models import Show
 
 class LoginForm(forms.Form):
@@ -49,6 +51,11 @@ class BasePopupForm(object):
 
         for field in self.hidden_fields:
             self.fields[field] = forms.CharField(widget=forms.HiddenInput)
+
+        # manually set labels for each field, since we're using camelcase
+        for field_name, field in self.fields.items():
+            if field.label is None:
+                field.label = camel_case_to_spaces(field_name).capitalize()
 
         if self.title is None:
             # automatically generate from the name
@@ -95,9 +102,30 @@ class AddStuntsheetPopup(PopupForm):
 
     numBeats = forms.IntegerField(label='Number of beats')
 
+class EditStuntsheetPopup(PopupForm):
+    """
+    The popup to edit a stuntsheet
+    """
+    name = 'edit-stuntsheet'
+
+    label = forms.CharField()
+    numBeats = forms.IntegerField(label='Number of beats')
+    fieldType = forms.ChoiceField(choices=DEF_FIELD_TYPES)
+    beatsPerStep = BeatsPerStepField(label='Beats per step')
+    stepType = forms.ChoiceField(choices=DEF_STEP_TYPES)
+    orientation = forms.ChoiceField(choices=DEF_ORIENTATIONS)
+
 class EditContinuityPopup(PopupForm):
     """
     The popup to edit a continuity
     """
     name = 'edit-continuity'
     template_name = 'partials/popup_edit_continuity.html'
+
+editor_popups = [
+    SetUpShowPopup,
+    EditShowPopup,
+    AddStuntsheetPopup,
+    EditStuntsheetPopup,
+    EditContinuityPopup,
+]

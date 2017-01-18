@@ -83,7 +83,7 @@ export default class EditorController extends ApplicationController {
                 showContextMenu(e, {
                     "Duplicate Sheet": "duplicateSheet",
                     "Delete Sheet": "deleteSheet",
-                    "Properties...": "showProperties",
+                    "Properties...": "editSheetProperties",
                 });
 
                 return false;
@@ -117,10 +117,10 @@ export default class EditorController extends ApplicationController {
                 data.numBeats = parseInt(data.numBeats);
                 if (_.isNaN(data.numBeats)) {
                     showError("Please provide the number of beats in the stuntsheet.");
-                    return;
+                    return false;
                 } else if (data.numBeats <= 0) {
                     showError("Need to have a positive number of beats.");
-                    return;
+                    return false;
                 }
 
                 controller.doAction("addSheet", [data.numBeats]);
@@ -249,6 +249,59 @@ export default class EditorController extends ApplicationController {
     }
 
     /**
+     * Show the popup for editing the currently active sheet's properties.
+     */
+    editSheetProperties() {
+        let controller = this;
+        let sheet = this._activeSheet;
+
+        showPopup("edit-stuntsheet", {
+            init: function(popup) {
+                popup.find(".label input").val(sheet.getLabel());
+                popup.find(".numBeats input").val(sheet.getDuration());
+                popup.find(".fieldType select").choose(sheet.fieldType);
+                popup.find(".stepType select").choose(sheet.stepType);
+                popup.find(".orientation select").choose(sheet.orientation);
+
+                popup.find(".beatsPerStep select")
+                    .choose(sheet.beatsPerStep === "default" ? "default" : "custom")
+                    .change(function() {
+                        let disabled = $(this).val() !== "custom";
+                        $(this).siblings("input").prop("disabled", disabled);
+                    })
+                    .change();
+                popup.find(".beatsPerStep > input").val(sheet.getBeatsPerStep());
+            },
+            onSubmit: function(popup) {
+                let data = getData(popup);
+
+                // validate data
+                data.numBeats = parseInt(data.numBeats);
+                if (_.isNaN(data.numBeats)) {
+                    showError("Please provide the number of beats.");
+                    return false;
+                } else if (data.numBeats <= 0) {
+                    showError("Need to have a positive number of beats.");
+                    return false;
+                }
+
+                if (data.beatsPerStep === "custom") {
+                    data.beatsPerStep = parseInt(data.customBeatsPerStep);
+                    if (_.isNaN(data.beatsPerStep)) {
+                        showError("Please provide the number of beats per step.");
+                        return false;
+                    } else if (data.beatsPerStep <= 0) {
+                        showError("Beats per step needs to be a positive integer.");
+                        return false;
+                    }
+                }
+
+                controller.doAction("saveSheetProperties", [data]);
+            },
+        });
+    }
+
+    /**
      * Show the popup for editing the show properties.
      */
     editShowProperties() {
@@ -266,9 +319,13 @@ export default class EditorController extends ApplicationController {
                 let data = getData(popup);
 
                 // validate data
-                if (data.beatsPerStep <= 0) {
+                data.beatsPerStep = parseInt(data.beatsPerStep);
+                if (_.isNaN(data.beatsPerStep)) {
+                    showError("Please provide the number of beats per step.");
+                    return false;
+                } else if (data.beatsPerStep <= 0) {
                     showError("Beats per step needs to be a positive integer.");
-                    return;
+                    return false;
                 }
 
                 controller.doAction("saveShowProperties", [data]);
@@ -690,9 +747,33 @@ class EditorActions {
     }
 
     /**
+     * Save the given Sheet's properties.
+     *
+     * @param {Object} data - The data from the edit-stuntsheet popup.
+     * @param {Sheet} [sheet=this._activeSheet]
+     */
+    static saveSheetProperties(data, sheet=this._activeSheet) {
+        let changed = update(sheet, underscoreKeys(data));
+        sheet.updateMovements();
+        this.checkContinuities({
+            quiet: true,
+        });
+        this.refresh();
+
+        return {
+            data: [data, sheet],
+            undo: function() {
+                update(sheet, changed);
+                sheet.updateMovements();
+                this.refresh();
+            },
+        };
+    }
+
+    /**
      * Save the Show properties.
      *
-     * @param {object} data - The data from the edit-show popup.
+     * @param {Object} data - The data from the edit-show popup.
      */
     static saveShowProperties(data) {
         let changed = update(this._show, underscoreKeys(data));

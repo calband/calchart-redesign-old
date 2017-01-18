@@ -132,7 +132,7 @@ export default class FountainGridContinuity extends BaseContinuity {
             initial: this._end,
         }));
 
-        fields.orientation.find("label").text("Final Orientation:");
+        fields.orientation.find("label").text("Final orientation:");
 
         return fields;
     }

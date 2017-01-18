@@ -10,6 +10,10 @@ FIELD_TYPES = [
     ('', ''),
     ('college', 'College Field'),
 ]
+DEF_FIELD_TYPES = [
+    ('default', 'Default'),
+    ('college', 'College Field'),
+]
 
 # types of dots, copied from DotType.js
 DOT_TYPES = [
@@ -31,9 +35,22 @@ STEP_TYPES = [
     ('SH', 'Show High'),
     ('JS', 'Jerky Step'),
 ]
+DEF_STEP_TYPES = [
+    ('default', 'Default'),
+    ('HS', 'High Step'),
+    ('MM', 'Mini Military'),
+    ('FF', 'Full Field'),
+    ('SH', 'Show High'),
+    ('JS', 'Jerky Step'),
+]
 
 # orientations, copied from CalchartUtils.ORIENTATIONS
 ORIENTATIONS = [
+    ('east', 'East'),
+    ('west', 'West'),
+]
+DEF_ORIENTATIONS = [
+    ('default', 'Default'),
     ('east', 'East'),
     ('west', 'West'),
 ]

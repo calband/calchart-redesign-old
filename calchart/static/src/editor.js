@@ -28,10 +28,10 @@ $(function() {
             data.numDots = parseInt(data.numDots);
             if (_.isNaN(data.numDots)) {
                 showError("Please provide the number of dots in the show.");
-                return;
+                return false;
             } else if (data.numDots <= 0) {
                 showError("Need to have a positive number of dots.");
-                return;
+                return false;
             }
 
             // save show and initialize controller

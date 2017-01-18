@@ -418,7 +418,8 @@ export function setupPanel(panel, options={}) {
  * @param {string} name - The name of the popup to show.
  * @param {object} [options] - An object containing optional parameters, such as:
  *   - {function(jQuery)} init - Function to run before the popup is shown.
- *   - {function(jQuery)} onSubmit - Function to run when the Save button is pressed.
+ *   - {function(jQuery)} onSubmit - Function to run when the Save button is pressed. If
+ *     false is returned, don't hide the popup.
  *   - {function(jQuery)} onHide - Function to run after the popup is hidden.
  */
 export function showPopup(name, options={}) {
@@ -434,7 +435,10 @@ export function showPopup(name, options={}) {
             e.preventDefault();
 
             if (!_.isUndefined(options.onSubmit)) {
-                options.onSubmit(popup);
+                let result = options.onSubmit(popup);
+                if (result === false) {
+                    return;
+                }
             }
 
             hidePopup();
