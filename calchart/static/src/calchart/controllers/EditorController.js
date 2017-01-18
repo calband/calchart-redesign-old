@@ -92,7 +92,7 @@ export default class EditorController extends ApplicationController {
                 let sheet = $(this).data("sheet");
 
                 // only load if the sheet isn't already loaded
-                if (sheet !== this._activeSheet) {
+                if (sheet !== controller._activeSheet) {
                     controller.loadSheet(sheet);
                 }
             });
