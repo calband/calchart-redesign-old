@@ -346,7 +346,7 @@ export default class EditorController extends ApplicationController {
      */
     firstBeat() {
         this._currBeat = 0;
-        this.refresh();
+        this.refresh("grapher");
     }
 
     /**
@@ -397,7 +397,7 @@ export default class EditorController extends ApplicationController {
      */
     lastBeat() {
         this._currBeat = this._activeSheet.getDuration();
-        this.refresh();
+        this.refresh("grapher");
     }
 
     /**
@@ -438,7 +438,7 @@ export default class EditorController extends ApplicationController {
         if (this._currBeat > duration) {
             this._currBeat = duration;
         } else {
-            this.refresh();
+            this.refresh("grapher");
         }
     }
 
@@ -451,7 +451,7 @@ export default class EditorController extends ApplicationController {
         if (this._currBeat < 0) {
             this._currBeat = 0;
         } else {
-            this.refresh();
+            this.refresh("grapher");
         }
     }
 
@@ -475,42 +475,73 @@ export default class EditorController extends ApplicationController {
     /**
      * Refresh the UI according to the current state of the editor
      * and Show.
+     *
+     * @param {...String} [targets=all] - The elements to refresh.
+     *   Elements that can be refreshed:
+     *     - all
+     *     - sidebar (default all)
+     *     - sidebarPreviews (default sidebar)
+     *     - grapherClear
+     *     - grapher (default all || grapherClear)
+     *     - context (default all)
      */
-    refresh() {
-        // refresh sidebar
-        let sidebar = $(".sidebar").empty();
-        this._show.getSheets().forEach(sheet => {
-            let label = HTMLBuilder.span(sheet.getLabel(), "label");
+    refresh(...targets) {
+        // targets to refresh
+        let refresh = {};
+        refresh.all = targets.includes("all") || targets.length === 0;
+        refresh.sidebar = refresh.all || targets.includes("sidebar");
+        refresh.sidebarPreviews = refresh.sidebar || targets.includes("sidebarPreviews");
+        refresh.grapherClear = targets.includes("grapherClear");
+        refresh.grapher = refresh.all || refresh.grapherClear || targets.includes("grapher");
+        refresh.context = refresh.all || targets.includes("context");
 
-            let preview = HTMLBuilder.div("preview");
-            let $sheet = HTMLBuilder
-                .div("stuntsheet", [label, preview], sidebar)
-                .data("sheet", sheet);
+        let _this = this;
+        let sidebar = $(".sidebar");
 
-            // field preview
-            let grapher = new Grapher(this._show, preview, {
-                drawOrientation: false,
-                drawYardlines: false,
-                fieldPadding: 5,
-            })
-            grapher.draw(sheet);
+        if (refresh.sidebar) {
+            sidebar.empty();
+            this._show.getSheets().forEach(sheet => {
+                let label = HTMLBuilder.span(sheet.getLabel(), "label");
 
-            if (sheet === this._activeSheet) {
-                $sheet
-                    .addClass("active")
-                    .scrollIntoView({
-                        margin: 10,
-                    });
-            }
-        });
+                let preview = HTMLBuilder.div("preview");
+                let $sheet = HTMLBuilder
+                    .div("stuntsheet", [label, preview], sidebar)
+                    .data("sheet", sheet);
+
+                if (sheet === this._activeSheet) {
+                    $sheet.addClass("active");
+                }
+            });
+            sidebar.find(".stuntsheet.active").scrollIntoView({
+                margin: 10,
+            });
+        }
+
+        if (refresh.sidebarPreviews) {
+            sidebar.find(".stuntsheet").each(function() {
+                let sheet = $(this).data("sheet");
+                let preview = $(this).find(".preview");
+
+                // field preview
+                let grapher = new Grapher(_this._show, preview, {
+                    drawOrientation: false,
+                    drawYardlines: false,
+                    fieldPadding: 5,
+                })
+                grapher.draw(sheet);
+            });
+        }
 
         // refresh grapher
-        if (this._activeSheet) {
+        if (refresh.grapher && this._activeSheet) {
+            if (refresh.grapherClear) {
+                this._grapher.clear();
+            }
             this._grapher.draw(this._activeSheet, this._currBeat, this._selectedDots);
         }
 
         // refresh context
-        if (this._context) {
+        if (refresh.context && this._context) {
             this._context.refresh();
         }
     }
@@ -596,6 +627,7 @@ export default class EditorController extends ApplicationController {
      */
     zoomTo(ratio) {
         this._grapher.setOption("zoom", ratio);
+        this.refresh("grapher");
     }
 
     /**
@@ -603,6 +635,7 @@ export default class EditorController extends ApplicationController {
      */
     zoomIn() {
         this._grapher.zoomIn();
+        this.refresh("grapherClear");
     }
 
     /**
@@ -610,6 +643,7 @@ export default class EditorController extends ApplicationController {
      */
     zoomOut() {
         this._grapher.zoomOut();
+        this.refresh("grapherClear");
     }
 
     /**

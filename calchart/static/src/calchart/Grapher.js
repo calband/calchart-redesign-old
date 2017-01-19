@@ -31,9 +31,6 @@ export default class Grapher {
         // the radius of the dots to draw; proportional to scale
         this._dotRadius = undefined;
 
-        // the arguments used to last draw the graph
-        this._drawArgs = null;
-
         // maps dot label to dot SVG element
         this._dots = {};
 
@@ -96,12 +93,6 @@ export default class Grapher {
 
         this._drawDots(sheet, currentBeat);
         this.selectDots(selectedDots);
-
-        this._drawArgs = {
-            sheet: sheet,
-            currentBeat: currentBeat,
-            selectedDots: selectedDots,
-        };
     }
 
     /**
@@ -193,17 +184,6 @@ export default class Grapher {
     }
 
     /**
-     * Completely refresh the Grapher.
-     */
-    refresh() {
-        // only refresh if draw has been called at least once
-        if (!_.isNull(this._drawArgs)) {
-            this.clear();
-            this.draw(this._drawArgs);
-        }
-    }
-
-    /**
      * Select the given dots. Use to select dots without having to refresh the
      * entire graph.
      *
@@ -214,7 +194,8 @@ export default class Grapher {
     }
 
     /**
-     * Set a Grapher option. The available options are:
+     * Set a Grapher option. Will not go into effect until draw() has been called again. The
+     * available options are:
      *  - {boolean} [circleSelected=false] - If true, circles the selected dot, or the last
      *    selected dot, if multiple.
      *  - {boolean} [draw4Step=false] - If true, draws 4 step lines.
@@ -231,25 +212,22 @@ export default class Grapher {
      */
     setOption(name, val) {
         this._options[name] = val;
-        this.refresh();
     }
 
     /**
-     * Increment the zoom on the Grapher.
+     * Increment the zoom on the Grapher. Won't take effect until draw() is called again.
      */
     zoomIn() {
         let zoom = _.defaultTo(this._options.zoom, 1);
         this._options.zoom = zoom + 0.1;
-        this.refresh();
     }
 
     /**
-     * Decrement the zoom on the Grapher.
+     * Decrement the zoom on the Grapher. Won't take effect until draw() is called again.
      */
     zoomOut() {
         let zoom = _.defaultTo(this._options.zoom, 1);
         this._options.zoom = zoom - 0.1;
-        this.refresh();
     }
 
     /**
