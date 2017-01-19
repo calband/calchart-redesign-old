@@ -21,15 +21,9 @@ window.$ = jQuery;
 window.jQuery = jQuery;
 
 /**
- * Contains functions to add to the jQuery API.
- * @type {Object.<string, function>}
- */
-let jQueryUtils = {};
-
-/**
  * Helper function to set the value of a select and refresh the dropdown.
  */
-jQueryUtils.choose = function(opt) {
+$.fn.choose = function(opt) {
     return this.val(opt).trigger("chosen:updated");
 };
 
@@ -43,7 +37,7 @@ jQueryUtils.choose = function(opt) {
  * @param {jQuery} [parent=Window] - The parent to listen for clicks
  * @return {jQuery} @this
  */
-jQueryUtils.clickOff = function() {
+$.fn.clickOff = function() {
     if (arguments.length === 0) {
         this.data("callback").call(this);
         $(parent).off(".clickOff");
@@ -75,7 +69,7 @@ jQueryUtils.clickOff = function() {
  *      {@link https://harvesthq.github.io/chosen/options.html}.
  * @return {jQuery} @this
  */
-jQueryUtils.dropdown = function(options) {
+$.fn.dropdown = function(options) {
     if (this.length > 1) {
         return this.each(function() {
             $(this).dropdown(options);
@@ -104,8 +98,22 @@ jQueryUtils.dropdown = function(options) {
 /**
  * @return {boolean} true if the given jQuery selection exists
  */
-jQueryUtils.exists = function() {
+$.fn.exists = function() {
     return this.length !== 0;
+};
+
+/**
+ * Prevent this element from scrolling.
+ */
+$.fn.lockScroll = function() {
+    this.addClass("no-scroll");
+};
+
+/**
+ * Re-enable this element from scrolling after calling lockScroll.
+ */
+$.fn.unlockScroll = function() {
+    this.removeClass("no-scroll");
 };
 
 /**
@@ -114,7 +122,7 @@ jQueryUtils.exists = function() {
  * @param {jQuery} element
  * @return {boolean} true if this element is not in the given element
  */
-jQueryUtils.notIn = function(element) {
+$.fn.notIn = function(element) {
     return !this.closest(element).exists();
 };
 
@@ -131,7 +139,7 @@ jQueryUtils.notIn = function(element) {
  *   - {function(number, number)} [callback] - A callback function that
  *     takes in the change in x/y positions.
  */
-jQueryUtils.scrollIntoView = function(options={}) {
+$.fn.scrollIntoView = function(options={}) {
     let { tolerance=0, margin=tolerance } = options;
 
     // top/left of the visible part of the parent
@@ -224,7 +232,7 @@ jQueryUtils.scrollIntoView = function(options={}) {
  * @param {float} [right=left] - The position of the right edge of the
  *   element, if it goes offscreen.
  */
-jQueryUtils.smartPosition = function(top, left, right=left) {
+$.fn.smartPosition = function(top, left, right=left) {
     let position = {
         top: top,
         left: left,
@@ -244,5 +252,3 @@ jQueryUtils.smartPosition = function(top, left, right=left) {
 
     return this.css(position);
 };
-
-$.extend($.fn, jQueryUtils);

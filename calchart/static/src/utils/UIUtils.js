@@ -298,12 +298,12 @@ export function showContextMenu(e, items) {
 
     function closeMenus() {
         $(".context-menu").remove();
-        parents.removeClass("no-scroll");
+        parents.unlockScroll();
     };
 
     // close any existing menus
     closeMenus();
-    parents.addClass("no-scroll");
+    parents.lockScroll();
     let menu = HTMLBuilder.make("ul.context-menu", "body");
 
     // recursively setup menu items

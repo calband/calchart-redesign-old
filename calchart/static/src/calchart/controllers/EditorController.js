@@ -62,7 +62,7 @@ export default class EditorController extends ApplicationController {
         setupMenu(".menu");
         setupToolbar(".toolbar");
 
-        this._grapher = new Grapher(this._show, $(".grapher-draw-target"), {
+        this._grapher = new Grapher(this._show, $(".workspace"), {
             showLabels: true,
             drawYardlineNumbers: true,
             draw4Step: true,
