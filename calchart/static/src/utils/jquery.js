@@ -14,7 +14,6 @@ import * as _ from "lodash";
 
 // jQuery plugins
 import "chosen-js";
-import "jquery-mousewheel";
 
 // expose the jQuery operator to the global scope
 window.$ = jQuery;
@@ -107,6 +106,23 @@ $.fn.exists = function() {
  */
 $.fn.lockScroll = function() {
     this.addClass("no-scroll");
+};
+
+/**
+ * Capture the pinch gesture on trackpads, which is the same as scrolling
+ * with the ctrl key pressed (http://stackoverflow.com/a/28685082/4966649).
+ *
+ * @param {function(Event)} callback - The callback to run when a pinch is
+ *   detected. The event will have deltaY defined, which represents the velocity
+ *   of the pinch. A positive deltaY means the pinch is getting wider apart.
+ */
+$.fn.pinch = function(callback) {
+    return this.on("wheel", function(e) {
+        if (e.ctrlKey) {
+            e.deltaY = -e.originalEvent.deltaY;
+            callback(e);
+        }
+    });
 };
 
 /**

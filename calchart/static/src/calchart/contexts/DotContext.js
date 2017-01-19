@@ -143,15 +143,10 @@ export default class DotContext extends BaseContext {
      * Set up the events for selecting/dragging dots.
      */
     _setupDrag() {
-        let _this = this;
-        let scale = this._grapher.getScale();
-
+        let controller = this._controller;
         let workspace = $(".workspace").offset();
         let graph = this._grapher.getGraph();
-        let svg = {
-            width: graph.outerWidth(),
-            height: graph.outerHeight(),
-        };
+        let scale;
 
         // variables to track state when dragging dots
         let dragState = "none"; // none, drag, select
@@ -159,31 +154,31 @@ export default class DotContext extends BaseContext {
         let scrollStart = {};
 
         this._addEvents(".workspace", {
-            mousedown: function(e) {
+            mousedown: e => {
                 let target = $(e.target);
 
                 if (target.is(".dot-marker")) {
                     let dot = target.parent();
 
                     if (e.shiftKey || e.ctrlKey || e.metaKey) {
-                        _this._controller.toggleDots(dot);
-                        this._dragState = "none";
+                        controller.toggleDots(dot);
+                        dragState = "none";
                         return;
                     }
 
-                    if (!_this._grapher.isSelected(dot)) {
-                        _this._controller.selectDots(dot, {
+                    if (!this._grapher.isSelected(dot)) {
+                        controller.selectDots(dot, {
                             append: false,
                         });
                     }
 
                     dragState = "drag";
-                    _this._scrollOffset.top = 0;
-                    _this._scrollOffset.left = 0;
-                    _this._moveOffset.x = 0;
-                    _this._moveOffset.y = 0;
+                    this._scrollOffset.top = 0;
+                    this._scrollOffset.left = 0;
+                    this._moveOffset.x = 0;
+                    this._moveOffset.y = 0;
                 } else {
-                    _this._controller.deselectDots();
+                    controller.deselectDots();
                     HTMLBuilder.div("selection-box", null, $(".workspace"));
                     dragState = "select";
                 }
@@ -193,11 +188,12 @@ export default class DotContext extends BaseContext {
                     top: $(".workspace").scrollTop(),
                     left: $(".workspace").scrollLeft(),
                 };
+                scale = this._grapher.getScale();
             },
         });
 
         this._addEvents(document, {
-            mousemove: function(e) {
+            mousemove: e => {
                 if (dragState === "none") {
                     return;
                 }
@@ -212,12 +208,12 @@ export default class DotContext extends BaseContext {
                     case "drag":
                         // snap deltaX and deltaY to grid; dots can themselves be off
                         // the grid, but they move in a consistent interval
-                        let snap = scale.toDistance(_this._grid);
-                        deltaX = round(_this._scrollOffset.left + deltaX, snap);
-                        deltaY = round(_this._scrollOffset.top + deltaY, snap);
-                        _this.moveSelection(deltaX, deltaY);
-                        _this._moveOffset.x = deltaX;
-                        _this._moveOffset.y = deltaY;
+                        let snap = scale.toDistance(this._grid);
+                        deltaX = round(this._scrollOffset.left + deltaX, snap);
+                        deltaY = round(this._scrollOffset.top + deltaY, snap);
+                        this.moveSelection(deltaX, deltaY);
+                        this._moveOffset.x = deltaX;
+                        this._moveOffset.y = deltaY;
                         break;
                     case "select":
                         // relative to workspace
@@ -228,8 +224,8 @@ export default class DotContext extends BaseContext {
                         let minY = Math.min(e.pageY, dragStart.pageY) - workspace.top + scrollStart.top;
 
                         // contain in graph
-                        let maxX = Math.min(minX + width, svg.width);
-                        let maxY = Math.min(minY + height, svg.height);
+                        let maxX = Math.min(minX + width, graph.outerWidth());
+                        let maxY = Math.min(minY + height, graph.outerHeight());
                         width = maxX - minX;
                         height = maxY - minY;
 
@@ -250,8 +246,8 @@ export default class DotContext extends BaseContext {
                             });
 
                         // select dots within the selection box
-                        _this._controller.deselectDots();
-                        _this._grapher.getDots().each(function() {
+                        controller.deselectDots();
+                        this._grapher.getDots().each(function() {
                             let dot = $(this);
                             let position = dot.data("position");
                             if (
@@ -260,20 +256,20 @@ export default class DotContext extends BaseContext {
                                 position.y >= minY &&
                                 position.y <= maxY
                             ) {
-                                _this._controller.selectDots(dot);
+                                controller.selectDots(dot);
                             }
                         });
                 }
             },
-            mouseup: function() {
+            mouseup: () => {
                 switch (dragState) {
                     case "drag":
-                        if (_this._moveOffset.x === 0 && _this._moveOffset.y === 0) {
+                        if (this._moveOffset.x === 0 && this._moveOffset.y === 0) {
                             break;
                         }
-                        let deltaX = scale.toSteps(_this._moveOffset.x);
-                        let deltaY = scale.toSteps(_this._moveOffset.y);
-                        _this._controller.doAction("moveDots", [deltaX, deltaY]);
+                        let deltaX = scale.toSteps(this._moveOffset.x);
+                        let deltaY = scale.toSteps(this._moveOffset.y);
+                        controller.doAction("moveDots", [deltaX, deltaY]);
                         break;
                     case "select":
                         $(".selection-box").remove();

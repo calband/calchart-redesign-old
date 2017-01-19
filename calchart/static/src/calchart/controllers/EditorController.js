@@ -98,14 +98,12 @@ export default class EditorController extends ApplicationController {
                 }
             });
 
-        // set up zoom: http://stackoverflow.com/a/28685082/4966649
-        $(".workspace").mousewheel(e => {
-            if (e.ctrlKey) {
-                e.preventDefault();
-                let delta = e.deltaY / 100;
-                this._grapher.zoom(delta);
-                this.refresh("grapherClear");
-            }
+        // set up zoom
+        $(".workspace").pinch(e => {
+            e.preventDefault();
+            let delta = e.deltaY / 100;
+            this._grapher.zoom(delta);
+            this.refresh("grapherClear");
         });
 
         let sheet = _.first(this._show.getSheets());
