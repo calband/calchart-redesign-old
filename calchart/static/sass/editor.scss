@@ -103,10 +103,6 @@ $sidebar-width: 200px;
         .grapher-draw-target {
             width: 100%;
             height: 100%;
-            // guarantee big enough for editing; maybe take out after
-            // implementing zoom
-            min-width: 1250px;
-            min-height: 700px;
         }
         .selection-box {
             position: absolute;

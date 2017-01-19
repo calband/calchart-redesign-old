@@ -67,6 +67,7 @@ export default class EditorController extends ApplicationController {
             drawYardlineNumbers: true,
             draw4Step: true,
             drawDotType: true,
+            zoom: 1,
         });
         this._grapher.drawField();
 

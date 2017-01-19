@@ -5,6 +5,10 @@ import Coordinate from "calchart/Coordinate";
 import CollegeGrapher from "calchart/graphers/CollegeGrapher";
 
 import { getNearestOrientation } from "utils/CalchartUtils";
+import { parseArgs } from "utils/JSUtils";
+
+let FIELD_RATIO = 700 / 1250; // height = width * ratio
+let BASE_WIDTH = 1250; // 100% means SVG width = 1250px
 
 /**
  * A Grapher is responsible for drawing the field and the dots according to
@@ -27,17 +31,17 @@ export default class Grapher {
         // the radius of the dots to draw; proportional to scale
         this._dotRadius = undefined;
 
+        // the arguments used to last draw the graph
+        this._drawArgs = null;
+
         // maps dot label to dot SVG element
         this._dots = {};
 
-        let svgWidth = this._drawTarget.width();
-        let svgHeight = this._drawTarget.height();
-
         this._svg = d3.select(this._drawTarget.get(0))
             .append("svg")
-            .attr("class", "graph")
-            .attr("width", svgWidth)
-            .attr("height", svgHeight);
+            .attr("class", "graph");
+
+        this.setZoom(_.defaultTo(options.zoom, null));
     }
 
     get svgWidth() { return this._svgWidth; }
@@ -47,7 +51,7 @@ export default class Grapher {
      * Clear the Grapher of all graphics.
      */
     clear() {
-        this._svg.empty();
+        this._svg.selectAll("*").remove();
     }
 
     /**
@@ -76,7 +80,13 @@ export default class Grapher {
      *   of the Sheet.
      * @param {jQuery} [selectedDots] - The selected dots, defaults to none.
      */
-    draw(sheet, currentBeat=0, selectedDots=null) {
+    draw() {
+        let {
+            sheet,
+            currentBeat=0,
+            selectedDots=null,
+        } = parseArgs(arguments, ["sheet", "currentBeat", "selectedDots"]);
+
         let fieldType = sheet.getFieldType();
         let field = this._svg.select(".field");
 
@@ -88,6 +98,12 @@ export default class Grapher {
 
         this._drawDots(sheet, currentBeat);
         this.selectDots(selectedDots);
+
+        this._drawArgs = {
+            sheet: sheet,
+            currentBeat: currentBeat,
+            selectedDots: selectedDots,
+        };
     }
 
     /**
@@ -161,6 +177,17 @@ export default class Grapher {
     }
 
     /**
+     * Completely refresh the Grapher.
+     */
+    refresh() {
+        // only refresh if draw has been called at least once
+        if (!_.isNull(this._drawArgs)) {
+            this.clear();
+            this.draw(this._drawArgs);
+        }
+    }
+
+    /**
      * Select the given dots. Use to select dots without having to refresh the
      * entire graph.
      *
@@ -172,21 +199,41 @@ export default class Grapher {
 
     /**
      * Set a Grapher option. The available options are:
-     *  - {boolean} circleSelected - If true, circles the selected dot, or the last
-     *    selected dot, if multiple (default false).
-     *  - {boolean} draw4Step - If true, draws 4 step lines (default false).
-     *  - {boolean} drawDotType - If true, draw dots according to their dot type, overriding
-     *    drawOrientation. (default false).
-     *  - {boolean} drawOrientation - If true, colors dots differently based on orientation.
-     *  - {boolean} drawYardlineNumbers - If true, draws yardline numbers (default false).
-     *  - {boolean} drawYardlines - If true, draw yardlines and hashes (default true).
-     *  - {float} fieldPadding - The minimum amount of space between the field and the SVG
-     *    (default 30).
-     *  - {boolean} labelLeft - If true, show the label on the left of the dot (default true).
-     *  - {boolean} showLabels - If true, show the label next to each dot (default false).
+     *  - {boolean} [circleSelected=false] - If true, circles the selected dot, or the last
+     *    selected dot, if multiple.
+     *  - {boolean} [draw4Step=false] - If true, draws 4 step lines.
+     *  - {boolean} [drawDotType=false] - If true, draw dots according to their dot type, overriding
+     *    drawOrientation.
+     *  - {boolean} [drawOrientation=true] - If true, colors dots differently based on orientation.
+     *  - {boolean} [drawYardlineNumbers=false] - If true, draws yardline numbers.
+     *  - {boolean} [drawYardlines=true] - If true, draw yardlines and hashes.
+     *  - {number} [fieldPadding=30] - The minimum amount of space between the field and the SVG.
+     *  - {boolean} [labelLeft=true] - If true, show the label on the left of the dot.
+     *  - {boolean} [showLabels=false] - If true, show the label next to each dot.
+     *  - {?number} [zoom=null] - Use setZoom instead of setOption. @see setZoom.
      */
     setOption(name, val) {
         this._options[name] = val;
+        this.refresh();
+    }
+
+    /**
+     * Set the zoom of the Grapher and refresh.
+     *
+     * @param {?number} ratio - If null, use the dimensions of the draw target as the dimensions
+     *   of the field. If a number, zoom the field to the given ratio.
+     */
+    setZoom(ratio) {
+        let svgWidth, svgHeight;
+        if (_.isNull(ratio)) {
+            svgWidth = this._drawTarget.width();
+            svgHeight = this._drawTarget.height();
+        } else {
+            svgWidth = BASE_WIDTH * ratio;
+            svgHeight = svgWidth * FIELD_RATIO;
+        }
+        this._svg.attr("width", svgWidth).attr("height", svgHeight);
+        this.refresh();
     }
 
     /**
@@ -291,11 +338,11 @@ export default class Grapher {
                 if (dotLabel.empty()) {
                     dotLabel = dotGroup.append("text")
                         .classed("dot-label", true)
-                        .attr("font-size", dotRadius * 2.5)
+                        .attr("font-size", dotRadius * 2)
                         .text(dot.getLabel());
                 }
 
-                let offsetX = -2.25 * dotRadius;
+                let offsetX = -1.25 * parseFloat(dotLabel.style("width"));
                 let offsetY = -1.25 * dotRadius;
                 if (options.labelLeft === false) {
                     offsetX *= -1;
