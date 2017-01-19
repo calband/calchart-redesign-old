@@ -73,14 +73,9 @@ export default class Grapher {
      * @param {Sheet} sheet - The stuntsheet to draw.
      * @param {int} [currentBeat=0] - The beat to draw, relative to the start
      *   of the Sheet.
-     * @param {jQuery} [selectedDots] - The selected dots, defaults to none.
      */
     draw() {
-        let {
-            sheet,
-            currentBeat=0,
-            selectedDots=null,
-        } = parseArgs(arguments, ["sheet", "currentBeat", "selectedDots"]);
+        let { sheet, currentBeat=0 } = parseArgs(arguments, ["sheet", "currentBeat"]);
 
         let fieldType = sheet.getFieldType();
         let field = this._svg.select(".field");
@@ -92,7 +87,6 @@ export default class Grapher {
         }
 
         this._drawDots(sheet, currentBeat);
-        this.selectDots(selectedDots);
     }
 
     /**
@@ -141,11 +135,17 @@ export default class Grapher {
     }
 
     /**
+     * Get the dots, optionally filtered by the given labels.
+     *
+     * @param {string[]} [labels]
      * @return {jQuery} The dots in the grapher.
      */
-    getDots() {
-        return $(this._svg.selectAll("g.dot").nodes());
-
+    getDots(labels) {
+        let dots = this._svg.selectAll("g.dot");
+        if (!_.isUndefined(labels)) {
+            dots = dots.filter(dot => labels.includes(dot.getLabel()));
+        }
+        return $(dots.nodes());
     }
 
     /**

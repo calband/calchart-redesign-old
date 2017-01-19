@@ -528,9 +528,17 @@ export default class EditorController extends ApplicationController {
         // refresh grapher
         if (refresh.grapher && this._activeSheet) {
             if (refresh.grapherClear) {
+                let selectedDots = this.getSelectedDots().map(dot => dot.getLabel());
                 this._grapher.clear();
+                this._grapher.draw(this._activeSheet, this._currBeat);
+
+                // reselect dots
+                let selection = this._grapher.getDots(selectedDots);
+                this._grapher.selectDots(selection);
+            } else {
+                this._grapher.draw(this._activeSheet, this._currBeat);
+                this._grapher.selectDots(this._selectedDots);
             }
-            this._grapher.draw(this._activeSheet, this._currBeat, this._selectedDots);
         }
 
         // refresh context
