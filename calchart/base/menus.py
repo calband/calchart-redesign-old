@@ -15,19 +15,9 @@ from django.utils.html import format_html, format_html_join, mark_safe
 from django.utils.text import slugify
 
 from base.constants import DOT_TYPES
+from base.utils import collapse
 
 ### MENU CLASSES ###
-
-def _collapse(items):
-    """
-    _collapse([1,2,3]) -> [1,2,3]
-    _collapse([[1,2,3]]) -> [1,2,3]
-    """
-    if len(items) == 1 and isinstance(items[0], list):
-        return items[0]
-    else:
-        return items
-
 
 class Menu(object):
     """
@@ -39,7 +29,7 @@ class Menu(object):
     </ul>
     """
     def __init__(self, *submenus):
-        self.submenus = _collapse(submenus)
+        self.submenus = collapse(submenus)
 
     def render(self):
         return format_html(
@@ -139,7 +129,7 @@ class ToolbarGroup(object):
     </ul>
     """
     def __init__(self, *items, **kwargs):
-        self.items = _collapse(items)
+        self.items = collapse(items)
         self.classes = kwargs.get('classes', '')
 
     def render(self):
@@ -161,7 +151,7 @@ class ToolbarContextGroup(ToolbarGroup):
     </ul>
     """
     def __init__(self, name, *items, **kwargs):
-        items = _collapse(items)
+        items = collapse(items)
 
         super(ToolbarContextGroup, self).__init__(*items, **kwargs)
         self.name = name
@@ -303,5 +293,9 @@ editor_toolbar = Toolbar(
         CustomToolbarItem('Seek', '<span class="bar"></span><span class="marker"></span>'),
         ToolbarItem('Next Beat', 'chevron-right', 'nextBeat'),
         ToolbarItem('Check Continuities', 'check', 'checkContinuities'),
+    ),
+    ToolbarGroup(
+        ToolbarItem('Zoom In', 'search-plus', 'zoomIn'),
+        ToolbarItem('Zoom Out', 'search-minus', 'zoomOut'),
     ),
 )
