@@ -9,9 +9,12 @@
  * });
  */
 
-import "chosen-js";
-import * as _ from "lodash";
 import jQuery from "jquery";
+import * as _ from "lodash";
+
+// jQuery plugins
+import "chosen-js";
+import "jquery-mousewheel";
 
 // expose the jQuery operator to the global scope
 window.$ = jQuery;

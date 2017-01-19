@@ -253,11 +253,11 @@ editor_menu = Menu(
             MenuItem('Zoom in', 'zoomIn', icon='search-plus'),
             MenuItem('Zoom out', 'zoomOut', icon='search-minus'),
         ], [
-            MenuItem('50%', 'zoom(0.5)'),
-            MenuItem('75%', 'zoom(0.75)'),
-            MenuItem('100%', 'zoom(1)'),
-            MenuItem('150%', 'zoom(1.5)'),
-            MenuItem('200%', 'zoom(2)'),
+            MenuItem('50%', 'zoomTo(0.5)'),
+            MenuItem('75%', 'zoomTo(0.75)'),
+            MenuItem('100%', 'zoomTo(1)'),
+            MenuItem('150%', 'zoomTo(1.5)'),
+            MenuItem('200%', 'zoomTo(2)'),
         ], icon='search'),
     ]),
 )

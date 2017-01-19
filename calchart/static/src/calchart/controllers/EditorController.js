@@ -98,6 +98,21 @@ export default class EditorController extends ApplicationController {
                 }
             });
 
+        // set up zoom: http://stackoverflow.com/a/28685082/4966649
+        $(".workspace").mousewheel(e => {
+            if (e.ctrlKey) {
+                e.preventDefault();
+
+                // add some margin of tolerance
+                let tolerance = 3;
+                if (e.deltaY > tolerance) {
+                    this.zoomIn();
+                } else if (e.deltaY < -tolerance) {
+                    this.zoomOut();
+                }
+            }
+        });
+
         let sheet = _.first(this._show.getSheets());
         if (sheet) {
             this.loadSheet(sheet);
@@ -579,7 +594,7 @@ export default class EditorController extends ApplicationController {
      *
      * @param {number} ratio
      */
-    zoom(ratio) {
+    zoomTo(ratio) {
         this._grapher.setOption("zoom", ratio);
     }
 
