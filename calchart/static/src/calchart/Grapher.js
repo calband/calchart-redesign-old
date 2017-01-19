@@ -215,19 +215,13 @@ export default class Grapher {
     }
 
     /**
-     * Increment the zoom on the Grapher. Won't take effect until draw() is called again.
+     * Change the zoom by the given amount. Won't take effect until draw() is called again.
+     *
+     * @param {number} delta
      */
-    zoomIn() {
+    zoom(delta) {
         let zoom = _.defaultTo(this._options.zoom, 1);
-        this._options.zoom = zoom + 0.1;
-    }
-
-    /**
-     * Decrement the zoom on the Grapher. Won't take effect until draw() is called again.
-     */
-    zoomOut() {
-        let zoom = _.defaultTo(this._options.zoom, 1);
-        this._options.zoom = zoom - 0.1;
+        this._options.zoom = zoom + delta;
     }
 
     /**

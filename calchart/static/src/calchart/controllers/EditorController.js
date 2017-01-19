@@ -102,14 +102,9 @@ export default class EditorController extends ApplicationController {
         $(".workspace").mousewheel(e => {
             if (e.ctrlKey) {
                 e.preventDefault();
-
-                // add some margin of tolerance
-                let tolerance = 3;
-                if (e.deltaY > tolerance) {
-                    this.zoomIn();
-                } else if (e.deltaY < -tolerance) {
-                    this.zoomOut();
-                }
+                let delta = e.deltaY / 100;
+                this._grapher.zoom(delta);
+                this.refresh("grapherClear");
             }
         });
 
@@ -634,7 +629,7 @@ export default class EditorController extends ApplicationController {
      * Zoom in to the field
      */
     zoomIn() {
-        this._grapher.zoomIn();
+        this._grapher.zoom(+0.1);
         this.refresh("grapherClear");
     }
 
@@ -642,7 +637,7 @@ export default class EditorController extends ApplicationController {
      * Zoom out of the field
      */
     zoomOut() {
-        this._grapher.zoomOut();
+        this._grapher.zoom(-0.1);
         this.refresh("grapherClear");
     }
 
