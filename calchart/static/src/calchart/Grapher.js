@@ -40,8 +40,6 @@ export default class Grapher {
         this._svg = d3.select(this._drawTarget.get(0))
             .append("svg")
             .attr("class", "graph");
-
-        this.setZoom(_.defaultTo(options.zoom, null));
     }
 
     get svgWidth() { return this._svgWidth; }
@@ -107,7 +105,8 @@ export default class Grapher {
     }
 
     /**
-     * Draw the field using the appropriate FieldGrapher
+     * Draw the field using the appropriate FieldGrapher. Also set the scale of
+     * the grapher based on the zoom level.
      *
      * @param {string} [fieldType] - The field type to draw. Defaults to using the
      *   default field type of the Show.
@@ -117,7 +116,21 @@ export default class Grapher {
             fieldType = this._show.getFieldType();
         }
 
-        this._svg.insert("g", ":first-child").classed(`field field-${fieldType}`, true);
+        let zoom = _.defaultTo(this._options.zoom, null);
+        let svgWidth, svgHeight;
+        if (_.isNull(zoom)) {
+            svgWidth = this._drawTarget.width();
+            svgHeight = this._drawTarget.height();
+        } else {
+            svgWidth = BASE_WIDTH * zoom;
+            svgHeight = svgWidth * FIELD_RATIO;
+        }
+        this._svg
+            .attr("width", svgWidth)
+            .attr("height", svgHeight);
+
+        this._svg.insert("g", ":first-child")
+            .classed(`field field-${fieldType}`, true);
 
         let fieldGrapher;
         switch (fieldType) {
@@ -210,7 +223,8 @@ export default class Grapher {
      *  - {number} [fieldPadding=30] - The minimum amount of space between the field and the SVG.
      *  - {boolean} [labelLeft=true] - If true, show the label on the left of the dot.
      *  - {boolean} [showLabels=false] - If true, show the label next to each dot.
-     *  - {?number} [zoom=null] - Use setZoom instead of setOption. @see setZoom.
+     *  - {?number} [zoom=null] - If null, use the dimensions of the draw target as the dimensions
+     *   of the field. If a number, zoom the field to the given ratio.
      */
     setOption(name, val) {
         this._options[name] = val;
@@ -218,21 +232,20 @@ export default class Grapher {
     }
 
     /**
-     * Set the zoom of the Grapher and refresh.
-     *
-     * @param {?number} ratio - If null, use the dimensions of the draw target as the dimensions
-     *   of the field. If a number, zoom the field to the given ratio.
+     * Increment the zoom on the Grapher.
      */
-    setZoom(ratio) {
-        let svgWidth, svgHeight;
-        if (_.isNull(ratio)) {
-            svgWidth = this._drawTarget.width();
-            svgHeight = this._drawTarget.height();
-        } else {
-            svgWidth = BASE_WIDTH * ratio;
-            svgHeight = svgWidth * FIELD_RATIO;
-        }
-        this._svg.attr("width", svgWidth).attr("height", svgHeight);
+    zoomIn() {
+        let zoom = _.defaultTo(this._options.zoom, 1);
+        this._options.zoom = zoom + 0.1;
+        this.refresh();
+    }
+
+    /**
+     * Decrement the zoom on the Grapher.
+     */
+    zoomOut() {
+        let zoom = _.defaultTo(this._options.zoom, 1);
+        this._options.zoom = zoom - 0.1;
         this.refresh();
     }
 

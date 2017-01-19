@@ -575,6 +575,20 @@ export default class EditorController extends ApplicationController {
     }
 
     /**
+     * Zoom in to the field
+     */
+    zoomIn() {
+        this._grapher.zoomIn();
+    }
+
+    /**
+     * Zoom out of the field
+     */
+    zoomOut() {
+        this._grapher.zoomOut();
+    }
+
+    /**
      * Get the action represented by the given parameter. Overriding
      * ApplicationController's _getAction to allow looking up methods
      * in EditorActions and the active Context.
