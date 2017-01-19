@@ -122,8 +122,11 @@ export default class Grapher {
             svgWidth = this._drawTarget.width();
             svgHeight = this._drawTarget.height();
         } else {
+            // bound zoom
+            zoom = _.clamp(zoom, 0.4, 2);
             svgWidth = BASE_WIDTH * zoom;
             svgHeight = svgWidth * FIELD_RATIO;
+            this._options.zoom = zoom;
         }
         this._svg
             .attr("width", svgWidth)
@@ -236,7 +239,7 @@ export default class Grapher {
      */
     zoomIn() {
         let zoom = _.defaultTo(this._options.zoom, 1);
-        this._options.zoom = Math.min(zoom + 0.1, 2);
+        this._options.zoom = zoom + 0.1;
         this.refresh();
     }
 
@@ -245,7 +248,7 @@ export default class Grapher {
      */
     zoomOut() {
         let zoom = _.defaultTo(this._options.zoom, 1);
-        this._options.zoom = Math.max(zoom - 0.1, 0.4);
+        this._options.zoom = zoom - 0.1;
         this.refresh();
     }
 

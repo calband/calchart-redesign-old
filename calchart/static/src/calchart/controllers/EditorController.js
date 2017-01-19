@@ -575,6 +575,15 @@ export default class EditorController extends ApplicationController {
     }
 
     /**
+     * Zoom to the given ratio.
+     *
+     * @param {number} ratio
+     */
+    zoom(ratio) {
+        this._grapher.setOption("zoom", ratio);
+    }
+
+    /**
      * Zoom in to the field
      */
     zoomIn() {
