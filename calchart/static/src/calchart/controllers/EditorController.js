@@ -115,16 +115,25 @@ export default class EditorController extends ApplicationController {
      *
      * @param {(Dot[]|Dot|string)} [dots] - The dots to check continuities of,
      *   the dot type of the dots to check, or all the dots by default.
-     * @param {Sheet} [sheet] - The Sheet to check continuities for (defaults to
-     *   currently active Sheet).
-     * @param {boolean} [quiet=false] - if true, don't show a success message
-     *   if there are no errors (default false).
+     * @param {Sheet} [sheet] - The Sheet to check continuities for. Skips check
+     *   if the Sheet is the last Sheet in the show. (defaults to the currently
+     *   active Sheet)
+     * @param {boolean} [message=false] - if true, show a success message if there
+     *   are no errors.
      * @return {boolean} true if no errors in checking continuities
      */
     checkContinuities() {
-        let args = parseArgs(arguments, ["dots", "sheet", "quiet"]);
+        let args = parseArgs(arguments, ["dots", "sheet", "message"]);
+        let successMessage = "Continuities valid!";
 
-        let sheet = _.defaultTo(args.sheet, this._activeSheet);
+        let sheet = _.defaultTo(args.sheets, this._activeSheet);
+        if (sheet.isLastSheet()) {
+            if (args.message) {
+                showMessage(successMessage);
+            }
+            return true;
+        }
+
         let duration = sheet.getDuration();
         let nextSheet = sheet.getNextSheet();
 
@@ -158,11 +167,9 @@ export default class EditorController extends ApplicationController {
                 }
             }
 
-            if (nextSheet) {
-                let position = nextSheet.getPosition(dot);
-                if (final.x !== position.x || final.y !== position.y) {
-                    errors.wrongPosition.push(dot.getLabel());
-                }
+            let position = nextSheet.getPosition(dot);
+            if (final.x !== position.x || final.y !== position.y) {
+                errors.wrongPosition.push(dot.getLabel());
             }
         });
 
@@ -180,10 +187,12 @@ export default class EditorController extends ApplicationController {
                 showError(`${msg} (SS ${label})`);
             });
             return false;
-        } else if (!args.quiet) {
-            showMessage("Continuities valid!");
-            return true;
         }
+
+        if (args.message) {
+            showMessage(successMessage);
+        }
+        return true;
     }
 
     /**
@@ -972,7 +981,6 @@ class EditorActions {
             sheet.updateMovements();
             this.checkContinuities({
                 sheet: sheet,
-                quiet: true,
             });
         });
         this.refresh();
@@ -984,7 +992,6 @@ class EditorActions {
                     sheet.updateMovements();
                     this.checkContinuities({
                         sheet: sheet,
-                        quiet: true,
                     });
                 });
                 this.refresh();
@@ -1002,7 +1009,7 @@ class EditorActions {
         let changed = update(sheet, underscoreKeys(data));
         sheet.updateMovements();
         this.checkContinuities({
-            quiet: true,
+            sheet: sheet,
         });
         this.refresh();
 
@@ -1027,9 +1034,7 @@ class EditorActions {
         this._show.getSheets().forEach(function(sheet) {
             sheet.updateMovements();
         });
-        this.checkContinuities({
-            quiet: true,
-        });
+        this.checkContinuities();
         this.refresh();
 
         return {

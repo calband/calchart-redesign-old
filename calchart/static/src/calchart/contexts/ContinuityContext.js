@@ -76,7 +76,7 @@ export default class ContinuityContext extends BaseContext {
                         "Next beat": "nextBeat",
                         "Last beat": "lastBeat",
                     },
-                    "Check Continuities...": "checkContinuities",
+                    "Check Continuities...": "checkContinuities(message=true)",
                 });
             },
         });
@@ -359,7 +359,7 @@ let ContextShortcuts = {
     "right": "nextBeat",
     "down": "firstBeat",
     "up": "lastBeat",
-    "ctrl+enter": "checkContinuities",
+    "ctrl+enter": "checkContinuities(message=true)",
 };
 
 class ContextActions {
@@ -397,10 +397,7 @@ class ContextActions {
         let changed = continuity.savePopup(data);
 
         sheet.updateMovements(dotType);
-        this._controller.checkContinuities({
-            dots: dotType,
-            quiet: true,
-        });
+        this._controller.checkContinuities(dotType);
         this._controller.refresh();
 
         return {

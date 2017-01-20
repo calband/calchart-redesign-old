@@ -1,7 +1,6 @@
 import * as _ from "lodash";
 
 import { ActionError } from "utils/errors";
-import { parseNumber } from "utils/JSUtils";
 
 // The singleton instance of the ApplicationController
 window.controller = null;
@@ -191,6 +190,7 @@ export default class ApplicationController {
      *   - "name(args, ...)": the name of the function, run with the given comma separated
      *     arguments. Arguments can be given in the following formats:
      *       - a number; e.g. "foo(1)" -> `foo(1)`
+     *       - a boolean; e.g. "foo(true)" -> `foo(true)`
      *       - a string; e.g. "foo(bar)" -> `foo("bar")`
      *       - an object; e.g. "foo(x=1)" -> `foo({x: 1})`
      *       - an array; e.g. "foo(bar, [1,2])" -> `foo("bar", [1,2])`
@@ -245,7 +245,7 @@ export default class ApplicationController {
                 if (arg.includes("=")) {
                     let [key, val] = arg.split("=");
                     return {
-                        [key]: parseNumber(val),
+                        [key]: JSON.parse(val),
                     };
                 }
 
