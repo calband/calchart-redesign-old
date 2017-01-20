@@ -11,7 +11,7 @@ import { getData, showPopup } from "utils/UIUtils";
  * Setup show, prompting user for show details if the show is new
  */
 $(function() {
-    if (!_.isNull(window.show)) {
+    if (!_.isUndefined(window.show)) {
         EditorController.init(Show.deserialize(window.show));
         return;
     }
@@ -35,7 +35,7 @@ $(function() {
 
             // save show and initialize controller
 
-            let controller = EditorController.init(Show.create(data));
+            let controller = EditorController.init(Show.create(window.showName, data));
             controller.saveShow();
         },
     });

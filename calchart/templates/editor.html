@@ -9,7 +9,11 @@
     {% add_style "editor.css" %}
     {% add_script "editor.js" %}
     <script>
-        window.show = {{ show.viewer|asjson }};
+        {% if show.viewer %}
+            window.show = {{ show.viewer|asjson }};
+        {% else %}
+            window.showName = "{{ show.name }}";
+        {% endif %}
     </script>
 {% endblock %}
 

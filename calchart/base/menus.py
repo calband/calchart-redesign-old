@@ -228,11 +228,8 @@ editor_menu = Menu(
         MenuItem('New stuntsheet', 'addStuntsheet', icon='file-o'),
         MenuItem('Rename show', 'promptRename'),
         MenuItem('Save', 'saveShow', icon='floppy-o'),
-        MenuItem('Print', 'print', icon='print'),
-        SubMenu('Download as', [
-            MenuItem('JSON', 'download(json)', icon='file-code-o'),
-            MenuItem('PDF', 'download(pdf)', icon='file-pdf-o'),
-        ]),
+        MenuItem('Generate PDF', 'generatePoopsheet', icon='file-pdf-o'),
+        MenuItem('Export', 'export', icon='file-code-o'),
     ], [
         MenuItem('Preferences', 'editPreferences'),
         MenuItem('Show properties', 'editShowProperties'),
