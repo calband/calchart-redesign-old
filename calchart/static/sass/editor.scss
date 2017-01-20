@@ -268,3 +268,9 @@ $sidebar-width: 200px;
         text-align: center;
     }
 }
+
+.reorder-sheet-bar {
+    position: absolute;
+    height: 2px;
+    background: $black;
+}

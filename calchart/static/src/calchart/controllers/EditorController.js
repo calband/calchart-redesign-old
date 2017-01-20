@@ -58,7 +58,7 @@ export default class EditorController extends ApplicationController {
     init() {
         super.init();
 
-        let controller = this;
+        let _this = this;
         setupMenu(".menu");
         setupToolbar(".toolbar");
 
@@ -71,7 +71,11 @@ export default class EditorController extends ApplicationController {
         });
         this._grapher.drawField();
 
-        $(".content .sidebar")
+        let sidebar = $(".content .sidebar");
+        let sidebarOffset = sidebar.offset();
+
+        // sidebar context menus
+        sidebar
             .contextmenu(function(e) {
                 showContextMenu(e, {
                     "Add Sheet...": "addStuntsheet",
@@ -79,7 +83,7 @@ export default class EditorController extends ApplicationController {
             })
             .on("contextmenu", ".stuntsheet", function(e) {
                 let sheet = $(this).data("sheet");
-                controller.loadSheet(sheet);
+                _this.loadSheet(sheet);
 
                 showContextMenu(e, {
                     "Duplicate Sheet": "duplicateSheet",
@@ -88,14 +92,87 @@ export default class EditorController extends ApplicationController {
                 });
 
                 return false;
-            })
-            .on("click", ".stuntsheet", function() {
-                let sheet = $(this).data("sheet");
+            });
 
-                // only load if the sheet isn't already loaded
-                if (sheet !== controller._activeSheet) {
-                    controller.loadSheet(sheet);
+        // sidebar clicks and drags
+        let reorder = false;
+        let index = -1;
+        let dragStart = null;
+        sidebar
+            .on("mousedown", ".stuntsheet", function(e) {
+                e.preventDefault();
+                dragStart = e;
+
+                let sheet = $(this).data("sheet");
+                index = sheet.getIndex();
+                // load sheet if not already active
+                if (sheet !== _this._activeSheet) {
+                    _this.loadSheet(sheet);
                 }
+
+                $(document).mouseup(function(e) {
+                    // reordering sheets
+                    if (reorder) {
+                        $(".reorder-sheet-bar").remove();
+                        let currIndex = sheet.getIndex();
+                        if (index !== currIndex) {
+                            _this.doAction("moveSheet", [currIndex, index]);
+                        }
+                    }
+
+                    reorder = false;
+                    dragStart = null;
+
+                    $(this).off(e);
+                });
+            })
+            .on("mousemove", function(e) {
+                if (_.isNull(dragStart)) {
+                    return;
+                }
+
+                // check whether to toggle reorder
+                if (!reorder) {
+                    let deltaX = Math.abs(e.pageX - dragStart.pageX);
+                    let deltaY = Math.abs(e.pageY - dragStart.pageY);
+                    if (deltaX < 5 && deltaY < 5) {
+                        return;
+                    }
+                    reorder = true;
+                }
+
+                let stuntsheet = _this._getClosestStuntsheet(e.pageY);
+                let sheet = stuntsheet.data("sheet");
+                index = sheet.getIndex();
+
+                // if cursor is on the bottom half of the stuntsheet, try to move after sheet;
+                // else, move before sheet
+                let offset = -5;
+                if (e.pageY > stuntsheet.offset().top + stuntsheet.outerHeight() / 2) {
+                    offset = stuntsheet.outerHeight() + 5;
+                }
+
+                // move indication bar
+                let bar = $(".reorder-sheet-bar");
+                if (!bar.exists()) {
+                    bar = HTMLBuilder.div("reorder-sheet-bar")
+                        .css({
+                            width: sidebar.outerWidth(),
+                            left: sidebarOffset.left,
+                        })
+                        .appendTo(sidebar);
+                }
+
+                bar.css("top", stuntsheet.position().top + offset - bar.outerHeight() / 2);
+            })
+            .on("mouseleave", function(e) {
+                if (_.isNull(dragStart)) {
+                    return;
+                }
+
+                // remove indication bar
+                $(".reorder-sheet-bar").remove();
+                reorder = false;
             });
 
         // set up zoom
@@ -699,6 +776,46 @@ export default class EditorController extends ApplicationController {
     }
 
     /**
+     * Get the closest stuntsheet to the given y-coordinate. The coordinate should
+     * be within the sidebar.
+     *
+     * @param {number} y
+     * @return {jQuery}
+     */
+    _getClosestStuntsheet(y) {
+        let sidebar = $(".content .sidebar");
+        let halfSheet = $(".stuntsheet").outerHeight() / 2;
+
+        let testX = sidebar.offset().left + sidebar.outerWidth() / 2;
+        let testY = y;
+
+        let closestElem = document.elementFromPoint(testX, testY);
+        let stuntsheet = $(closestElem).closest(".stuntsheet");
+
+        // either in between stuntsheets or above/below the available stuntsheets
+        if (!stuntsheet.exists()) {
+            // try checking half a stuntsheet height below
+            testY = y + halfSheet;
+            closestElem = document.elementFromPoint(testX, testY);
+
+            // below screen, check half a stuntsheet height above
+            if (_.isNull(closestElem)) {
+                testY = y - halfSheet;
+                closestElem = document.elementFromPoint(testX, testY);
+            }
+
+            stuntsheet = $(closestElem).closest(".stuntsheet");
+        }
+
+        // below stuntsheets when sidebar not filled up completely
+        if (!stuntsheet.exists()) {
+            return $(".stuntsheet:last");
+        } else {
+            return stuntsheet;
+        }
+    }
+
+    /**
      * Update the Undo/Redo labels in the menu.
      */
     _updateHistory() {
@@ -815,6 +932,51 @@ class EditorActions {
                 this._show.removeSheet(clone);
                 sheet.updateMovements();
                 this.loadSheet(sheet);
+            },
+        };
+    }
+
+    /**
+     * Move the corresponding Sheet from the given index to the
+     * specified index.
+     *
+     * @param {int} from - The index the Sheet is currently at.
+     * @param {int} to - The index to move to.
+     */
+    static moveSheet(from, to) {
+        this._show.moveSheet(from, to);
+
+        let sheets = this._show.getSheets();
+
+        // update continuities of all affected sheets
+        let toUpdate = [sheets[to]];
+        if (from > 0) {
+            toUpdate.push(sheets[from-1]);
+        }
+        if (to > 0) {
+            toUpdate.push(sheets[to-1]);
+        }
+
+        toUpdate.forEach(sheet => {
+            sheet.updateMovements();
+            this.checkContinuities({
+                sheet: sheet,
+                quiet: true,
+            });
+        });
+        this.refresh();
+
+        return {
+            undo: function() {
+                this._show.moveSheet(to, from);
+                toUpdate.forEach(sheet => {
+                    sheet.updateMovements();
+                    this.checkContinuities({
+                        sheet: sheet,
+                        quiet: true,
+                    });
+                });
+                this.refresh();
             },
         };
     }

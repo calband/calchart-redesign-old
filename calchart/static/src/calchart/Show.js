@@ -4,6 +4,8 @@ import Dot from "calchart/Dot";
 import Sheet from "calchart/Sheet";
 import Song from "calchart/Song";
 
+import { moveElem } from "utils/JSUtils";
+
 /**
  * A Show represents a Calchart show, containing the following information:
  *  - the name of the show
@@ -233,9 +235,26 @@ export default class Show {
      */
     insertSheet(sheet, index) {
         this._sheets.splice(index, 0, sheet);
-        _.range(index + 1, this._sheets.length).forEach(
-            i => this._sheets[i].setIndex(i)
-        );
+
+        _.range(index + 1, this._sheets.length).forEach(i => {
+            this._sheets[i].setIndex(i);
+        });
+    }
+
+    /**
+     * Move the stuntsheet at the given index to the specified index.
+     *
+     * @param {int} from - The index of the stuntsheet to move.
+     * @param {int} to - The index to move to.
+     */
+    moveSheet(from, to) {
+        moveElem(this._sheets, from, to);
+
+        _.range(from, to + 1).forEach(i => {
+            this._sheets[i].setIndex(i);
+        });
+
+        console.log(this._sheets);
     }
 
     /**

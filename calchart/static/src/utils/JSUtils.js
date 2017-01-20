@@ -67,6 +67,22 @@ export function empty(array) {
 }
 
 /**
+ * Move the element from the given index to the specified index. Ex.
+ *
+ * x = [1,2,3,4]
+ * moveElem(x, 0, 2);
+ * x // [2,3,1,4]
+ *
+ * @param {Array} array
+ * @param {int} from - The index to remove the element from.
+ * @param {int} to - The index to put the element.
+ */
+export function moveElem(array, from, to) {
+    let elem = array.splice(from, 1)[0];
+    array.splice(to, 0, elem);
+}
+
+/**
  * Update the given object with the given data, returning an object mapping
  * any keys that have been changed to the old value.
  *
