@@ -62,7 +62,8 @@ export default class EditorController extends ApplicationController {
         setupToolbar(".toolbar");
         this._setupSidebar();
 
-        this._grapher = new Grapher(this._show, $(".workspace"), {
+        let workspace = $(".workspace");
+        this._grapher = new Grapher(this._show, workspace, {
             showLabels: true,
             drawYardlineNumbers: true,
             draw4Step: true,
@@ -72,11 +73,36 @@ export default class EditorController extends ApplicationController {
         this._grapher.drawField();
 
         // set up zoom
-        $(".workspace").pinch(e => {
+        let graph = this._grapher.getGraph();
+        workspace.pinch(e => {
             e.preventDefault();
-            let delta = e.deltaY / 100;
+
+            // reduce sensitivity
+            if (Math.abs(e.deltaY) < 1) {
+                return;
+            }
+
+            // limit pinch velocity
+            let limit = 0.05;
+            let delta = _.clamp(e.deltaY / 100, -limit, limit);
+
+            // steps from top-left corner of visible field
+            let offset = workspace.offset();
+            let left = e.pageX - offset.left;
+            let top = e.pageY - offset.top;
+
+            // steps from origin of field
+            let scale = this._grapher.getScale();
+            let x = scale.toSteps(workspace.scrollLeft() + left);
+            let y = scale.toSteps(workspace.scrollTop() + top);
+
             this._grapher.zoom(delta);
             this.refresh("grapherClear");
+
+            // scroll workspace to keep same location under cursor
+            scale = this._grapher.getScale();
+            workspace.scrollLeft(scale.toDistance(x) - left);
+            workspace.scrollTop(scale.toDistance(y) - top);
         });
 
         let sheet = _.first(this._show.getSheets());
@@ -622,7 +648,7 @@ export default class EditorController extends ApplicationController {
      */
     zoomTo(ratio) {
         this._grapher.setOption("zoom", ratio);
-        this.refresh("grapher");
+        this.refresh("grapherClear");
     }
 
     /**
