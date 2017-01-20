@@ -253,8 +253,6 @@ export default class Show {
         _.range(from, to + 1).forEach(i => {
             this._sheets[i].setIndex(i);
         });
-
-        console.log(this._sheets);
     }
 
     /**
