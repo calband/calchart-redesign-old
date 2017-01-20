@@ -13,6 +13,7 @@
             window.show = {{ show.viewer|asjson }};
         {% else %}
             window.showName = "{{ show.name }}";
+            window.showSlug = "{{ show.slug }}";
         {% endif %}
     </script>
 {% endblock %}

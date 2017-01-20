@@ -35,7 +35,8 @@ $(function() {
 
             // save show and initialize controller
 
-            let controller = EditorController.init(Show.create(window.showName, data));
+            let show = Show.create(window.showName, window.showSlug, data);
+            let controller = EditorController.init(show);
             controller.saveShow();
         },
     });

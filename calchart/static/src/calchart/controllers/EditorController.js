@@ -335,6 +335,14 @@ export default class EditorController extends ApplicationController {
     }
 
     /**
+     * Automatically download the JSON file for the show.
+     */
+    export() {
+        let slug = this._show.getSlug();
+        window.open(`/download/${slug}.json`);
+    }
+
+    /**
      * Go to the zero-th beat of the sheet.
      */
     firstBeat() {

@@ -1,7 +1,7 @@
 from django.views.generic import View, TemplateView, FormView
 from django.shortcuts import redirect
 from django.contrib import messages
-from django.http.response import JsonResponse
+from django.http.response import HttpResponse, JsonResponse
 
 import json
 
@@ -9,6 +9,20 @@ from base.forms import LoginForm, editor_popups
 from base.menus import *
 from base.mixins import CalchartMixin
 from base.models import Show
+
+### ENDPOINTS ###
+
+def export(request, slug):
+    """
+    Return a JSON file to be downloaded automatically.
+    """
+    show = Show.objects.get(slug=slug)
+    response = HttpResponse(show.viewer)
+    response['Content-Disposition'] = 'attachment; filename=%s.json' % slug
+
+    return response
+
+### PAGES ###
 
 class LoginView(FormView):
     """

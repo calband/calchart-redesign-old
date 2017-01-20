@@ -7,6 +7,7 @@ import Song from "calchart/Song";
 /**
  * A Show represents a Calchart show, containing the following information:
  *  - the name of the show
+ *  - the slug for the show
  *  - a Dot object for each dot in the show
  *  - a Sheet object for each stuntsheet in the show
  *  - a Song object for each song in the show
@@ -18,6 +19,7 @@ import Song from "calchart/Song";
 export default class Show {
     /**
      * @param {string} name - The name of the show.
+     * @param {string} slug - The slug of the show.
      * @param {Object[]} dots - The serialized data for every Dot marching in the Show.
      * @param {Object[]} sheets - The serialized data for every Sheet contained in the Show.
      * @param {Object[]} songs - The serialized data for every Song in the Show.
@@ -30,8 +32,9 @@ export default class Show {
      *   - {string} [orientation=east] - The default orientation for the entire
      *     Show (@see CalchartUtils.ORIENTATIONS).
      */
-    constructor(name, dots, sheets, songs, fieldType, options={}) {
+    constructor(name, slug, dots, sheets, songs, fieldType, options={}) {
         this._name = name;
+        this._slug = slug;
 
         this._dots = _.fromPairs(dots.map(data => {
             let dot = Dot.deserialize(data);
@@ -61,7 +64,7 @@ export default class Show {
      * @param {Object} data - The form data from the setup-show popup.
      * @return {Show}
      */
-    static create(name, data) {
+    static create(name, slug, data) {
         let getLabel;
         switch (data.dotFormat) {
             case "combo":
@@ -83,7 +86,7 @@ export default class Show {
             i => new Dot(getLabel(i)).serialize()
         );
 
-        return new Show(name, dots, [], [], data.fieldType);
+        return new Show(name, slug, dots, [], [], data.fieldType);
     }
 
     /**
@@ -93,7 +96,7 @@ export default class Show {
      * @return {Show}
      */
     static deserialize(data) {
-        return new Show(data.name, data.dots, data.sheets, data.songs, data.fieldType, data);
+        return new Show(data.name, data.slug, data.dots, data.sheets, data.songs, data.fieldType, data);
     }
 
     /**
@@ -104,6 +107,7 @@ export default class Show {
     serialize() {
         let data = {
             name: this._name,
+            slug: this._slug,
             fieldType: this._fieldType,
             beatsPerStep: this._beatsPerStep,
             stepType: this._stepType,
@@ -132,6 +136,13 @@ export default class Show {
     }
 
     /**
+     * @return {string}
+     */
+    getName() {
+        return this._name;
+    }
+
+    /**
      * @return {string} The default orientation of the entire Show.
      */
     getOrientation() {
@@ -149,6 +160,13 @@ export default class Show {
                 return 90;
         }
         throw new Error(`Invalid orientation: ${this._orientation}`);
+    }
+
+    /**
+     * @return {string}
+     */
+    getSlug() {
+        return this._slug;
     }
 
     /**
