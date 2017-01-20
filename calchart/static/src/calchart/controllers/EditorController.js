@@ -334,7 +334,7 @@ export default class EditorController extends ApplicationController {
      */
     firstBeat() {
         this._currBeat = 0;
-        this.refresh("grapher");
+        this.refresh("grapher", "context");
     }
 
     /**
@@ -385,7 +385,7 @@ export default class EditorController extends ApplicationController {
      */
     lastBeat() {
         this._currBeat = this._activeSheet.getDuration();
-        this.refresh("grapher");
+        this.refresh("grapher", "context");
     }
 
     /**
@@ -426,7 +426,7 @@ export default class EditorController extends ApplicationController {
         if (this._currBeat > duration) {
             this._currBeat = duration;
         } else {
-            this.refresh("grapher");
+            this.refresh("grapher", "context");
         }
     }
 
@@ -439,7 +439,7 @@ export default class EditorController extends ApplicationController {
         if (this._currBeat < 0) {
             this._currBeat = 0;
         } else {
-            this.refresh("grapher");
+            this.refresh("grapher", "context");
         }
     }
 
