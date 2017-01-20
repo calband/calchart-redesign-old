@@ -28,9 +28,6 @@ export default class Grapher {
         // the GrapherScale containing data about scale
         this._scale = null;
 
-        // the radius of the dots to draw; proportional to scale
-        this._dotRadius = undefined;
-
         // maps dot label to dot SVG element
         this._dots = {};
 
@@ -128,7 +125,6 @@ export default class Grapher {
 
         fieldGrapher.drawField();
         this._scale = fieldGrapher.getScale();
-        this._dotRadius = this._scale.toDistance(3/4);
     }
 
     /**
@@ -232,7 +228,7 @@ export default class Grapher {
     _drawDots(sheet, currentBeat) {
         let _this = this;
         let options = this._options;
-        let dotRadius = this._dotRadius;
+        let dotRadius = this._scale.toDistance(3/4);
 
         // group containing all dots
         let dotsGroup = this._svg.select("g.dots");

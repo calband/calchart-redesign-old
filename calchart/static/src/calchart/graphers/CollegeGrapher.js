@@ -73,12 +73,14 @@ export default class CollegeGrapher extends FieldGrapher {
         });
 
         if (this._options.drawYardlineNumbers) {
+            let fontSize = Math.max(this._scale.toDistance(3), 8);
             this._field
                 .selectAll("text.yardline-label")
                 .data(_.range(0, 210, 5))
                 .enter()
                 .append("text")
                 .classed("yardline-label", true)
+                .style("font-size", fontSize)
                 .text(function(d) {
                     // numbers 105-210 are on the bottom of the field
                     if (d > 100) {
@@ -96,11 +98,10 @@ export default class CollegeGrapher extends FieldGrapher {
                     let y;
 
                     if (d > 100) {
-                        let height = parseFloat(label.style("height"));
-                        y = EAST + height;
+                        y = EAST + fontSize;
                         d -= 105;
                     } else {
-                        y = WEST - 5;
+                        y = WEST - fontSize / 3;
                     }
 
                     let width = parseFloat(label.style("width"));
