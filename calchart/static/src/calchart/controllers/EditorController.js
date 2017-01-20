@@ -341,7 +341,8 @@ export default class EditorController extends ApplicationController {
 
         showPopup("edit-stuntsheet", {
             init: function(popup) {
-                popup.find(".label input").val(sheet.getLabel());
+                let label = _.defaultTo(sheet.label, "");
+                popup.find(".label input").val(label);
                 popup.find(".numBeats input").val(sheet.getDuration());
                 popup.find(".fieldType select").choose(sheet.fieldType);
                 popup.find(".stepType select").choose(sheet.stepType);
@@ -360,6 +361,10 @@ export default class EditorController extends ApplicationController {
                 let data = getData(popup);
 
                 // validate data
+                if (data.label === "") {
+                    data.label = null;
+                }
+
                 data.numBeats = parseInt(data.numBeats);
                 if (_.isNaN(data.numBeats)) {
                     throw new ValidationError("Please provide the number of beats.");

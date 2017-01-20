@@ -108,7 +108,7 @@ class EditStuntsheetPopup(PopupForm):
     """
     name = 'edit-stuntsheet'
 
-    label = forms.CharField()
+    label = forms.CharField(label='Label (opt.)')
     numBeats = forms.IntegerField(label='Number of beats')
     fieldType = forms.ChoiceField(choices=DEF_FIELD_TYPES)
     beatsPerStep = BeatsPerStepField(label='Beats per step')

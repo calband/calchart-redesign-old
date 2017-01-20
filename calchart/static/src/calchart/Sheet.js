@@ -44,7 +44,7 @@ export default class Sheet {
         this._numBeats = numBeats;
 
         options = _.defaults(options, {
-            label: String(index + 1),
+            label: null,
             fieldType: "default",
             beatsPerStep: "default",
             orientation: "default",
@@ -159,6 +159,7 @@ export default class Sheet {
     // getter methods to access raw properties instead of resolving defaults
     get beatsPerStep() { return this._beatsPerStep; }
     get fieldType() { return this._fieldType; }
+    get label() { return this._label; }
     get orientation() { return this._orientation; }
     get stepType() { return this._stepType; }
 
@@ -356,7 +357,7 @@ export default class Sheet {
      * @return {string} The label for this Sheet.
      */
     getLabel() {
-        return this._label;
+        return _.defaultTo(this._label, String(this._index + 1));
     }
 
     /**
