@@ -250,8 +250,8 @@ export default class Show {
     moveSheet(from, to) {
         moveElem(this._sheets, from, to);
 
-        _.range(from, to + 1).forEach(i => {
-            this._sheets[i].setIndex(i);
+        this._sheets.forEach((sheet, i) => {
+            sheet.setIndex(i);
         });
     }
 
