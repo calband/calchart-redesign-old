@@ -223,7 +223,10 @@ export default class Show {
     addSheet(numBeats) {
         let index = this._sheets.length;
         let sheet = Sheet.create(this, index, numBeats, this.getDotLabels());
+
         this._sheets.push(sheet);
+        this._updateMovements(index - 1);
+
         return sheet;
     }
 
@@ -239,6 +242,8 @@ export default class Show {
         _.range(index + 1, this._sheets.length).forEach(i => {
             this._sheets[i].setIndex(i);
         });
+
+        this._updateMovements(index - 1, index);
     }
 
     /**
@@ -253,6 +258,8 @@ export default class Show {
         this._sheets.forEach((sheet, i) => {
             sheet.setIndex(i);
         });
+
+        this._updateMovements(from - 1, to - 1, to);
     }
 
     /**
@@ -261,15 +268,27 @@ export default class Show {
      * @param {Sheet} sheet
      */
     removeSheet(sheet) {
-        for (let i = 0; i < this._sheets.length; i++) {
-            let _sheet = this._sheets[i];
-            if (_sheet === sheet) {
-                _.pullAt(this._sheets, i);
-                i--;
-            } else {
-                _sheet.setIndex(i);
+        let i = this._sheets.indexOf(sheet);
+        _.pullAt(this._sheets, i);
+
+        _.range(i, this._sheets.length).forEach(i => {
+            this._sheets[i].setIndex(i);
+        });
+
+        this._updateMovements(i - 1);
+    }
+
+    /**
+     * Update the movements of the sheets at the given indices.
+     *
+     * @param {...int} indices
+     */
+    _updateMovements(...indices) {
+        indices.forEach(i => {
+            if (i > 0) {
+                this._sheets[i].updateMovements();
             }
-        }
+        });
     }
 
     /**** SONGS ****/

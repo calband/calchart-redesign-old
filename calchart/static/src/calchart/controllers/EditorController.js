@@ -745,9 +745,9 @@ export default class EditorController extends ApplicationController {
                 _this.loadSheet(sheet);
 
                 showContextMenu(e, {
+                    "Properties...": "editSheetProperties",
                     "Duplicate Sheet": "duplicateSheet",
                     "Delete Sheet": "deleteSheet",
-                    "Properties...": "editSheetProperties",
                 });
 
                 return false;
@@ -889,18 +889,11 @@ class EditorActions {
      */
     static addSheet(numBeats) {
         let sheet = this._show.addSheet(numBeats);
-        let prevSheet = sheet.getPrevSheet();
-        if (prevSheet) {
-            prevSheet.updateMovements();
-        }
         this.loadSheet(sheet);
 
         return {
             undo: function() {
                 this._show.removeSheet(sheet);
-                if (prevSheet) {
-                    prevSheet.updateMovements();
-                }
                 this.loadSheet(prevSheet);
             },
         };
@@ -908,22 +901,16 @@ class EditorActions {
 
     /**
      * Delete the currently active Sheet.
+     *
+     * @param {Sheet} [sheet] - The deleted Sheet to redelete, for redo.
      */
-    static deleteSheet() {
-        let sheet = this._activeSheet;
-        let prevSheet = sheet.getPrevSheet();
-        let nextSheet = sheet.getNextSheet();
+    static deleteSheet(sheet=this._activeSheet) {
         this._show.removeSheet(sheet);
-        if (prevSheet) {
-            prevSheet.updateMovements();
-        }
-        this.loadSheet(_.defaultTo(prevSheet, nextSheet));
+        this.loadSheet(_.defaultTo(sheet.getPrevSheet(), sheet.getNextSheet()));
         return {
+            data: [sheet],
             undo: function() {
                 this._show.insertSheet(sheet, sheet.getIndex());
-                if (prevSheet) {
-                    prevSheet.updateMovements();
-                }
                 this.loadSheet(sheet);
             },
         };
@@ -943,14 +930,12 @@ class EditorActions {
         }
 
         this._show.insertSheet(clone, clone.getIndex());
-        sheet.updateMovements();
         this.loadSheet(clone);
 
         return {
             data: [clone],
             undo: function() {
                 this._show.removeSheet(clone);
-                sheet.updateMovements();
                 this.loadSheet(sheet);
             },
         };
@@ -967,18 +952,11 @@ class EditorActions {
         this._show.moveSheet(from, to);
 
         let sheets = this._show.getSheets();
-
-        // update continuities of all affected sheets
-        let toUpdate = [sheets[to]];
-        if (from > 0) {
-            toUpdate.push(sheets[from-1]);
-        }
-        if (to > 0) {
-            toUpdate.push(sheets[to-1]);
-        }
+        let toUpdate = _.flatMap([from - 1, to - 1, to], i =>
+            _.defaultTo(sheets[i], [])
+        );
 
         toUpdate.forEach(sheet => {
-            sheet.updateMovements();
             this.checkContinuities(sheet);
         });
         this.refresh();
@@ -987,7 +965,6 @@ class EditorActions {
             undo: function() {
                 this._show.moveSheet(to, from);
                 toUpdate.forEach(sheet => {
-                    sheet.updateMovements();
                     this.checkContinuities(sheet);
                 });
                 this.refresh();

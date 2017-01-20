@@ -411,6 +411,13 @@ export default class Sheet {
     }
 
     /**
+     * @return {boolean} true if this Sheet is the first sheet in the Show.
+     */
+    isFirstSheet() {
+        return this._index === 0;
+    }
+
+    /**
      * @return {boolean} true if this Sheet is the last sheet in the Show.
      */
     isLastSheet() {
