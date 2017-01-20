@@ -397,7 +397,9 @@ class ContextActions {
         let changed = continuity.savePopup(data);
 
         sheet.updateMovements(dotType);
-        this._controller.checkContinuities(dotType);
+        this._controller.checkContinuities({
+            dots: dotType,
+        });
         this._controller.refresh();
 
         return {

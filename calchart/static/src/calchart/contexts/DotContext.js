@@ -363,12 +363,12 @@ class ContextActions {
         let controller = this._controller;
         let _updateMovements = function() {
             sheet.updateMovements(dots);
-            controller.checkContinuities(dots, sheet);
+            controller.checkContinuities(sheet, dots);
 
             let prevSheet = sheet.getPrevSheet();
             if (prevSheet) {
                 prevSheet.updateMovements(dots);
-                controller.checkContinuities(dots, prevSheet);
+                controller.checkContinuities(prevSheet, dots);
             }
         };
         _updateMovements();

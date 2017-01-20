@@ -113,17 +113,17 @@ export default class EditorController extends ApplicationController {
      * active sheet, showing a UI error if so. Can also pass arguments in as
      * an Object of keyword arguments.
      *
-     * @param {(Dot[]|Dot|string)} [dots] - The dots to check continuities of,
-     *   the dot type of the dots to check, or all the dots by default.
      * @param {Sheet} [sheet] - The Sheet to check continuities for. Skips check
      *   if the Sheet is the last Sheet in the show. (defaults to the currently
      *   active Sheet)
+     * @param {(Dot[]|Dot|string)} [dots] - The dots to check continuities of,
+     *   the dot type of the dots to check, or all the dots by default.
      * @param {boolean} [message=false] - if true, show a success message if there
      *   are no errors.
      * @return {boolean} true if no errors in checking continuities
      */
     checkContinuities() {
-        let args = parseArgs(arguments, ["dots", "sheet", "message"]);
+        let args = parseArgs(arguments, ["sheet", "dots", "message"]);
         let successMessage = "Continuities valid!";
 
         let sheet = _.defaultTo(args.sheets, this._activeSheet);
@@ -979,9 +979,7 @@ class EditorActions {
 
         toUpdate.forEach(sheet => {
             sheet.updateMovements();
-            this.checkContinuities({
-                sheet: sheet,
-            });
+            this.checkContinuities(sheet);
         });
         this.refresh();
 
@@ -990,9 +988,7 @@ class EditorActions {
                 this._show.moveSheet(to, from);
                 toUpdate.forEach(sheet => {
                     sheet.updateMovements();
-                    this.checkContinuities({
-                        sheet: sheet,
-                    });
+                    this.checkContinuities(sheet);
                 });
                 this.refresh();
             },
@@ -1008,9 +1004,7 @@ class EditorActions {
     static saveSheetProperties(data, sheet=this._activeSheet) {
         let changed = update(sheet, underscoreKeys(data));
         sheet.updateMovements();
-        this.checkContinuities({
-            sheet: sheet,
-        });
+        this.checkContinuities(sheet);
         this.refresh();
 
         return {
