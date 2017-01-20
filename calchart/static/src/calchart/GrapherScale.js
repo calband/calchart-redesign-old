@@ -11,19 +11,23 @@ export default class GrapherScale {
      * @param {FieldGrapher} grapher - The grapher to get the scale of.
      * @param {number} svgWidth - The width of the svg.
      * @param {number} svgHeight - The height of the svg.
-     * @param {number} padding - The minimum amount of space between the
-     *   field and the SVG.
+     * @param {number} paddingWidth - The minimum amount of space between
+     *   the sides of the field and the SVG.
+     * @param {number} paddingHeight - The minimum amount of space between
+     *   the top and bottom of the field and the SVG.
      */
-    constructor(grapher, svgWidth, svgHeight, padding) {
-        // keep aspect ratio of width/height
-        this._width = svgWidth - 2 * padding;
+    constructor(grapher, svgWidth, svgHeight, paddingWidth, paddingHeight) {
+        // the width/height of the field
+        this._width = svgWidth - 2 * paddingWidth;
         this._height = this._width * grapher.FIELD_HEIGHT / grapher.FIELD_WIDTH;
 
+        // keep aspect ratio of width/height
         if (this._height > svgHeight) {
-            this._height = svgHeight - 2 * padding;
+            this._height = svgHeight - 2 * paddingHeight;
             this._width = this._height * grapher.FIELD_WIDTH / grapher.FIELD_HEIGHT;
         }
 
+        // pixels to the edges of the field
         this._minX = (svgWidth - this._width) / 2;
         this._maxX = this._minX + this._width;
         this._minY = (svgHeight - this._height) / 2;

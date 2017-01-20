@@ -11,19 +11,35 @@ import { NotImplementedError } from "utils/errors";
 export default class FieldGrapher {
     /**
      * @param {D3} svg - The SVG element to draw the field in.
+     * @param {number} svgWidth - The width of the svg.
+     * @param {number} svgHeight - The height of the svg.
      * @param {Object} options - The options to customize drawing the field.
      *   @see Grapher#setOption.
      */
-    constructor(svg, options) {
+    constructor(svg, svgWidth, svgHeight, options) {
         this._svg = svg;
-        this._svgWidth = parseFloat(svg.style("width"));
-        this._svgHeight = parseFloat(svg.style("height"));
         this._options = options;
-
-        this._field = svg.select(".field");
+        this._svgWidth = svgWidth;
+        this._svgHeight = svgHeight;
 
         let padding = _.defaultTo(options.fieldPadding, 30);
-        this._scale = new GrapherScale(this, this._svgWidth, this._svgHeight, padding);
+        let paddingWidth = padding;
+        let paddingHeight = padding;
+
+        // expand field to a field and a half in each direction
+        if (this._options.expandField) {
+            paddingWidth += this._svgWidth * 1.5;
+            paddingHeight += this._svgHeight * 1.5;
+            this._svgWidth *= 4;
+            this._svgHeight *= 4;
+        }
+
+        this._svg
+            .attr("width", this._svgWidth)
+            .attr("height", this._svgHeight);
+
+        this._field = svg.select(".field");
+        this._scale = new GrapherScale(this, this._svgWidth, this._svgHeight, paddingWidth, paddingHeight);
     }
 
     /**

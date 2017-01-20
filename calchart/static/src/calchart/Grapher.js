@@ -8,7 +8,7 @@ import { getNearestOrientation } from "utils/CalchartUtils";
 import { parseArgs } from "utils/JSUtils";
 
 let FIELD_RATIO = 700 / 1250; // height = width * ratio
-let BASE_WIDTH = 1250; // 100% means SVG width = 1250px
+let BASE_WIDTH = 1250; // the width of the SVG at 100% zoom
 
 /**
  * A Grapher is responsible for drawing the field and the dots according to
@@ -113,9 +113,6 @@ export default class Grapher {
             svgHeight = svgWidth * FIELD_RATIO;
             this._options.zoom = zoom;
         }
-        this._svg
-            .attr("width", svgWidth)
-            .attr("height", svgHeight);
 
         this._svg.insert("g", ":first-child")
             .classed(`field field-${fieldType}`, true);
@@ -123,7 +120,7 @@ export default class Grapher {
         let fieldGrapher;
         switch (fieldType) {
             case "college":
-                fieldGrapher = new CollegeGrapher(this._svg, this._options);
+                fieldGrapher = new CollegeGrapher(this._svg, svgWidth, svgHeight, this._options);
                 break;
             default:
                 throw new Error(`No Grapher of type: ${fieldType}`);
@@ -204,11 +201,13 @@ export default class Grapher {
      *  - {boolean} [drawOrientation=true] - If true, colors dots differently based on orientation.
      *  - {boolean} [drawYardlineNumbers=false] - If true, draws yardline numbers.
      *  - {boolean} [drawYardlines=true] - If true, draw yardlines and hashes.
+     *  - {boolean} [expandField=false] - If true, expand the boundaries of the field beyond the
+     *    field (and fieldPadding).
      *  - {number} [fieldPadding=30] - The minimum amount of space between the field and the SVG.
      *  - {boolean} [labelLeft=true] - If true, show the label on the left of the dot.
      *  - {boolean} [showLabels=false] - If true, show the label next to each dot.
      *  - {?number} [zoom=null] - If null, use the dimensions of the draw target as the dimensions
-     *   of the field. If a number, zoom the field to the given ratio.
+     *    of the field. If a number, zoom the field to the given ratio.
      */
     setOption(name, val) {
         this._options[name] = val;

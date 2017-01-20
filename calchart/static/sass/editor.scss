@@ -99,11 +99,6 @@ $sidebar-width: 200px;
     }
     .workspace {
         width: calc(100% - #{$sidebar-width});
-        background: $field-green;
-        .grapher-draw-target {
-            width: 100%;
-            height: 100%;
-        }
         .selection-box {
             position: absolute;
             border: 2px solid rgba($white, 0.8);
