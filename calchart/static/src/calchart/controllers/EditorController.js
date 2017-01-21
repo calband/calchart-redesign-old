@@ -82,32 +82,9 @@ export default class EditorController extends ApplicationController {
         workspace.pinch(e => {
             e.preventDefault();
 
-            // reduce sensitivity
-            if (Math.abs(e.deltaY) < 1) {
-                return;
-            }
-
-            // limit pinch velocity
-            let limit = 0.05;
-            let delta = _.clamp(e.deltaY / 100, -limit, limit);
-
-            // steps from top-left corner of visible field
-            let offset = workspace.offset();
-            let left = e.pageX - offset.left;
-            let top = e.pageY - offset.top;
-
-            // steps from origin of field
-            let scale = this._grapher.getScale();
-            let x = scale.toSteps(workspace.scrollLeft() + left);
-            let y = scale.toSteps(workspace.scrollTop() + top);
-
+            let delta = e.deltaY / 100;
             this._grapher.zoom(delta);
-            this.refresh("grapherClear");
-
-            // scroll workspace to keep same location under cursor
-            scale = this._grapher.getScale();
-            workspace.scrollLeft(scale.toDistance(x) - left);
-            workspace.scrollTop(scale.toDistance(y) - top);
+            this.refreshZoom(e.pageX, e.pageY);
         });
 
         let sheet = _.first(this._show.getSheets());
@@ -500,7 +477,7 @@ export default class EditorController extends ApplicationController {
      *     - all
      *     - sidebar (default all)
      *     - sidebarPreviews (default sidebar)
-     *     - grapherClear
+     *     - grapherClear: empties grapher before refreshing
      *     - grapher (default all || grapherClear)
      *     - context (default all)
      */
@@ -570,6 +547,46 @@ export default class EditorController extends ApplicationController {
         if (refresh.context && this._context) {
             this._context.refresh();
         }
+    }
+
+    /**
+     * Refresh the graph after zooming, keeping the given coordinate
+     * in the same place afterwards.
+     *
+     * @param {number} [pageX] - The x-coordinate in the page to zoom
+     *   into/out of. Defaults to the center of the graph.
+     * @param {number} [pageY] - The y-coordinate in the page to zoom
+     *   into/out of. Defaults to the center of the graph.
+     */
+    refreshZoom(pageX, pageY) {
+        let workspace = $(".workspace");
+        let offset = workspace.offset();
+
+        // distance from top-left corner of workspace
+        let left, top;
+        if (_.isUndefined(pageX)) {
+            left = workspace.outerWidth() / 2;
+        } else {
+            left = pageX - offset.left;
+        }
+        if (_.isUndefined(pageY)) {
+            top = workspace.outerHeight() / 2;
+        } else {
+            top = pageY - offset.top;
+        }
+
+        // steps from top-left corner of field
+        let start = this._grapher.getScale().toStepCoordinates({
+            x: workspace.scrollLeft() + left,
+            y: workspace.scrollTop() + top,
+        });
+
+        this.refresh("grapherClear");
+
+        // scroll workspace to keep same location under cursor
+        let end = this._grapher.getScale().toDistanceCoordinates(start);
+        workspace.scrollLeft(end.x - left);
+        workspace.scrollTop(end.y - top);
     }
 
     /**
@@ -653,23 +670,23 @@ export default class EditorController extends ApplicationController {
      */
     zoomTo(ratio) {
         this._grapher.setOption("zoom", ratio);
-        this.refresh("grapherClear");
+        this.refreshZoom();
     }
 
     /**
-     * Zoom in to the field
+     * Zoom in to the field.
      */
     zoomIn() {
         this._grapher.zoom(+0.1);
-        this.refresh("grapherClear");
+        this.refreshZoom();
     }
 
     /**
-     * Zoom out of the field
+     * Zoom out of the field.
      */
     zoomOut() {
         this._grapher.zoom(-0.1);
-        this.refresh("grapherClear");
+        this.refreshZoom();
     }
 
     /**

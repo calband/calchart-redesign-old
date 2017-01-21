@@ -79,7 +79,8 @@ export default class GrapherScale {
     /**
      * Convert the given coordinate from steps to distance.
      *
-     * @param {Coordinate} steps
+     * @param {(Coordinate|Object)} steps - The coordinate to convert, either
+     *   a Coordinate object or an object that has x and y defined.
      * @return {Coordinate}
      */
     toDistanceCoordinates(steps) {
@@ -91,7 +92,8 @@ export default class GrapherScale {
     /**
      * Convert the given coordinate from distance to steps.
      *
-     * @param {Coordinate} distance
+     * @param {(Coordinate|Object)} distance - The coordinate to convert, either
+     *   a Coordinate object or an object that has x and y defined.
      * @return {Coordinate}
      */
     toStepCoordinates(distance) {

@@ -245,12 +245,7 @@ export default class Grapher {
         // each dot consists of a group containing all svg elements making up a dot
         let dotGroups = dotsGroup.selectAll("g.dot").data(dots);
         if (dotGroups.empty()) {
-            dotGroups = dotGroups.enter()
-                .append("g")
-                .attr("id", function(dot) {
-                    let label = dot.getLabel();
-                    return `dot-${label}`;
-                });
+            dotGroups = dotGroups.enter().append("g");
         }
         
         dotGroups.each(function(dot) {
@@ -270,14 +265,15 @@ export default class Grapher {
             // save dot in jQuery data also
             $(this).data("dot", dot);
 
-            let dotClass;
+            let dotClass = "";
             if (options.drawDotType) {
                 dotClass = sheet.getDotType(dot);
             } else if (options.drawOrientation !== false) {
                 dotClass = getNearestOrientation(state.angle);
             }
 
-            let dotGroup = d3.select(this).attr("class", `dot ${dotClass}`);
+            dotClass = `dot ${dotClass} dot-${dot.getLabel()}`;
+            let dotGroup = d3.select(this).attr("class", dotClass);
 
             let dotMarker = dotGroup.selectAll(".dot-marker");
             if (dotMarker.empty()) {
