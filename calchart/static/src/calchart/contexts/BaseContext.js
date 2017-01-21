@@ -2,9 +2,6 @@ import * as _ from "lodash";
 
 import { NotImplementedError } from "utils/errors";
 
-// Maps Context constructor names to whether they've been initialized yet
-let initializedContexts = {};
-
 /**
  * Represents a Context that defines a state of the editor application and
  * the actions that can be run when the editor application is in the
@@ -18,11 +15,6 @@ export default class BaseContext {
         this._controller = controller;
         this._sheet = controller.getActiveSheet();
         this._eventListeners = new Set();
-
-        if (!initializedContexts[this.constructor.name]) {
-            this._init();
-            initializedContexts[this.constructor.name] = true;
-        }
     }
 
     /**
@@ -93,9 +85,4 @@ export default class BaseContext {
         $(element).on(events);
         this._eventListeners.add(element);
     }
-
-    /**
-     * Any actions to run when the context is initialized the first time.
-     */
-    _init() {}
 }

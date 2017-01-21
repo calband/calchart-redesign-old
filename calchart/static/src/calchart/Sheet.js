@@ -57,29 +57,29 @@ export default class Sheet {
         this._orientation = options.orientation;
         this._stepType = options.stepType;
 
-        // map dot labels to their info for the sheet. See Sheet.getDotInfo
-        this._dots = {};
+        // @type {Object[]} see Sheet.getDotInfo
+        this._dots = [];
 
-        // map dot type to Continuities
+        // @type {Object.<string, Continuity[]>}
         this._continuities = {};
     }
 
     /**
      * Create a stuntsheet from the given number of beats and the given
-     * dot labels.
+     * number of dots.
      *
      * @param {Show} show
      * @param {int} index
      * @param {int} numBeats
-     * @param {string[]} dotLabels - The labels for the dots in the show.
+     * @param {int} numDots
      * @return {Sheet}
      */
-    static create(show, index, numBeats, dotLabels) {
+    static create(show, index, numBeats, numDots) {
         let sheet = new Sheet(show, index, numBeats);
 
         // initialize dots as plain dots
-        dotLabels.forEach(dot => {
-            sheet._dots[dot] = {
+        sheet._dots = _.range(numDots).map(i => {
+            return {
                 type: DotType.PLAIN,
                 position: new Coordinate(0, 0),
                 movements: [],
@@ -101,8 +101,8 @@ export default class Sheet {
     static deserialize(show, data) {
         let sheet = new Sheet(show, data.index, data.numBeats, data.options);
 
-        _.each(data.dots, function(dotData, label) {
-            sheet._dots[label] = {
+        sheet._dots = data.dots.map(dotData => {
+            return {
                 type: dotData.type,
                 position: Coordinate.deserialize(dotData.position),
                 movements: dotData.movements.map(
@@ -139,9 +139,8 @@ export default class Sheet {
             stepType: this._stepType,
         };
         
-        data.dots = {};
-        _.each(this._dots, function(dotInfo, label) {
-            data.dots[label] = {
+        data.dots = this._dots.map(dotInfo => {
+            return {
                 type: dotInfo.type,
                 position: dotInfo.position.serialize(),
                 movements: dotInfo.movements.map(movement => movement.serialize()),
@@ -182,8 +181,7 @@ export default class Sheet {
      */
     changeDotTypes(dots, dotType) {
         dots.forEach(dot => {
-            let label = dot.getLabel();
-            this._dots[label].type = dotType;
+            this._dots[dot.id].type = dotType;
         });
 
         if (_.isUndefined(this._continuities[dotType])) {
@@ -225,8 +223,7 @@ export default class Sheet {
      *   throw an AnimationStateError.
      */
     getAnimationState(dot, beatNum) {
-        let label = dot.getLabel();
-        let movements = this._dots[label].movements;
+        let movements = this._dots[dot.id].movements;
         let remaining = beatNum;
 
         for (let i = 0; i < movements.length; i++) {
@@ -240,7 +237,7 @@ export default class Sheet {
         }
 
         throw new AnimationStateError(
-            `Ran out of movements for ${label}: ${remaining} beats remaining`
+            `Ran out of movements for ${dot.label}: ${remaining} beats remaining`
         );
     }
 
@@ -266,17 +263,14 @@ export default class Sheet {
     /**
      * Get the info for the given Dot for this stuntsheet.
      *
-     * @param {(Dot|string)} dot - The dot or dot label to retrieve info for.
+     * @param {Dot} dot - The dot to retrieve info for.
      * @return {Object} The dot's information for this stuntsheet, containing:
      *   - {DotType} type - The dot's type.
      *   - {Coordinate} position - The dot's starting position.
      *   - {MovementCommand[]} movements - The dot's movements in the sheet.
      */
     getDotInfo(dot) {
-        if (dot instanceof Dot) {
-            dot = dot.getLabel();
-        }
-        return this._dots[dot];
+        return this._dots[dot.id];
     }
 
     /**
@@ -286,21 +280,19 @@ export default class Sheet {
      * @return {Dot[]}
      */
     getDotsOfType(dotType) {
-        let dotTypeDots = [];
-
-        _.each(this._dots, (info, label) => {
+        return _.flatMap(this._dots, (info, i) => {
             if (info.type === dotType) {
-                dotTypeDots.push(this._show.getDotByLabel(label));
+                return this._show.getDot(i);
+            } else {
+                return [];
             }
         });
-
-        return dotTypeDots;
     }
 
     /**
      * Get the dot type of the given dot.
      *
-     * @param {(Dot|string)} dot - The dot or dot label to get the dot type of.
+     * @param {Dot} dot - The dot to get the dot type of.
      * @return {DotType}
      */
     getDotType(dot) {
@@ -311,8 +303,8 @@ export default class Sheet {
      * @return {DotType[]} The dot types in this sheet, sorted by DotType.
      */
     getDotTypes() {
-        let dotTypes = _.map(_.values(this._dots), "type");
-        return DotType.sort(new Set(dotTypes));
+        let dotTypes = new Set(_.map(this._dots, "type"));
+        return DotType.sort(dotTypes);
     }
 
     /**
@@ -333,8 +325,8 @@ export default class Sheet {
     /**
      * Get the position of the given dot at the end of the sheet.
      *
-     * @param {(Dot|string)} dot - The dot or dot label.
-     * @return {Coordinate} The final position of the dot in the sheet.
+     * @param {Dot} dot
+     * @return {Coordinate}
      */
     getFinalPosition(dot) {
         let dotInfo = this.getDotInfo(dot);
@@ -387,8 +379,8 @@ export default class Sheet {
     /**
      * Get the position of the dot at the beginning of the sheet.
      *
-     * @param {(Dot|string)} dot - The dot or dot label.
-     * @return {Coordinate} The initial position of the dot in the sheet.
+     * @param {Dot} dot
+     * @return {Coordinate}
      */
     getPosition(dot) {
         return this.getDotInfo(dot).position;
@@ -448,7 +440,7 @@ export default class Sheet {
     /**
      * Update the movements for the given dots.
      *
-     * @param {(string|Dot|Array<Dot>)} [dots] - The dots to update movements for, as
+     * @param {(string|Dot|Dot[])} [dots] - The dots to update movements for, as
      *   either the dot type, the Dot, or a list of Dots. If undefined, updates all dots.
      */
     updateMovements(dots) {
@@ -461,8 +453,8 @@ export default class Sheet {
         }
 
         dots.forEach(dot => {
-            let continuities = this._continuities[this.getDotType(dot)];
             let info = this.getDotInfo(dot);
+            let continuities = this._continuities[info.type];
             let data = {
                 position: info.position,
                 remaining: this._numBeats,

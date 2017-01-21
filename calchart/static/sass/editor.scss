@@ -120,28 +120,22 @@ $sidebar-width: 200px;
     label {
         width: 90px;
     }
-    .field.beatsPerStep {
-        label {
-            width: initial;
+    .field {
+        &.numBeats, &.numDots, &.beatsPerStep {
+            label {
+                width: initial;
+            }
         }
-        select {
-            width: 90px;
-        }
-        & > input {
-            margin-left: 10px;
-            width: 50px;
-            vertical-align: middle;
-            text-align: center;
-        }
-    }
-    &.setup-show {
-        .numDots label {
-            width: initial;
-        }
-    }
-    &.edit-stuntsheet {
-        .numBeats label {
-            width: initial;
+        &.beatsPerStep {
+            select {
+                width: 90px;
+            }
+            & > input {
+                margin-left: 10px;
+                width: 50px;
+                vertical-align: middle;
+                text-align: center;
+            }
         }
     }
     &.edit-continuity {

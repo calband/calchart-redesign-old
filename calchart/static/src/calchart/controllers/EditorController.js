@@ -105,6 +105,13 @@ export default class EditorController extends ApplicationController {
         }
 
         this.loadContext("dot");
+
+        // mark entire toolbar as inactive if there are no sheets
+        if (this._show.getSheets().length === 0) {
+            $(".toolbar li").addClass("inactive");
+            // except new sheet
+            $(".toolbar .add-stuntsheet").removeClass("inactive");
+        }
     }
 
     /**
@@ -112,6 +119,8 @@ export default class EditorController extends ApplicationController {
      */
     addStuntsheet() {
         let controller = this;
+        let firstSheet = this._show.getSheets().length === 0;
+
         showPopup("add-stuntsheet", {
             onSubmit: function(popup) {
                 let data = getData(popup);
@@ -124,6 +133,9 @@ export default class EditorController extends ApplicationController {
                 }
 
                 controller.doAction("addSheet", [data.numBeats]);
+                if (firstSheet) {
+                    $(".toolbar li").removeClass("inactive");
+                }
             },
         });
     }
@@ -179,7 +191,7 @@ export default class EditorController extends ApplicationController {
                 if (e instanceof AnimationStateError) {
                     // ignore if no movements
                     if (sheet.getDotInfo(dot).movements.length !== 0) {
-                        errors.lackMoves.push(dot.getLabel());
+                        errors.lackMoves.push(dot.label);
                     }
                     return;
                 } else {
@@ -189,7 +201,7 @@ export default class EditorController extends ApplicationController {
 
             let position = nextSheet.getPosition(dot);
             if (final.x !== position.x || final.y !== position.y) {
-                errors.wrongPosition.push(dot.getLabel());
+                errors.wrongPosition.push(dot.label);
             }
         });
 
@@ -541,18 +553,26 @@ export default class EditorController extends ApplicationController {
         }
 
         // refresh grapher
-        if (refresh.grapher && this._activeSheet) {
+        if (refresh.grapher) {
+            let selectedDots = this._selectedDots;
             if (refresh.grapherClear) {
-                // this._selectedDots will refer to stale dots after calling grapher.clear()
-                let selectedDots = this.getSelectedDots().map(dot => dot.getLabel());
+                selectedDots = this.getSelectedDots().map(dot => dot.id);
                 this._grapher.clear();
-                this._grapher.draw(this._activeSheet, this._currBeat);
-                this._selectedDots = this._grapher.getDots(selectedDots);
-            } else {
-                this._grapher.draw(this._activeSheet, this._currBeat);
             }
 
-            this._grapher.selectDots(this._selectedDots);
+            if (this._activeSheet) {
+                this._grapher.draw(this._activeSheet, this._currBeat);
+            } else {
+                this._grapher.drawField();
+            }
+
+            // this._selectedDots will refer to stale dots after calling grapher.clear()
+            if (refresh.grapherClear) {
+                selectedDots = this._grapher.getDots(selectedDots);
+            }
+
+            this._grapher.selectDots(selectedDots);
+            this._selectedDots = selectedDots;
         }
 
         // refresh context

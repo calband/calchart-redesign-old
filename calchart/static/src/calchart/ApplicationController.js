@@ -244,8 +244,14 @@ export default class ApplicationController {
                 // object
                 if (arg.includes("=")) {
                     let [key, val] = arg.split("=");
+
+                    // try to parse as JSON, otherwise it's a string
+                    try {
+                        val = JSON.parse(val);
+                    } catch (e) {}
+
                     return {
-                        [key]: JSON.parse(val),
+                        [key]: val,
                     };
                 }
 

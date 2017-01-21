@@ -212,8 +212,8 @@ header {
                 &.active, &.focus:hover {
                     background: rgba($white, 0.7);
                 }
-                &.disabled {
-                    &:hover {
+                &.disabled, &.inactive {
+                    &:hover:not(.active) {
                         border-color: transparent;
                         box-shadow: none;
                         background: none;

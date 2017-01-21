@@ -114,29 +114,21 @@ export default class Grapher {
         this._svg.insert("g", ":first-child")
             .classed(`field field-${fieldType}`, true);
 
-        let fieldGrapher;
-        switch (fieldType) {
-            case "college":
-                fieldGrapher = new CollegeGrapher(this._svg, svgWidth, svgHeight, this._options);
-                break;
-            default:
-                throw new Error(`No Grapher of type: ${fieldType}`);
-        }
-
+        let fieldGrapher = this._getFieldGrapher(fieldType, svgWidth, svgHeight);
         fieldGrapher.drawField();
         this._scale = fieldGrapher.getScale();
     }
 
     /**
-     * Get the dots, optionally filtered by the given labels.
+     * Get the dots, optionally filtered by the given dot IDs.
      *
-     * @param {string[]} [labels]
+     * @param {int[]} [ids]
      * @return {jQuery} The dots in the grapher.
      */
-    getDots(labels) {
+    getDots(ids) {
         let dots = this._svg.selectAll("g.dot");
-        if (!_.isUndefined(labels)) {
-            dots = dots.filter(dot => labels.includes(dot.getLabel()));
+        if (!_.isUndefined(ids)) {
+            dots = dots.filter(dot => ids.includes(dot.id));
         }
         return $(dots.nodes());
     }
@@ -246,12 +238,13 @@ export default class Grapher {
 
         // order dots in reverse order so that lower dot values are drawn on top
         // of higher dot values
-        let dots = this._show.getDots().sort(function(dot1, dot2) {
+        let dots = this._show.getDots();
+        let sortedDots = _.clone(dots).sort(function(dot1, dot2) {
             return -1 * dot1.compareTo(dot2);
         });
 
         // each dot consists of a group containing all svg elements making up a dot
-        let dotGroups = dotsGroup.selectAll("g.dot").data(dots);
+        let dotGroups = dotsGroup.selectAll("g.dot").data(sortedDots);
         if (dotGroups.empty()) {
             dotGroups = dotGroups.enter().append("g");
         }
@@ -280,7 +273,7 @@ export default class Grapher {
                 dotClass = getNearestOrientation(state.angle);
             }
 
-            dotClass = `dot ${dotClass} dot-${dot.getLabel()}`;
+            dotClass = `dot ${dotClass} dot-${dot.id}`;
             let dotGroup = d3.select(this).attr("class", dotClass);
 
             let dotMarker = dotGroup.selectAll(".dot-marker");
@@ -326,7 +319,7 @@ export default class Grapher {
                     dotLabel = dotGroup.append("text")
                         .classed("dot-label", true)
                         .attr("font-size", dotRadius * 2)
-                        .text(dot.getLabel());
+                        .text(dot.label);
                 }
 
                 let offsetX = -1.25 * parseFloat(dotLabel.style("width"));
@@ -342,5 +335,23 @@ export default class Grapher {
             let y = _this._scale.yScale(state.y);
             _this.moveDotTo(this, x, y);
         });
+    }
+
+    /**
+     * Get the FieldGrapher of the given type.
+     *
+     * @param {string} fieldType - The field type of the FieldGrapher to get. Options are:
+     *   - college: CollegeGrapher
+     * @param {number} svgWidth - The width of the SVG to pass to the FieldGrapher.
+     * @param {number} svgHeight - The height of the SVG to pass to the FieldGrapher.
+     * @return {FieldGrapher}
+     */
+    _getFieldGrapher(fieldType, svgWidth, svgHeight) {
+        switch (fieldType) {
+            case "college":
+                return new CollegeGrapher(this._svg, svgWidth, svgHeight, this._options);
+            default:
+                throw new Error(`No FieldGrapher of type: ${fieldType}`);
+        }
     }
 }

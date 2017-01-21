@@ -1,11 +1,11 @@
-# format of dot labels for shows
+# format of dot labels for shows, see CalchartUtils.DOT_FORMATS
 DOT_FORMATS = [
     ('', ''),
     ('combo', 'A0, A1, A2, ...'),
     ('number', '1, 2, 3, ...'),
 ]
 
-# types of fields that can be drawn
+# types of fields that can be drawn, see Grapher#_getFieldGrapher
 FIELD_TYPES = [
     ('', ''),
     ('college', 'College Field'),
@@ -15,7 +15,7 @@ DEF_FIELD_TYPES = [
     ('college', 'College Field'),
 ]
 
-# types of dots, copied from DotType.js
+# types of dots, see DotType.js
 DOT_TYPES = [
     ('Plain Dot', 'plain'),
     ('Solid Dot', 'solid'),
@@ -27,7 +27,7 @@ DOT_TYPES = [
     ('Solid Cross Dot', 'solid-x'),
 ]
 
-# step types, copied from CalchartUtils.STEP_TYPES
+# step types, see CalchartUtils.STEP_TYPES
 STEP_TYPES = [
     ('HS', 'High Step'),
     ('MM', 'Mini Military'),
@@ -44,7 +44,7 @@ DEF_STEP_TYPES = [
     ('JS', 'Jerky Step'),
 ]
 
-# orientations, copied from CalchartUtils.ORIENTATIONS
+# orientations, see CalchartUtils.ORIENTATIONS
 ORIENTATIONS = [
     ('east', 'East'),
     ('west', 'West'),

@@ -301,14 +301,19 @@ class ContextActions {
      * Change the currently selected dots' dot type to the given dot type.
      *
      * @param {string} dotType - The dot type to change to.
-     * @param {Sheet} [sheet] -- The sheet to change dot types for. Defaults
+     * @param {Dot[]} [dots] - The dots to change dot types for. Defaults to
+     *   the currently selected dots.
+     * @param {Sheet} [sheet] - The sheet to change dot types for. Defaults
      *   to the current sheet.
      */
-    static changeDotType(dotType, sheet=this._sheet) {
-        let selected = this._controller.getSelectedDots();
+    static changeDotType(dotType, dots, sheet=this._sheet) {
+        if (_.isUndefined(dots)) {
+            dots = this._controller.getSelectedDots();
+        }
+
         let oldTypes = {};
 
-        selected.forEach(function(dot) {
+        dots.forEach(function(dot) {
             let dotType = sheet.getDotType(dot);
             if (_.isUndefined(oldTypes[dotType])) {
                 oldTypes[dotType] = [];
@@ -316,11 +321,11 @@ class ContextActions {
             oldTypes[dotType].push(dot);
         });
 
-        sheet.changeDotTypes(selected, dotType);
+        sheet.changeDotTypes(dots, dotType);
         this._controller.loadSheet(sheet);
 
         return {
-            data: [dotType, sheet],
+            data: [dotType, dots, sheet],
             undo: function() {
                 _.each(oldTypes, function(dots, dotType) {
                     sheet.changeDotTypes(dots, dotType);
@@ -354,7 +359,7 @@ class ContextActions {
         dots.forEach(function(dot) {
             let position = sheet.getPosition(dot);
             // copy position
-            prevPositions[dot.getLabel()] = _.clone(position);
+            prevPositions[dot.label] = _.clone(position);
             sheet.updatePosition(dot, position.x + deltaX, position.y + deltaY);
         });
 
@@ -380,7 +385,7 @@ class ContextActions {
             data: [deltaX, deltaY, sheet, dots],
             undo: function() {
                 dots.forEach(function(dot) {
-                    let position = prevPositions[dot.getLabel()];
+                    let position = prevPositions[dot.label];
                     sheet.updatePosition(dot, position.x, position.y);
                 });
                 _updateMovements();

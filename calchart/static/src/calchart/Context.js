@@ -3,6 +3,9 @@ import * as _ from "lodash";
 import ContinuityContext from "calchart/contexts/ContinuityContext";
 import DotContext from "calchart/contexts/DotContext";
 
+// cache contexts after they've been created
+let contexts = {};
+
 /**
  * A proxy class for knowing and loading all Context types, although all Context
  * types actually inherit from {@link BaseContext}. This proxy class allows for
@@ -18,17 +21,20 @@ export default class Context {
      * @return {Context}
      */
     static load(name, controller, options={}) {
-        let context;
-        switch (name) {
-            case "continuity":
-                context = new ContinuityContext(controller);
-                break;
-            case "dot":
-                context = new DotContext(controller);
-                break;
-            default:
-                throw new Error(`No context named: ${name}`);
+        if (_.isUndefined(contexts[name])) {
+            switch (name) {
+                case "continuity":
+                    contexts[name] = new ContinuityContext(controller);
+                    break;
+                case "dot":
+                    contexts[name] = new DotContext(controller);
+                    break;
+                default:
+                    throw new Error(`No context named: ${name}`);
+            }
         }
+
+        let context = contexts[name];
         context.load(options);
         return context;
     }

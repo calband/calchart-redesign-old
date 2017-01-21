@@ -4,6 +4,7 @@ import Dot from "calchart/Dot";
 import Sheet from "calchart/Sheet";
 import Song from "calchart/Song";
 
+import { getDotLabels } from "utils/CalchartUtils";
 import { moveElem } from "utils/JSUtils";
 
 /**
@@ -38,11 +39,7 @@ export default class Show {
         this._name = name;
         this._slug = slug;
 
-        this._dots = _.fromPairs(dots.map(data => {
-            let dot = Dot.deserialize(data);
-            return [dot.getLabel(), dot];
-        }));
-
+        this._dots = dots.map(data => Dot.deserialize(data));
         this._sheets = sheets.map(data => Sheet.deserialize(this, data));
         this._songs = songs.map(data => Song.deserialize(data));
         this._fieldType = fieldType;
@@ -67,25 +64,8 @@ export default class Show {
      * @return {Show}
      */
     static create(name, slug, data) {
-        let getLabel;
-        switch (data.dotFormat) {
-            case "combo":
-                getLabel = function(n) {
-                    // 65 = "A"
-                    let charCode = 65 + (n / 10);
-                    let num = n % 10;
-                    return String.fromCharCode(charCode) + num;
-                };
-                break;
-            case "number":
-                getLabel = function(n) {
-                    return String(n);
-                };
-                break;
-        }
-
-        let dots = _.range(data.numDots).map(
-            i => new Dot(getLabel(i)).serialize()
+        let dots = getDotLabels(data.dotFormat, data.numDots).map(
+            (label, i) => new Dot(i, label).serialize()
         );
 
         return new Show(name, slug, dots, [], [], data.fieldType);
@@ -116,7 +96,7 @@ export default class Show {
             orientation: this._orientation,
         };
 
-        data.dots = _.values(this._dots).map(dot => dot.serialize());
+        data.dots = this._dots.map(dot => dot.serialize());
         data.sheets = this._sheets.map(sheet => sheet.serialize());
         data.songs = this._songs.map(song => song.serialize());
 
@@ -185,24 +165,17 @@ export default class Show {
      * @return {Dot[]} Every Dot in the show.
      */
     getDots() {
-        return _.values(this._dots);
+        return this._dots;
     }
 
     /**
-     * @return {string[]} The labels of every dots in show.
-     */
-    getDotLabels() {
-        return _.keys(this._dots);
-    }
-
-    /**
-     * Get dot by its label.
+     * Get dot by its ID.
      *
-     * @param {string} label - The label of the dot to get.
+     * @param {int} id - The ID of the dot to get.
      * @return {Dot}
      */
-    getDotByLabel(label) {
-        return this._dots[label];
+    getDot(id) {
+        return this._dots[id];
     }
 
     /**** SHEETS ****/
@@ -222,7 +195,7 @@ export default class Show {
      */
     addSheet(numBeats) {
         let index = this._sheets.length;
-        let sheet = Sheet.create(this, index, numBeats, this.getDotLabels());
+        let sheet = Sheet.create(this, index, numBeats, this._dots.length);
 
         this._sheets.push(sheet);
         this._updateMovements(index - 1);

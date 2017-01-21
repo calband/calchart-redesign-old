@@ -24,6 +24,8 @@ export default class ContinuityContext extends BaseContext {
 
         // the currently active dot type
         this._dotType = null;
+
+        this._setupPanel();
     };
 
     static get shortcuts() {
@@ -198,11 +200,8 @@ export default class ContinuityContext extends BaseContext {
     /**
      * Initialize the continuity panel and toolbar
      */
-    _init() {
+    _setupPanel() {
         let _this = this;
-
-        // reinitialize here because cannot initialize this._panel before calling super()
-        this._panel = $(".panel.edit-continuity");
 
         // setup continuity panel
         setupPanel(this._panel, {
