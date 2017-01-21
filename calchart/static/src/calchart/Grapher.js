@@ -149,6 +149,14 @@ export default class Grapher {
     }
 
     /**
+     * @param {string} name
+     * @return {*} @see Grapher#setOption.
+     */
+    getOption(name) {
+        return this._options[name];
+    }
+
+    /**
      * @return {GrapherScale} The scale of the Grapher field.
      */
     getScale() {

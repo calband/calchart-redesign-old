@@ -8,7 +8,8 @@ import Sheet from "calchart/Sheet";
 
 import { ActionError, AnimationStateError, ValidationError } from "utils/errors";
 import HTMLBuilder from "utils/HTMLBuilder";
-import { empty, parseArgs, underscoreKeys, update } from "utils/JSUtils";
+import { empty, parseArgs, parseNumber, underscoreKeys, update } from "utils/JSUtils";
+import { round } from "utils/MathUtils";
 import {
     doAction,
     showContextMenu,
@@ -58,6 +59,7 @@ export default class EditorController extends ApplicationController {
     init() {
         super.init();
 
+        let controller = this;
         setupMenu(".menu");
         setupToolbar(".toolbar");
         this._setupSidebar();
@@ -77,7 +79,7 @@ export default class EditorController extends ApplicationController {
         workspace.scrollLeft(scale.minX - 30);
         workspace.scrollTop(scale.minY - 30);
 
-        // set up zoom
+        // set up pinch zoom
         let graph = this._grapher.getGraph();
         workspace.pinch(e => {
             e.preventDefault();
@@ -86,6 +88,16 @@ export default class EditorController extends ApplicationController {
             this._grapher.zoom(delta);
             this.refreshZoom(e.pageX, e.pageY);
         });
+
+        // set up zoom item in toolbar
+        let toolbarZoom = $(".toolbar .zoom select");
+        HTMLBuilder.make("option.custom").appendTo(toolbarZoom);
+        toolbarZoom
+            .change(function() {
+                let zoom = parseNumber($(this).val());
+                controller.zoomTo(zoom);
+            })
+            .choose(1);
 
         let sheet = _.first(this._show.getSheets());
         if (sheet) {
@@ -587,6 +599,18 @@ export default class EditorController extends ApplicationController {
         let end = this._grapher.getScale().toDistanceCoordinates(start);
         workspace.scrollLeft(end.x - left);
         workspace.scrollTop(end.y - top);
+
+        // update toolbar
+        let zoom = round(this._grapher.getOption("zoom"), 1e-3);
+        let toolbarZoom = $(".toolbar .zoom select").choose(zoom);
+        if (_.isNull(toolbarZoom.val())) {
+            // custom zoom
+            let label = (zoom * 100).toFixed(1);
+            toolbarZoom.children("option.custom")
+                .val(zoom)
+                .text(`${label}%`);
+            toolbarZoom.choose(zoom);
+        }
     }
 
     /**

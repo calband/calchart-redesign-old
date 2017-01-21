@@ -54,3 +54,12 @@ DEF_ORIENTATIONS = [
     ('east', 'East'),
     ('west', 'West'),
 ]
+
+# zoom options
+ZOOMS = [
+    (0.5, '50%'),
+    (0.75, '75%'),
+    (1, '100%'),
+    (1.5, '150%'),
+    (2, '200%'),
+]

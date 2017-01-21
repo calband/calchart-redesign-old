@@ -43,6 +43,15 @@ $editor-header-height: 100px;
                 background: $medium-gray;
             }
         }
+        .zoom {
+            text-align: center;
+            select {
+                width: 100px;
+            }
+            .chosen-container li.custom {
+                display: none;
+            }
+        }
     }
 }
 

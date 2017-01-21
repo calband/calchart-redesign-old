@@ -14,7 +14,7 @@ from django.templatetags.static import static as get_static_path
 from django.utils.html import format_html, format_html_join, mark_safe
 from django.utils.text import slugify
 
-from base.constants import DOT_TYPES
+from base.constants import DOT_TYPES, ZOOMS
 from base.utils import collapse
 
 ### MENU CLASSES ###
@@ -250,11 +250,8 @@ editor_menu = Menu(
             MenuItem('Zoom in', 'zoomIn', icon='search-plus'),
             MenuItem('Zoom out', 'zoomOut', icon='search-minus'),
         ], [
-            MenuItem('50%', 'zoomTo(0.5)'),
-            MenuItem('75%', 'zoomTo(0.75)'),
-            MenuItem('100%', 'zoomTo(1)'),
-            MenuItem('150%', 'zoomTo(1.5)'),
-            MenuItem('200%', 'zoomTo(2)'),
+            MenuItem(label, 'zoomTo(%s)' % zoom)
+            for zoom, label in ZOOMS
         ], icon='search'),
     ]),
 )
@@ -294,5 +291,9 @@ editor_toolbar = Toolbar(
     ToolbarGroup(
         ToolbarItem('Zoom In', 'search-plus', 'zoomIn'),
         ToolbarItem('Zoom Out', 'search-minus', 'zoomOut'),
+        CustomToolbarItem('Zoom', '<select><option></option>%s</select>' % ''.join([
+            '<option value="%s">%s</option>' % (zoom, label)
+            for zoom, label in ZOOMS
+        ])),
     ),
 )
