@@ -177,12 +177,11 @@ export default class HTMLBuilder {
         _.each(args.options, function(label, value) {
             $("<option>")
                 .attr("value", value)
-                .prop("selected", value === args.initial)
                 .text(label)
                 .appendTo(select);
         });
 
-        return select;
+        return select.val(args.initial);
     }
 
     /**
