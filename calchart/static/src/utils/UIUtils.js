@@ -521,15 +521,19 @@ export function showMessage(message, isError) {
         li.addClass("error");
     }
 
+    function removeMessage() {
+        li.fadeOut(function() {
+            if (!container.children(":visible").exists()) {
+                container.remove();
+            }
+        });
+    }
+
     HTMLBuilder.icon("times", "close-message")
-        .click(function() {
-            li.fadeOut(function() {
-                if (!container.children(":visible").exists()) {
-                    container.remove();
-                }
-            });
-        })
+        .click(removeMessage)
         .appendTo(li);
+
+    setTimeout(removeMessage, 2000);
 }
 
 /**
