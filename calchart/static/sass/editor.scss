@@ -150,108 +150,109 @@ $sidebar-width: 200px;
     position: absolute;
     background: $dark-gray;
     z-index: z-index(popup);
-    box-shadow: 0 0 5px $medium-gray;
+    box-shadow: 0 0 5px $black;
     $panel-handle-height: 10px;
     .panel-handle {
         background: $medium-gray;
         background: linear-gradient($semilight-gray, $medium-gray);
         height: $panel-handle-height;
     }
-    &.edit-continuity {
-        $panel-ec-actions-width: 40px;
-        width: 300px;
-        background: $light-gray;
-        .add-continuity {
-            padding: 0 10px;
-            margin: 10px 0;
-            select {
-                width: 100%;
-            }
-            .chosen-container .chosen-results {
-                max-height: 125px;
-            }
+}
+
+.panel.edit-continuity {
+    $panel-ec-actions-width: 40px;
+    width: 300px;
+    background: $light-gray;
+    .add-continuity {
+        padding: 0 10px;
+        margin: 10px 0;
+        select {
+            width: 100%;
         }
-        .continuities {
-            height: 125px;
-            padding: 0 10px;
-            margin: 10px 0;
-            overflow-y: auto;
-            .continuity {
+        .chosen-container .chosen-results {
+            max-height: 125px;
+        }
+    }
+    .continuities {
+        height: 125px;
+        padding: 0 10px;
+        margin: 10px 0;
+        overflow-y: auto;
+        .continuity {
+            @include vertically-center(false);
+            padding: 10px;
+            background: $light-gold;
+            &:not(:last-child) {
+                margin-bottom: 5px;
+            }
+            .info {
                 @include vertically-center(false);
-                padding: 10px;
-                background: $light-gold;
-                &:not(:last-child) {
-                    margin-bottom: 5px;
-                }
-                .info {
-                    @include vertically-center(false);
-                    width: calc(100% - #{$panel-ec-actions-width + 5px});
+                width: calc(100% - #{$panel-ec-actions-width + 5px});
+                margin-right: 5px;
+                & > span {
+                    width: 50px;
                     margin-right: 5px;
-                    & > span {
-                        width: 50px;
-                        margin-right: 5px;
-                    }
-                    label {
-                        margin-right: 5px;
-                    }
-                    input.panel-continuity-duration {
-                        width: 50px;
-                        margin-right: 5px;
-                    }
                 }
-                .actions {
-                    width: $panel-ec-actions-width;
-                    i {
-                        margin: 0 2px;
-                        cursor: pointer;
-                        &.delete {
-                            color: $red;
-                        }
-                    }
+                label {
+                    margin-right: 5px;
                 }
-                select {
-                    -webkit-appearance: none;
-                    padding: 5px 10px;
-                    padding-right: 20px;
-                    width: initial;
-                    background: $light-gray url(../img/updown.png) no-repeat right;
-                    background-size: 1.2em;
-                    color: $blue;
-                    border: 1px solid $medium-gray;
-                    border-radius: 3px;
-                    font-size: 0.8em;
-                    vertical-align: middle;
-                    outline: 0;
-                    cursor: pointer;
+                input.panel-continuity-duration {
+                    width: 50px;
+                    margin-right: 5px;
                 }
             }
-        }
-        .dot-types {
-            @include unselectable;
-            height: 35px;
-            padding: 0 10px;
-            border-top: 2px solid $black;
-            background: $dark-gray;
-            li {
-                display: inline-block;
-                padding: 5px 7px;
-                top: -2px;
-                background: $medium-gray;
-                border: 2px solid $black;
+            .actions {
+                width: $panel-ec-actions-width;
+                i {
+                    margin: 0 2px;
+                    cursor: pointer;
+                    &.delete {
+                        color: $red;
+                    }
+                }
+            }
+            select {
+                -webkit-appearance: none;
+                padding: 5px 10px;
+                padding-right: 20px;
+                width: initial;
+                background: $light-gray url(../img/updown.png) no-repeat right;
+                background-size: 1.2em;
+                color: $blue;
+                border: 1px solid $medium-gray;
+                border-radius: 3px;
+                font-size: 0.8em;
+                vertical-align: middle;
+                outline: 0;
                 cursor: pointer;
-                &:hover {
-                    background: lighten($medium-gray, 5);
-                }
-                &:not(:last-child) {
-                    border-right: none;
-                }
-                &.active {
-                    background: $light-gray;
-                    border-top-color: transparent;
-                }
-                img {
-                    height: 14px;
-                }
+            }
+        }
+    }
+    .dot-types {
+        @include unselectable;
+        height: 35px;
+        padding: 0 10px;
+        border-top: 2px solid $black;
+        background: $dark-gray;
+        li {
+            display: inline-block;
+            padding: 5px 7px;
+            top: -2px;
+            background: $medium-gray;
+            border: 2px solid $black;
+            cursor: pointer;
+            &:hover {
+                background: lighten($medium-gray, 5);
+            }
+            &:not(:last-child) {
+                border-right: none;
+            }
+            &.active {
+                background: $light-gray;
+                border-top-color: transparent;
+            }
+            img {
+                height: 14px;
             }
         }
     }

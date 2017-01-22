@@ -42,6 +42,10 @@ export default class FieldGrapher {
         this._scale = new GrapherScale(this, this._svgWidth, this._svgHeight, paddingWidth, paddingHeight);
     }
 
+    // get dimensions of the SVG
+    get svgWidth() { return this._svgWidth; }
+    get svgHeight() { return this._svgHeight; }
+
     /**
      * @return {int} The height of the field, in steps.
      */

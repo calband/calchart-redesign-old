@@ -34,6 +34,9 @@ export default class Grapher {
         this._svg = d3.select(this._drawTarget.get(0))
             .append("svg")
             .attr("class", "graph");
+
+        this._svgWidth = undefined;
+        this._svgHeight = undefined;
     }
 
     get svgWidth() { return this._svgWidth; }
@@ -117,6 +120,19 @@ export default class Grapher {
         let fieldGrapher = this._getFieldGrapher(fieldType, svgWidth, svgHeight);
         fieldGrapher.drawField();
         this._scale = fieldGrapher.getScale();
+        this._svgWidth = fieldGrapher.svgWidth;
+        this._svgHeight = fieldGrapher.svgHeight;
+    }
+
+    /**
+     * Get the dot corresponding to the given Dot.
+     *
+     * @param {Dot} dot
+     * @return {jQuery}
+     */
+    getDot(dot) {
+        let dotNode = this._svg.select(`g.dot.dot-${dot.id}`).nodes();
+        return $(dotNode);
     }
 
     /**
@@ -171,6 +187,11 @@ export default class Grapher {
      * @param {float} y - The y-coordinate of the dot's position, in pixels.
      */
     moveDotTo(dot, x, y) {
+        if (this._options.boundDots) {
+            x = _.clamp(x, 0, this._svgWidth);
+            y = _.clamp(y, 0, this._svgHeight);
+        }
+
         $(dot)
             .attr("transform", `translate(${x}, ${y})`)
             .data("position", new Coordinate(x, y));

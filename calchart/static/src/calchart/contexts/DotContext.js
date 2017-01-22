@@ -362,13 +362,27 @@ class ContextActions {
 
         let prevPositions = {};
 
-        // update positions
+        let scale = this._grapher.getScale();
+        let _deltaX = scale.toDistance(deltaX);
+        let _deltaY = scale.toDistance(deltaY);
+        let boundPosition = position => {
+            position = scale.toDistanceCoordinates(position);
 
-        dots.forEach(function(dot) {
-            let position = sheet.getPosition(dot);
+            let x = _.clamp(position.x + _deltaX, 0, this._grapher.svgWidth);
+            let y = _.clamp(position.y + _deltaY, 0, this._grapher.svgHeight);
+
+            return scale.toStepCoordinates({ x, y });
+        };
+
+        // update positions
+        dots.forEach(dot => {
             // copy position
-            prevPositions[dot.label] = _.clone(position);
-            sheet.updatePosition(dot, position.x + deltaX, position.y + deltaY);
+            let prevPosition = sheet.getPosition(dot);
+            prevPositions[dot.label] = _.clone(prevPosition);
+
+            // bound dots within graph
+            let position = boundPosition(prevPosition);
+            sheet.updatePosition(dot, position.x, position.y);
         });
 
         // update movements
