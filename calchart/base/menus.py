@@ -14,7 +14,7 @@ from django.templatetags.static import static as get_static_path
 from django.utils.html import format_html, format_html_join, mark_safe
 from django.utils.text import slugify
 
-from base.constants import DOT_TYPES, ZOOMS
+from base.constants import ZOOMS
 from base.utils import collapse
 
 ### MENU CLASSES ###
@@ -273,13 +273,6 @@ editor_toolbar = Toolbar(
         ToolbarItem('Selection', 'selection', 'loadSelection(box)'),
         ToolbarItem('Lasso', 'lasso', 'loadSelection(lasso)'),
         classes='dot-selection',
-    ),
-    ToolbarContextGroup(
-        'edit-dots',
-        [
-            ImageToolbarItem(label, 'dot-%s.png' % slug, 'changeDotType(%s)' % slug)
-            for label, slug in DOT_TYPES
-        ]
     ),
     ToolbarContextGroup(
         'edit-continuity',

@@ -15,18 +15,6 @@ DEF_FIELD_TYPES = [
     ('college', 'College Field'),
 ]
 
-# types of dots, see DotType.js
-DOT_TYPES = [
-    ('Plain Dot', 'plain'),
-    ('Solid Dot', 'solid'),
-    ('Plain Forwardslash Dot', 'plain-forwardslash'),
-    ('Solid Forwardslash Dot', 'solid-forwardslash'),
-    ('Plain Backslash Dot', 'plain-backslash'),
-    ('Solid Backslash Dot', 'solid-backslash'),
-    ('Plain Cross Dot', 'plain-x'),
-    ('Solid Cross Dot', 'solid-x'),
-]
-
 # step types, see CalchartUtils.STEP_TYPES
 STEP_TYPES = [
     ('HS', 'High Step'),

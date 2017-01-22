@@ -283,6 +283,14 @@ export default class DotContext extends BaseContext {
 }
 
 let ContextShortcuts = {
+    "ctrl+1": "changeDotType(plain)",
+    "ctrl+2": "changeDotType(solid)",
+    "ctrl+3": "changeDotType(plain-forwardslash)",
+    "ctrl+4": "changeDotType(solid-forwardslash)",
+    "ctrl+5": "changeDotType(plain-backslash)",
+    "ctrl+6": "changeDotType(solid-backslash)",
+    "ctrl+7": "changeDotType(plain-x)",
+    "ctrl+8": "changeDotType(solid-x)",
     "s": "loadSelection(box)",
     "l": "loadSelection(lasso)",
     "left": "moveDots(-1, 0)",
