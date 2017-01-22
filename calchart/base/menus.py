@@ -15,7 +15,7 @@ from django.utils.html import format_html, format_html_join, mark_safe
 from django.utils.text import slugify
 
 from base.constants import ZOOMS
-from base.utils import collapse
+from utils.general import collapse
 
 ### MENU CLASSES ###
 

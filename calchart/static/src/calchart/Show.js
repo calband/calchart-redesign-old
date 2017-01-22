@@ -8,6 +8,19 @@ import { getDotLabels } from "utils/CalchartUtils";
 import { moveElem } from "utils/JSUtils";
 
 /**
+ * Increment this variable whenever an edit was made to any serializable
+ * class (e.g. Show, Sheet, Dot, Continuity, MovementCommand, etc.) that would
+ * break deserialization. Examples of when NOT to increment this variable:
+ *   - editing a method in a class
+ *   - adding a MovementCommand or Continuity (adding a new deserialization
+ *     option will not break old shows)
+ *
+ * After incrementing this variable, add a migration to update all Shows in
+ * the database. See docs/Versioning.md for more details on this variable.
+ */
+let VERSION = 1;
+
+/**
  * A Show represents a Calchart show, containing the following information:
  *  - the name of the show
  *  - the slug for the show
@@ -21,8 +34,11 @@ import { moveElem } from "utils/JSUtils";
  */
 export default class Show {
     /**
-     * @param {string} name - The name of the show.
-     * @param {string} slug - The slug of the show.
+     * @param {Object} metadata - Any relevant metadata about a Show including:
+     *   - {string} name - The name of the show.
+     *   - {string} slug - The slug of the show.
+     *   - {string} dotFormat - The format used to label the dots.
+     *   - {int} version - The version of the Show.
      * @param {Object[]} dots - The serialized data for every Dot marching in the Show.
      * @param {Object[]} sheets - The serialized data for every Sheet contained in the Show.
      * @param {Object[]} songs - The serialized data for every Song in the Show.
@@ -35,9 +51,15 @@ export default class Show {
      *   - {string} [orientation=east] - The default orientation for the entire
      *     Show (@see CalchartUtils.ORIENTATIONS).
      */
-    constructor(name, slug, dots, sheets, songs, fieldType, options={}) {
-        this._name = name;
-        this._slug = slug;
+    constructor(metadata, dots, sheets, songs, fieldType, options={}) {
+        this._name = metadata.name;
+        this._slug = metadata.slug;
+        this._dotFormat = metadata.dotFormat;
+        this._version = metadata.version;
+
+        if (this._version !== VERSION) {
+            alert("WARNING: You are running an outdated version of a Calchart show!");
+        }
 
         this._dots = dots.map(data => Dot.deserialize(data));
         this._sheets = sheets.map(data => Sheet.deserialize(this, data));
@@ -67,8 +89,14 @@ export default class Show {
         let dots = getDotLabels(data.dotFormat, data.numDots).map(
             (label, i) => new Dot(i, label).serialize()
         );
+        let metadata = {
+            name: name,
+            slug: slug,
+            dotFormat: data.dotFormat,
+            version: VERSION,
+        };
 
-        return new Show(name, slug, dots, [], [], data.fieldType);
+        return new Show(metadata, dots, [], [], data.fieldType);
     }
 
     /**
@@ -78,7 +106,7 @@ export default class Show {
      * @return {Show}
      */
     static deserialize(data) {
-        return new Show(data.name, data.slug, data.dots, data.sheets, data.songs, data.fieldType, data);
+        return new Show(data, data.dots, data.sheets, data.songs, data.fieldType, data);
     }
 
     /**
@@ -90,6 +118,8 @@ export default class Show {
         let data = {
             name: this._name,
             slug: this._slug,
+            dotFormat: this._dotFormat,
+            version: this._version,
             fieldType: this._fieldType,
             beatsPerStep: this._beatsPerStep,
             stepType: this._stepType,
