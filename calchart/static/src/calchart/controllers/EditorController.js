@@ -66,11 +66,12 @@ export default class EditorController extends ApplicationController {
 
         let workspace = $(".workspace");
         this._grapher = new Grapher(this._show, workspace, {
-            showLabels: true,
+            boundDots: true,
             drawYardlineNumbers: true,
             draw4Step: true,
             drawDotType: true,
             expandField: true,
+            showLabels: true,
             zoom: 1,
         });
         this._grapher.drawField();

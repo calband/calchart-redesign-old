@@ -189,6 +189,7 @@ export default class Grapher {
     /**
      * Set a Grapher option. Will not go into effect until draw() has been called again. The
      * available options are:
+     *  - {boolean} [boundDots=false] - If true, prevent dots from going out of the SVG.
      *  - {boolean} [circleSelected=false] - If true, circles the selected dot, or the last
      *    selected dot, if multiple.
      *  - {boolean} [draw4Step=false] - If true, draws 4 step lines.
