@@ -67,6 +67,20 @@ export function empty(array) {
 }
 
 /**
+ * Map a function to each element in an array, getting rid of any undefined
+ * values that are returned.
+ *
+ * @param {Array} array
+ * @param {function} callback
+ * @return {Array}
+ */
+export function mapSome(array, callback) {
+    return _.flatMap(array, function(val, key) {
+        return _.defaultTo(callback(val, key), []);
+    });
+}
+
+/**
  * Move the element from the given index to the specified index. Ex.
  *
  * x = [1,2,3,4]

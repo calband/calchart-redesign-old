@@ -8,7 +8,7 @@ import Sheet from "calchart/Sheet";
 
 import { ActionError, AnimationStateError, ValidationError } from "utils/errors";
 import HTMLBuilder from "utils/HTMLBuilder";
-import { empty, parseArgs, parseNumber, underscoreKeys, update } from "utils/JSUtils";
+import { empty, mapSome, parseArgs, parseNumber, underscoreKeys, update } from "utils/JSUtils";
 import { round } from "utils/MathUtils";
 import {
     doAction,
@@ -1044,9 +1044,7 @@ class EditorActions {
         this._show.moveSheet(from, to);
 
         let sheets = this._show.getSheets();
-        let toUpdate = _.flatMap([from - 1, to - 1, to], i =>
-            _.defaultTo(sheets[i], [])
-        );
+        let toUpdate = mapSome([from - 1, to - 1, to], i => sheets[i]);
 
         toUpdate.forEach(sheet => {
             this.checkContinuities(sheet);

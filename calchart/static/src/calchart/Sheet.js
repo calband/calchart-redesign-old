@@ -8,6 +8,7 @@ import DotType from "calchart/DotType";
 import MovementCommand from "calchart/MovementCommand";
 
 import { AnimationStateError } from "utils/errors";
+import { mapSome } from "utils/JSUtils";
 
 /**
  * A Sheet represents a stuntsheet, containing the following information:
@@ -280,11 +281,9 @@ export default class Sheet {
      * @return {Dot[]}
      */
     getDotsOfType(dotType) {
-        return _.flatMap(this._dots, (info, i) => {
+        return mapSome(this._dots, (info, i) => {
             if (info.type === dotType) {
                 return this._show.getDot(i);
-            } else {
-                return [];
             }
         });
     }
