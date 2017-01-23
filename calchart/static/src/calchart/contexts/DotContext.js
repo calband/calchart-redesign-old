@@ -4,7 +4,7 @@ import BaseContext from "calchart/contexts/BaseContext";
 
 import HTMLBuilder from "utils/HTMLBuilder";
 import { round } from "utils/MathUtils";
-import { showContextMenu } from "utils/UIUtils";
+import { setupPanel, showContextMenu } from "utils/UIUtils";
 
 /**
  * The Context that allows a user to select and edit dots with a drag
@@ -23,6 +23,9 @@ export default class DotContext extends BaseContext {
         this._scrollOffset = {};
         // tracks how far the selection has been moved from their initial positions
         this._moveOffset = {};
+
+        this._panel = $(".panel.select-dots");
+        this._setupPanel();
     }
 
     static get shortcuts() {
@@ -37,6 +40,8 @@ export default class DotContext extends BaseContext {
         this._setupDrag();
         this._setupContextMenus();
 
+        this._panel.show();
+
         $(".toolbar .edit-dots").addClass("active");
         $(".toolbar .edit-dots-group").removeClass("hide");
 
@@ -46,6 +51,7 @@ export default class DotContext extends BaseContext {
     unload() {
         super.unload();
         this._controller.deselectDots();
+        this._panel.hide();
 
         $(".toolbar .edit-dots").removeClass("active");
         $(".toolbar .edit-dots-group").addClass("hide");
@@ -278,6 +284,13 @@ export default class DotContext extends BaseContext {
 
                 dragState = "none";
             },
+        });
+    }
+
+    _setupPanel() {
+        setupPanel(this._panel, {
+            bottom: 20,
+            right: 20,
         });
     }
 }
