@@ -1,6 +1,7 @@
 import * as _ from "lodash";
 
 import BaseContext from "calchart/contexts/BaseContext";
+import DotType from "calchart/DotType";
 
 import HTMLBuilder from "utils/HTMLBuilder";
 import { round } from "utils/MathUtils";
@@ -288,9 +289,31 @@ export default class DotContext extends BaseContext {
     }
 
     _setupPanel() {
-        setupPanel(this._panel, {
-            bottom: 20,
-            right: 20,
+        let _this = this;
+        let controller = this._controller;
+        let grapher = this._grapher;
+
+        // add dot labels
+        let dotLabels = this._panel.find(".dot-labels");
+        this._controller.getShow().getDots().forEach(function(dot) {
+            HTMLBuilder
+                .li(dot.label)
+                .click(function() {
+                    let $dot = grapher.getDot(dot);
+                    controller.toggleDots($dot);
+                    $(this).toggleClass("active");
+                })
+                .appendTo(dotLabels);
+        });
+
+        setupPanel(this._panel);
+
+        // click on dot type
+        this._panel.find(".dot-types li").click(function() {
+            let dotType = $(this).data("type");
+            let dots = _this._sheet.getDotsOfType(dotType);
+            let $dots = grapher.getDots(dots);
+            controller.selectDots($dots);
         });
     }
 }

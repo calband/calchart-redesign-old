@@ -1,3 +1,15 @@
+# dot types, see DotType
+DOT_TYPES = [
+    'plain',
+    'solid',
+    'plain-forwardslash',
+    'solid-forwardslash',
+    'plain-backslash',
+    'solid-backslash',
+    'plain-x',
+    'solid-x',
+]
+
 # format of dot labels for shows, see CalchartUtils.DOT_FORMATS
 DOT_FORMATS = [
     ('', ''),

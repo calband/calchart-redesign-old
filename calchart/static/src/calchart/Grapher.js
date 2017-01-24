@@ -136,17 +136,21 @@ export default class Grapher {
     }
 
     /**
-     * Get the dots, optionally filtered by the given dot IDs.
+     * Get the dots, optionally filtered by the given dots.
      *
-     * @param {int[]} [ids]
+     * @param {(Dot[]|int[])} [dots] - Dots or dot IDs to optionally filter by.
      * @return {jQuery} The dots in the grapher.
      */
-    getDots(ids) {
-        let dots = this._svg.selectAll("g.dot");
-        if (!_.isUndefined(ids)) {
-            dots = dots.filter(dot => ids.includes(dot.id));
+    getDots(dots) {
+        let dotGroups = this._svg.selectAll("g.dot");
+        if (!_.isUndefined(dots)) {
+            let ids = dots;
+            if (dots.length > 0 && !_.isInteger(dots[0])) {
+                ids = dots.map(dot => dot.id);
+            }
+            dotGroups = dotGroups.filter(dot => ids.includes(dot.id));
         }
-        return $(dots.nodes());
+        return $(dotGroups.nodes());
     }
 
     /**

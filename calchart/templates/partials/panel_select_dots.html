@@ -1,7 +1,11 @@
 {% extends "partials/panel.html" %}
-{% load staticfiles %}
+{% load staticfiles utils %}
 
 {% block content %}
-    <ul class="dot-types"></ul>
+    <ul class="dot-types">
+        {% foreach_dottype %}
+            <li data-type="{{ dot_type }}"><img src="{% static 'img/dot-'|add:dot_type|add:'.png' %}"></li>
+        {% endfor %}
+    </ul>
     <ul class="dot-labels"></ul>
 {% endblock %}
