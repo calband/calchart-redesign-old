@@ -1,10 +1,11 @@
 import * as _ from "lodash";
 
 import BaseContext from "calchart/contexts/BaseContext";
+import DotType from "calchart/DotType";
 
 import HTMLBuilder from "utils/HTMLBuilder";
 import { round } from "utils/MathUtils";
-import { showContextMenu } from "utils/UIUtils";
+import { setupPanel, showContextMenu } from "utils/UIUtils";
 
 /**
  * The Context that allows a user to select and edit dots with a drag
@@ -23,6 +24,9 @@ export default class DotContext extends BaseContext {
         this._scrollOffset = {};
         // tracks how far the selection has been moved from their initial positions
         this._moveOffset = {};
+
+        this._panel = $(".panel.select-dots");
+        this._setupPanel();
     }
 
     static get shortcuts() {
@@ -37,6 +41,10 @@ export default class DotContext extends BaseContext {
         this._setupDrag();
         this._setupContextMenus();
 
+        this._panel.show()
+            .find(".dot-labels")
+            .scrollTop(0);
+
         $(".toolbar .edit-dots").addClass("active");
         $(".toolbar .edit-dots-group").removeClass("hide");
 
@@ -45,10 +53,19 @@ export default class DotContext extends BaseContext {
 
     unload() {
         super.unload();
-        this._controller.deselectDots();
+        this.deselectDots();
+        this._panel.hide();
 
         $(".toolbar .edit-dots").removeClass("active");
         $(".toolbar .edit-dots-group").addClass("hide");
+    }
+
+    /**
+     * Deselect all dots.
+     */
+    deselectDots() {
+        this._controller.deselectDots();
+        this._panel.find(".dot-labels .active").removeClass("active");
     }
 
     /**
@@ -103,6 +120,41 @@ export default class DotContext extends BaseContext {
     }
 
     /**
+     * Select the given dots with the given options.
+     *
+     * @param {jQuery} dots
+     * @param {Object} [options]
+     */
+    selectDots(dots, options) {
+        this._controller.selectDots(dots, options);
+        
+        let dotLabels = this._panel.find(".dot-labels");
+        options = _.defaultTo(options, {});
+        if (!_.defaultTo(options.append, true)) {
+            dotLabels.find(".active").removeClass("active");
+        }
+        dots.each(function() {
+            let dot = $(this).data("dot");
+            dotLabels.find(`.dot-${dot.label}`).addClass("active");
+        });
+    }
+
+    /**
+     * Toggle the given dots.
+     *
+     * @param {jQuery} dots
+     */
+    toggleDots(dots) {
+        this._controller.toggleDots(dots);
+
+        let dotLabels = this._panel.find(".dot-labels");
+        dotLabels.find(".active").removeClass("active");
+        this._controller.getSelectedDots().forEach(dot => {
+            dotLabels.find(`.dot-${dot.label}`).addClass("active");
+        });
+    }
+
+    /**
      * Set up the events for showing context menus.
      */
     _setupContextMenus() {
@@ -143,6 +195,7 @@ export default class DotContext extends BaseContext {
      * Set up the events for selecting/dragging dots.
      */
     _setupDrag() {
+        let _this = this;
         let controller = this._controller;
         let workspace = $(".workspace").offset();
         let graph = this._grapher.getGraph();
@@ -161,13 +214,13 @@ export default class DotContext extends BaseContext {
                     let dot = target.parent();
 
                     if (e.shiftKey || e.ctrlKey || e.metaKey) {
-                        controller.toggleDots(dot);
+                        _this.toggleDots(dot);
                         dragState = "none";
                         return;
                     }
 
                     if (!this._grapher.isSelected(dot)) {
-                        controller.selectDots(dot, {
+                        _this.selectDots(dot, {
                             append: false,
                         });
                     }
@@ -178,7 +231,7 @@ export default class DotContext extends BaseContext {
                     this._moveOffset.x = 0;
                     this._moveOffset.y = 0;
                 } else {
-                    controller.deselectDots();
+                    _this.deselectDots();
                     HTMLBuilder.div("selection-box", null, $(".workspace"));
                     dragState = "select";
                 }
@@ -246,7 +299,7 @@ export default class DotContext extends BaseContext {
                             });
 
                         // select dots within the selection box
-                        controller.deselectDots();
+                        _this.deselectDots();
                         this._grapher.getDots().each(function() {
                             let dot = $(this);
                             let position = dot.data("position");
@@ -256,7 +309,7 @@ export default class DotContext extends BaseContext {
                                 position.y >= minY &&
                                 position.y <= maxY
                             ) {
-                                controller.selectDots(dot);
+                                _this.selectDots(dot);
                             }
                         });
                 }
@@ -278,6 +331,36 @@ export default class DotContext extends BaseContext {
 
                 dragState = "none";
             },
+        });
+    }
+
+    _setupPanel() {
+        let _this = this;
+        let controller = this._controller;
+        let grapher = this._grapher;
+
+        // add dot labels
+        let dotLabels = this._panel.find(".dot-labels");
+        this._controller.getShow().getDots().forEach(function(dot) {
+            HTMLBuilder
+                .li(dot.label)
+                .addClass(`dot-${dot.label}`)
+                .click(function() {
+                    let $dot = grapher.getDot(dot);
+                    controller.toggleDots($dot);
+                    $(this).toggleClass("active");
+                })
+                .appendTo(dotLabels);
+        });
+
+        setupPanel(this._panel);
+
+        // click on dot type
+        this._panel.find(".dot-types li").click(function() {
+            let dotType = $(this).data("type");
+            let dots = _this._sheet.getDotsOfType(dotType);
+            let $dots = grapher.getDots(dots);
+            controller.selectDots($dots);
         });
     }
 }

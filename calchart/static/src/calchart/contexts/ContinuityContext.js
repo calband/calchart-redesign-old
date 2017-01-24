@@ -204,10 +204,7 @@ export default class ContinuityContext extends BaseContext {
         let _this = this;
 
         // setup continuity panel
-        setupPanel(this._panel, {
-            bottom: 20,
-            right: 20,
-        });
+        setupPanel(this._panel);
 
         // using custom panel-dropdowns because chosen doesn't render outside of scroll overflow
         this._panel.on("mousedown", "select", function(e) {

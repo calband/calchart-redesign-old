@@ -346,13 +346,13 @@ export function showContextMenu(e, items) {
  * @param {jQuery} panel - The panel to set up.
  * @param {Object} [options] - Options to create a panel. Can include:
  *   - {float} top - The top of the initial position for the panel. (defaults
- *     to center of the screen)
+ *     to bottom-right of the screen)
  *   - {float} left - The left of the initial position for the panel. (defaults
- *     to center of the screen)
+ *     to bottom-right of the screen)
  *   - {float} bottom - The bottom of the initial position for the panel. (defaults
- *     to center of the screen)
+ *     to bottom-right of the screen)
  *   - {float} right - The right of the initial position for the panel. (defaults
- *     to center of the screen)
+ *     to bottom-right of the screen)
  */
 export function setupPanel(panel, options={}) {
     // set up initial position
@@ -361,18 +361,16 @@ export function setupPanel(panel, options={}) {
 
     if (options.top) {
         position.top = options.top;
-    } else if (options.bottom) {
-        position.top = $(window).height() - $(panel).outerHeight() - options.bottom;
     } else {
-        position.top = $(window).height() / 2 - $(panel).outerHeight() / 2;
+        let bottom = _.defaultTo(options.bottom, 20);
+        position.top = $(window).height() - $(panel).outerHeight() - bottom;
     }
 
     if (options.left) {
         position.left = options.left;
-    } else if (options.right) {
-        position.left = $(window).width() - $(panel).outerWidth() - options.right;
     } else {
-        position.left = $(window).width() / 2 - $(panel).outerWidth() / 2;
+        let right = _.defaultTo(options.right, 20);
+        position.left = $(window).width() - $(panel).outerWidth() - right;
     }
 
     $(panel).css(position);

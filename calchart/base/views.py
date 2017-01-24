@@ -109,6 +109,7 @@ class EditorView(CalchartMixin, TemplateView):
         context['toolbar'] = editor_toolbar
         context['panels'] = [
             ('partials/panel_edit_continuity.html', 'edit-continuity'),
+            ('partials/panel_select_dots.html', 'select-dots'),
         ]
         return context
 
