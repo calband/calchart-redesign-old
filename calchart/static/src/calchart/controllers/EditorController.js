@@ -256,7 +256,7 @@ export default class EditorController extends ApplicationController {
 
         let data = action.function.apply(action.context, action.args);
 
-        if (action.canUndo) {
+        if (action.canUndo && data !== false) {
             let actionData = _.extend({}, data, action);
             // if data was returned from the action, use it for redos instead
             // of the initial args
@@ -972,7 +972,8 @@ let EditorShortcuts = {
  *   - {string} [label] - Optional label to use for the Undo/Redo menu item.
  *     Defaults to the spaced-out name of the action.
  *
- * Actions are also passed the EditorController instance as `this`.
+ * Actions are also passed the EditorController instance as `this`. If an action returns
+ * false, the action is cancelled (i.e. cannot be undone).
  */
 class EditorActions {
     /**

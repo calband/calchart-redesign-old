@@ -8,7 +8,7 @@ import DotType from "calchart/DotType";
 import MovementCommand from "calchart/MovementCommand";
 
 import { AnimationStateError } from "utils/errors";
-import { mapSome } from "utils/JSUtils";
+import { mapSome, moveElem } from "utils/JSUtils";
 
 /**
  * A Sheet represents a stuntsheet, containing the following information:
@@ -166,7 +166,7 @@ export default class Sheet {
     /**
      * Add the given continuity to the given dot type.
      *
-     * @param {string} dotType
+     * @param {DotType} dotType
      * @param {BaseContinuity} continuity
      */
     addContinuity(dotType, continuity) {
@@ -178,7 +178,7 @@ export default class Sheet {
      * Change the dot types of the given dots.
      *
      * @param {Dot[]} dots - The dots to change dot types.
-     * @param {string} dotType - The dot type to change to.
+     * @param {DotType} dotType - The dot type to change to.
      */
     changeDotTypes(dots, dotType) {
         dots.forEach(dot => {
@@ -254,7 +254,7 @@ export default class Sheet {
     /**
      * Get the continuities for the given dot type.
      *
-     * @param {string} dotType
+     * @param {DotType} dotType
      * @return {Continuity[]}
      */
     getContinuities(dotType) {
@@ -277,7 +277,7 @@ export default class Sheet {
     /**
      * Get all dots of the given dot type.
      *
-     * @param {string} dotType
+     * @param {DotType} dotType
      * @return {Dot[]}
      */
     getDotsOfType(dotType) {
@@ -416,9 +416,22 @@ export default class Sheet {
     }
 
     /**
+     * Move the continuity at the given index to the specified index.
+     *
+     * @param {DotType} dotType
+     * @param {int} from
+     * @param {int} to
+     */
+    moveContinuity(dotType, from, to) {
+        let continuities = this._continuities[dotType];
+        moveElem(continuities, from, to);
+        this.updateMovements(dotType);
+    }
+
+    /**
      * Remove the given continuity from the given dot type.
      *
-     * @param {string} dotType
+     * @param {DotType} dotType
      * @param {Continuity} continuity
      */
     removeContinuity(dotType, continuity) {

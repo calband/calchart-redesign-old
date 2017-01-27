@@ -229,7 +229,6 @@ export default class BaseContinuity {
      * @return {jQuery} The HTML element to add to the panel, in the format:
      *
      *   <div class="continuity {type}">
-     *       <i class="icon-bars reorder"></i>
      *       <div class="info">{contents}</div>
      *       <div class="actions">
      *           <i class="icon-pencil edit"></i>
@@ -238,13 +237,12 @@ export default class BaseContinuity {
      *   </div>
      */
     _wrapPanel(type, contents) {
-        let iconBar = HTMLBuilder.icon("bars", "reorder");
         let iconEdit = HTMLBuilder.icon("pencil", "edit");
         let iconDelete = HTMLBuilder.icon("times", "delete");
         let actions = HTMLBuilder.div("actions", [iconEdit, iconDelete]);
         let info = HTMLBuilder.div("info", contents);
 
-        return HTMLBuilder.div("continuity " + type, [iconBar, info, actions])
+        return HTMLBuilder.div("continuity " + type, [info, actions])
             .data("continuity", this);
     }
 }

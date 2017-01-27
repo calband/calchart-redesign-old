@@ -12,7 +12,7 @@ import { validatePositive, parseNumber } from "utils/JSUtils";
 export default class ForwardContinuity extends BaseContinuity {
     /**
      * @param {Sheet} sheet
-     * @param {string} dotType
+     * @param {DotType} dotType
      * @param {int} steps - The number of steps to move.
      * @param {int} direction - The direction to march, in Calchart degrees.
      * @param {object} [options] - Options for the continuity, including:

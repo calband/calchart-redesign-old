@@ -391,7 +391,7 @@ class ContextActions {
     /**
      * Change the currently selected dots' dot type to the given dot type.
      *
-     * @param {string} dotType - The dot type to change to.
+     * @param {DotType} dotType - The dot type to change to.
      * @param {Dot[]} [dots] - The dots to change dot types for. Defaults to
      *   the currently selected dots.
      * @param {Sheet} [sheet] - The sheet to change dot types for. Defaults

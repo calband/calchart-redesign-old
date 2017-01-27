@@ -160,7 +160,7 @@ $sidebar-width: 200px;
 }
 
 .panel.edit-continuity {
-    width: 325px;
+    width: 300px;
     background: $light-gray;
     .add-continuity {
         padding: 0 10px;
@@ -183,12 +183,6 @@ $sidebar-width: 200px;
             background: $light-gold;
             &:not(:last-child) {
                 margin-bottom: 5px;
-            }
-            .reorder {
-                margin-right: 10px;
-                font-size: 12px;
-                cursor: row-resize;
-                color: $dark-gray;
             }
             .info {
                 @include vertically-center(false);
