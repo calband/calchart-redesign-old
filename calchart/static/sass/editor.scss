@@ -105,6 +105,11 @@ $sidebar-width: 200px;
                 border: 2px solid $blue;
             }
         }
+        .reorder-sheet-bar {
+            position: absolute;
+            height: 2px;
+            background: $black;
+        }
     }
     .workspace {
         width: calc(100% - #{$sidebar-width});
@@ -158,6 +163,52 @@ $sidebar-width: 200px;
         height: $panel-handle-height;
     }
 }
+
+/** DOT CONTEXT **/
+
+.panel.select-dots {
+    $dot-type-size: 24px;
+    $li-size: $dot-type-size + 10px;
+    $li-margin: 5px;
+    ul {
+        height: $li-size * 8 + $li-margin * 7;
+        margin: 5px;
+        display: inline-block;
+        vertical-align: top;
+        &.dot-types li {
+            padding: 5px;
+            background: $light-gray;
+            font-size: 0;
+            cursor: pointer;
+            &:not(:last-child) {
+                margin-bottom: $li-margin;
+            }
+            img {
+                width: $dot-type-size;
+            }
+        }
+        &.dot-labels {
+            overflow: scroll;
+            margin-left: 0;
+            background: $light-gray;
+            li {
+                padding: 5px 20px;
+                text-align: center;
+                &.active {
+                    background: $blue;
+                    color: $light-gray;
+                }
+            }
+        }
+    }
+}
+
+.lasso-path {
+    stroke: $gold;
+    fill: rgba($light-gray, 0.3);
+}
+
+/** CONTINUITY CONTEXT **/
 
 .panel.edit-continuity {
     width: 300px;
@@ -257,43 +308,6 @@ $sidebar-width: 200px;
     }
 }
 
-.panel.select-dots {
-    $dot-type-size: 24px;
-    $li-size: $dot-type-size + 10px;
-    $li-margin: 5px;
-    ul {
-        height: $li-size * 8 + $li-margin * 7;
-        margin: 5px;
-        display: inline-block;
-        vertical-align: top;
-        &.dot-types li {
-            padding: 5px;
-            background: $light-gray;
-            font-size: 0;
-            cursor: pointer;
-            &:not(:last-child) {
-                margin-bottom: $li-margin;
-            }
-            img {
-                width: $dot-type-size;
-            }
-        }
-        &.dot-labels {
-            overflow: scroll;
-            margin-left: 0;
-            background: $light-gray;
-            li {
-                padding: 5px 20px;
-                text-align: center;
-                &.active {
-                    background: $blue;
-                    color: $light-gray;
-                }
-            }
-        }
-    }
-}
-
 .panel-dropdown {
     @include hover-menu;
     z-index: z-index(popup);
@@ -302,10 +316,4 @@ $sidebar-width: 200px;
         padding: 5px;
         text-align: center;
     }
-}
-
-.reorder-sheet-bar {
-    position: absolute;
-    height: 2px;
-    background: $black;
 }

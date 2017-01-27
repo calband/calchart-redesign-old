@@ -394,18 +394,18 @@ export function setupPanel(panel, options={}) {
         });
     }
 
-    $(panel).find(".panel-handle").on({
-        mousedown: function(e) {
-            let offset = $(this).offset();
-            $(panel).data("offset", {
-                top: offset.top - e.pageY,
-                left: offset.left - e.pageX,
-            });
-            $(window).on("mousemove", movePanel);
-        },
-        mouseup: function() {
-            $(window).off("mousemove", movePanel);
-        },
+    $(panel).find(".panel-handle").mousedown(function(e) {
+        let offset = $(this).offset();
+        $(panel).data("offset", {
+            top: offset.top - e.pageY,
+            left: offset.left - e.pageX,
+        });
+        $(window).on({
+            mousemove: movePanel,
+            mouseup: function() {
+                $(window).off("mousemove", movePanel);
+            },
+        });
     });
 }
 
