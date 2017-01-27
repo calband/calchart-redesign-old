@@ -208,7 +208,14 @@ class LassoSelection extends BaseSelection {
     }
 
     mouseup(e) {
-        // TODO: select elements in path using document.elementFromPoint
+        this.dots.each((i, dot) => {
+            dot = $(dot);
+            let offset = dot.find(".dot-marker").offset();
+            let topElem = document.elementFromPoint(offset.left, offset.top);
+            if ($(topElem).is(this.path)) {
+                this.context.selectDots(dot);
+            }
+        });
 
         this.path.remove();
     }
