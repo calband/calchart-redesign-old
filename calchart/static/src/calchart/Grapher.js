@@ -176,6 +176,13 @@ export default class Grapher {
     }
 
     /**
+     * @return {D3} The SVG element wrapped in a D3 selection.
+     */
+    getSVG() {
+        return this._svg;
+    }
+
+    /**
      * @param {jQuery} dot - The dot to check.
      * @return {boolean} true if the given dot is selected.
      */

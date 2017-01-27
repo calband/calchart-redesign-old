@@ -1,7 +1,7 @@
 import * as _ from "lodash";
 
 import BaseContext from "calchart/contexts/BaseContext";
-import { BoxSelection } from "calchart/DotSelection";
+import DotSelection from "calchart/DotSelection";
 import DotType from "calchart/DotType";
 
 import HTMLBuilder from "utils/HTMLBuilder";
@@ -20,9 +20,6 @@ export default class DotContext extends BaseContext {
 
         // number of steps to snap dots to when dragging: null, 1, 2, 4
         this._grid = 2;
-
-        // the dot selection class
-        this._selection = null;
 
         // the panel to help select dots
         this._panel = $(".panel.select-dots");
@@ -81,22 +78,9 @@ export default class DotContext extends BaseContext {
      * @param {string} name
      */
     loadSelection(name) {
-        let toolbarClass;
-        switch (name) {
-            case "box":
-                toolbarClass = "selection";
-                this._selection = BoxSelection;
-                break;
-            case "lasso":
-                toolbarClass = "lasso";
-                this._selection = LassoSelection;
-                break;
-            default:
-                throw new Error(`No selection named: ${name}`);
-        }
-
+        DotSelection.load(name);
         $(".toolbar .dot-selection li").removeClass("active");
-        $(`.toolbar .${toolbarClass}`).addClass("active");
+        $(`.toolbar .${DotSelection.iconName}`).addClass("active");
     }
 
     /**
@@ -184,8 +168,7 @@ export default class DotContext extends BaseContext {
             // mass selection
             if (!target.is(".dot-marker")) {
                 this.deselectDots();
-                this._selection.init(this);
-                this._selection.mousedown(e);
+                DotSelection.start(this, e);
                 return;
             }
 
@@ -205,7 +188,6 @@ export default class DotContext extends BaseContext {
 
             scale = this._grapher.getScale();
             dragStart = e;
-            console.log($(".workspace").scrollLeft());
             scrollOffset = {
                 top: 0,
                 left: 0,

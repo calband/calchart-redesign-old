@@ -3,9 +3,66 @@
  * in the DotContext.
  */
 
+import * as d3 from "d3";
 import * as _ from "lodash";
 
+import { NotImplementedError } from "utils/errors";
 import HTMLBuilder from "utils/HTMLBuilder";
+
+// remember the currently active selection method
+let SelectionClass = undefined;
+
+/**
+ * The helper class that remembers the currently loaded selection
+ * method and can start selecting dots accordingly.
+ */
+export default class DotSelection {
+    /**
+     * Load the selection with the given name.
+     *
+     * @param {string} name
+     */
+    static load(name) {
+        switch (name) {
+            case "box":
+                SelectionClass = BoxSelection;
+                break;
+            case "lasso":
+                SelectionClass = LassoSelection;
+                break;
+            default:
+                throw new Error(`No selection named: ${name}`);
+        }
+    }
+
+    /**
+     * @return {string} The name of the icon in the toolbar for the
+     *   currently loaded selection method.
+     */
+    static get iconName() {
+        return SelectionClass.icon;
+    }
+
+    /**
+     * Start selecting dots.
+     *
+     * @param {DotContext} context
+     */
+    static start(context, e) {
+        let selection = new SelectionClass(context);
+        selection.mousedown(e);
+
+        $(document).on({
+            "mousemove.selection": e => {
+                selection.mousemove(e);
+            },
+            "mouseup.selection": e => {
+                selection.mouseup(e);
+                $(document).off(".selection");
+            },
+        });
+    }
+}
 
 /**
  * The abstract superclass for all custom selection classes.
@@ -17,7 +74,7 @@ class BaseSelection {
      *
      * @param {DotContext} context
      */
-    static init(context) {
+    constructor(context) {
         this.context = context;
         this.grapher = context.getGrapher();
         this.dots = this.grapher.getDots();
@@ -26,16 +83,13 @@ class BaseSelection {
             top: $(".workspace").scrollTop(),
             left: $(".workspace").scrollLeft(),
         };
+    }
 
-        $(document).on({
-            "mousemove.selection": e => {
-                this.mousemove(e);
-            },
-            "mouseup.selection": e => {
-                this.mouseup(e);
-                this.finish();
-            },
-        });
+    /**
+     * @return {string} The name of the selection icon in the toolbar.
+     */
+    static get icon() {
+        throw new NotImplementedError(this);
     }
 
     /**
@@ -43,44 +97,52 @@ class BaseSelection {
      *
      * @param {Event} e
      */
-    static mousedown(e) {}
+    mousedown(e) {}
 
     /**
      * The function that is called when the user moves the mouse.
      *
      * @param {Event} e
      */
-    static mousemove(e) {}
+    mousemove(e) {}
 
     /**
      * The function that is called when the user lifts their mouse.
      *
      * @param {Event} e
      */
-    static mouseup(e) {}
+    mouseup(e) {}
 
     /**
-     * Run any final actions to clean-up the selection class after mouseup is called.
+     * Scroll the given element into view.
+     *
+     * @param {jQuery} element
      */
-    static finish() {
-        this.context = null;
-        this.grapher = null;
-        this.dots = null;
-        this.scroll = null;
-        $(document).off(".selection");
+    _scrollIntoView(element) {
+        $(element).scrollIntoView({
+            parent: ".workspace",
+            callback: (deltaX, deltaY) => {
+                this.scroll.top += deltaY;
+                this.scroll.left += deltaX;
+            },
+        });
     }
 }
 
 /**
  * Selects a rectangular area of dots.
  */
-export class BoxSelection extends BaseSelection {
-    static mousedown(e) {
+class BoxSelection extends BaseSelection {
+    static get icon() {
+        return "selection";
+    }
+
+    mousedown(e) {
         this.start = e;
         HTMLBuilder.div("selection-box", null, $(".workspace"));
     }
 
-    static mousemove(e) {
+    mousemove(e) {
         let width = Math.abs(e.pageX - this.start.pageX);
         let height = Math.abs(e.pageY - this.start.pageY);
 
@@ -92,20 +154,13 @@ export class BoxSelection extends BaseSelection {
         let maxY = minY + height;
 
         // update dimensions of the selection box
-        $(".selection-box")
-            .css({
-                top: minY,
-                left: minX,
-                width: width,
-                height: height,
-            })
-            .scrollIntoView({
-                parent: ".workspace",
-                callback: (deltaX, deltaY) => {
-                    this.scroll.top += deltaY;
-                    this.scroll.left += deltaX;
-                },
-            });
+        $(".selection-box").css({
+            top: minY,
+            left: minX,
+            width: width,
+            height: height,
+        });
+        this._scrollIntoView(".selection-box");
 
         // select dots within the selection box
         this.context.deselectDots();
@@ -121,7 +176,52 @@ export class BoxSelection extends BaseSelection {
         });
     }
 
-    static mouseup(e) {
+    mouseup(e) {
         $(".selection-box").remove();
+    }
+}
+
+/**
+ * Selects dots within an arbitrary path drawn by the user.
+ */
+class LassoSelection extends BaseSelection {
+    static get icon() {
+        return "lasso";
+    }
+
+    mousedown(e) {
+        let [startX, startY] = this._makeRelative(e);
+        let path = this.grapher.getSVG()
+            .append("path")
+            .classed("lasso-path", true)
+            .attr("d", `M ${startX} ${startY}`);
+
+        this.path = $(path.nodes());
+    }
+
+    mousemove(e) {
+        let [x, y] = this._makeRelative(e);
+        let pathDef = this.path.attr("d") + ` L ${x} ${y}`;
+
+        this.path.attr("d", pathDef);
+        this._scrollIntoView(this.path);
+    }
+
+    mouseup(e) {
+        // TODO: select elements in path using document.elementFromPoint
+
+        this.path.remove();
+    }
+
+    /**
+     * @param {Event} e
+     * @return {[x, y]} The (x,y) coordinates specified in the Event, made
+     *   relative to the workspace.
+     */
+    _makeRelative(e) {
+        let offset = $(".workspace").offset();
+        let x = e.pageX - offset.left + this.scroll.left;
+        let y = e.pageY - offset.top + this.scroll.top;
+        return [x, y];
     }
 }
