@@ -236,6 +236,27 @@ $.fn.scrollIntoView = function(options={}) {
 };
 
 /**
+ * When scrollLeft() and scrollTop() take in a float, it always rounds up to
+ * the nearest integer. Overriding to round up/down to the nearest integer.
+ */
+$.fn._scrollLeft = $.fn.scrollLeft;
+$.fn._scrollTop = $.fn.scrollTop;
+$.fn.scrollLeft = function(val) {
+    if (arguments.length === 0) {
+        return this._scrollLeft();
+    } else {
+        return this._scrollLeft(Math.round(val));
+    }
+}
+$.fn.scrollTop = function(val) {
+    if (arguments.length === 0) {
+        return this._scrollTop();
+    } else {
+        return this._scrollTop(Math.round(val));
+    }
+}
+
+/**
  * Position this element at the given position in the top, left corner. If
  * the element goes offscreen to the right, position the element on the left
  * instead. If the element goes below the screen, position the element so
