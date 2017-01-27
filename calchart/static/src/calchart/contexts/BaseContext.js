@@ -72,13 +72,22 @@ export default class BaseContext {
     }
 
     /**
-     * Add the given events to the given element
+     * Add the given events to the given element. Can either give as two parameters as
+     * described below, or three parameters, where the second parameter is the event
+     * name and the third parameter is the event handler.
      *
      * @param {jQuery|string} element - The jQuery selector or element to add events to.
      * @param {Object.<string, function(Event)>} events - The events to add, mapping event
      *   name to handler.
      */
     _addEvents(element, events) {
+        if (arguments.length === 3) {
+            let name = arguments[1];
+            events = {
+                [name]: arguments[2],
+            };
+        }
+
         // namespace events
         events = _.mapKeys(events, (handler, name) => `${name}.app-context`);
 
