@@ -194,7 +194,7 @@ export default class ContinuityContext extends BaseContext {
         if (_.isNumber(continuity)) {
             continuity = this._panel.find(".continuity").get(continuity);
         }
-        return continuity.data("continuity");
+        return $(continuity).data("continuity");
     }
 
     /**
