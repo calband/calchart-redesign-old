@@ -13,7 +13,7 @@ import { validatePositive } from "utils/JSUtils";
 export default class StopContinuity extends BaseContinuity {
     /**
      * @param {Sheet} sheet
-     * @param {string} dotType
+     * @param {DotType} dotType
      * @param {boolean} isMarkTime - true if mark time, false if close.
      * @param {?int} duration - The number of beats to mark time or close. If null,
      *   use remaining beats.

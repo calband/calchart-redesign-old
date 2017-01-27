@@ -160,7 +160,6 @@ $sidebar-width: 200px;
 }
 
 .panel.edit-continuity {
-    $panel-ec-actions-width: 40px;
     width: 300px;
     background: $light-gray;
     .add-continuity {
@@ -187,8 +186,6 @@ $sidebar-width: 200px;
             }
             .info {
                 @include vertically-center(false);
-                width: calc(100% - #{$panel-ec-actions-width + 5px});
-                margin-right: 5px;
                 & > span {
                     width: 50px;
                     margin-right: 5px;
@@ -202,7 +199,9 @@ $sidebar-width: 200px;
                 }
             }
             .actions {
-                width: $panel-ec-actions-width;
+                @include vertically-center-self;
+                position: absolute;
+                right: 10px;
                 i {
                     margin: 0 2px;
                     cursor: pointer;

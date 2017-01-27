@@ -231,8 +231,8 @@ export default class BaseContinuity {
      *   <div class="continuity {type}">
      *       <div class="info">{contents}</div>
      *       <div class="actions">
-     *           <i class="icon-pencil"></i>
-     *           <i class="icon-times"></i>
+     *           <i class="icon-pencil edit"></i>
+     *           <i class="icon-times delete"></i>
      *       </div>
      *   </div>
      */

@@ -12,7 +12,7 @@ import HTMLBuilder from "utils/HTMLBuilder";
 export default class EvenContinuity extends BaseContinuity {
     /**
      * @param {Sheet} sheet
-     * @param {string} dotType
+     * @param {DotType} dotType
      * @param {object} [options] - Options for the continuity, including:
      *   - {string} stepType
      *   - {int} beatsPerStep

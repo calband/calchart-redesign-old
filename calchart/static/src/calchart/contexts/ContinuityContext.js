@@ -3,6 +3,7 @@ import * as _ from "lodash";
 import BaseContext from "calchart/contexts/BaseContext";
 import Continuity from "calchart/Continuity";
 
+import { ActionError } from "utils/errors";
 import HTMLBuilder from "utils/HTMLBuilder";
 import { round } from "utils/MathUtils";
 import {
@@ -139,6 +140,19 @@ export default class ContinuityContext extends BaseContext {
         });
     }
 
+    /**
+     * Move the given continuity by the given amount.
+     *
+     * @param {(jQuery|int)} continuity - The continuity to reorder. (@see
+     *   ContinuityContext#_getContinuity)
+     * @param {int} delta - The amount to move the continuity by; e.g. delta=1
+     *   would put the continuity 1 index later, if possible.
+     */
+    moveContinuity(continuity, delta) {
+        continuity = this._getContinuity(continuity);
+        this._controller.doAction("reorderContinuity", [continuity, delta]);
+    }
+
     refresh() {
         super.refresh();
 
@@ -194,7 +208,7 @@ export default class ContinuityContext extends BaseContext {
         if (_.isNumber(continuity)) {
             continuity = this._panel.find(".continuity").get(continuity);
         }
-        return continuity.data("continuity");
+        return $(continuity).data("continuity");
     }
 
     /**
@@ -284,6 +298,8 @@ export default class ContinuityContext extends BaseContext {
 
             showContextMenu(e, {
                 "Edit...": `editContinuity(${index})`,
+                "Move down": `moveContinuity(${index}, 1)`,
+                "Move up": `moveContinuity(${index}, -1)`,
                 "Delete": `deleteContinuity(${index})`,
             });
         });
@@ -376,6 +392,40 @@ class ContextActions {
             data: [type, sheet, dotType],
             undo: function() {
                 sheet.removeContinuity(dotType, continuity);
+                this._controller.refresh();
+            },
+        };
+    }
+
+    /**
+     * Reorder the given continuity by the given amount.
+     *
+     * @param {Continuity} continuity - The continuity to reorder.
+     * @param {int} delta - The amount to move the continuity by; e.g. delta=1
+     *   would put the continuity 1 index later, if possible.
+     * @param {Sheet} [sheet=this._sheet] - The sheet to reorder continuity in.
+     * @param {string} [dotType=this._dotType] - The dot type to reorder continuity for.
+     */
+    static reorderContinuity(continuity, delta, sheet=this._sheet, dotType=this._dotType) {
+        let continuities = sheet.getContinuities(dotType);
+        let index = continuities.indexOf(continuity);
+        let newIndex = index + delta;
+        if (index === -1) {
+            throw new ActionError("Continuity does not exist!");
+        } else if (newIndex < 0 || newIndex >= continuities.length) {
+            return false;
+        }
+        sheet.moveContinuity(dotType, index, newIndex);
+
+        // no need to checkContinuities, since changing order of movements (vectors) doesn't
+        // change the cumulative movement (vector)?
+
+        this._controller.refresh();
+
+        return {
+            data: [continuity, delta, sheet, dotType],
+            undo: function() {
+                sheet.moveContinuity(dotType, newIndex, index);
                 this._controller.refresh();
             },
         };
