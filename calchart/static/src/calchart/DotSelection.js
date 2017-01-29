@@ -47,6 +47,7 @@ export default class DotSelection {
      * Start selecting dots.
      *
      * @param {DotContext} context
+     * @param {Event} e - The mousedown event.
      */
     static start(context, e) {
         let selection = new SelectionClass(context);
@@ -114,6 +115,20 @@ class BaseSelection {
     mouseup(e) {}
 
     /**
+     * Convert the given (x,y) coordinates on the page to be relative to the workspace.
+     *
+     * @param {number} pageX
+     * @param {number} pageY
+     * @return {[x, y]}
+     */
+    _makeRelative(pageX, pageY) {
+        let offset = $(".workspace").offset();
+        let x = pageX - offset.left + this.scroll.left;
+        let y = pageY - offset.top + this.scroll.top;
+        return [x, y];
+    }
+
+    /**
      * Scroll the given element into view.
      *
      * @param {jQuery} element
@@ -148,8 +163,10 @@ class BoxSelection extends BaseSelection {
 
         // relative to workspace
         let offset = $(".workspace").offset();
-        let minX = Math.min(e.pageX, this.start.pageX) - offset.left + this.scroll.left;
-        let minY = Math.min(e.pageY, this.start.pageY) - offset.top + this.scroll.top;
+        let [minX, minY] = this._makeRelative(
+            Math.min(e.pageX, this.start.pageX),
+            Math.min(e.pageY, this.start.pageY)
+        );
         let maxX = minX + width;
         let maxY = minY + height;
 
@@ -190,7 +207,7 @@ class LassoSelection extends BaseSelection {
     }
 
     mousedown(e) {
-        let [startX, startY] = this._makeRelative(e);
+        let [startX, startY] = this._makeRelative(e.pageX, e.pageY);
         let path = this.grapher.getSVG()
             .append("path")
             .classed("lasso-path", true)
@@ -200,7 +217,7 @@ class LassoSelection extends BaseSelection {
     }
 
     mousemove(e) {
-        let [x, y] = this._makeRelative(e);
+        let [x, y] = this._makeRelative(e.pageX, e.pageY);
         let pathDef = this.path.attr("d") + ` L ${x} ${y}`;
 
         this.path.attr("d", pathDef);
@@ -218,17 +235,5 @@ class LassoSelection extends BaseSelection {
         });
 
         this.path.remove();
-    }
-
-    /**
-     * @param {Event} e
-     * @return {[x, y]} The (x,y) coordinates specified in the Event, made
-     *   relative to the workspace.
-     */
-    _makeRelative(e) {
-        let offset = $(".workspace").offset();
-        let x = e.pageX - offset.left + this.scroll.left;
-        let y = e.pageY - offset.top + this.scroll.top;
-        return [x, y];
     }
 }
