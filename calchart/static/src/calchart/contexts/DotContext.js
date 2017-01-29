@@ -237,7 +237,7 @@ export default class DotContext extends BaseContext {
             let deltaX = scale.toSteps(moveOffset.x);
             let deltaY = scale.toSteps(moveOffset.y);
 
-            if (deltaX !== 0 && deltaY !== 0) {
+            if (deltaX !== 0 || deltaY !== 0) {
                 this._controller.doAction("moveDots", [deltaX, deltaY]);
             }
 
