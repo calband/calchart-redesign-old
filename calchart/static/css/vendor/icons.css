@@ -578,9 +578,6 @@
 .icon-flickr:before {
   content: "\e084";
 }
-.icon-floppy-o:before {
-  content: "\e085";
-}
 .icon-folder:before {
   content: "\e086";
 }
@@ -1391,6 +1388,9 @@
 .icon-youtube-play:before {
   content: "\6a";
 }
+.icon-floppy-o:before {
+  content: "\51";
+}
 .icon-lasso:before {
-  content: "\6c";
+  content: "\54";
 }
