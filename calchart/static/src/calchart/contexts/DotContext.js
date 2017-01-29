@@ -5,6 +5,7 @@ import DotSelection from "calchart/DotSelection";
 import DotType from "calchart/DotType";
 
 import HTMLBuilder from "utils/HTMLBuilder";
+import { parseNumber } from "utils/JSUtils";
 import { round } from "utils/MathUtils";
 import { setupPanel, showContextMenu } from "utils/UIUtils";
 
@@ -18,8 +19,9 @@ export default class DotContext extends BaseContext {
 
         this._grapher = controller.getGrapher();
 
-        // number of steps to snap dots to when dragging: null, 1, 2, 4
+        // number of steps to snap dots to when dragging: 0, 1, 2, 4
         this._grid = 2;
+        this._setupSnap();
 
         // the panel to help select dots
         this._panel = $(".panel.select-dots");
@@ -210,9 +212,11 @@ export default class DotContext extends BaseContext {
 
             // snap deltaX and deltaY to grid; dots can themselves be off
             // the grid, but they move in a consistent interval
-            let snap = scale.toDistance(this._grid);
-            deltaX = round(scrollOffset.left + deltaX, snap);
-            deltaY = round(scrollOffset.top + deltaY, snap);
+            if (this._grid !== 0) {
+                let snap = scale.toDistance(this._grid);
+                deltaX = round(scrollOffset.left + deltaX, snap);
+                deltaY = round(scrollOffset.top + deltaY, snap);
+            }
 
             this._controller.getSelection()
                 .each((i, dot) => {
@@ -274,6 +278,25 @@ export default class DotContext extends BaseContext {
             let dots = _this._sheet.getDotsOfType(dotType);
             let $dots = grapher.getDots(dots);
             controller.selectDots($dots);
+        });
+    }
+
+    _setupSnap() {        
+        let _this = this;
+
+        $(".toolbar .snap-to select")
+            .change(function() {
+                _this._grid = parseNumber($(this).val());
+            })
+            .choose(2);
+
+        $(".toolbar .resnap button").click(() => {
+            this._controller.getShow().getDots().forEach(dot => {
+                let position = this._sheet.getPosition(dot);
+                position.x = round(position.x, this._grid);
+                position.y = round(position.y, this._grid);
+            });
+            this._controller.refresh();
         });
     }
 }

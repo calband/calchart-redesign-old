@@ -43,7 +43,18 @@ $editor-header-height: 100px;
                 background: $medium-gray;
             }
         }
-        .zoom {
+        .snap-to {
+            text-align: center;
+            select {
+                width: 75px;
+            }
+        }
+        .resnap button {
+            font-size: 12px;
+            margin: 0;
+            padding: 0.6em 1.5em 0.3em;
+        }
+        .zoom-to {
             text-align: center;
             select {
                 width: 100px;

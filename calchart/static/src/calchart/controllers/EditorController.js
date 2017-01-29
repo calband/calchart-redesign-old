@@ -91,7 +91,7 @@ export default class EditorController extends ApplicationController {
         });
 
         // set up zoom item in toolbar
-        let toolbarZoom = $(".toolbar .zoom select");
+        let toolbarZoom = $(".toolbar .zoom-to select");
         HTMLBuilder.make("option.custom").appendTo(toolbarZoom);
         toolbarZoom
             .change(function() {
