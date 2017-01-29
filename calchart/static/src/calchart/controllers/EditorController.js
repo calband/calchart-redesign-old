@@ -623,7 +623,7 @@ export default class EditorController extends ApplicationController {
 
         // update toolbar
         let zoom = round(this._grapher.getOption("zoom"), 1e-3);
-        let toolbarZoom = $(".toolbar .zoom select").choose(zoom);
+        let toolbarZoom = $(".toolbar .zoom-to select").choose(zoom);
         if (_.isNull(toolbarZoom.val())) {
             // custom zoom
             let label = (zoom * 100).toFixed(1);
