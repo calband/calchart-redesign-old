@@ -43,7 +43,13 @@ $editor-header-height: 100px;
                 background: $medium-gray;
             }
         }
-        .zoom {
+        .snap-to {
+            text-align: center;
+            select {
+                width: 75px;
+            }
+        }
+        .zoom-to {
             text-align: center;
             select {
                 width: 100px;

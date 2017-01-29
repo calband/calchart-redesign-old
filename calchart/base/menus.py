@@ -14,7 +14,7 @@ from django.templatetags.static import static as get_static_path
 from django.utils.html import format_html, format_html_join, mark_safe
 from django.utils.text import slugify
 
-from base.constants import ZOOMS
+from base.constants import SNAP_OPTIONS, ZOOMS
 from utils.general import collapse
 
 ### MENU CLASSES ###
@@ -207,9 +207,11 @@ class CustomToolbarItem(object):
     """
     A Calchart ToolbarItem, with custom HTML contents, in the format
 
-    <li class="{{ name }}">
+    <li class="{{ class }}">
         {{ contents }}
     </li>
+
+    where the class is the slugified name
     """
     def __init__(self, name, contents):
         self.name = name
@@ -219,6 +221,27 @@ class CustomToolbarItem(object):
         return format_html(
             '<li class="{}">{}</li>',
             slugify(self.name), mark_safe(self.contents)
+        )
+
+class ChoiceToolbarItem(CustomToolbarItem):
+    """
+    A Calchart ToolbarItem with a select box, in the format
+
+    <li class="{{ class }}">
+        <label>{{ name }}:</label>
+        <select>
+            # for each option
+            <option value="{{ value }}">{{ label }}</option>
+        </select>
+    </li>
+
+    where the class is the slugified name
+    """
+    def __init__(self, name, options):
+        self.name = name
+        self.contents = format_html(
+            '<label>{}:</label><select>{}</select>',
+            name, format_html_join('', '<option value="{}">{}</option>', options)
         )
 
 ### MENUS ###
@@ -275,6 +298,10 @@ editor_toolbar = Toolbar(
         classes='dot-selection',
     ),
     ToolbarContextGroup(
+        'edit-dots',
+        ChoiceToolbarItem('Snap to', SNAP_OPTIONS),
+    ),
+    ToolbarContextGroup(
         'edit-continuity',
         ToolbarItem('Previous Beat', 'chevron-left', 'prevBeat'),
         CustomToolbarItem('Seek', '<span class="bar"></span><span class="marker"></span>'),
@@ -282,11 +309,8 @@ editor_toolbar = Toolbar(
         ToolbarItem('Check Continuities', 'check', 'checkContinuities(message=true)'),
     ),
     ToolbarGroup(
+        ChoiceToolbarItem('Zoom to', [('','')] + ZOOMS),
         ToolbarItem('Zoom In', 'search-plus', 'zoomIn'),
         ToolbarItem('Zoom Out', 'search-minus', 'zoomOut'),
-        CustomToolbarItem('Zoom', '<select><option></option>%s</select>' % ''.join([
-            '<option value="%s">%s</option>' % (zoom, label)
-            for zoom, label in ZOOMS
-        ])),
     ),
 )

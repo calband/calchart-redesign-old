@@ -55,6 +55,14 @@ DEF_ORIENTATIONS = [
     ('west', 'West'),
 ]
 
+# snap to grid options
+SNAP_OPTIONS = [
+    (0, 'None'),
+    (1, 1),
+    (2, 2),
+    (4, 4),
+]
+
 # zoom options
 ZOOMS = [
     (0.5, '50%'),
