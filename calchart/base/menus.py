@@ -300,6 +300,7 @@ editor_toolbar = Toolbar(
     ToolbarContextGroup(
         'edit-dots',
         ChoiceToolbarItem('Snap to', SNAP_OPTIONS),
+        CustomToolbarItem('Resnap', '<button>Resnap</button>'),
     ),
     ToolbarContextGroup(
         'edit-continuity',
