@@ -21,14 +21,7 @@ export default class DotContext extends BaseContext {
 
         // number of steps to snap dots to when dragging: 0, 1, 2, 4
         this._grid = 2;
-
-        // setup snap select in toolbar
-        let _this = this;
-        $(".toolbar .snap-to select")
-            .change(function() {
-                _this._grid = parseNumber($(this).val());
-            })
-            .choose(2);
+        this._setupSnap();
 
         // the panel to help select dots
         this._panel = $(".panel.select-dots");
@@ -285,6 +278,25 @@ export default class DotContext extends BaseContext {
             let dots = _this._sheet.getDotsOfType(dotType);
             let $dots = grapher.getDots(dots);
             controller.selectDots($dots);
+        });
+    }
+
+    _setupSnap() {        
+        let _this = this;
+
+        $(".toolbar .snap-to select")
+            .change(function() {
+                _this._grid = parseNumber($(this).val());
+            })
+            .choose(2);
+
+        $(".toolbar .resnap button").click(() => {
+            this._controller.getShow().getDots().forEach(dot => {
+                let position = this._sheet.getPosition(dot);
+                position.x = round(position.x, this._grid);
+                position.y = round(position.y, this._grid);
+            });
+            this._controller.refresh();
         });
     }
 }
