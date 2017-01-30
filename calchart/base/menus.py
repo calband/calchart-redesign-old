@@ -282,9 +282,6 @@ editor_menu = Menu(
 editor_toolbar = Toolbar(
     ToolbarGroup(
         ToolbarItem('Add Stuntsheet', 'file-o', 'addStuntsheet'),
-        ToolbarItem('Save', 'floppy-o', 'saveShow'),
-        ToolbarItem('Undo', 'undo', 'undo'),
-        ToolbarItem('Redo', 'repeat', 'redo'),
     ),
     ToolbarGroup(
         ToolbarItem('Edit Music', 'music', 'loadContext(music)'),
@@ -295,7 +292,14 @@ editor_toolbar = Toolbar(
         'edit-dots',
         ToolbarItem('Selection', 'selection', 'loadSelection(box)'),
         ToolbarItem('Lasso', 'lasso', 'loadSelection(lasso)'),
-        classes='dot-selection',
+        classes='edit-tools',
+    ),
+    ToolbarContextGroup(
+        'edit-dots',
+        ToolbarItem('Line', 'line', 'TODO'),
+        ToolbarItem('Rectangle', 'rectangle', 'TODO'),
+        ToolbarItem('Circle', 'circle-o', 'TODO'),
+        classes='edit-tools',
     ),
     ToolbarContextGroup(
         'edit-dots',
@@ -308,10 +312,5 @@ editor_toolbar = Toolbar(
         CustomToolbarItem('Seek', '<span class="bar"></span><span class="marker"></span>'),
         ToolbarItem('Next Beat', 'chevron-right', 'nextBeat'),
         ToolbarItem('Check Continuities', 'check', 'checkContinuities(message=true)'),
-    ),
-    ToolbarGroup(
-        ChoiceToolbarItem('Zoom to', [('','')] + ZOOMS),
-        ToolbarItem('Zoom In', 'search-plus', 'zoomIn'),
-        ToolbarItem('Zoom Out', 'search-minus', 'zoomOut'),
     ),
 )
