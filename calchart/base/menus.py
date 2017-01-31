@@ -207,7 +207,7 @@ class CustomToolbarItem(object):
     """
     A Calchart ToolbarItem, with custom HTML contents, in the format
 
-    <li class="{{ class }}">
+    <li class="toolbar-custom-item {{ class }}">
         {{ contents }}
     </li>
 
@@ -219,7 +219,7 @@ class CustomToolbarItem(object):
 
     def render(self):
         return format_html(
-            '<li class="{}">{}</li>',
+            '<li class="toolbar-custom-item {}">{}</li>',
             slugify(self.name), mark_safe(self.contents)
         )
 
@@ -227,7 +227,7 @@ class ChoiceToolbarItem(CustomToolbarItem):
     """
     A Calchart ToolbarItem with a select box, in the format
 
-    <li class="{{ class }}">
+    <li class="toolbar-custom-item {{ class }}">
         <label>{{ name }}:</label>
         <select>
             # for each option

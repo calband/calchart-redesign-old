@@ -8,7 +8,7 @@ body {
     cursor: default;
 }
 
-$editor-header-height: 100px;
+$editor-header-height: 95px;
 
 .editor-header {
     height: $editor-header-height;
@@ -44,6 +44,7 @@ $editor-header-height: 100px;
             }
         }
         .snap-to {
+            margin: 0 5px;
             text-align: center;
             select {
                 width: 75px;
@@ -53,15 +54,6 @@ $editor-header-height: 100px;
             font-size: 12px;
             margin: 0;
             padding: 0.6em 1.5em 0.3em;
-        }
-        .zoom-to {
-            text-align: center;
-            select {
-                width: 100px;
-            }
-            .chosen-container li.custom {
-                display: none;
-            }
         }
     }
 }
