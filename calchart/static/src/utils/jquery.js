@@ -20,6 +20,16 @@ window.$ = jQuery;
 window.jQuery = jQuery;
 
 /**
+ * Convert the given d3 selections to jQuery selections.
+ *
+ * @param {D3} selection
+ * @param {jQuery}
+ */
+$.fromD3 = function(selection) {
+    return $(selection.nodes());
+};
+
+/**
  * Helper function to set the value of a select and refresh the dropdown.
  */
 $.fn.choose = function(opt) {

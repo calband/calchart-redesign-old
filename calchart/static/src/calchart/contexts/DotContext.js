@@ -1,8 +1,8 @@
 import * as _ from "lodash";
 
 import BaseContext from "calchart/contexts/BaseContext";
-import DotSelection from "calchart/DotSelection";
 import DotType from "calchart/DotType";
+import EditTools from "calchart/EditTools";
 
 import HTMLBuilder from "utils/HTMLBuilder";
 import { parseNumber } from "utils/JSUtils";
@@ -18,6 +18,9 @@ export default class DotContext extends BaseContext {
         super(controller);
 
         this._grapher = controller.getGrapher();
+
+        // the tool that's currently handling any mouse event in the workspace
+        this._activeTool = null;
 
         // number of steps to snap dots to when dragging: 0, 1, 2, 4
         this._grid = 2;
@@ -37,17 +40,19 @@ export default class DotContext extends BaseContext {
     }
 
     load(options) {
-        this._setupDrag();
         this._setupContextMenus();
 
         this._panel.show()
             .find(".dot-labels")
             .scrollTop(0);
 
+        this.loadTool("selection");
+        this._addEvents(".workspace", "mousedown", e => {
+            this._activeTool.handle(this, e);
+        });
+
         $(".toolbar .edit-dots").addClass("active");
         $(".toolbar .edit-dots-group").removeClass("hide");
-
-        this.loadSelection("box");
     }
 
     unload() {
@@ -68,21 +73,26 @@ export default class DotContext extends BaseContext {
     }
 
     /**
-     * Get the Grapher
+     * @return {Grapher}
      */
     getGrapher() {
         return this._grapher;
     }
 
     /**
-     * Load the given selection method.
+     * @return {int}
+     */
+    getGrid() {
+        return this._grid;
+    }
+
+    /**
+     * Load the given editing tool.
      *
      * @param {string} name
      */
-    loadSelection(name) {
-        DotSelection.load(name);
-        $(".toolbar .dot-selection li").removeClass("active");
-        $(`.toolbar .${DotSelection.iconName}`).addClass("active");
+    loadTool(name) {
+        this._activeTool = EditTools.load(name);
     }
 
     /**
@@ -157,100 +167,6 @@ export default class DotContext extends BaseContext {
         });
     }
 
-    /**
-     * Set up the events for selecting/dragging dots.
-     */
-    _setupDrag() {
-        let scale, dragStart, scrollOffset, moveOffset;
-
-        let mousedown = e => {
-            e.preventDefault();
-            let target = $(e.target);
-
-            // mass selection
-            if (!target.is(".dot-marker")) {
-                this.deselectDots();
-                DotSelection.start(this, e);
-                return;
-            }
-
-            let dot = target.parent();
-
-            // toggle dot selection
-            if (e.shiftKey || e.ctrlKey || e.metaKey) {
-                this.toggleDots(dot);
-                return;
-            }
-
-            if (!this._grapher.isSelected(dot)) {
-                this.selectDots(dot, {
-                    append: false,
-                });
-            }
-
-            scale = this._grapher.getScale();
-            dragStart = e;
-            scrollOffset = {
-                top: 0,
-                left: 0,
-            };
-            moveOffset = {
-                x: 0,
-                y: 0,
-            };
-
-            $(document).on({
-                "mousemove.dot-drag": mousemove,
-                "mouseup.dot-drag": mouseup,
-            });
-        };
-
-        let mousemove = e => {
-            // change from beginning of move to now
-            let deltaX = e.pageX - dragStart.pageX;
-            let deltaY = e.pageY - dragStart.pageY;
-
-            // snap deltaX and deltaY to grid; dots can themselves be off
-            // the grid, but they move in a consistent interval
-            if (this._grid !== 0) {
-                let snap = scale.toDistance(this._grid);
-                deltaX = round(scrollOffset.left + deltaX, snap);
-                deltaY = round(scrollOffset.top + deltaY, snap);
-            }
-
-            this._controller.getSelection()
-                .each((i, dot) => {
-                    let dotPosition = this._sheet.getPosition($(dot).data("dot"));
-                    let position = scale.toDistanceCoordinates(dotPosition);
-                    this._grapher.moveDotTo(dot, position.x + deltaX, position.y + deltaY);
-                })
-                .scrollIntoView({
-                    parent: ".workspace",
-                    tolerance: 10,
-                    callback: (deltaX, deltaY) => {
-                        scrollOffset.top += deltaY;
-                        scrollOffset.left += deltaX;
-                    },
-                });
-
-            moveOffset.x = deltaX;
-            moveOffset.y = deltaY;
-        };
-
-        let mouseup = e => {
-            let deltaX = scale.toSteps(moveOffset.x);
-            let deltaY = scale.toSteps(moveOffset.y);
-
-            if (deltaX !== 0 || deltaY !== 0) {
-                this._controller.doAction("moveDots", [deltaX, deltaY]);
-            }
-
-            $(document).off(".dot-drag");
-        };
-
-        this._addEvents(".workspace", "mousedown", mousedown);
-    }
-
     _setupPanel() {
         let _this = this;
         let controller = this._controller;
@@ -310,8 +226,11 @@ let ContextShortcuts = {
     "ctrl+6": "changeDotType(solid-backslash)",
     "ctrl+7": "changeDotType(plain-x)",
     "ctrl+8": "changeDotType(solid-x)",
-    "s": "loadSelection(box)",
-    "l": "loadSelection(lasso)",
+    "s": "loadTool(selection)",
+    "a": "loadTool(lasso)",
+    "l": "loadTool(line)",
+    "r": "loadTool(rectangle)",
+    "c": "loadTool(circle)",
     "left": "moveDots(-1, 0)",
     "up": "moveDots(0, -1)",
     "right": "moveDots(1, 0)",
@@ -406,21 +325,20 @@ class ContextActions {
 
         // update movements
 
-        let controller = this._controller;
-        let _updateMovements = function() {
+        let _updateMovements = () => {
             sheet.updateMovements(dots);
-            controller.checkContinuities(sheet, dots);
+            this._controller.checkContinuities(sheet, dots);
 
             let prevSheet = sheet.getPrevSheet();
             if (prevSheet) {
                 prevSheet.updateMovements(dots);
-                controller.checkContinuities(prevSheet, dots);
+                this._controller.checkContinuities(prevSheet, dots);
             }
         };
         _updateMovements();
 
         // refresh
-        controller.loadSheet(sheet);
+        this._controller.loadSheet(sheet);
 
         return {
             data: [deltaX, deltaY, sheet, dots],
@@ -430,7 +348,61 @@ class ContextActions {
                     sheet.updatePosition(dot, position.x, position.y);
                 });
                 _updateMovements();
-                controller.loadSheet(sheet);
+                this._controller.loadSheet(sheet);
+            },
+        };
+    }
+
+    /**
+     * Move the given dots to the given positions.
+     *
+     * @param {Object[]} data - The dots to move and their positions
+     *   (in steps), as an array of objects in the format
+     *   {
+     *        dot: Dot,
+     *        x: number,
+     *        y: number,
+     *   }
+     * @param {Sheet} [sheet] - The sheet to move dots for. Defaults
+     *   to the currently loaded stunt sheet.
+     */
+    static moveDotsTo(data, sheet=this._sheet) {
+        let dots = [];
+        let oldData = data.map(info => {
+            let oldPosition = _.clone(sheet.getPosition(info.dot));
+            sheet.updatePosition(info.dot, info.x, info.y);
+            dots.push(info.dot);
+            return {
+                dot: info.dot,
+                x: oldPosition.x,
+                y: oldPosition.y,
+            };
+        });
+
+        // update movements
+
+        let _updateMovements = () => {
+            sheet.updateMovements(dots);
+            this._controller.checkContinuities(sheet, dots);
+
+            let prevSheet = sheet.getPrevSheet();
+            if (prevSheet) {
+                prevSheet.updateMovements(dots);
+                this._controller.checkContinuities(prevSheet, dots);
+            }
+        };
+        _updateMovements();
+
+        this._controller.loadSheet(sheet);
+
+        return {
+            data: [data, sheet],
+            undo: function() {
+                oldData.forEach(info => {
+                    sheet.updatePosition(info.dot, info.x, info.y);
+                });
+                _updateMovements();
+                this._controller.loadSheet(sheet);
             },
         };
     }

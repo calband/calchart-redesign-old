@@ -1373,9 +1373,6 @@
 .icon-wrench:before {
   content: "\e1e2";
 }
-.icon-selection:before {
-  content: "\e1eb";
-}
 .icon-birthday-cake:before {
   content: "\61";
 }
@@ -1393,4 +1390,13 @@
 }
 .icon-lasso:before {
   content: "\54";
+}
+.icon-selection:before {
+  content: "\6c";
+}
+.icon-line:before {
+  content: "\56";
+}
+.icon-rectangle:before {
+  content: "\57";
 }

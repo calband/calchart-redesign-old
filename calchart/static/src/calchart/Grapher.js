@@ -131,8 +131,8 @@ export default class Grapher {
      * @return {jQuery}
      */
     getDot(dot) {
-        let dotNode = this._svg.select(`g.dot.dot-${dot.id}`).nodes();
-        return $(dotNode);
+        let dotNode = this._svg.select(`g.dot.dot-${dot.id}`);
+        return $.fromD3(dotNode);
     }
 
     /**
@@ -150,7 +150,7 @@ export default class Grapher {
             }
             dotGroups = dotGroups.filter(dot => ids.includes(dot.id));
         }
-        return $(dotGroups.nodes());
+        return $.fromD3(dotGroups);
     }
 
     /**
