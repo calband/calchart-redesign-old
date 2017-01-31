@@ -325,21 +325,20 @@ class ContextActions {
 
         // update movements
 
-        let controller = this._controller;
-        let _updateMovements = function() {
+        let _updateMovements = () => {
             sheet.updateMovements(dots);
-            controller.checkContinuities(sheet, dots);
+            this._controller.checkContinuities(sheet, dots);
 
             let prevSheet = sheet.getPrevSheet();
             if (prevSheet) {
                 prevSheet.updateMovements(dots);
-                controller.checkContinuities(prevSheet, dots);
+                this._controller.checkContinuities(prevSheet, dots);
             }
         };
         _updateMovements();
 
         // refresh
-        controller.loadSheet(sheet);
+        this._controller.loadSheet(sheet);
 
         return {
             data: [deltaX, deltaY, sheet, dots],
@@ -349,7 +348,61 @@ class ContextActions {
                     sheet.updatePosition(dot, position.x, position.y);
                 });
                 _updateMovements();
-                controller.loadSheet(sheet);
+                this._controller.loadSheet(sheet);
+            },
+        };
+    }
+
+    /**
+     * Move the given dots to the given positions.
+     *
+     * @param {Object[]} data - The dots to move and their positions
+     *   (in steps), as an array of objects in the format
+     *   {
+     *        dot: Dot,
+     *        x: number,
+     *        y: number,
+     *   }
+     * @param {Sheet} [sheet] - The sheet to move dots for. Defaults
+     *   to the currently loaded stunt sheet.
+     */
+    static moveDotsTo(data, sheet=this._sheet) {
+        let dots = [];
+        let oldData = data.map(info => {
+            let oldPosition = _.clone(sheet.getPosition(info.dot));
+            sheet.updatePosition(info.dot, info.x, info.y);
+            dots.push(info.dot);
+            return {
+                dot: info.dot,
+                x: oldPosition.x,
+                y: oldPosition.y,
+            };
+        });
+
+        // update movements
+
+        let _updateMovements = () => {
+            sheet.updateMovements(dots);
+            this._controller.checkContinuities(sheet, dots);
+
+            let prevSheet = sheet.getPrevSheet();
+            if (prevSheet) {
+                prevSheet.updateMovements(dots);
+                this._controller.checkContinuities(prevSheet, dots);
+            }
+        };
+        _updateMovements();
+
+        this._controller.loadSheet(sheet);
+
+        return {
+            data: [data, sheet],
+            undo: function() {
+                oldData.forEach(info => {
+                    sheet.updatePosition(info.dot, info.x, info.y);
+                });
+                _updateMovements();
+                this._controller.loadSheet(sheet);
             },
         };
     }

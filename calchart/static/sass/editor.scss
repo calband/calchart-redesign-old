@@ -219,6 +219,10 @@ $sidebar-width: 200px;
     fill: rgba($light-gray, 0.3);
 }
 
+.line-tool-path {
+    stroke: $gold;
+}
+
 /** CONTINUITY CONTEXT **/
 
 .panel.edit-continuity {

@@ -70,8 +70,9 @@ class BaseTool {
      * @param {DotContext} context
      */
     constructor(context) {
-        this.controller = context.getController();
         this.context = context;
+        this.controller = context.getController();
+        this.grapher = context.getGrapher();
     }
 
     /**
@@ -142,17 +143,47 @@ class BaseTool {
 
     /**
      * Convert the given (x,y) coordinates on the page to be relative to
-     * the workspace.
+     * the workspace. Can also pass in an Event object, which will have
+     * its pageX and pageY values taken.
      *
-     * @param {number} pageX
-     * @param {number} pageY
+     * @param {Event} [e]
+     * @param {number} [pageX]
+     * @param {number} [pageY]
      * @return {[x, y]}
      */
     _makeRelative(pageX, pageY) {
+        if (arguments.length === 1) {
+            let e = arguments[0];
+            pageX = e.pageX;
+            pageY = e.pageY;
+        }
+
         let workspace = $(".workspace");
         let offset = workspace.offset();
         let x = pageX - offset.left + workspace.scrollLeft();
         let y = pageY - offset.top + workspace.scrollTop();
+        return [x, y];
+    }
+
+    /**
+     * Same as _makeRelative, except the returned values are constrained
+     * to the grid, if applicable.
+     */
+    _makeRelativeSnap() {
+        let [x, y] = this._makeRelative.apply(this, arguments);
+
+        let grid = this.context.getGrid();
+        if (grid !== 0) {
+            let scale = this.grapher.getScale();
+            let steps = scale.toStepCoordinates({x, y});
+            let distance = scale.toDistanceCoordinates({
+                x: round(steps.x, grid),
+                y: round(steps.y, grid),
+            });
+            x = distance.x;
+            y = distance.y;
+        }
+
         return [x, y];
     }
 }
@@ -162,16 +193,6 @@ class BaseTool {
  * selection box that mass selects dots.
  */
 class SelectionTool extends BaseTool {
-    /**
-     * @param {DotContext} context
-     */
-    constructor(context) {
-        super(context);
-
-        this.grapher = context.getGrapher();
-        this.dots = this.grapher.getDots();
-    }
-
     mousedown(e) {
         if ($(e.target).is(".dot-marker")) {
             this._dragType = "dot";
@@ -284,7 +305,7 @@ class SelectionTool extends BaseTool {
 
         // select dots within the selection box
         this.context.deselectDots();
-        this.dots.each((i, dot) => {
+        this.grapher.getDots().each((i, dot) => {
             dot = $(dot);
             let position = dot.data("position");
             if (
@@ -329,17 +350,17 @@ class LassoTool extends SelectionTool {
     mousedown(e) {
         this.context.deselectDots();
 
-        let [startX, startY] = this._makeRelative(e.pageX, e.pageY);
+        let [startX, startY] = this._makeRelative(e);
         let path = this.grapher.getSVG()
             .append("path")
             .classed("lasso-path", true)
             .attr("d", `M ${startX} ${startY}`);
 
-        this._path = $(path.nodes());
+        this._path = $.fromD3(path);
     }
 
     mousemove(e) {
-        let [x, y] = this._makeRelative(e.pageX, e.pageY);
+        let [x, y] = this._makeRelative(e);
         let pathDef = this._path.attr("d") + ` L ${x} ${y}`;
 
         this._path
@@ -350,7 +371,7 @@ class LassoTool extends SelectionTool {
     }
 
     mouseup(e) {
-        this.dots.each((i, dot) => {
+        this.grapher.getDots().each((i, dot) => {
             dot = $(dot);
             let offset = dot.find(".dot-marker").offset();
             let topElem = document.elementFromPoint(offset.left, offset.top);
@@ -360,5 +381,59 @@ class LassoTool extends SelectionTool {
         });
 
         this._path.remove();
+    }
+}
+
+/**
+ * Arrange the selected dots in a line, where the user defines the
+ * interval and angle at which to draw the line.
+ */
+class LineTool extends BaseTool {
+    mousedown(e) {
+        let [startX, startY] = this._makeRelativeSnap(e);
+        this._startX = startX;
+        this._startY = startY;
+
+        // the helper line
+        let line = this.grapher.getSVG()
+            .append("line")
+            .classed("line-tool-path", true)
+            .attr("x1", this._startX)
+            .attr("y1", this._startY);
+        this._line = $.fromD3(line);
+
+        this.mousemove(e);
+    }
+
+    mousemove(e) {
+        let [x, y] = this._makeRelativeSnap(e);
+
+        this._line
+            .attr("x2", x)
+            .attr("y2", y);
+
+        let deltaX = x - this._startX;
+        let deltaY = y - this._startY;
+
+        this.controller.getSelection().each((i, dot) => {
+            let x = this._startX + i * deltaX;
+            let y = this._startY + i * deltaY;
+            this.grapher.moveDotTo(dot, x, y);
+        });
+    }
+
+    mouseup(e) {
+        let scale = this.grapher.getScale();
+        let data = _.map(this.controller.getSelection(), dot => {
+            let position = scale.toStepCoordinates($(dot).data("position"));
+            return {
+                dot: $(dot).data("dot"),
+                x: position.x,
+                y: position.y,
+            };
+        })
+        this.controller.doAction("moveDotsTo", [data]);
+
+        this._line.remove();
     }
 }
