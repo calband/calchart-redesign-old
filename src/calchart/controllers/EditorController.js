@@ -159,7 +159,7 @@ export default class EditorController extends ApplicationController {
         let args = parseArgs(arguments, ["sheet", "dots", "message"]);
         let successMessage = "Continuities valid!";
 
-        let sheet = _.defaultTo(args.sheets, this._activeSheet);
+        let sheet = _.defaultTo(args.sheet, this._activeSheet);
         if (sheet.isLastSheet()) {
             if (args.message) {
                 showMessage(successMessage);

@@ -184,7 +184,7 @@ header {
     padding: 5px 0;
     background: $light-gray;
     background: linear-gradient($light-gray, $semilight-gray);
-    border-bottom: 1px solid $semilight-gray;
+    border-bottom: 1px solid rgba($medium-gray, 0.5);
     box-shadow: 0 1px 2px rgba($black, 0.2);
     ul.toolbar-group {
         display: inline-block;
@@ -197,11 +197,11 @@ header {
         }
         li {
             display: inline-block;
-            padding: 5px;
             margin: 0 1px;
             cursor: default;
             vertical-align: middle;
             &.toolbar-item {
+                padding: 5px;
                 border: 1px solid transparent;
                 border-radius: 2px;
                 &:hover, &.active, &.focus:hover {

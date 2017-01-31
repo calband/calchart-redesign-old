@@ -215,6 +215,23 @@ export default class DotContext extends BaseContext {
             this._controller.refresh();
         });
     }
+
+    /**
+     * Update movements after editing dot positions.
+     *
+     * @param {Dot[]} dots - The dots to update movements for.
+     * @param {Sheet} sheet - The sheet to update movements in
+     */
+    _updateMovements(dots, sheet) {
+        sheet.updateMovements(dots);
+        this._controller.checkContinuities(sheet, dots);
+
+        let prevSheet = sheet.getPrevSheet();
+        if (prevSheet) {
+            prevSheet.updateMovements(dots);
+            this._controller.checkContinuities(prevSheet, dots);
+        }
+    }
 }
 
 let ContextShortcuts = {
@@ -323,19 +340,7 @@ class ContextActions {
             sheet.updatePosition(dot, position.x, position.y);
         });
 
-        // update movements
-
-        let _updateMovements = () => {
-            sheet.updateMovements(dots);
-            this._controller.checkContinuities(sheet, dots);
-
-            let prevSheet = sheet.getPrevSheet();
-            if (prevSheet) {
-                prevSheet.updateMovements(dots);
-                this._controller.checkContinuities(prevSheet, dots);
-            }
-        };
-        _updateMovements();
+        this._updateMovements(dots, sheet);
 
         // refresh
         this._controller.loadSheet(sheet);
@@ -347,7 +352,7 @@ class ContextActions {
                     let position = prevPositions[dot.label];
                     sheet.updatePosition(dot, position.x, position.y);
                 });
-                _updateMovements();
+                this._updateMovements(dots, sheet);
                 this._controller.loadSheet(sheet);
             },
         };
@@ -379,20 +384,7 @@ class ContextActions {
             };
         });
 
-        // update movements
-
-        let _updateMovements = () => {
-            sheet.updateMovements(dots);
-            this._controller.checkContinuities(sheet, dots);
-
-            let prevSheet = sheet.getPrevSheet();
-            if (prevSheet) {
-                prevSheet.updateMovements(dots);
-                this._controller.checkContinuities(prevSheet, dots);
-            }
-        };
-        _updateMovements();
-
+        this._updateMovements(dots, sheet);
         this._controller.loadSheet(sheet);
 
         return {
@@ -401,7 +393,7 @@ class ContextActions {
                 oldData.forEach(info => {
                     sheet.updatePosition(info.dot, info.x, info.y);
                 });
-                _updateMovements();
+                this._updateMovements(dots, sheet);
                 this._controller.loadSheet(sheet);
             },
         };

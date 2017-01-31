@@ -9,7 +9,7 @@ module.exports = function (grunt) {
         webpack: {
             build: {
                 entry: {
-                    editor: "./calchart/static/src/editor.js",
+                    editor: "./src/editor.js",
                 },
                 output: {
                     path: "calchart/static/js/",
@@ -18,7 +18,7 @@ module.exports = function (grunt) {
                 // set import paths relative to src/ directory
                 resolve: {
                     root: [
-                        path.resolve("./calchart/static/src")
+                        path.resolve("./src")
                     ],
                 },
                 module: {
@@ -26,7 +26,7 @@ module.exports = function (grunt) {
                         // convert ES6 to ES5
                         {
                             test: /\.js$/,
-                            include: ["./calchart/static/src"],
+                            include: ["./src"],
                             loader: "babel-loader",
                             query: {
                                 presets: ["es2015"],
@@ -72,7 +72,7 @@ module.exports = function (grunt) {
                 tasks: "sass",
             },
             js: {
-                files: ["calchart/static/src/**/*.js"],
+                files: ["src/**/*.js"],
                 tasks: "webpack:build",
             },
         },
