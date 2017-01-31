@@ -72,6 +72,13 @@ export default class BaseContext {
     }
 
     /**
+     * @return {EditorController}
+     */
+    getController() {
+        return this._controller;
+    }
+
+    /**
      * Add the given events to the given element. Can either give as two parameters as
      * described below, or three parameters, where the second parameter is the event
      * name and the third parameter is the event handler.
