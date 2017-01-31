@@ -373,8 +373,12 @@ class LassoTool extends SelectionTool {
     mouseup(e) {
         this.grapher.getDots().each((i, dot) => {
             dot = $(dot);
-            let offset = dot.find(".dot-marker").offset();
-            let topElem = document.elementFromPoint(offset.left, offset.top);
+            let marker = dot.find(".dot-marker");
+            let offset = marker.offset();
+            let topElem = document.elementFromPoint(
+                offset.left + marker.width() / 2,
+                offset.top + marker.height() / 2,
+            );
             if ($(topElem).is(this._path)) {
                 this.context.selectDots(dot);
             }
