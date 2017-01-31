@@ -290,12 +290,8 @@ editor_toolbar = Toolbar(
     ),
     ToolbarContextGroup(
         'edit-dots',
-        ToolbarItem('Selection', 'selection', 'loadSelection(box)'),
+        ToolbarItem('Selection', 'mouse-pointer', 'loadSelection(box)'),
         ToolbarItem('Lasso', 'lasso', 'loadSelection(lasso)'),
-        classes='edit-tools',
-    ),
-    ToolbarContextGroup(
-        'edit-dots',
         ToolbarItem('Line', 'line', 'TODO'),
         ToolbarItem('Rectangle', 'rectangle', 'TODO'),
         ToolbarItem('Circle', 'circle-o', 'TODO'),
