@@ -108,17 +108,24 @@ export function roundSmall(x) {
 
 /**
  * Convert an angle measured in degrees to one
- * measured in radians.
+ * measured in Calchart degrees.
  *
  * @param {number} angle - The angle, measured in degrees.
- * @return {number} The angle, measured in radians.
+ * @return {number} The angle, measured in Calchart degrees.
  */
-export function toRadians(angle) {
-    return angle * Math.PI / 180;
+export function toCalchartDegrees(angle) {
+    angle = 270 - angle;
+    while (angle < 0) {
+        angle += 360;
+    }
+    while (angle >= 360) {
+        angle -= 360;
+    }
+    return angle;
 }
 
 /**
- * Converts an angle measured in radians to one
+ * Convert an angle measured in radians to one
  * measured in degrees.
  *
  * @param {number} angle - The angle, measured in radians.
@@ -126,4 +133,15 @@ export function toRadians(angle) {
  */
 export function toDegrees(angle) {
     return angle * 180 / Math.PI;
+}
+
+/**
+ * Convert an angle measured in degrees to one
+ * measured in radians.
+ *
+ * @param {number} angle - The angle, measured in degrees.
+ * @return {number} The angle, measured in radians.
+ */
+export function toRadians(angle) {
+    return angle * Math.PI / 180;
 }
