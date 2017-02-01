@@ -388,6 +388,7 @@ class ContextActions {
         this._controller.loadSheet(sheet);
 
         return {
+            label: "move dots",
             data: [data, sheet],
             undo: function() {
                 oldData.forEach(info => {

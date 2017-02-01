@@ -206,13 +206,13 @@ $sidebar-width: 200px;
     }
 }
 
-.lasso-path {
+.edit-tool-path {
     stroke: $gold;
-    fill: rgba($light-gray, 0.3);
+    fill: none;
 }
 
-.line-tool-path {
-    stroke: $gold;
+.lasso-path {
+    fill: rgba($light-gray, 0.3);
 }
 
 /** CONTINUITY CONTEXT **/

@@ -9,7 +9,7 @@ import * as _ from "lodash";
 import { NotImplementedError } from "utils/errors";
 import HTMLBuilder from "utils/HTMLBuilder";
 import { isSubclass } from "utils/JSUtils";
-import { round } from "utils/MathUtils";
+import { calcAngle, calcDistance, calcRotatedXPos, calcRotatedYPos, round } from "utils/MathUtils";
 
 /**
  * The proxy class that can load any tools used to edit dots
@@ -186,6 +186,22 @@ class BaseTool {
 
         return [x, y];
     }
+
+    /**
+     * Save the currently selected dots' positions.
+     */
+    _saveDotPositions() {
+        let scale = this.grapher.getScale();
+        let data = _.map(this.controller.getSelection(), dot => {
+            let position = scale.toStepCoordinates($(dot).data("position"));
+            return {
+                dot: $(dot).data("dot"),
+                x: position.x,
+                y: position.y,
+            };
+        })
+        this.controller.doAction("moveDotsTo", [data]);
+    }
 }
 
 /**
@@ -353,7 +369,7 @@ class LassoTool extends SelectionTool {
         let [startX, startY] = this._makeRelative(e);
         let path = this.grapher.getSVG()
             .append("path")
-            .classed("lasso-path", true)
+            .classed("edit-tool-path lasso-path", true)
             .attr("d", `M ${startX} ${startY}`);
 
         this._path = $.fromD3(path);
@@ -401,7 +417,7 @@ class LineTool extends BaseTool {
         // the helper line
         let line = this.grapher.getSVG()
             .append("line")
-            .classed("line-tool-path", true)
+            .classed("edit-tool-path", true)
             .attr("x1", this._startX)
             .attr("y1", this._startY);
         this._line = $.fromD3(line);
@@ -427,17 +443,84 @@ class LineTool extends BaseTool {
     }
 
     mouseup(e) {
-        let scale = this.grapher.getScale();
-        let data = _.map(this.controller.getSelection(), dot => {
-            let position = scale.toStepCoordinates($(dot).data("position"));
-            return {
-                dot: $(dot).data("dot"),
-                x: position.x,
-                y: position.y,
-            };
-        })
-        this.controller.doAction("moveDotsTo", [data]);
-
+        this._saveDotPositions();
         this._line.remove();
+    }
+}
+
+/**
+ * Arrange the selected dots in a rectangle, where the user defines
+ * TODO
+ */
+class RectangleTool extends BaseTool {
+
+}
+
+/**
+ * Arrange the selected dots in a circle, where the user defines
+ * the origin and radius of the circle.
+ */
+class CircleTool extends BaseTool {
+    mousedown(e) {
+        let [startX, startY] = this._makeRelativeSnap(e);
+        this._startX = startX;
+        this._startY = startY;
+
+        // helper paths
+
+        let svg = this.grapher.getSVG();
+
+        let line = svg.append("line")
+            .classed("edit-tool-path", true)
+            .attr("x1", this._startX)
+            .attr("y1", this._startY);
+        this._line = $.fromD3(line);
+
+        let circle = svg.append("circle")
+            .classed("edit-tool-path", true)
+            .attr("cx", this._startX)
+            .attr("cy", this._startY);
+        this._circle = $.fromD3(circle);
+
+        // snap
+
+        let grid = this.context.getGrid();
+        if (grid !== 0) {
+            let scale = this.grapher.getScale();
+            this._snap = scale.toDistance(grid);
+        }
+
+        this.mousemove(e);
+    }
+
+    mousemove(e) {
+        // radius
+        let [x, y] = this._makeRelative(e);
+        let radius = calcDistance(this._startX, this._startY, x, y);
+        if (!_.isUndefined(this._snap)) {
+            radius = round(radius, this._snap);
+        }
+
+        // helper paths, snap radius line to 45 degree angles
+        let angle = calcAngle(this._startX, this._startY, x, y);
+        angle = round(angle, 45);
+        let rx = calcRotatedXPos(angle) * radius;
+        let ry = calcRotatedYPos(angle) * radius;
+        this._line.attr("x2", this._startX + rx).attr("y2", this._startY + ry);
+        this._circle.attr("r", radius);
+
+        let selection = this.controller.getSelection();
+        let delta = 360 / selection.length;
+        selection.each((i, dot) => {
+            let rx = calcRotatedXPos(delta * i) * radius;
+            let ry = calcRotatedYPos(delta * i) * radius;
+            this.grapher.moveDotTo(dot, this._startX + rx, this._startY + ry);
+        });
+    }
+
+    mouseup(e) {
+        this._saveDotPositions();
+        this._line.remove();
+        this._circle.remove();
     }
 }

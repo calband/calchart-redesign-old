@@ -33,12 +33,12 @@ export function calcDistance(x1, y1, x2, y2) {
  * @param {number} x2 - The x coordinate of the vector's end.
  * @param {number} y2 - The y coordinate of the vector's end.
  * @return {number} The angle the vector (x1,y1) -> (x2,y2) is
- *   facing, in degrees.
+ *   facing, in Calchart degrees.
  */
 export function calcAngle(x1, y1, x2, y2) {
     let deltaX = x2 - x1;
     let deltaY = y2 - y1;
-    let angle = Math.atan(deltaY / deltaX);
+    let angle = Math.atan(-deltaX / deltaY);
     if (deltaY < 0) {
         angle += Math.PI;
     }
