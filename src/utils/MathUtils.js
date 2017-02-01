@@ -33,12 +33,12 @@ export function calcDistance(x1, y1, x2, y2) {
  * @param {number} x2 - The x coordinate of the vector's end.
  * @param {number} y2 - The y coordinate of the vector's end.
  * @return {number} The angle the vector (x1,y1) -> (x2,y2) is
- *   facing, in Calchart degrees.
+ *   facing, in degrees.
  */
 export function calcAngle(x1, y1, x2, y2) {
     let deltaX = x2 - x1;
     let deltaY = y2 - y1;
-    let angle = Math.atan(-deltaX / deltaY);
+    let angle = Math.atan(deltaY / deltaX);
     if (deltaY < 0) {
         angle += Math.PI;
     }
@@ -107,14 +107,21 @@ export function roundSmall(x) {
 }
 
 /**
- * Convert an angle measured in degrees to one
- * measured in radians.
+ * Converts an angle measured in degrees to one
+ * measured in Calchart degrees.
  *
  * @param {number} angle - The angle, measured in degrees.
- * @return {number} The angle, measured in radians.
+ * @return {number} The angle, measured in Calchart degrees.
  */
-export function toRadians(angle) {
-    return angle * Math.PI / 180;
+export function toCalchartDegrees(angle) {
+    angle = 270 - angle;
+    while (angle < 0) {
+        angle += 360;
+    }
+    while (angle >= 360) {
+        angle -= 360;
+    }
+    return angle;
 }
 
 /**
@@ -126,4 +133,15 @@ export function toRadians(angle) {
  */
 export function toDegrees(angle) {
     return angle * 180 / Math.PI;
+}
+
+/**
+ * Convert an angle measured in degrees to one
+ * measured in radians.
+ *
+ * @param {number} angle - The angle, measured in degrees.
+ * @return {number} The angle, measured in radians.
+ */
+export function toRadians(angle) {
+    return angle * Math.PI / 180;
 }

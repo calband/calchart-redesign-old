@@ -2,7 +2,7 @@ import * as _ from "lodash";
 
 import MovementCommandMove from "calchart/movements/MovementCommandMove";
 
-import { calcAngle, calcDistance } from "utils/MathUtils";
+import { calcAngle, calcDistance, toCalchartDegrees } from "utils/MathUtils";
  
 /**
  * A MovementCommand which represents an even-step transition between two points.
@@ -20,6 +20,8 @@ export default class MovementCommandEven extends MovementCommandMove {
      */ 
     constructor(startX, startY, endX, endY, duration, options={}) {
         let direction = calcAngle(startX, startY, endX, endY);
+        direction = toCalchartDegrees(direction);
+
         options.stepSize = calcDistance(startX, startY, endX, endY) / duration;
 
         super(startX, startY, direction, duration, options);
