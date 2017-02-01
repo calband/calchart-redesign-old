@@ -2,7 +2,7 @@ import * as _ from "lodash";
 
 import MovementCommandMove from "calchart/movements/MovementCommandMove";
 
-import { calcAngle, calcDistance, toCalchartDegrees } from "utils/MathUtils";
+import { calcAngle, calcDistance } from "utils/MathUtils";
  
 /**
  * A MovementCommand which represents an even-step transition between two points.

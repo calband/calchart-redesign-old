@@ -107,7 +107,7 @@ export function roundSmall(x) {
 }
 
 /**
- * Converts an angle measured in degrees to one
+ * Convert an angle measured in degrees to one
  * measured in Calchart degrees.
  *
  * @param {number} angle - The angle, measured in degrees.
@@ -125,7 +125,7 @@ export function toCalchartDegrees(angle) {
 }
 
 /**
- * Converts an angle measured in radians to one
+ * Convert an angle measured in radians to one
  * measured in degrees.
  *
  * @param {number} angle - The angle, measured in radians.
