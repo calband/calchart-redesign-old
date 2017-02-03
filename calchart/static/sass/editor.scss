@@ -121,6 +121,9 @@ $sidebar-width: 200px;
             border: 2px solid rgba($white, 0.8);
             background: rgba($white, 0.2);
         }
+        &.edit-tools-active {
+            cursor: crosshair;
+        }
     }
 }
 

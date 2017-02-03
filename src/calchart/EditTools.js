@@ -44,8 +44,14 @@ export default class EditTools {
                 throw new Error(`No tool named: ${name}`);
         }
 
-        if (isSubclass(SelectionTool, EditTool)) {
+        if (isSubclass(BaseSelection, EditTool)) {
             this._lastSelectionTool = name;
+        }
+
+        if (isSubclass(BaseEdit, EditTool)) {
+            $(".workspace").addClass("edit-tools-active");
+        } else {
+            $(".workspace").removeClass("edit-tools-active");
         }
 
         $(".toolbar .edit-tools li").removeClass("active");
@@ -186,29 +192,19 @@ class BaseTool {
 
         return [x, y];
     }
+}
 
-    /**
-     * Save the currently selected dots' positions.
-     */
-    _saveDotPositions() {
-        let scale = this.grapher.getScale();
-        let data = _.map(this.controller.getSelection(), dot => {
-            let position = scale.toStepCoordinates($(dot).data("position"));
-            return {
-                dot: $(dot).data("dot"),
-                x: position.x,
-                y: position.y,
-            };
-        })
-        this.controller.doAction("moveDotsTo", [data]);
-    }
+/**
+ * A superclass for all tools that select dots
+ */
+class BaseSelection extends BaseTool {
 }
 
 /**
  * The default edit tool that can either move dots or draw a rectangular
  * selection box that mass selects dots.
  */
-class SelectionTool extends BaseTool {
+class SelectionTool extends BaseSelection {
     mousedown(e) {
         if ($(e.target).is(".dot-marker")) {
             this._dragType = "dot";
@@ -362,7 +358,7 @@ class SelectionTool extends BaseTool {
 /**
  * Selects dots within an arbitrary path drawn by the user.
  */
-class LassoTool extends SelectionTool {
+class LassoTool extends BaseSelection {
     mousedown(e) {
         this.context.deselectDots();
 
@@ -405,10 +401,31 @@ class LassoTool extends SelectionTool {
 }
 
 /**
+ * A superclass for all tools that edit dots.
+ */
+class BaseEdit extends BaseTool {
+    /**
+     * Save the currently selected dots' positions.
+     */
+    _saveDotPositions() {
+        let scale = this.grapher.getScale();
+        let data = _.map(this.controller.getSelection(), dot => {
+            let position = scale.toStepCoordinates($(dot).data("position"));
+            return {
+                dot: $(dot).data("dot"),
+                x: position.x,
+                y: position.y,
+            };
+        })
+        this.controller.doAction("moveDotsTo", [data]);
+    }
+}
+
+/**
  * Arrange the selected dots in a line, where the user defines the
  * interval and angle at which to draw the line.
  */
-class LineTool extends BaseTool {
+class LineTool extends BaseEdit {
     mousedown(e) {
         let [startX, startY] = this._makeRelativeSnap(e);
         this._startX = startX;
@@ -452,7 +469,7 @@ class LineTool extends BaseTool {
  * Arrange the selected dots in a rectangle, where the user defines
  * TODO
  */
-class RectangleTool extends BaseTool {
+class RectangleTool extends BaseEdit {
 
 }
 
@@ -460,7 +477,7 @@ class RectangleTool extends BaseTool {
  * Arrange the selected dots in a circle, where the user defines
  * the origin and radius of the circle.
  */
-class CircleTool extends BaseTool {
+class CircleTool extends BaseEdit {
     mousedown(e) {
         let [startX, startY] = this._makeRelativeSnap(e);
         this._startX = startX;
