@@ -5,7 +5,7 @@ import DotType from "calchart/DotType";
 import EditTools from "calchart/EditTools";
 
 import HTMLBuilder from "utils/HTMLBuilder";
-import { parseNumber } from "utils/JSUtils";
+import { mapSome, parseNumber } from "utils/JSUtils";
 import { round } from "utils/MathUtils";
 import { setupPanel, showContextMenu } from "utils/UIUtils";
 
@@ -207,12 +207,9 @@ export default class DotContext extends BaseContext {
             .choose(2);
 
         $(".toolbar .resnap button").click(() => {
-            this._controller.getShow().getDots().forEach(dot => {
-                let position = this._sheet.getPosition(dot);
-                position.x = round(position.x, this._grid);
-                position.y = round(position.y, this._grid);
-            });
-            this._controller.refresh();
+            if (this._grid !== 0) {
+                this._controller.doAction("resnapDots");
+            }
         });
     }
 
@@ -397,6 +394,37 @@ class ContextActions {
                 this._updateMovements(dots, sheet);
                 this._controller.loadSheet(sheet);
             },
+        };
+    }
+
+    /**
+     * Resnap dots to the grid.
+     *
+     * @param {Object[]} [data] - Data to pass to moveDotsTo. Used when
+     *   redo-ing to optimize performance.
+     * @param {Sheet} [sheet] - The sheet to move dots for. Defaults
+     *   to the currently loaded stunt sheet.
+     */
+    static resnapDots(data, sheet=this._sheet) {
+        if (_.isUndefined(data)) {
+            let dots = this._controller.getShow().getDots();
+            data = mapSome(dots, dot => {
+                let position = this._sheet.getPosition(dot);
+                let rounded = {
+                    dot: dot,
+                    x: round(position.x, this._grid),
+                    y: round(position.y, this._grid),
+                };
+                if (rounded.x !== position.x || rounded.y !== position.y) {
+                    return rounded;
+                }
+            });
+        }
+
+        let result = this.actions.moveDotsTo.call(this, data, sheet);
+        return {
+            data: [data, sheet],
+            undo: result.undo,
         };
     }
 }
