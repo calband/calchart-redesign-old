@@ -293,6 +293,7 @@ editor_toolbar = Toolbar(
         ToolbarItem('Selection', 'mouse-pointer', 'loadTool(selection)'),
         ToolbarItem('Lasso', 'lasso', 'loadTool(lasso)'),
         ToolbarItem('Line', 'line', 'loadTool(line)'),
+        ToolbarItem('Arc', 'arc', 'loadTool(arc)'),
         ToolbarItem('Rectangle', 'rectangle', 'loadTool(rectangle)'),
         ToolbarItem('Circle', 'circle-o', 'loadTool(circle)'),
         classes='edit-tools',

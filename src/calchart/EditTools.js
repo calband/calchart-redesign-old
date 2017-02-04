@@ -34,6 +34,9 @@ export default class EditTools {
             case "line":
                 EditTool = LineTool;
                 break;
+            case "arc":
+                EditTool = ArcTool;
+                break;
             case "rectangle":
                 EditTool = RectangleTool;
                 break;
@@ -84,7 +87,7 @@ class BaseTool {
     /**
      * Handle a mousedown event in the workspace. By default,
      * initializes an instance of the class and calls the
-     * mousedown and _postMousedown methods.
+     * mousedown and _attachListeners methods.
      *
      * @param {DotContext} context
      * @param {Event} e
@@ -92,9 +95,31 @@ class BaseTool {
     static handle(context, e) {
         e.preventDefault();
 
-        let tool = new this(context);
-        tool.mousedown(e);
-        tool._postMousedown();
+        if (_.isUndefined(this.tool)) {
+            this.tool = new this(context);
+            this.tool._attachListeners();
+            this.eventCount = 0;
+        }
+
+        this.eventCount++;
+        this.tool.mousedown(e);
+    }
+
+    /**
+     * The number of mousedown/mouseup events to handle before creating a
+     * new instance in BaseTool#handle.
+     *
+     * @return {int}
+     */
+    static get eventsToHandle() {
+        return 1;
+    }
+
+    /**
+     * @return {int} The number of mousedown events handled so far.
+     */
+    get eventCount() {
+        return this.constructor.eventCount;
     }
 
     /**
@@ -125,26 +150,18 @@ class BaseTool {
      * The function to run after the mousedown event is handled. By
      * default, adds the mousemove and mouseup listeners to the document.
      */
-    _postMousedown() {
+    _attachListeners() {
         $(document).on({
             "mousemove.selection": e => {
                 this.mousemove(e);
             },
             "mouseup.selection": e => {
                 this.mouseup(e);
-                this._postMouseup();
+                if (this.eventCount === this.constructor.eventsToHandle) {
+                    this._unloadTool();
+                }
             },
         });
-    }
-
-    /**
-     * The function to run after the mouseup event is handled. By
-     * default, removes the mousemove and mouseup listeners from the
-     * document and reverts to the SelectionTool.
-     */
-    _postMouseup() {
-        this.context.loadTool(EditTools.lastSelectionTool);
-        $(document).off(".selection");
     }
 
     /**
@@ -191,6 +208,16 @@ class BaseTool {
         }
 
         return [x, y];
+    }
+
+    /**
+     * The function to run after the mouseup event is handled. By
+     * default, removes the mousemove and mouseup listeners from the
+     * document and reverts to the SelectionTool.
+     */
+    _unloadTool() {
+        $(document).off(".selection");
+        this.constructor.tool = undefined;
     }
 }
 
@@ -419,6 +446,11 @@ class BaseEdit extends BaseTool {
         })
         this.controller.doAction("moveDotsTo", [data]);
     }
+
+    _unloadTool() {
+        super._unloadTool();
+        this.context.loadTool(EditTools.lastSelectionTool);
+    }
 }
 
 /**
@@ -462,6 +494,131 @@ class LineTool extends BaseEdit {
     mouseup(e) {
         this._saveDotPositions();
         this._line.remove();
+    }
+}
+
+/**
+ * Arrange the selected dots in an arc, where the user defines the
+ * origin of the circle and the start/end of the arc. The tool is
+ * used with two mouse events: click and drag from the origin to the
+ * start position, and then click again for the end position.
+ */
+class ArcTool extends BaseEdit {
+    constructor(context) {
+        super(context);
+
+        // true if user is about to select the end point
+        this._drawEnd = false;
+    }
+
+    static get eventsToHandle() {
+        return 2;
+    }
+
+    mousedown(e) {
+        if (this._drawEnd) {
+            return;
+        }
+
+        let [startX, startY] = this._makeRelativeSnap(e);
+        this._startX = startX;
+        this._startY = startY;
+
+        // after clicking and dragging for the first time, will contain the
+        // path definition for the helper line going from origin to start.
+        this._radiusPath = "";
+        this._radius = 0;
+        this._angle = 0;
+
+        // helper path
+
+        let path = this.grapher.getSVG()
+            .append("path")
+            .classed("edit-tool-path", true);
+        this._path = $.fromD3(path);
+
+        // snap
+
+        let grid = this.context.getGrid();
+        if (grid !== 0) {
+            let scale = this.grapher.getScale();
+            this._snap = scale.toDistance(grid);
+        }
+
+        this.mousemove(e);
+    }
+
+    mousemove(e) {
+        if (this._drawEnd) {
+            this.mousemoveArc(e);
+        } else {
+            this.mousemoveRadius(e);
+        }
+    }
+
+    mousemoveRadius(e) {
+        // radius
+        let [x, y] = this._makeRelative(e);
+        this._radius = calcDistance(this._startX, this._startY, x, y);
+        if (!_.isUndefined(this._snap)) {
+            this._radius = round(this._radius, this._snap);
+        }
+
+        // helper paths, snap radius line to 45 degree angles
+        let angle = calcAngle(this._startX, this._startY, x, y);
+        angle = round(angle, 45);
+        x = this._startX + calcRotatedXPos(angle) * this._radius;
+        y = this._startY + calcRotatedYPos(angle) * this._radius;
+        this._path.attr("d", `M ${this._startX} ${this._startY} L ${x} ${y}`);
+        this._angle = angle;
+
+        this.controller.getSelection().each((i, dot) => {
+            this.grapher.moveDotTo(dot, x, y);
+        });
+    }
+
+    mousemoveArc(e) {
+        let [x, y] = this._makeRelative(e);
+
+        // helper paths, snap radius line to 45 degree angles
+        let angle = calcAngle(this._startX, this._startY, x, y);
+        angle = round(angle, 45);
+        x = this._startX + calcRotatedXPos(angle) * this._radius;
+        y = this._startY + calcRotatedYPos(angle) * this._radius;
+
+        let flags = this._getArcFlags(angle);
+        let arcPath = `A ${this._radius} ${this._radius} 0 ${flags.largeArc} ${flags.sweep} ${x} ${y}`;
+        this._path.attr("d", `${this._radiusPath} ${arcPath} Z`);
+
+        let selection = this.controller.getSelection();
+        let delta = (angle - this._angle) / (selection.length - 1);
+        selection.each((i, dot) => {
+            let angle = delta * i + this._angle;
+            let x = this._startX + calcRotatedXPos(angle) * this._radius;
+            let y = this._startY + calcRotatedYPos(angle) * this._radius;
+            this.grapher.moveDotTo(dot, x, y);
+        });
+    }
+
+    mouseup(e) {
+        if (this.eventCount === 1) {
+            this._drawEnd = true;
+            this._radiusPath = this._path.attr("d");
+        } else {
+            this._saveDotPositions();
+            this._path.remove();
+        }
+    }
+
+    /**
+     * Get the flags for the arc path, where the arc goes from this._angle to the given angle.
+     * Documentation: https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorial/Paths#Arcs
+     *
+     * @param {int} angle - The angle to end at.
+     * @return {Object} An object with the keys `largeArc` and `sweep`.
+     */
+    _getArcFlags(angle) {
+        return {largeArc: 0, sweep: 0};
     }
 }
 
