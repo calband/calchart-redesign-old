@@ -1400,3 +1400,6 @@
 .icon-rectangle:before {
   content: "\57";
 }
+.icon-arc:before {
+  content: "\58";
+}
