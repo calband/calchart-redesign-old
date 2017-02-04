@@ -364,9 +364,6 @@ svg.graph {
             stroke: $uniform-white;
             stroke-width: 2px;
         }
-        .dot-label {
-            fill: $medium-gray;
-        }
         // dot types
         &[class*=" plain"] .dot-marker {
             fill: transparent !important;
@@ -406,5 +403,9 @@ svg.graph {
                 fill: none;
             }
         }
+    }
+    .dot-labels text {
+        fill: $medium-gray;
+        pointer-events: none;
     }
 }
