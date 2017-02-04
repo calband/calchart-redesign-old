@@ -53,7 +53,8 @@ export default class Grapher {
      * Clear the Grapher of all the dots (i.e. keeping the field).
      */
     clearDots() {
-        this._svg.find(".dots").remove();
+        this._svg.select(".dots").remove();
+        this._svg.select(".dot-labels").remove();
     }
 
     /**
@@ -203,9 +204,14 @@ export default class Grapher {
             y = _.clamp(y, 0, this._svgHeight);
         }
 
+        let transform = `translate(${x}, ${y})`;
         $(dot)
-            .attr("transform", `translate(${x}, ${y})`)
+            .attr("transform", transform)
             .data("position", new Coordinate(x, y));
+
+        let id = $(dot).data("dot").id;
+        this._svg.select(`.dot-label-${id}`)
+            .attr("transform", transform);
     }
 
     /**
@@ -267,6 +273,12 @@ export default class Grapher {
         let dotsGroup = this._svg.select("g.dots");
         if (dotsGroup.empty()) {
             dotsGroup = this._svg.append("g").classed("dots", true);
+        }
+
+        // separate labels from dots to keep in a separate layer
+        let labelsGroup = this._svg.select("g.dot-labels");
+        if (options.showLabels && labelsGroup.empty()) {
+            labelsGroup = this._svg.append("g").classed("dot-labels", true);
         }
 
         // order dots in reverse order so that lower dot values are drawn on top
@@ -346,22 +358,24 @@ export default class Grapher {
                 }
             }
 
+            let dotLabel = labelsGroup.select(`.dot-label-${dot.id}`);
             if (options.showLabels) {
-                let dotLabel = dotGroup.select(".dot-label");
                 if (dotLabel.empty()) {
-                    dotLabel = dotGroup.append("text")
-                        .classed("dot-label", true)
+                    dotLabel = labelsGroup.append("text")
+                        .classed(`dot-label-${dot.id}`, true)
                         .attr("font-size", dotRadius * 2)
                         .text(dot.label);
-                }
 
-                let offsetX = -1.25 * parseFloat(dotLabel.style("width"));
-                let offsetY = -1.25 * dotRadius;
-                if (options.labelLeft === false) {
-                    offsetX *= -1;
-                }
+                    let offsetX = -1.25 * parseFloat(dotLabel.style("width"));
+                    let offsetY = -1.25 * dotRadius;
+                    if (options.labelLeft === false) {
+                        offsetX *= -1;
+                    }
 
-                dotLabel.attr("x", offsetX).attr("y", offsetY);
+                    dotLabel.attr("x", offsetX).attr("y", offsetY);
+                }
+            } else {
+                dotLabel.remove();
             }
 
             let x = _this._scale.xScale(state.x);
