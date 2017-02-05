@@ -528,7 +528,11 @@ class ArcTool extends BaseEdit {
         // path definition for the helper line going from origin to start.
         this._radiusPath = "";
         this._radius = 0;
-        this._angle = 0;
+
+        // angle of the start point
+        this._startAngle = 0;
+        // last angle 
+        this._lastAngle = 0;
 
         // helper path
 
@@ -564,17 +568,26 @@ class ArcTool extends BaseEdit {
             this._radius = round(this._radius, this._snap);
         }
 
-        // helper paths, snap radius line to 45 degree angles
+        // snap radius line to 45 degree angles
         let angle = calcAngle(this._startX, this._startY, x, y);
         angle = round(angle, 45);
+
+        // helper path
         x = this._startX + calcRotatedXPos(angle) * this._radius;
         y = this._startY + calcRotatedYPos(angle) * this._radius;
         this._path.attr("d", `M ${this._startX} ${this._startY} L ${x} ${y}`);
-        this._angle = angle;
+
+        if (angle === 360) {
+            this._startAngle = 0;
+        } else {
+            this._startAngle = angle;
+        }
 
         this.controller.getSelection().each((i, dot) => {
             this.grapher.moveDotTo(dot, x, y);
         });
+
+        this._lastAngle = angle;
     }
 
     mousemoveArc(e) {
@@ -583,17 +596,20 @@ class ArcTool extends BaseEdit {
         // helper paths, snap radius line to 45 degree angles
         let angle = calcAngle(this._startX, this._startY, x, y);
         angle = round(angle, 45);
+
         x = this._startX + calcRotatedXPos(angle) * this._radius;
         y = this._startY + calcRotatedYPos(angle) * this._radius;
 
-        let flags = this._getArcFlags(angle);
-        let arcPath = `A ${this._radius} ${this._radius} 0 ${flags.largeArc} ${flags.sweep} ${x} ${y}`;
+        let arc = this._getArcData(angle);
+        let arcPath = `A ${this._radius} ${this._radius} 0 ${arc.largeArcFlag} ${arc.sweepFlag} ${x} ${y}`;
         this._path.attr("d", `${this._radiusPath} ${arcPath} Z`);
 
         let selection = this.controller.getSelection();
-        let delta = (angle - this._angle) / (selection.length - 1);
+        let total = selection.length - 1;
+        let delta = arc.length / total;
         selection.each((i, dot) => {
-            let angle = delta * i + this._angle;
+            // selection originally in reverse order
+            let angle = delta * (total - i) + this._startAngle;
             let x = this._startX + calcRotatedXPos(angle) * this._radius;
             let y = this._startY + calcRotatedYPos(angle) * this._radius;
             this.grapher.moveDotTo(dot, x, y);
@@ -611,14 +627,38 @@ class ArcTool extends BaseEdit {
     }
 
     /**
-     * Get the flags for the arc path, where the arc goes from this._angle to the given angle.
+     * Get the data for the arc path, where the arc goes from this._startAngle to the given angle.
      * Documentation: https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorial/Paths#Arcs
      *
-     * @param {int} angle - The angle to end at.
-     * @return {Object} An object with the keys `largeArc` and `sweep`.
+     * @param {int} angle - The angle to end at, in Calchart degrees.
+     * @return {Object} An object with the keys `length`, `largeArcFlag`, and `sweepFlag`.
      */
-    _getArcFlags(angle) {
-        return {largeArc: 0, sweep: 0};
+    _getArcData(angle) {
+        // mouse events should be continuous, so enforce 45 degree changes
+        let diff = angle - this._lastAngle;
+        while (diff > 45) {
+            diff -= 360;
+        }
+        while (diff < -45) {
+            diff += 360;
+        }
+
+        this._lastAngle += diff;
+        let length = this._lastAngle - this._startAngle;
+
+        if (Math.abs(length) === 360) {
+            this._lastAngle = this._startAngle;
+            length = 0;
+        }
+
+        return {
+            // positive if CW, negative if CCW
+            length: length,
+            // <180: 0, >180: 1
+            largeArcFlag: Math.abs(length) < 180 ? 0 : 1,
+            // CCW: 0, CW: 1
+            sweepFlag: length < 0 ? 0 : 1,
+        };
     }
 }
 

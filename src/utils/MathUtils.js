@@ -26,7 +26,9 @@ export function calcDistance(x1, y1, x2, y2) {
 }
 
 /**
- * Calculate the angle toward which the given vector is facing
+ * Calculate the angle toward which the given vector is facing.
+ * Coordinates relative to the origin of the field (see
+ * docs/Coordinate_System.md).
  *
  * @param {number} x1 - The x coordinate of the vector's start.
  * @param {number} y1 - The y coordinate of the vector's start.
@@ -38,11 +40,11 @@ export function calcDistance(x1, y1, x2, y2) {
 export function calcAngle(x1, y1, x2, y2) {
     let deltaX = x2 - x1;
     let deltaY = y2 - y1;
-    let angle = Math.atan(-deltaX / deltaY);
-    if (deltaY < 0) {
-        angle += Math.PI;
+    let angle = Math.atan(deltaY / -deltaX);
+    if (deltaX < 0) {
+        angle -= Math.PI;
     }
-    return toDegrees(angle);
+    return toCalchartDegrees(toDegrees(angle));
 }
 
 /**
