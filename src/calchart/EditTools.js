@@ -94,6 +94,7 @@ class BaseTool {
      */
     static handle(context, e) {
         e.preventDefault();
+        e.stopPropagation();
 
         if (_.isUndefined(this.tool)) {
             this.tool = new this(context);
@@ -152,6 +153,10 @@ class BaseTool {
      */
     _attachListeners() {
         $(document).on({
+            "mousedown.selection": e => {
+                // case of eventsToHandle > 1
+                this.constructor.handle(this.context, e);
+            },
             "mousemove.selection": e => {
                 this.mousemove(e);
             },
@@ -531,7 +536,7 @@ class ArcTool extends BaseEdit {
 
         // angle of the start point
         this._startAngle = 0;
-        // last angle 
+        // angle of the last point seen (when drawing arc)
         this._lastAngle = 0;
 
         // helper path
@@ -596,6 +601,9 @@ class ArcTool extends BaseEdit {
         // helper paths, snap radius line to 45 degree angles
         let angle = calcAngle(this._startX, this._startY, x, y);
         angle = round(angle, 45);
+        if (angle === 360) {
+            angle = 0;
+        }
 
         x = this._startX + calcRotatedXPos(angle) * this._radius;
         y = this._startY + calcRotatedYPos(angle) * this._radius;
@@ -634,21 +642,32 @@ class ArcTool extends BaseEdit {
      * @return {Object} An object with the keys `length`, `largeArcFlag`, and `sweepFlag`.
      */
     _getArcData(angle) {
-        // mouse events should be continuous, so enforce 45 degree changes
-        let diff = angle - this._lastAngle;
-        while (diff > 45) {
-            diff -= 360;
-        }
-        while (diff < -45) {
-            diff += 360;
+        let diff = Math.abs(angle - this._lastAngle);
+
+        if (diff === 180) {
+            // 180deg continues in same CW/CCW direction
+            if (this._lastAngle < this._startAngle) {
+                this._lastAngle -= 180;
+            } else {
+                this._lastAngle += 180;
+            }
+        } else {
+            // find closest angle among equivalent angles
+            this._lastAngle = _.minBy(
+                [angle, angle - 360, angle + 360],
+                angle => Math.abs(angle - this._lastAngle) - diff
+            );
         }
 
-        this._lastAngle += diff;
         let length = this._lastAngle - this._startAngle;
 
-        if (Math.abs(length) === 360) {
-            this._lastAngle = this._startAngle;
-            length = 0;
+        while (length <= -360) {
+            this._lastAngle += 360;
+            length += 360;
+        }
+        while (length >= 360) {
+            this._lastAngle -= 360;
+            length -= 360;
         }
 
         return {
