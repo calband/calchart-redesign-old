@@ -216,6 +216,22 @@ class BaseTool {
     }
 
     /**
+     * Calculate the angle between the given points and snap to
+     * 45 degree intervals;
+     *
+     * @param {number} x1
+     * @param {number} y1
+     * @param {number} x2
+     * @param {number} y2
+     * @return {number}
+     */
+    _snapAngle(x1, y1, x2, y2) {
+        let angle = calcAngle(x1, y1, x2, y2);
+        angle = round(angle, 45);
+        return angle === 360 ? 0 : angle;
+    }
+
+    /**
      * The function to run after the mouseup event is handled. By
      * default, removes the mousemove and mouseup listeners from the
      * document and reverts to the SelectionTool.
@@ -573,20 +589,14 @@ class ArcTool extends BaseEdit {
             this._radius = round(this._radius, this._snap);
         }
 
-        // snap radius line to 45 degree angles
-        let angle = calcAngle(this._startX, this._startY, x, y);
-        angle = round(angle, 45);
+        let angle = this._snapAngle(this._startX, this._startY, x, y);
 
         // helper path
         x = this._startX + calcRotatedXPos(angle) * this._radius;
         y = this._startY + calcRotatedYPos(angle) * this._radius;
         this._path.attr("d", `M ${this._startX} ${this._startY} L ${x} ${y}`);
 
-        if (angle === 360) {
-            this._startAngle = 0;
-        } else {
-            this._startAngle = angle;
-        }
+        this._startAngle = angle;
 
         this.controller.getSelection().each((i, dot) => {
             this.grapher.moveDotTo(dot, x, y);
@@ -597,13 +607,7 @@ class ArcTool extends BaseEdit {
 
     mousemoveArc(e) {
         let [x, y] = this._makeRelative(e);
-
-        // helper paths, snap radius line to 45 degree angles
-        let angle = calcAngle(this._startX, this._startY, x, y);
-        angle = round(angle, 45);
-        if (angle === 360) {
-            angle = 0;
-        }
+        let angle = this._snapAngle(this._startX, this._startY, x, y);
 
         x = this._startX + calcRotatedXPos(angle) * this._radius;
         y = this._startY + calcRotatedYPos(angle) * this._radius;

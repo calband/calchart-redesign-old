@@ -42,7 +42,7 @@ export function calcAngle(x1, y1, x2, y2) {
     let deltaY = y2 - y1;
     let angle = Math.atan(deltaY / -deltaX);
     if (deltaX < 0) {
-        angle -= Math.PI;
+        angle += Math.PI;
     }
     return toCalchartDegrees(toDegrees(angle));
 }
