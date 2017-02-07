@@ -292,6 +292,7 @@ editor_toolbar = Toolbar(
         'edit-dots',
         ToolbarItem('Selection', 'mouse-pointer', 'loadTool(selection)'),
         ToolbarItem('Lasso', 'lasso', 'loadTool(lasso)'),
+        ToolbarItem('Swap', 'exchange', 'loadTool(swap)'),
         ToolbarItem('Line', 'line', 'loadTool(line)'),
         ToolbarItem('Arc', 'arc', 'loadTool(arc)'),
         ToolbarItem('Rectangle', 'rectangle', 'loadTool(rectangle)'),
