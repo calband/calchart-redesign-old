@@ -242,6 +242,7 @@ let ContextShortcuts = {
     "ctrl+8": "changeDotType(solid-x)",
     "s": "loadTool(selection)",
     "shift+s": "loadTool(lasso)",
+    "w": "loadTool(swap)",
     "l": "loadTool(line)",
     "a": "loadTool(arc)",
     "r": "loadTool(rectangle)",
@@ -426,6 +427,34 @@ class ContextActions {
         return {
             data: [data, sheet],
             undo: result.undo,
+        };
+    }
+
+    /**
+     * Swap the given dots in the given sheet.
+     *
+     * @param {Dot} dot1
+     * @param {Dot} dot2
+     * @param {Sheet} [sheet] - The sheet to swap dots in. Defaults
+     *   to the currently loaded stunt sheet.
+     */
+    static swapDots(dot1, dot2, sheet=this._sheet) {
+        let info1 = sheet.getDotInfo(dot1);
+        let info2 = sheet.getDotInfo(dot2);
+
+        let swap = () => {
+            let temp = info1.position;
+            info1.position = info2.position;
+            info2.position = temp;
+
+            this._updateMovements([dot1, dot2], sheet);
+            this._controller.loadSheet(sheet);
+        }
+        swap();
+
+        return {
+            data: [dot1, dot2, sheet],
+            undo: swap,
         };
     }
 }

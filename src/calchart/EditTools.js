@@ -31,6 +31,9 @@ export default class EditTools {
             case "lasso":
                 EditTool = LassoTool;
                 break;
+            case "swap":
+                EditTool = SwapTool;
+                break;
             case "line":
                 EditTool = LineTool;
                 break;
@@ -404,7 +407,7 @@ class SelectionTool extends BaseSelection {
 }
 
 /**
- * Selects dots within an arbitrary path drawn by the user.
+ * Select dots within an arbitrary path drawn by the user.
  */
 class LassoTool extends BaseSelection {
     mousedown(e) {
@@ -445,6 +448,29 @@ class LassoTool extends BaseSelection {
         });
 
         this._path.remove();
+    }
+}
+
+/**
+ * Swap two dots' positions
+ */
+class SwapTool extends BaseTool {
+    mousedown(e) {
+        if ($(e.target).is(".dot-marker")) {
+            let selection = this.controller.getSelection();
+            let dot = $(e.target).parent();
+
+            if (selection.length === 0) {
+                this.controller.selectDots(dot);
+            } else {
+                let dot1 = selection.first().data("dot");
+                let dot2 = dot.data("dot");
+                this.controller.doAction("swapDots", [dot1, dot2]);
+                this.controller.deselectDots();
+            }
+        } else {
+            this.controller.deselectDots();
+        }
     }
 }
 
