@@ -257,12 +257,17 @@ class BaseSelection extends BaseTool {
  */
 class SelectionTool extends BaseSelection {
     mousedown(e) {
+        this._modified = e.shiftKey || e.ctrlKey || e.metaKey;
+
         if ($(e.target).is(".dot-marker")) {
-            this._dragType = "dot";
-            this.mousedownDot(e);
-        } else if (e.shiftKey || e.ctrlKey || e.metaKey) {
-            this._dragType = "none";
-            this.context.toggleDots(dot);
+            if (this._modified) {
+                this._dragType = "none";
+                let dot = $(e.target).parent();
+                this.context.toggleDots(dot);
+            } else {
+                this._dragType = "dot";
+                this.mousedownDot(e);
+            }
         } else {
             this._dragType = "select";
             this.mousedownSelect(e);
@@ -292,7 +297,9 @@ class SelectionTool extends BaseSelection {
     }
 
     mousedownSelect(e) {
-        this.context.deselectDots();
+        if (!this._modified) {
+            this.context.deselectDots();
+        }
         this._box = HTMLBuilder.div("selection-box", null, ".workspace");
     }
 
@@ -367,7 +374,10 @@ class SelectionTool extends BaseSelection {
             });
 
         // select dots within the selection box
-        this.context.deselectDots();
+        if (!this._modified) {
+            this.context.deselectDots();
+        }
+
         this.grapher.getDots().each((i, dot) => {
             dot = $(dot);
             let position = dot.data("position");
@@ -375,7 +385,11 @@ class SelectionTool extends BaseSelection {
                 _.inRange(position.x, minX, maxX) &&
                 _.inRange(position.y, minY, maxY)
             ) {
-                this.context.selectDots(dot);
+                if (this._modified) {
+                    this.context.deselectDots(dot);
+                } else {
+                    this.context.selectDots(dot);
+                }
             }
         });
     }
@@ -531,9 +545,12 @@ class LineTool extends BaseEdit {
         let deltaX = x - this._startX;
         let deltaY = y - this._startY;
 
-        this.controller.getSelection().each((i, dot) => {
-            let x = this._startX + i * deltaX;
-            let y = this._startY + i * deltaY;
+        let selection = this.controller.getSelection();
+        let total = selection.length - 1;
+        selection.each((i, dot) => {
+            // selection originally in reverse order
+            let x = this._startX + (total - i) * deltaX;
+            let y = this._startY + (total - i) * deltaY;
             this.grapher.moveDotTo(dot, x, y);
         });
     }

@@ -65,10 +65,12 @@ export default class DotContext extends BaseContext {
     }
 
     /**
-     * Deselect all dots.
+     * Deselect the given dots.
+     *
+     * @param {jQuery} [dots] - Dots to deselect (defaults to all dots).
      */
-    deselectDots() {
-        this._controller.deselectDots();
+    deselectDots(dots) {
+        this._controller.deselectDots(dots);
         this._panel.find(".dot-labels .active").removeClass("active");
     }
 
