@@ -176,10 +176,10 @@ $.fn.scrollIntoView = function(options={}) {
 
     // track furthest distance needed to scroll
     let scroll = {
-        top: tolerance,
-        bottom: -tolerance,
-        left: tolerance,
-        right: -tolerance,
+        top: Infinity,
+        bottom: -Infinity,
+        left: Infinity,
+        right: -Infinity,
     };
 
     this.each(function() {
@@ -212,23 +212,36 @@ $.fn.scrollIntoView = function(options={}) {
         scroll.right = Math.max(scroll.right, right);
     });
 
-    let deltaX = 0;
-    let deltaY = 0;
-
-    if (scroll.top < tolerance && scroll.bottom > -tolerance) {
-        // if elements hidden on both top and bottom, don't scroll
-    } else if (scroll.top < tolerance) {
+    let deltaY;
+    if (scroll.top <= tolerance && scroll.bottom >= -tolerance) {
+        // if elements hidden on both top and bottom
+        deltaY = 0;
+    } else if (scroll.bottom - scroll.top > parentHeight) {
+        // if elements longer than height of parent
+        deltaY = 0;
+    } else if (scroll.top <= tolerance) {
         deltaY = scroll.top - margin;
-    } else if (scroll.bottom > -tolerance) {
-        deltaY = scroll.bottom + margin;
+    } else if (scroll.bottom >= -tolerance) {
+        // dont scroll past top-most element
+        deltaY = Math.min(scroll.bottom, scroll.top) + margin;
+    } else {
+        deltaY = 0;
     }
 
-    if (scroll.left < tolerance && scroll.right > -tolerance) {
+    let deltaX;
+    if (scroll.left <= tolerance && scroll.right >= -tolerance) {
         // if elements hidden on both left and right, don't scroll
-    } else if (scroll.left < tolerance) {
+        deltaX = 0;
+    } else if (scroll.right - scroll.left > parentWidth) {
+        // if elements longer than width of parent
+        deltaX = 0;
+    } else if (scroll.left <= tolerance) {
         deltaX = scroll.left - margin;
-    } else if (scroll.right > -tolerance) {
-        deltaX = scroll.right + margin;
+    } else if (scroll.right >= -tolerance) {
+        // dont scroll past left-most element
+        deltaX = Math.min(scroll.right + margin, scroll.left - margin);
+    } else {
+        deltaX = 0;
     }
 
     let parentScroll = {
