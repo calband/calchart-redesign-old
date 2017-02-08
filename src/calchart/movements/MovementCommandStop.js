@@ -1,6 +1,8 @@
 import AnimationState from "calchart/AnimationState";
 import BaseMovementCommand from "calchart/movements/BaseMovementCommand";
 
+import { roundSmall } from "utils/MathUtils";
+
 /**
  * A MovementCommand which represents no motion.
  */
@@ -40,7 +42,7 @@ export default class MovementCommandStop extends BaseMovementCommand {
     }
 
     getAnimationState(beatNum) {
-        if (beatNum < 0 || beatNum > this._duration) {
+        if (beatNum < 0 || roundSmall(beatNum - this._duration) > 0) {
             return null;
         }
         return new AnimationState(this.getStartPosition(), this._orientation);
