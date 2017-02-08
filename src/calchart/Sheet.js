@@ -9,6 +9,7 @@ import MovementCommand from "calchart/MovementCommand";
 
 import { AnimationStateError } from "utils/errors";
 import { mapSome, moveElem } from "utils/JSUtils";
+import { roundSmall } from "utils/MathUtils";
 
 /**
  * A Sheet represents a stuntsheet, containing the following information:
@@ -230,10 +231,12 @@ export default class Sheet {
         for (let i = 0; i < movements.length; i++) {
             let movement = movements[i];
             let duration = movement.getDuration();
-            if (remaining <= duration) {
+
+            let beats = roundSmall(remaining - duration);
+            if (beats <= 0) {
                 return movement.getAnimationState(remaining);
             } else {
-                remaining -= duration;
+                remaining = beats;
             }
         }
 

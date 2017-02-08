@@ -97,7 +97,6 @@ class BaseTool {
      */
     static handle(context, e) {
         e.preventDefault();
-        e.stopPropagation();
 
         if (_.isUndefined(this.tool)) {
             this.tool = new this(context);
@@ -157,8 +156,11 @@ class BaseTool {
     _attachListeners() {
         $(document).on({
             "mousedown.selection": e => {
-                // case of eventsToHandle > 1
-                this.constructor.handle(this.context, e);
+                // handle additional mousedown events not in workspace (for
+                // eventsToHandle > 1)
+                if ($(e.target).notIn(".workspace")) {
+                    this.constructor.handle(this.context, e);
+                }
             },
             "mousemove.selection": e => {
                 this.mousemove(e);
