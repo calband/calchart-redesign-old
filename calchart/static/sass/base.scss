@@ -403,6 +403,16 @@ svg.graph {
                 fill: none;
             }
         }
+        // collision
+        &.collision {
+            .fslash, .bslash {
+                stroke: $collision;
+            }
+            .dot-marker {
+                fill: $collision;
+                stroke: $collision;
+            }
+        }
     }
     .dot-labels text {
         fill: $medium-gray;

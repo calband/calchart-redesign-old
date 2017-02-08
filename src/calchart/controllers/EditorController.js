@@ -71,6 +71,7 @@ export default class EditorController extends ApplicationController {
             draw4Step: true,
             drawDotType: true,
             expandField: true,
+            showCollisions: true,
             showLabels: true,
             zoom: 1,
         });
