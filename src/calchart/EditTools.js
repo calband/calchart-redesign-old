@@ -259,10 +259,10 @@ class BaseSelection extends BaseTool {
  */
 class SelectionTool extends BaseSelection {
     mousedown(e) {
-        this._modified = e.shiftKey || e.ctrlKey || e.metaKey;
+        this._metaKey = e.shiftKey || e.ctrlKey || e.metaKey;
 
         if ($(e.target).is(".dot-marker")) {
-            if (this._modified) {
+            if (this._metaKey) {
                 this._dragType = "none";
                 let dot = $(e.target).parent();
                 this.context.toggleDots(dot);
@@ -299,7 +299,7 @@ class SelectionTool extends BaseSelection {
     }
 
     mousedownSelect(e) {
-        if (this._modified) {
+        if (this._metaKey) {
             this._deselected = new Set();
         } else {
             this.context.deselectDots();
@@ -379,7 +379,7 @@ class SelectionTool extends BaseSelection {
             });
 
         // select dots within the selection box
-        if (!this._modified) {
+        if (!this._metaKey) {
             this.context.deselectDots();
         }
 
@@ -390,14 +390,17 @@ class SelectionTool extends BaseSelection {
                 _.inRange(position.x, minX, maxX) &&
                 _.inRange(position.y, minY, maxY)
             ) {
-                if (this._modified) {
-                    this.context.deselectDots(dot);
-                    this._deselected.add(i);
+                if (this._metaKey) {
+                    if (this.grapher.isSelected(dot)) {
+                        this.context.deselectDots(dot);
+                        this._deselected.add(i);
+                    }
                 } else {
                     this.context.selectDots(dot);
                 }
-            } else if (this._modified && this._deselected.has(i)) {
+            } else if (this._metaKey && this._deselected.has(i)) {
                 this.context.selectDots(dot);
+                this._deselected.delete(i);
             }
         });
     }
