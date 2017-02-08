@@ -297,9 +297,12 @@ class SelectionTool extends BaseSelection {
     }
 
     mousedownSelect(e) {
-        if (!this._modified) {
+        if (this._modified) {
+            this._deselected = new Set();
+        } else {
             this.context.deselectDots();
         }
+
         this._box = HTMLBuilder.div("selection-box", null, ".workspace");
     }
 
@@ -387,9 +390,12 @@ class SelectionTool extends BaseSelection {
             ) {
                 if (this._modified) {
                     this.context.deselectDots(dot);
+                    this._deselected.add(i);
                 } else {
                     this.context.selectDots(dot);
                 }
+            } else if (this._modified && this._deselected.has(i)) {
+                this.context.selectDots(dot);
             }
         });
     }
