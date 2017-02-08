@@ -300,7 +300,8 @@ class SelectionTool extends BaseSelection {
 
     mousedownSelect(e) {
         if (this._metaKey) {
-            this._deselected = new Set();
+            let selectedDots = this.controller.getSelectedDots().map(dot => dot.id);
+            this._selected = new Set(selectedDots);
         } else {
             this.context.deselectDots();
         }
@@ -378,29 +379,34 @@ class SelectionTool extends BaseSelection {
                 parent: ".workspace",
             });
 
-        // select dots within the selection box
         if (!this._metaKey) {
             this.context.deselectDots();
         }
 
+        // select dots within the selection box
         this.grapher.getDots().each((i, dot) => {
             dot = $(dot);
+            let id = dot.data("dot").id;
             let position = dot.data("position");
-            if (
+            let inRange = (
                 _.inRange(position.x, minX, maxX) &&
                 _.inRange(position.y, minY, maxY)
-            ) {
-                if (this._metaKey) {
-                    if (this.grapher.isSelected(dot)) {
+            );
+
+            if (this._metaKey) {
+                if (inRange) {
+                    if (this._selected.has(id)) {
                         this.context.deselectDots(dot);
-                        this._deselected.add(i);
+                    } else {
+                        this.context.selectDots(dot);
                     }
-                } else {
+                } else if (this._selected.has(id)) {
                     this.context.selectDots(dot);
+                } else {
+                    this.context.deselectDots(dot);
                 }
-            } else if (this._metaKey && this._deselected.has(i)) {
+            } else if (inRange) {
                 this.context.selectDots(dot);
-                this._deselected.delete(i);
             }
         });
     }
