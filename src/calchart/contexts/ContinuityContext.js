@@ -83,6 +83,10 @@ export default class ContinuityContext extends BaseContext {
                 });
             },
         });
+
+        this._grapher.setOptions({
+            showCollisions: true,
+        });
         
         $(".toolbar .edit-continuity").addClass("active");
         $(".toolbar .edit-continuity-group").removeClass("hide");
@@ -96,6 +100,10 @@ export default class ContinuityContext extends BaseContext {
         this._panel.hide();
         this._controller.setBeat(0);
         this._controller.deselectDots();
+
+        this._grapher.setOptions({
+            showCollisions: false,
+        });
 
         $(".toolbar .edit-continuity").removeClass("active");
         $(".toolbar .edit-continuity-group").addClass("hide");

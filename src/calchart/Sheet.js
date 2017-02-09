@@ -148,7 +148,7 @@ export default class Sheet {
                 type: dotInfo.type,
                 position: dotInfo.position.serialize(),
                 movements: dotInfo.movements.map(movement => movement.serialize()),
-                collisions: Array.from(dotInfo),
+                collisions: Array.from(dotInfo.collisions),
             };
         });
 
@@ -505,6 +505,7 @@ export default class Sheet {
 
         // update collisions
         let allDots = this._show.getDots();
+        this._dots.forEach(info => info.collisions.clear());
         for (let beat = 0; beat < this._numBeats; beat++) {
             for (let i = 0; i < allDots.length; i++) {
                 let dot1 = allDots[i];

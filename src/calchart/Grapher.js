@@ -250,6 +250,15 @@ export default class Grapher {
     }
 
     /**
+     * Set multiple options at once. @see setOption
+     *
+     * @param {Object} options
+     */
+    setOptions(options) {
+        _.assign(this._options, options);
+    }
+
+    /**
      * Change the zoom by the given amount. Won't take effect until draw() is called again.
      *
      * @param {number} delta
