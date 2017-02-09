@@ -13,6 +13,7 @@ export default class BaseContext {
      */
     constructor(controller) {
         this._controller = controller;
+        this._grapher = controller.getGrapher();
         this._sheet = controller.getActiveSheet();
         this._eventListeners = new Set();
     }

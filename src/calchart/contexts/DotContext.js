@@ -17,8 +17,6 @@ export default class DotContext extends BaseContext {
     constructor(controller) {
         super(controller);
 
-        this._grapher = controller.getGrapher();
-
         // the tool that's currently handling any mouse event in the workspace
         this._activeTool = null;
 

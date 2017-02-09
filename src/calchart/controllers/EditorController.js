@@ -151,17 +151,19 @@ export default class EditorController extends ApplicationController {
      *   active Sheet)
      * @param {(Dot[]|Dot|string)} [dots] - The dots to check continuities of,
      *   the dot type of the dots to check, or all the dots by default.
-     * @param {boolean} [message=false] - if true, show a success message if there
-     *   are no errors.
+     * @param {boolean} [fullCheck=false] - if true, run a full check, which does the
+     *   following actions:
+     *     - check for collisions
+     *     - show a success message if there are no errors
      * @return {boolean} true if no errors in checking continuities
      */
     checkContinuities() {
-        let args = parseArgs(arguments, ["sheet", "dots", "message"]);
+        let args = parseArgs(arguments, ["sheet", "dots", "fullCheck"]);
         let successMessage = "Continuities valid!";
 
         let sheet = _.defaultTo(args.sheet, this._activeSheet);
         if (sheet.isLastSheet()) {
-            if (args.message) {
+            if (args.fullCheck) {
                 showMessage(successMessage);
             }
             return true;
@@ -214,6 +216,16 @@ export default class EditorController extends ApplicationController {
             errorMessages.push("Dots did not make it to their next spot: " + errors.wrongPosition.join(", "));
         }
 
+        // check collisions
+        if (args.fullCheck) {
+            for (let beat = 0; beat < duration; beat++) {
+                if (sheet.getCollisions(beat).length > 0) {
+                    errorMessages.push("Collision detected");
+                    break;
+                }
+            }
+        }
+
         if (errorMessages.length > 0) {
             let label = sheet.getLabel();
             errorMessages.forEach(msg => {
@@ -222,7 +234,7 @@ export default class EditorController extends ApplicationController {
             return false;
         }
 
-        if (args.message) {
+        if (args.fullCheck) {
             showMessage(successMessage);
         }
         return true;

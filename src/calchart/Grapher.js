@@ -240,12 +240,22 @@ export default class Grapher {
      *    field (and fieldPadding).
      *  - {number} [fieldPadding=30] - The minimum amount of space between the field and the SVG.
      *  - {boolean} [labelLeft=true] - If true, show the label on the left of the dot.
+     *  - {boolean} [showCollisions=false] - If true, color dots less than 1 step spacing away
      *  - {boolean} [showLabels=false] - If true, show the label next to each dot.
      *  - {?number} [zoom=null] - If null, use the dimensions of the draw target as the dimensions
      *    of the field. If a number, zoom the field to the given ratio.
      */
     setOption(name, val) {
         this._options[name] = val;
+    }
+
+    /**
+     * Set multiple options at once. @see setOption
+     *
+     * @param {Object} options
+     */
+    setOptions(options) {
+        _.assign(this._options, options);
     }
 
     /**
@@ -382,6 +392,12 @@ export default class Grapher {
             let y = _this._scale.yScale(state.y);
             _this.moveDotTo(this, x, y);
         });
+
+        if (options.showCollisions) {
+            sheet.getCollisions(currentBeat).forEach(dot => {
+                this.getDot(dot).addClass("collision");
+            });
+        }
     }
 
     /**
