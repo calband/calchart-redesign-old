@@ -172,16 +172,43 @@ export default class DotContext extends BaseContext {
         let controller = this._controller;
         let grapher = this._grapher;
 
+        // track last dot selected
+        let lastSelected = undefined;
+
         // add dot labels
         let dotLabels = this._panel.find(".dot-labels");
         this._controller.getShow().getDots().forEach(function(dot) {
             HTMLBuilder
                 .li(dot.label)
                 .addClass(`dot-${dot.label}`)
-                .click(function() {
+                .click(function(e) {
                     let $dot = grapher.getDot(dot);
-                    controller.toggleDots($dot);
-                    $(this).toggleClass("active");
+                    if (e.ctrlKey || e.metaKey) {
+                        controller.toggleDots($dot);
+
+                        if ($(this).hasClass("active")) {
+                            $(this).removeClass("active");
+                            lastSelected = undefined;
+                        } else {
+                            $(this).addClass("active");
+                            lastSelected = dot;
+                        }
+                    } else if (e.shiftKey && !_.isUndefined(lastSelected)) {
+                        let range = $();
+                        let delta = Math.sign(dot.id - lastSelected.id);
+                        let curr = lastSelected.id;
+                        while (curr !== dot.id) {
+                            curr += delta;
+                            range = range.add(grapher.getDot(curr));
+                        }
+                        _this.selectDots(range);
+                        lastSelected = dot;
+                    } else {
+                        _this.selectDots($dot, {
+                            append: false,
+                        });
+                        lastSelected = dot;
+                    }
                 })
                 .appendTo(dotLabels);
         });
@@ -189,11 +216,13 @@ export default class DotContext extends BaseContext {
         setupPanel(this._panel);
 
         // click on dot type
-        this._panel.find(".dot-types li").click(function() {
+        this._panel.find(".dot-types li").click(function(e) {
             let dotType = $(this).data("type");
             let dots = _this._sheet.getDotsOfType(dotType);
             let $dots = grapher.getDots(dots);
-            controller.selectDots($dots);
+            controller.selectDots($dots, {
+                append: e.shiftKey || e.ctrlKey || e.metaKey,
+            });
         });
     }
 

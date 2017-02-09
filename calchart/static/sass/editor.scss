@@ -198,6 +198,7 @@ $sidebar-width: 200px;
             margin-left: 0;
             background: $light-gray;
             li {
+                @include unselectable;
                 padding: 5px 20px;
                 text-align: center;
                 &.active {

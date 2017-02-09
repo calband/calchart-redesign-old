@@ -506,7 +506,8 @@ export default class Sheet {
         // update collisions
         let allDots = this._show.getDots();
         this._dots.forEach(info => info.collisions.clear());
-        for (let beat = 0; beat < this._numBeats; beat++) {
+
+        let updateCollisions = beat => {
             for (let i = 0; i < allDots.length; i++) {
                 let dot1 = allDots[i];
                 let state1 = this.getAnimationState(dot1, beat);
@@ -521,6 +522,19 @@ export default class Sheet {
                         this.getDotInfo(dot2).collisions.add(beat);
                         break;
                     }
+                }
+            }
+        }
+
+        for (let beat = 0; beat < this._numBeats; beat++) {
+            try {
+                updateCollisions(beat);
+            } catch (e) {
+                if (e instanceof AnimationStateError) {
+                    // ignore if no movements
+                    break;
+                } else {
+                    throw e;
                 }
             }
         }
