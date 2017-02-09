@@ -85,6 +85,7 @@ export default class Sheet {
                 type: DotType.PLAIN,
                 position: new Coordinate(0, 0),
                 movements: [],
+                collisions: new Set(),
             };
         });
 
@@ -110,6 +111,7 @@ export default class Sheet {
                 movements: dotData.movements.map(
                     movementData => MovementCommand.deserialize(movementData)
                 ),
+                collisions: new Set(dotData.collisions),
             };
         });
 
@@ -146,6 +148,7 @@ export default class Sheet {
                 type: dotInfo.type,
                 position: dotInfo.position.serialize(),
                 movements: dotInfo.movements.map(movement => movement.serialize()),
+                collisions: Array.from(dotInfo),
             };
         });
 
@@ -225,7 +228,7 @@ export default class Sheet {
      *   throw an AnimationStateError.
      */
     getAnimationState(dot, beatNum) {
-        let movements = this._dots[dot.id].movements;
+        let movements = this.getDotInfo(dot).movements;
         let remaining = beatNum;
 
         for (let i = 0; i < movements.length; i++) {
@@ -255,6 +258,20 @@ export default class Sheet {
     }
 
     /**
+     * Get the dots that collide at the given beat.
+     *
+     * @param {int} beatNum
+     * @return {Dot[]}
+     */
+    getCollisions(beatNum) {
+        return mapSome(this._dots, (info, id) => {
+            if (info.collisions.has(beatNum)) {
+                return this._show.getDot(id);
+            }
+        });
+    }
+
+    /**
      * Get the continuities for the given dot type.
      *
      * @param {DotType} dotType
@@ -272,6 +289,7 @@ export default class Sheet {
      *   - {DotType} type - The dot's type.
      *   - {Coordinate} position - The dot's starting position.
      *   - {MovementCommand[]} movements - The dot's movements in the sheet.
+     *   - {Set.<int>} collisions - All beats where this dot collides with another dot.
      */
     getDotInfo(dot) {
         return this._dots[dot.id];
@@ -484,6 +502,27 @@ export default class Sheet {
                 return moves;
             });
         });
+
+        // update collisions
+        let allDots = this._show.getDots();
+        for (let beat = 0; beat < this._numBeats; beat++) {
+            for (let i = 0; i < allDots.length; i++) {
+                let dot1 = allDots[i];
+                let state1 = this.getAnimationState(dot1, beat);
+                for (let j = i + 1; j < allDots.length; j++) {
+                    let dot2 = allDots[j];
+                    let state2 = this.getAnimationState(dot2, beat);
+                    if (
+                        Math.abs(state1.x - state2.x) <= 1 &&
+                        Math.abs(state1.y - state2.y) <= 1
+                    ) {
+                        this.getDotInfo(dot1).collisions.add(beat);
+                        this.getDotInfo(dot2).collisions.add(beat);
+                        break;
+                    }
+                }
+            }
+        }
     }
 
     /**

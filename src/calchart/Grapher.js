@@ -385,26 +385,9 @@ export default class Grapher {
         });
 
         if (options.showCollisions) {
-            let step = this._scale.toDistance(1);
-            let allDots = this.getDots().map((i, dot) => {
-                let position = $(dot).data("position");
-                return {
-                    elem: $(dot),
-                    x: position.x,
-                    y: position.y,
-                };
+            sheet.getCollisions(currentBeat).forEach(dot => {
+                this.getDot(dot).addClass("collision");
             });
-            for (let i = 0; i < dots.length; i++) {
-                let dot1 = allDots[i];
-                for (let j = i + 1; j < dots.length; j++) {
-                    let dot2 = allDots[j];
-                    if (Math.abs(dot1.x - dot2.x) <= step && Math.abs(dot1.y - dot2.y) <= step) {
-                        dot1.elem.addClass("collision");
-                        dot2.elem.addClass("collision");
-                        break;
-                    }
-                }
-            }
         }
     }
 
