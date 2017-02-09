@@ -3,6 +3,7 @@ import * as _ from "lodash";
 
 import Coordinate from "calchart/Coordinate";
 import CollegeGrapher from "calchart/graphers/CollegeGrapher";
+import Dot from "calchart/Dot";
 
 import { getNearestOrientation } from "utils/CalchartUtils";
 import { parseArgs } from "utils/JSUtils";
@@ -128,11 +129,14 @@ export default class Grapher {
     /**
      * Get the dot corresponding to the given Dot.
      *
-     * @param {Dot} dot
+     * @param {Dot|int} dot
      * @return {jQuery}
      */
     getDot(dot) {
-        let dotNode = this._svg.select(`g.dot.dot-${dot.id}`);
+        if (dot instanceof Dot) {
+            dot = dot.id;
+        }
+        let dotNode = this._svg.select(`g.dot.dot-${dot}`);
         return $.fromD3(dotNode);
     }
 

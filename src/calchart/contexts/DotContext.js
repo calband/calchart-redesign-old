@@ -172,6 +172,9 @@ export default class DotContext extends BaseContext {
         let controller = this._controller;
         let grapher = this._grapher;
 
+        // track last dot selected
+        let lastSelected = undefined;
+
         // add dot labels
         let dotLabels = this._panel.find(".dot-labels");
         this._controller.getShow().getDots().forEach(function(dot) {
@@ -182,13 +185,29 @@ export default class DotContext extends BaseContext {
                     let $dot = grapher.getDot(dot);
                     if (e.ctrlKey || e.metaKey) {
                         controller.toggleDots($dot);
-                        $(this).toggleClass("active");
-                    } else if (e.shiftKey) {
-                        // TODO
+
+                        if ($(this).hasClass("active")) {
+                            $(this).removeClass("active");
+                            lastSelected = undefined;
+                        } else {
+                            $(this).addClass("active");
+                            lastSelected = dot;
+                        }
+                    } else if (e.shiftKey && !_.isUndefined(lastSelected)) {
+                        let range = $();
+                        let delta = Math.sign(dot.id - lastSelected.id);
+                        let curr = lastSelected.id;
+                        while (curr !== dot.id) {
+                            curr += delta;
+                            range = range.add(grapher.getDot(curr));
+                        }
+                        _this.selectDots(range);
+                        lastSelected = dot;
                     } else {
                         _this.selectDots($dot, {
                             append: false,
                         });
+                        lastSelected = dot;
                     }
                 })
                 .appendTo(dotLabels);
