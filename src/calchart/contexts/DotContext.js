@@ -178,10 +178,18 @@ export default class DotContext extends BaseContext {
             HTMLBuilder
                 .li(dot.label)
                 .addClass(`dot-${dot.label}`)
-                .click(function() {
+                .click(function(e) {
                     let $dot = grapher.getDot(dot);
-                    controller.toggleDots($dot);
-                    $(this).toggleClass("active");
+                    if (e.ctrlKey || e.metaKey) {
+                        controller.toggleDots($dot);
+                        $(this).toggleClass("active");
+                    } else if (e.shiftKey) {
+                        // TODO
+                    } else {
+                        _this.selectDots($dot, {
+                            append: false,
+                        });
+                    }
                 })
                 .appendTo(dotLabels);
         });
@@ -189,11 +197,13 @@ export default class DotContext extends BaseContext {
         setupPanel(this._panel);
 
         // click on dot type
-        this._panel.find(".dot-types li").click(function() {
+        this._panel.find(".dot-types li").click(function(e) {
             let dotType = $(this).data("type");
             let dots = _this._sheet.getDotsOfType(dotType);
             let $dots = grapher.getDots(dots);
-            controller.selectDots($dots);
+            controller.selectDots($dots, {
+                append: e.shiftKey || e.ctrlKey || e.metaKey,
+            });
         });
     }
 
