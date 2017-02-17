@@ -25,32 +25,28 @@ import { convertShortcut } from "utils/JSUtils";
  * @param {string} action - The name of the action.
  * @param {Object} [params] - An optional object mapping
  *   key/value pairs to send to the server.
- * @param {function} [success] - An optional function to run after
- *   successfully doing action.
+ * @param {Object} [options] - An optional object containing additional
+ *   AJAX options.
  */
-export function doAction(action, params={}, success=null) {
-    // params is optional, and was left out in this case, with the success
-    // function being passed as this argument
-    if (_.isFunction(params)) {
-        success = params;
-        params = {};
-    }
+export function doAction(action, params={}, options={}) {
+    let data = new FormData();
+    data.append("csrfmiddlewaretoken", $("input[name=csrfmiddlewaretoken]").val());
+    data.append("action", action);
+    $.each(params, function(name, val) {
+        data.append(name, val);
+    });
 
-    let data = {
-        csrfmiddlewaretoken: $("input[name=csrfmiddlewaretoken]").val(),
-        action: action,
-    };
-    _.extend(data, params);
-
-    $.ajax("", {
+    let ajaxOptions = {
         method: "POST",
         data: data,
-        success: success,
         error: function(xhr) {
             console.error(xhr);
             showError("An error occurred.");
         },
-    });
+    };
+    _.extend(ajaxOptions, options);
+
+    $.ajax("", ajaxOptions);
 }
 
 /**

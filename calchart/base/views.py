@@ -2,8 +2,9 @@ from django.views.generic import View, TemplateView, FormView
 from django.shortcuts import redirect
 from django.contrib import messages
 from django.http.response import HttpResponse, JsonResponse
+from django.core.files.storage import default_storage
 
-import json
+import json, os
 
 from base.forms import LoginForm, editor_popups
 from base.menus import *
@@ -115,7 +116,20 @@ class EditorView(CalchartMixin, TemplateView):
 
     def save_show(self):
         """
-        A POST action that saves a show's JSON data
+        A POST action that saves a show's JSON data.
         """
         self.show.viewer = self.request.POST['viewer']
         self.show.save()
+
+    def upload_sheet_image(self):
+        """
+        A POST action that uploads an image for a given sheet in the show.
+        """
+        sheet = self.request.POST['sheet']
+        image = self.request.FILES['image']
+        ext = os.path.splitext(image.name)[1]
+        filename = '%s/sheet_%s_background%s' % (self.show.slug, sheet, ext)
+        if default_storage.exists(filename):
+            default_storage.delete(filename)
+        default_storage.save(filename, image)
+        return JsonResponse({'filename': filename})

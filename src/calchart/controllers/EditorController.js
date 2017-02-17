@@ -655,8 +655,10 @@ export default class EditorController extends ApplicationController {
             viewer: JSON.stringify(data),
         };
 
-        doAction("save_show", params, function() {
-            showMessage("Saved!");
+        doAction("save_show", params, {
+            success: function() {
+                showMessage("Saved!");
+            },
         });
     }
 
@@ -718,6 +720,31 @@ export default class EditorController extends ApplicationController {
 
         this._redoHistory.push(actionData);
         this._updateHistory();
+    }
+
+    /**
+     * Upload an image to be used for the given sheet's background image.
+     *
+     * @param {Sheet} sheet
+     * @param {File} image
+     */
+    uploadSheetImage(sheet, image) {
+        let params = {
+            sheet: sheet.getIndex(),
+            image: image,
+        };
+
+        // http://digipiph.com/blog/submitting-multipartform-data-using-jquery-and-ajax
+        doAction("upload_sheet_image", params, {
+            cache: false,
+            contentType: false,
+            processData: false,
+            dataType: "json",
+            success: function(data) {
+                let filename = data.filename;
+                console.log(filename);
+            },
+        })
     }
 
     /**
