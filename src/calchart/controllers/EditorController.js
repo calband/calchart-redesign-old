@@ -306,6 +306,17 @@ export default class EditorController extends ApplicationController {
                     })
                     .change();
                 popup.find(".beatsPerStep > input").val(sheet.getBeatsPerStep());
+
+                let background = sheet.getBackground();
+                let fileText;
+                if (_.isUndefined(background)) {
+                    fileText = "none selected";
+                } else {
+                    fileText = _.last(background.split("/"));
+                }
+                popup.find(".background-image .background-url").text(fileText);
+
+                // background links functionality
             },
             onSubmit: function(popup) {
                 let data = getData(popup);
@@ -744,7 +755,7 @@ export default class EditorController extends ApplicationController {
                 let filename = data.filename;
                 console.log(filename);
             },
-        })
+        });
     }
 
     /**

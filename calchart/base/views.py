@@ -3,6 +3,7 @@ from django.shortcuts import redirect
 from django.contrib import messages
 from django.http.response import HttpResponse, JsonResponse
 from django.core.files.storage import default_storage
+from django.conf import settings
 
 import json, os
 
@@ -132,4 +133,7 @@ class EditorView(CalchartMixin, TemplateView):
         if default_storage.exists(filename):
             default_storage.delete(filename)
         default_storage.save(filename, image)
-        return JsonResponse({'filename': filename})
+
+        return JsonResponse({
+            'filename': settings.MEDIA_ROOT + filename,
+        })

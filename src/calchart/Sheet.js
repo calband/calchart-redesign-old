@@ -30,6 +30,7 @@ export default class Sheet {
      * @param {int} numBeats - The number of beats in the stuntsheet.
      * @param {Object} [options] - Optional information about a stuntsheet, such as:
      *   - {string} label - A label for the Sheet.
+     *   - {string} [background] - The URL for the background image (or undefined)
      *   - {string} fieldType - The field type, or "default" to use the same field
      *     type as the Show.
      *   - {(int|string)} beatsPerStep - The default number of beats per step for
@@ -47,6 +48,7 @@ export default class Sheet {
 
         options = _.defaults(options, {
             label: null,
+            background: undefined,
             fieldType: "default",
             beatsPerStep: "default",
             orientation: "default",
@@ -54,6 +56,7 @@ export default class Sheet {
         });
 
         this._label = options.label;
+        this._background = options.background;
         this._fieldType = options.fieldType;
         this._beatsPerStep = options.beatsPerStep;
         this._orientation = options.orientation;
@@ -137,6 +140,7 @@ export default class Sheet {
 
         data.options = {
             label: this._label,
+            background: this._background,
             fieldType: this._fieldType,
             beatsPerStep: this._beatsPerStep,
             orientation: this._orientation,
@@ -246,6 +250,13 @@ export default class Sheet {
         throw new AnimationStateError(
             `Ran out of movements for ${dot.label}: ${remaining} beats remaining`
         );
+    }
+
+    /**
+     * @return {undefined|string} the URL for the background image
+     */
+    getBackground() {
+        return this._background;
     }
 
     /**
@@ -459,6 +470,15 @@ export default class Sheet {
         let continuities = this._continuities[dotType];
         _.pull(continuities, continuity);
         this.updateMovements(dotType);
+    }
+
+    /**
+     * Set or remove the background of the Sheet.
+     *
+     * @param {string} [url]
+     */
+    setBackground(url) {
+        this._background = url;
     }
 
     /**

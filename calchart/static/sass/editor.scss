@@ -154,6 +154,14 @@ $sidebar-width: 200px;
             width: 125px;
         }
     }
+    &.edit-stuntsheet {
+        .background-image .clear-link {
+            color: $red;
+            cursor: pointer;
+            display: inline-block;
+            vertical-align: middle;
+        }
+    }
 }
 
 .panel {

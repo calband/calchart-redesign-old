@@ -107,6 +107,7 @@ class EditStuntsheetPopup(PopupForm):
     The popup to edit a stuntsheet
     """
     name = 'edit-stuntsheet'
+    template_name = 'partials/popup_edit_sheet.html'
 
     label = forms.CharField(label='Label (opt.)')
     numBeats = forms.IntegerField(label='Number of beats')

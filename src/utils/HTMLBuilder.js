@@ -43,6 +43,18 @@ export default class HTMLBuilder {
     }
 
     /**
+     * Build a <button> element
+     *
+     * @param {string} text -- the text to put in the <button>
+     * @param {string} class -- the class to add to the <button>
+     */
+    static button() {
+        let args = parseArgs(arguments, ["text", "class"]);
+
+        return $("<button>").addClass(args.class).text(args.text);
+    }
+
+    /**
      * Build a <div> element
      *
      * @param {string} class -- the class to add to the <div>
