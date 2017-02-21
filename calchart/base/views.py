@@ -128,11 +128,10 @@ class EditorView(CalchartMixin, TemplateView):
         """
         sheet = self.request.POST['sheet']
         image = self.request.FILES['image']
-        ext = os.path.splitext(image.name)[1]
-        filename = 'backgrounds/%s/sheet_%s%s' % (self.show.slug, sheet, ext)
+        filename = 'backgrounds/%s/%s' % (self.show.slug, image.name)
         if default_storage.exists(filename):
             default_storage.delete(filename)
-        default_storage.save(filename, image)
+        filename = default_storage.save(filename, image)
 
         return JsonResponse({
             'url': settings.MEDIA_URL + filename,

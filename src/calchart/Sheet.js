@@ -255,8 +255,8 @@ export default class Sheet {
     /**
      * @return {undefined|Object} the info for the background image, including:
      *   - {string} url
-     *   - {number} width
-     *   - {number} height
+     *   - {number} width - The width of the image, in steps
+     *   - {number} height - The height of the image, in steps
      *   - {number} x - The number of steps from the south endzone
      *   - {number} y - The number of steps from the west sideline
      */
@@ -492,6 +492,15 @@ export default class Sheet {
     setBackground(url) {
         let _this = this;
 
+        this._background = {
+            url: url,
+            width: undefined,
+            height: undefined,
+            x: 0,
+            y: 0,
+        };
+
+        // set width and height
         $("<img>")
             .css({
                 position: "absolute",
@@ -500,19 +509,17 @@ export default class Sheet {
             })
             .attr("src", url)
             .on("load", function() {
-                _this._background.width = $(this).width();
-                _this._background.height = $(this).height();
+                // set to 20 yards wide
+                let width = 32;
+                let ratio = $(this).height() / $(this).width();
+                let height = width * ratio;
+
+                _this._background.width = width;
+                _this._background.height = height;
+
                 $(this).remove();
             })
             .appendTo("body");
-
-        this._background = {
-            url: url,
-            width: undefined,
-            height: undefined,
-            x: 0,
-            y: 0,
-        };
     }
 
     /**

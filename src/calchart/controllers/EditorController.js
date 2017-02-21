@@ -324,33 +324,39 @@ export default class EditorController extends ApplicationController {
                 updateBackgroundInfo(popup);
 
                 // add/update image
-                popup.find(".icons .edit-link").click(function() {
-                    promptFile(function(file) {
-                        let params = {
-                            sheet: sheet.getIndex(),
-                            image: file,
-                        };
+                popup.find(".icons .edit-link")
+                    .off("click")
+                    .click(function() {
+                        promptFile(function(file) {
+                            let params = {
+                                sheet: sheet.getIndex(),
+                                image: file,
+                            };
 
-                        doAction("upload_sheet_image", params, {
-                            dataType: "json",
-                            success: function(data) {
-                                sheet.setBackground(data.url);
-                                updateBackgroundInfo(popup);
-                            },
+                            doAction("upload_sheet_image", params, {
+                                dataType: "json",
+                                success: function(data) {
+                                    sheet.setBackground(data.url);
+                                    updateBackgroundInfo(popup);
+                                },
+                            });
                         });
                     });
-                });
 
                 // edit image (move and resize)
-                popup.find(".icons .move-link").click(function() {
-                    // TODO
-                });
+                popup.find(".icons .move-link")
+                    .off("click")
+                    .click(function() {
+                        // TODO
+                    });
 
                 // remove image
-                popup.find(".icons .clear-link").click(function() {
-                    sheet.removeBackground();
-                    updateBackgroundInfo(popup);
-                });
+                popup.find(".icons .clear-link")
+                    .off("click")
+                    .click(function() {
+                        sheet.removeBackground();
+                        updateBackgroundInfo(popup);
+                    });
             },
             onSubmit: function(popup) {
                 let data = getData(popup);
@@ -377,6 +383,10 @@ export default class EditorController extends ApplicationController {
                 }
 
                 controller.doAction("saveSheetProperties", [data]);
+            },
+            onHide: function(popup) {
+                // refresh to show background
+                controller.refresh();
             },
         });
     }
