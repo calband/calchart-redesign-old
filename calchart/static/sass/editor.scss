@@ -155,11 +155,19 @@ $sidebar-width: 200px;
         }
     }
     &.edit-stuntsheet {
-        .background-image .clear-link {
-            color: $red;
-            cursor: pointer;
+        .icons {
             display: inline-block;
+            margin-left: 10px;
             vertical-align: middle;
+            i {
+                cursor: pointer;
+                &.move-link {
+                    font-size: 0.9em;
+                }
+                &.clear-link {
+                    color: $red;
+                }
+            }
         }
     }
 }

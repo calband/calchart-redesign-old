@@ -67,6 +67,26 @@ export function getData(parent) {
     return data;
 }
 
+/**
+ * Prompt user to upload a file, running the given callback when the
+ * files are selected.
+ *
+ * Source: http://stackoverflow.com/a/37524021/4966649
+ *
+ * @param {Function} callback - Receives the file(s) selected
+ * @param {boolean} multiple - True if allow user to upload multiple files.
+ */
+export function promptFile(callback, multiple=false) {
+    $("<input>")
+        .attr("type", "file")
+        .prop("multiple", multiple)
+        .change(function() {
+            let files = multiple ? this.files : this.files[0];
+            callback.call(this, files);
+        })
+        .click();
+}
+
 /**** MENUS ****/
 
 /**

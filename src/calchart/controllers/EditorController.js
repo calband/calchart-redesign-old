@@ -15,6 +15,7 @@ import {
     showContextMenu,
     showPopup,
     getData,
+    promptFile,
     setupMenu,
     setupToolbar,
     showError,
@@ -289,6 +290,19 @@ export default class EditorController extends ApplicationController {
         let controller = this;
         let sheet = this._activeSheet;
 
+        function updateBackgroundInfo(popup) {
+            let background = sheet.getBackground();
+            let fileText;
+            if (_.isUndefined(background)) {
+                fileText = "none selected";
+                popup.find(".hide-if-none").hide();
+            } else {
+                fileText = _.last(background.split("/"));
+                popup.find(".hide-if-none").show();
+            }
+            popup.find(".background-image .background-url").text(fileText);
+        }
+
         showPopup("edit-stuntsheet", {
             init: function(popup) {
                 let label = _.defaultTo(sheet.label, "");
@@ -307,16 +321,40 @@ export default class EditorController extends ApplicationController {
                     .change();
                 popup.find(".beatsPerStep > input").val(sheet.getBeatsPerStep());
 
-                let background = sheet.getBackground();
-                let fileText;
-                if (_.isUndefined(background)) {
-                    fileText = "none selected";
-                } else {
-                    fileText = _.last(background.split("/"));
-                }
-                popup.find(".background-image .background-url").text(fileText);
+                updateBackgroundInfo(popup);
 
-                // background links functionality
+                // add/update image
+                popup.find(".icons .edit-link").click(function() {
+                    promptFile(function(file) {
+                        let params = {
+                            sheet: sheet.getIndex(),
+                            image: file,
+                        };
+
+                        // http://digipiph.com/blog/submitting-multipartform-data-using-jquery-and-ajax
+                        doAction("upload_sheet_image", params, {
+                            cache: false,
+                            contentType: false,
+                            processData: false,
+                            dataType: "json",
+                            success: function(data) {
+                                sheet.setBackground(data.filename);
+                                updateBackgroundInfo(popup);
+                            },
+                        });
+                    });
+                });
+
+                // edit image (move and resize)
+                popup.find(".icons .move-link").click(function() {
+                    // TODO
+                });
+
+                // remove image
+                popup.find(".icons .clear-link").click(function() {
+                    sheet.removeBackground();
+                    updateBackgroundInfo(popup);
+                });
             },
             onSubmit: function(popup) {
                 let data = getData(popup);
@@ -597,6 +635,8 @@ export default class EditorController extends ApplicationController {
 
             this._grapher.selectDots(selectedDots);
             this._selectedDots = selectedDots;
+
+            // TODO: refresh background image
         }
 
         // refresh context
@@ -731,31 +771,6 @@ export default class EditorController extends ApplicationController {
 
         this._redoHistory.push(actionData);
         this._updateHistory();
-    }
-
-    /**
-     * Upload an image to be used for the given sheet's background image.
-     *
-     * @param {Sheet} sheet
-     * @param {File} image
-     */
-    uploadSheetImage(sheet, image) {
-        let params = {
-            sheet: sheet.getIndex(),
-            image: image,
-        };
-
-        // http://digipiph.com/blog/submitting-multipartform-data-using-jquery-and-ajax
-        doAction("upload_sheet_image", params, {
-            cache: false,
-            contentType: false,
-            processData: false,
-            dataType: "json",
-            success: function(data) {
-                let filename = data.filename;
-                console.log(filename);
-            },
-        });
     }
 
     /**

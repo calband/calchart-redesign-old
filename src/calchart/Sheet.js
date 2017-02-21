@@ -253,7 +253,12 @@ export default class Sheet {
     }
 
     /**
-     * @return {undefined|string} the URL for the background image
+     * @return {undefined|Object} the info for the background image, including:
+     *   - {string} url
+     *   - {number} width
+     *   - {number} height
+     *   - {number} x - The number of steps from the south endzone
+     *   - {number} y - The number of steps from the west sideline
      */
     getBackground() {
         return this._background;
@@ -461,6 +466,13 @@ export default class Sheet {
     }
 
     /**
+     * Remove the background of the Sheet.
+     */
+    removeBackground() {
+        this._background = undefined;
+    }
+
+    /**
      * Remove the given continuity from the given dot type.
      *
      * @param {DotType} dotType
@@ -473,12 +485,19 @@ export default class Sheet {
     }
 
     /**
-     * Set or remove the background of the Sheet.
+     * Set the background of the Sheet.
      *
-     * @param {string} [url]
+     * @param {string} url
      */
     setBackground(url) {
-        this._background = url;
+        this._background = {
+            url: url,
+            // TODO
+            width: undefined,
+            height: undefined,
+            x: 0,
+            y: 0,
+        };
     }
 
     /**
