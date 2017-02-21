@@ -297,7 +297,7 @@ export default class EditorController extends ApplicationController {
                 fileText = "none selected";
                 popup.find(".hide-if-none").hide();
             } else {
-                fileText = _.last(background.split("/"));
+                fileText = _.last(background.url.split("/"));
                 popup.find(".hide-if-none").show();
             }
             popup.find(".background-image .background-url").text(fileText);
@@ -331,14 +331,10 @@ export default class EditorController extends ApplicationController {
                             image: file,
                         };
 
-                        // http://digipiph.com/blog/submitting-multipartform-data-using-jquery-and-ajax
                         doAction("upload_sheet_image", params, {
-                            cache: false,
-                            contentType: false,
-                            processData: false,
                             dataType: "json",
                             success: function(data) {
-                                sheet.setBackground(data.filename);
+                                sheet.setBackground(data.url);
                                 updateBackgroundInfo(popup);
                             },
                         });

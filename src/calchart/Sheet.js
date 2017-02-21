@@ -490,9 +490,24 @@ export default class Sheet {
      * @param {string} url
      */
     setBackground(url) {
+        let _this = this;
+
+        $("<img>")
+            .css({
+                position: "absolute",
+                left: "-1000%",
+                top: "-1000%",
+            })
+            .attr("src", url)
+            .on("load", function() {
+                _this._background.width = $(this).width();
+                _this._background.height = $(this).height();
+                $(this).remove();
+            })
+            .appendTo("body");
+
         this._background = {
             url: url,
-            // TODO
             width: undefined,
             height: undefined,
             x: 0,

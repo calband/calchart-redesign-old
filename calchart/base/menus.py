@@ -268,6 +268,7 @@ editor_menu = Menu(
             MenuItem('Continuity editor', 'loadContext(continuity)', icon='pencil-square-o'),
             # MenuItem('3D View', 'loadContext(3d)'),
         ]),
+        MenuItem('Toggle sheet background', 'toggleBackground'),
     ], [
         SubMenu('Zoom', [
             MenuItem('Zoom in', 'zoomIn', icon='search-plus'),
