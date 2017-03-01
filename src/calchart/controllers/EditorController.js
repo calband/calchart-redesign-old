@@ -641,8 +641,6 @@ export default class EditorController extends ApplicationController {
 
             this._grapher.selectDots(selectedDots);
             this._selectedDots = selectedDots;
-
-            // TODO: refresh background image
         }
 
         // refresh context

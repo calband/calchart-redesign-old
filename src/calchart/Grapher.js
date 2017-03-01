@@ -96,7 +96,9 @@ export default class Grapher {
         } else {
             if (image.empty() || image.attr("href") !== background.url) {
                 image.remove();
-                image = field.append("image").classed("background-image", true);
+                // insert right after field background
+                image = field.insert("image", ".field-background + *")
+                    .classed("background-image", true);
             }
 
             let position = this._scale.toDistanceCoordinates(background);
