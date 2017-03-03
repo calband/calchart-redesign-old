@@ -12,14 +12,15 @@ import { empty, mapSome, parseArgs, parseNumber, underscoreKeys, update } from "
 import { round } from "utils/MathUtils";
 import {
     doAction,
-    showContextMenu,
-    showPopup,
     getData,
+    hidePopup,
     promptFile,
     setupMenu,
     setupToolbar,
+    showContextMenu,
     showError,
     showMessage,
+    showPopup,
 } from "utils/UIUtils";
 
 /**
@@ -287,7 +288,7 @@ export default class EditorController extends ApplicationController {
      * Show the popup for editing the currently active sheet's properties.
      */
     editSheetProperties() {
-        let controller = this;
+        let _this = this;
         let sheet = this._activeSheet;
 
         function updateBackgroundInfo(popup) {
@@ -347,7 +348,11 @@ export default class EditorController extends ApplicationController {
                 popup.find(".icons .move-link")
                     .off("click")
                     .click(function() {
-                        // TODO
+                        let options = {
+                            previousContext: Context.name(_this._context),
+                        };
+                        _this.loadContext("background", options);
+                        hidePopup();
                     });
 
                 // remove image
@@ -382,11 +387,11 @@ export default class EditorController extends ApplicationController {
                     }
                 }
 
-                controller.doAction("saveSheetProperties", [data]);
+                _this.doAction("saveSheetProperties", [data]);
             },
             onHide: function(popup) {
                 // refresh to show background
-                controller.refresh();
+                _this.refresh();
             },
         });
     }
@@ -492,10 +497,13 @@ export default class EditorController extends ApplicationController {
      * Loads a Context for the application.
      *
      * @param {string} name - The name of the Context to load.
-     * @param {Object} [options] - Any options to pass Context.load
+     * @param {Object} [options] - Any options to customize loading the context.
+     *   Will also be passed to Context.load.
+     *   - {boolean} [unload=true] - Whether to unload the current context
+     *     before loading the next one.
      */
-    loadContext(name, options) {
-        if (this._context) {
+    loadContext(name, options={}) {
+        if (_.defaultTo(options.unload, true) && this._context) {
             this._context.unload();
         }
 

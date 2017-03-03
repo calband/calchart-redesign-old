@@ -268,6 +268,7 @@ editor_menu = Menu(
             MenuItem('Continuity editor', 'loadContext(continuity)', icon='pencil-square-o'),
             # MenuItem('3D View', 'loadContext(3d)'),
         ]),
+        # TODO: disable unless dot context
         MenuItem('Toggle sheet background', 'toggleBackground'),
     ], [
         SubMenu('Zoom', [
@@ -311,5 +312,10 @@ editor_toolbar = Toolbar(
         CustomToolbarItem('Seek', '<span class="bar"></span><span class="marker"></span>'),
         ToolbarItem('Next Beat', 'chevron-right', 'nextBeat'),
         ToolbarItem('Check Continuities', 'check', 'checkContinuities(fullCheck=true)'),
+    ),
+    ToolbarContextGroup(
+        'edit-background',
+        ToolbarItem('Save', 'check', 'saveAndQuit'),
+        ToolbarItem('Cancel', 'times', 'revert'),
     ),
 )
