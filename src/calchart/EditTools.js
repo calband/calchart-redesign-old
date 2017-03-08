@@ -9,7 +9,14 @@ import * as _ from "lodash";
 import { NotImplementedError } from "utils/errors";
 import HTMLBuilder from "utils/HTMLBuilder";
 import { isSubclass } from "utils/JSUtils";
-import { calcAngle, calcDistance, calcRotatedXPos, calcRotatedYPos, round } from "utils/MathUtils";
+import {
+    calcAngle,
+    calcDistance,
+    calcRotatedXPos,
+    calcRotatedYPos,
+    getDimensions,
+    round
+} from "utils/MathUtils";
 
 /**
  * The proxy class that can load any tools used to edit dots
@@ -191,11 +198,7 @@ class BaseTool {
             pageY = e.pageY;
         }
 
-        let workspace = $(".workspace");
-        let offset = workspace.offset();
-        let x = pageX - offset.left + workspace.scrollLeft();
-        let y = pageY - offset.top + workspace.scrollTop();
-        return [x, y];
+        return $(".workspace").makeRelative(pageX, pageY);
     }
 
     /**
@@ -357,13 +360,13 @@ class SelectionTool extends BaseSelection {
     }
 
     mousemoveSelect(e) {
-        // get dimensions
-        let width = Math.abs(e.pageX - this._dragStart.pageX);
-        let height = Math.abs(e.pageY - this._dragStart.pageY);
-        let [minX, minY] = this._makeRelative(
-            Math.min(e.pageX, this._dragStart.pageX),
-            Math.min(e.pageY, this._dragStart.pageY)
+        let {x, y, width, height} = getDimensions(
+            e.pageX,
+            e.pageY,
+            this._dragStart.pageX,
+            this._dragStart.pageY
         );
+        let [minX, minY] = this._makeRelative(x, y);
         let maxX = minX + width;
         let maxY = minY + height;
 

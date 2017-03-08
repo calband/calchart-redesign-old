@@ -2,6 +2,8 @@ import * as _ from "lodash";
 
 import BaseContext from "calchart/contexts/BaseContext";
 
+import { getDimensions } from "utils/MathUtils";
+
 /**
  * The Context that allows a user to move and resize the background image
  */
@@ -73,12 +75,23 @@ export default class EditBackgroundContext extends BaseContext {
         });
 
         this._addEvents(this._handles, "mousedown", e => {
-            // TODO: if on handle, start resizing
-            // TODO: else, start moving
+            let [startX, startY] = $(".workspace").makeRelative(e.pageX, e.pageY);
+            let isResize = $(e.target).is(".handle");
 
             $(document).on({
                 "mousemove.edit-background": e => {
-                    // TODO: move/resize handles and image
+                    let {x, y, width, height} = getDimensions(
+                        startX,
+                        startY,
+                        e.pageX,
+                        e.pageY
+                    );
+
+                    if (isResize) {
+                        // TODO: resize handles and image
+                    } else {
+                        // TODO: move handles and image
+                    }
                 },
                 "mouseup.edit-background": e => {
                     // TODO: saveBackground with background position

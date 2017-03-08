@@ -74,6 +74,28 @@ export function calcRotatedYPos(angle) {
 }
 
 /**
+ * Get the dimensions of the box bounded by the given (x,y) coordinates.
+ *
+ * @param {number} x1
+ * @param {number} y1
+ * @param {number} x2
+ * @param {number} y2
+ * @return {Object} an object containing x, y, width, and height
+ */
+export function getDimensions(x1, y1, x2, y2) {
+    let x = Math.min(x1, x2);
+    let y = Math.min(y1, y2);
+    let width = Math.abs(x2 - x1);
+    let height = Math.abs(y2 - y1);
+    return {
+        x: Math.min(x1, x2),
+        y: Math.min(y1, y2),
+        width: Math.abs(x2 - x1),
+        height: Math.abs(y2 - y1),
+    };
+}
+
+/**
  * Rotate the given angle by a quarter-turn in the specified direction.
  *
  * @param {float} angle - The angle to rotate, in radians.
