@@ -507,7 +507,7 @@ export default class EditorController extends ApplicationController {
             this._context.unload();
         }
 
-        $("body").addClass(`context-${name}`);
+        $("body").attr("class", `context-${name}`);
         this._context = Context.load(name, this, options);
         this.refresh();
     }

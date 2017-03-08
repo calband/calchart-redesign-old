@@ -46,9 +46,9 @@ export default class EditBackgroundContext extends BaseContext {
 
         _.range(3).forEach(i => {
             _.range(3).forEach(j => {
-                // no handle in the middle of the image
                 let dir;
                 if (i === 1 && j === 1) {
+                    // no handle in the middle of the image
                     return;
                 } else if (i === 1) {
                     dir = "vertical";
@@ -72,8 +72,7 @@ export default class EditBackgroundContext extends BaseContext {
             });
         });
 
-        // TODO: add event on image
-        this._addEvents(".workspace", "mousedown", e => {
+        this._addEvents(this._handles, "mousedown", e => {
             // TODO: if on handle, start resizing
             // TODO: else, start moving
 
