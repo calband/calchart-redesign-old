@@ -78,7 +78,7 @@ export default class EditBackgroundContext extends BaseContext {
 
             $(document).on({
                 "mousemove.edit-background": e => {
-                    // TODO: move/resize image
+                    // TODO: move/resize handles and image
                 },
                 "mouseup.edit-background": e => {
                     // TODO: saveBackground with background position
@@ -93,17 +93,17 @@ export default class EditBackgroundContext extends BaseContext {
 
     unload() {
         super.unload();
-        this._controller.loadContext(this._previousContext, {
-            unload: false,
-        });
         this._grapher.setOptions({
             backgroundVisible: false,
         });
 
-        // TODO: remove resize handles
-        // TODO: move image back
+        this._handles.remove();
 
         $(".toolbar .edit-background-group").addClass("hide");
+
+        this._controller.loadContext(this._previousContext, {
+            unload: false,
+        });
     }
 
     refresh() {
@@ -118,17 +118,11 @@ export default class EditBackgroundContext extends BaseContext {
 
 class ContextActions {
     /**
-     * TODO
+     * Revert all changes made to the background image.
      */
     static revert() {
-        // TODO
-    }
-
-    /**
-     * TODO
-     */
-    static saveAndQuit() {
-        // TODO
+        // TODO: set initial background data
+        // TODO: remove saveBackground actions from undo/redo history
     }
 
     /**

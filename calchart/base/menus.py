@@ -315,7 +315,7 @@ editor_toolbar = Toolbar(
     ),
     ToolbarContextGroup(
         'edit-background',
-        ToolbarItem('Save', 'check', 'saveAndQuit'),
+        ToolbarItem('Save', 'check', 'unload'),
         ToolbarItem('Cancel', 'times', 'revert'),
     ),
 )
