@@ -32,19 +32,8 @@ export default class EditBackgroundContext extends BaseContext {
             backgroundVisible: true,
         });
 
-        let image = this._getImage();
-        let width = image.width();
-        let height = image.height();
-
         this._handles = $("<div>")
             .addClass("background-image-handles")
-            // TODO: fix zoom
-            .css({
-                left: image.attr("x"),
-                top: image.attr("y"),
-                width: image.width(),
-                height: image.height(),
-            })
             .appendTo(".workspace");
 
         _.range(3).forEach(i => {
@@ -63,14 +52,12 @@ export default class EditBackgroundContext extends BaseContext {
                     dir = "nesw";
                 }
 
-                let x = i/2 * width;
-                let y = j/2 * height;
                 $("<span>")
                     .addClass(`handle ${dir}`)
                     .data("direction", dir)
                     .css({
-                        left: x - 5,
-                        top: y - 5,
+                        left: `calc(${i * 50}% - 5px)`,
+                        top: `calc(${j * 50}% - 5px)`,
                     })
                     .appendTo(this._handles);
             });
@@ -150,8 +137,20 @@ export default class EditBackgroundContext extends BaseContext {
         if (this._controller.getActiveSheet() !== this._sheet) {
             this.unload();
         } else {
+            let image = this._getImage();
+            this._handles.css({
+                left: image.attr("x"),
+                top: image.attr("y"),
+                width: image.width(),
+                height: image.height(),
+            });
+
             super.refresh();
         }
+    }
+
+    refreshZoom() {
+        this.refresh();
     }
 
     /**

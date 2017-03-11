@@ -690,6 +690,9 @@ export default class EditorController extends ApplicationController {
         });
 
         this.refresh("grapherClear");
+        if (this._context) {
+            this._context.refreshZoom();
+        }
 
         // scroll workspace to keep same location under cursor
         let end = this._grapher.getScale().toDistanceCoordinates(start);
