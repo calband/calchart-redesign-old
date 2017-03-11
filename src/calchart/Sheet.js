@@ -485,6 +485,15 @@ export default class Sheet {
     }
 
     /**
+     * Save the background with the given data.
+     *
+     * @param {Object} data - See getBackground
+     */
+    saveBackground(data) {
+        _.assign(this._background, data);
+    }
+
+    /**
      * Set the background of the Sheet.
      *
      * @param {string} url

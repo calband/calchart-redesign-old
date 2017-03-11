@@ -32,17 +32,18 @@ export default class EditBackgroundContext extends BaseContext {
             backgroundVisible: true,
         });
 
-        let image = this._grapher.getGraph().find("image.background-image");
+        let image = this._getImage();
         let width = image.width();
         let height = image.height();
 
         this._handles = $("<div>")
             .addClass("background-image-handles")
+            // TODO: fix zoom
             .css({
                 left: image.attr("x"),
                 top: image.attr("y"),
-                width: width,
-                height: height,
+                width: image.width(),
+                height: image.height(),
             })
             .appendTo(".workspace");
 
@@ -78,6 +79,9 @@ export default class EditBackgroundContext extends BaseContext {
         this._addEvents(this._handles, "mousedown", e => {
             let [startX, startY] = $(".workspace").makeRelative(e.pageX, e.pageY);
             let isResize = $(e.target).is(".handle");
+
+            let image = this._getImage();
+            let oldData = this._getImageData();
             
             let dir, deltaX, deltaY;
             if (isResize) {
@@ -117,8 +121,7 @@ export default class EditBackgroundContext extends BaseContext {
                     }
                 },
                 "mouseup.edit-background": e => {
-                    // TODO: saveBackground with background position
-
+                    this._controller.doAction("saveBackground", [oldData]);
                     $(document).off(".edit-background");
                 },
             });
@@ -150,6 +153,32 @@ export default class EditBackgroundContext extends BaseContext {
             super.refresh();
         }
     }
+
+    /**
+     * @return {jQuery} the background image
+     */
+    _getImage() {
+        return this._grapher.getGraph().find("image.background-image");
+    }
+
+    /**
+     * @return {Object} data of the background image to pass to
+     *   Sheet.saveBackground
+     */
+    _getImageData() {
+        let image = this._getImage();
+        let scale = this._grapher.getScale();
+        let position = scale.toStepCoordinates({
+            x: image.attr("x"),
+            y: image.attr("y"),
+        });
+        return {
+            x: position.x,
+            y: position.y,
+            width: scale.toSteps(image.width()),
+            height: scale.toSteps(image.height()),
+        };
+    }
 }
 
 class ContextActions {
@@ -164,12 +193,24 @@ class ContextActions {
     /**
      * Save the background image's position and size after modifying it.
      *
-     * @param {Object} [data] - The position/size data. Defaults to the
-     *   current position/size.
-     * @param {Sheet} [sheet] - The sheet to save background for. Defaults
-     *   to the current sheet.
+     * @param {Object} oldData - The previous position/size of the image
+     * @param {Object} [newData] - The position/size to save for the
+     *   image. Defaults to the current position/size of the image.
      */
-    static saveBackground(data=null, sheet=this._sheet) {
-        // TODO
+    static saveBackground(oldData, newData) {
+        if (_.isUndefined(newData)) {
+            newData = this._getImageData();
+        }
+
+        this._sheet.saveBackground(newData);
+        this._controller.refresh();
+
+        return {
+            data: [oldData, newData],
+            undo: function() {
+                this._sheet.saveBackground(oldData);
+                this._controller.refresh();
+            },
+        };
     }
 }
