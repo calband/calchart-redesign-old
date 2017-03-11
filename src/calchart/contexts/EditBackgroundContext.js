@@ -66,6 +66,7 @@ export default class EditBackgroundContext extends BaseContext {
                 let y = j/2 * height;
                 $("<span>")
                     .addClass(`handle ${dir}`)
+                    .data("direction", dir)
                     .css({
                         left: x - 5,
                         top: y - 5,
@@ -77,20 +78,42 @@ export default class EditBackgroundContext extends BaseContext {
         this._addEvents(this._handles, "mousedown", e => {
             let [startX, startY] = $(".workspace").makeRelative(e.pageX, e.pageY);
             let isResize = $(e.target).is(".handle");
+            
+            let dir, deltaX, deltaY;
+            if (isResize) {
+                dir = $(e.target).data("direction");
+            } else {
+                let delta = this._handles.makeRelative(e.pageX, e.pageY);
+                deltaX = delta[0];
+                deltaY = delta[1];
+            }
 
             $(document).on({
                 "mousemove.edit-background": e => {
-                    let {x, y, width, height} = getDimensions(
-                        startX,
-                        startY,
-                        e.pageX,
-                        e.pageY
-                    );
+                    let [endX, endY] = $(".workspace").makeRelative(e.pageX, e.pageY);
 
                     if (isResize) {
-                        // TODO: resize handles and image
+                        let {x, y, width, height} = getDimensions(
+                            startX,
+                            startY,
+                            endX,
+                            endY
+                        );
+                        // TODO
+                        switch (dir) {
+                            case "vertical":
+                            case "horizontal":
+                            case "nwse":
+                            case "nesw":
+                        }
                     } else {
-                        // TODO: move handles and image
+                        let x = endX - deltaX;
+                        let y = endY - deltaY;
+                        this._handles.css({
+                            left: x,
+                            top: y,
+                        });
+                        image.attr("x", x).attr("y", y);
                     }
                 },
                 "mouseup.edit-background": e => {
