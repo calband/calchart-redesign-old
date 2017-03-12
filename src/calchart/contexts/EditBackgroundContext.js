@@ -54,7 +54,7 @@ export default class EditBackgroundContext extends BaseContext {
 
                 $("<span>")
                     .addClass(`handle ${dir}`)
-                    .data("direction", dir)
+                    .data("handle-id", j * 3 + i + 1) // 1-9 like T9 phone
                     .css({
                         left: `calc(${i * 50}% - 5px)`,
                         top: `calc(${j * 50}% - 5px)`,
@@ -68,12 +68,15 @@ export default class EditBackgroundContext extends BaseContext {
             let isResize = $(e.target).is(".handle");
 
             let image = this._getImage();
-            let oldData = this._getImageData();
+            let oldData = this._getImageData(); // for saveBackground
             
-            let dir, deltaX, deltaY;
+            let id, startWidth, startHeight, deltaX, deltaY;
             if (isResize) {
-                dir = $(e.target).data("direction");
+                id = $(e.target).data("handle-id");
+                startWidth = image.width();
+                startHeight = image.height();
             } else {
+                // maintain offset from top-left corner of image
                 let delta = this._handles.makeRelative(e.pageX, e.pageY);
                 deltaX = delta[0];
                 deltaY = delta[1];
@@ -84,19 +87,68 @@ export default class EditBackgroundContext extends BaseContext {
                     let [endX, endY] = $(".workspace").makeRelative(e.pageX, e.pageY);
 
                     if (isResize) {
-                        let {x, y, width, height} = getDimensions(
-                            startX,
-                            startY,
-                            endX,
-                            endY
-                        );
-                        // TODO
-                        switch (dir) {
-                            case "vertical":
-                            case "horizontal":
-                            case "nwse":
-                            case "nesw":
+                        let deltaX = endX - startX;
+                        let deltaY = endY - startY;
+
+                        let data = {};
+
+                        switch (id) {
+                            case 1:
+                            case 2:
+                                if (deltaY > startHeight) {
+                                    data.y = startY + startHeight;
+                                    data.height = deltaY - startHeight;
+                                } else {
+                                    data.y = startY + deltaY;
+                                    data.height = startHeight - deltaY;
+                                }
+                                break;
+                            case 3:
+                            case 4:
+                                if (deltaX > startWidth) {
+                                    data.x = startX + startWidth;
+                                    data.width = deltaX - startWidth;
+                                } else {
+                                    data.x = startX + deltaX;
+                                    data.width = startWidth - deltaX;
+                                }
+                                break;
+                            case 6:
+                                if (deltaX < -startWidth) {
+                                    data.x = startX + deltaX;
+                                    data.width = -deltaX - startWidth;
+                                } else {
+                                    data.x = startX - startWidth;
+                                    data.width = startWidth + deltaX;
+                                }
+                                break;
+                            case 7:
+                            case 8:
+                                if (deltaY < -startHeight) {
+                                    data.y = startY + deltaY;
+                                    data.height = -deltaY - startHeight;
+                                } else {
+                                    data.y = startY - startHeight;
+                                    data.height = startHeight + deltaY;
+                                }
+                                break;
+                            case 9:
                         }
+
+                        if (data.width < 0) {
+                            data.x += data.width;
+                        }
+
+                        this._handles.css({
+                            left: data.x,
+                            top: data.y,
+                            width: data.width,
+                            height: data.height,
+                        });
+                        image.attr("x", data.x)
+                            .attr("y", data.y)
+                            .attr("width", data.width)
+                            .attr("height", data.height);
                     } else {
                         let x = endX - deltaX;
                         let y = endY - deltaY;
@@ -168,8 +220,8 @@ export default class EditBackgroundContext extends BaseContext {
         let image = this._getImage();
         let scale = this._grapher.getScale();
         let position = scale.toStepCoordinates({
-            x: image.attr("x"),
-            y: image.attr("y"),
+            x: parseInt(image.attr("x")),
+            y: parseInt(image.attr("y")),
         });
         return {
             x: position.x,

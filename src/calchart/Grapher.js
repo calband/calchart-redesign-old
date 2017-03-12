@@ -98,7 +98,8 @@ export default class Grapher {
                 image.remove();
                 // insert right after field background
                 image = field.insert("image", ".field-background + *")
-                    .classed("background-image", true);
+                    .classed("background-image", true)
+                    .attr("preserveAspectRatio", "none");
             }
 
             let position = this._scale.toDistanceCoordinates(background);
