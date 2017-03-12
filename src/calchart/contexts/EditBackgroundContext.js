@@ -54,7 +54,7 @@ export default class EditBackgroundContext extends BaseContext {
 
                 $("<span>")
                     .addClass(`handle ${dir}`)
-                    .data("handle-id", j * 3 + i + 1) // 1-9 like T9 phone
+                    .data("handle-id", j * 3 + i) // 0-8 like T9 phone minus 1
                     .css({
                         left: `calc(${i * 50}% - 5px)`,
                         top: `calc(${j * 50}% - 5px)`,
@@ -64,182 +64,19 @@ export default class EditBackgroundContext extends BaseContext {
         });
 
         this._addEvents(this._handles, "mousedown", e => {
-            let [startX, startY] = $(".workspace").makeRelative(e.pageX, e.pageY);
-            let isResize = $(e.target).is(".handle");
+            // for saveBackground
+            let oldData = this._getImageData();
 
-            let image = this._getImage();
-            let oldData = this._getImageData(); // for saveBackground
-            
-            let id, startWidth, startHeight, ratio, deltaX, deltaY;
-            if (isResize) {
-                id = $(e.target).data("handle-id");
-                startWidth = image.width();
-                startHeight = image.height();
-                ratio = startWidth / startHeight;
-            } else {
-                // maintain offset from top-left corner of image
-                let delta = this._handles.makeRelative(e.pageX, e.pageY);
-                deltaX = delta[0];
-                deltaY = delta[1];
-            }
+            let mousemove = $(e.target).is(".handle")
+                ? this.mousedownResize(e)
+                : this.mousedownMove(e);
 
             $(document).on({
-                "mousemove.edit-background": e => {
-                    let [endX, endY] = $(".workspace").makeRelative(e.pageX, e.pageY);
-
-                    if (isResize) {
-                        let deltaX = endX - startX;
-                        let deltaY = endY - startY;
-
-                        let data = {};
-
-                        switch (id) {
-                            case 1:
-                                if (deltaX > deltaY * ratio) {
-                                    deltaX = deltaY * ratio;
-                                } else {
-                                    deltaY = deltaX / ratio;
-                                }
-                                if (deltaY > startHeight) {
-                                    data.y = startY + startHeight;
-                                    data.height = deltaY - startHeight;
-                                } else {
-                                    data.y = startY + deltaY;
-                                    data.height = startHeight - deltaY;
-                                }
-                                if (deltaX > startWidth) {
-                                    data.x = startX + startWidth;
-                                    data.width = deltaX - startWidth;
-                                } else {
-                                    data.x = startX + deltaX;
-                                    data.width = startWidth - deltaX;
-                                }
-                                break;
-                            case 2:
-                                if (deltaY > startHeight) {
-                                    data.y = startY + startHeight;
-                                    data.height = deltaY - startHeight;
-                                } else {
-                                    data.y = startY + deltaY;
-                                    data.height = startHeight - deltaY;
-                                }
-                                break;
-                            case 3:
-                                if (deltaX > deltaY * -ratio) {
-                                    deltaX = deltaY * -ratio;
-                                } else {
-                                    deltaY = deltaX / -ratio;
-                                }
-                                if (deltaY > startHeight) {
-                                    data.y = startY + startHeight;
-                                    data.height = deltaY - startHeight;
-                                } else {
-                                    data.y = startY + deltaY;
-                                    data.height = startHeight - deltaY;
-                                }
-                                if (deltaX < -startWidth) {
-                                    data.x = startX + deltaX;
-                                    data.width = -deltaX - startWidth;
-                                } else {
-                                    data.x = startX - startWidth;
-                                    data.width = startWidth + deltaX;
-                                }
-                                break;
-                            case 4:
-                                if (deltaX > startWidth) {
-                                    data.x = startX + startWidth;
-                                    data.width = deltaX - startWidth;
-                                } else {
-                                    data.x = startX + deltaX;
-                                    data.width = startWidth - deltaX;
-                                }
-                                break;
-                            case 6:
-                                if (deltaX < -startWidth) {
-                                    data.x = startX + deltaX;
-                                    data.width = -deltaX - startWidth;
-                                } else {
-                                    data.x = startX - startWidth;
-                                    data.width = startWidth + deltaX;
-                                }
-                                break;
-                            case 7:
-                                if (deltaX > deltaY * -ratio) {
-                                    deltaX = deltaY * -ratio;
-                                } else {
-                                    deltaY = deltaX / -ratio;
-                                }
-                                if (deltaY < -startHeight) {
-                                    data.y = startY + deltaY;
-                                    data.height = -deltaY - startHeight;
-                                } else {
-                                    data.y = startY - startHeight;
-                                    data.height = startHeight + deltaY;
-                                }
-                                if (deltaX > startWidth) {
-                                    data.x = startX + startWidth;
-                                    data.width = deltaX - startWidth;
-                                } else {
-                                    data.x = startX + deltaX;
-                                    data.width = startWidth - deltaX;
-                                }
-                                break;
-                            case 8:
-                                if (deltaY < -startHeight) {
-                                    data.y = startY + deltaY;
-                                    data.height = -deltaY - startHeight;
-                                } else {
-                                    data.y = startY - startHeight;
-                                    data.height = startHeight + deltaY;
-                                }
-                                break;
-                            case 9:
-                                if (deltaX > deltaY * ratio) {
-                                    deltaX = deltaY * ratio;
-                                } else {
-                                    deltaY = deltaX / ratio;
-                                }
-                                if (deltaY < -startHeight) {
-                                    data.y = startY + deltaY;
-                                    data.height = -deltaY - startHeight;
-                                } else {
-                                    data.y = startY - startHeight;
-                                    data.height = startHeight + deltaY;
-                                }
-                                if (deltaX < -startWidth) {
-                                    data.x = startX + deltaX;
-                                    data.width = -deltaX - startWidth;
-                                } else {
-                                    data.x = startX - startWidth;
-                                    data.width = startWidth + deltaX;
-                                }
-                                break;
-                        }
-
-                        this._handles.css({
-                            left: data.x,
-                            top: data.y,
-                            width: data.width,
-                            height: data.height,
-                        });
-                        image.attr("x", data.x)
-                            .attr("y", data.y)
-                            .attr("width", data.width)
-                            .attr("height", data.height);
-                    } else {
-                        let x = endX - deltaX;
-                        let y = endY - deltaY;
-                        this._handles.css({
-                            left: x,
-                            top: y,
-                        });
-                        image.attr("x", x).attr("y", y);
-                    }
-                },
+                "mousemove.edit-background": mousemove,
                 "mouseup.edit-background": e => {
                     this._controller.doAction("saveBackground", [oldData]);
                     $(document).off(".edit-background");
-                },
+                }
             });
         });
 
@@ -280,6 +117,107 @@ export default class EditBackgroundContext extends BaseContext {
 
     refreshZoom() {
         this.refresh();
+    }
+
+    /**
+     * Handle the mousedown event on the image, to move the image.
+     *
+     * @param {Event} e
+     * @return {Function}
+     */
+    mousedownMove(e) {
+        let image = this._getImage();
+        let [deltaX, deltaY] = this._handles.makeRelative(e.pageX, e.pageY);
+
+        return e => {
+            let [endX, endY] = $(".workspace").makeRelative(e.pageX, e.pageY);
+            let x = endX - deltaX;
+            let y = endY - deltaY;
+
+            this._handles.css({
+                left: x,
+                top: y,
+            });
+            image.attr("x", x).attr("y", y);
+        };
+    }
+
+    /**
+     * Handle the mousedown event on a handle, to resize the image.
+     *
+     * @param {Event} e
+     * @return {Function}
+     */
+    mousedownResize(e) {
+        let image = this._getImage();
+
+        let [startX, startY] = $(".workspace").makeRelative(e.pageX, e.pageY);
+        let startWidth = image.width();
+        let startHeight = image.height();
+        let ratio = startWidth / startHeight;
+
+        let id = $(e.target).data("handle-id");
+        let div = Math.floor(id / 3);
+        let mod = id % 3;
+        // multipliers to make math work
+        if (id % 8 !== 0) {
+            ratio *= -1;
+        }
+        if (mod !== 0) {
+            startWidth *= -1;
+        }
+        if (div !== 0) {
+            startHeight *= -1;
+        }
+
+        return e => {
+            let [endX, endY] = $(".workspace").makeRelative(e.pageX, e.pageY);
+            let deltaX = endX - startX;
+            let deltaY = endY - startY;
+
+            // diagonal handles
+            if (id % 2 === 0) {
+                if (deltaX > deltaY * ratio) {
+                    deltaX = deltaY * ratio;
+                } else {
+                    deltaY = deltaX / ratio;
+                }
+            }
+
+            // handles to change width
+            if (mod !== 1) {
+                let x, width;
+                if (deltaX > startWidth) {
+                    x = startX + startWidth;
+                    width = deltaX - startWidth;
+                } else {
+                    x = startX + deltaX;
+                    width = startWidth - deltaX;
+                }
+                this._handles.css({
+                    left: x,
+                    width: width,
+                });
+                image.attr("x", x).attr("width", width);
+            }
+
+            // handles to change height
+            if (div !== 1) {
+                let y, height;
+                if (deltaY > startHeight) {
+                    y = startY + startHeight;
+                    height = deltaY - startHeight;
+                } else {
+                    y = startY + deltaY;
+                    height = startHeight - deltaY;
+                }
+                this._handles.css({
+                    top: y,
+                    height: height,
+                });
+                image.attr("y", y).attr("height", height);
+            }
+        };
     }
 
     /**
