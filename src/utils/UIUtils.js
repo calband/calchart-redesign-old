@@ -30,8 +30,7 @@ import { convertShortcut } from "utils/JSUtils";
  */
 export function doAction(action, params={}, options={}) {
     let data = new FormData();
-    data.append("csrfmiddlewaretoken", "hLclGfVmAH26440ZbqEPNL7PsmCPLiSP");
-    // data.append("csrfmiddlewaretoken", $("input[name=csrfmiddlewaretoken]").val());
+    data.append("csrfmiddlewaretoken", $("input[name=csrfmiddlewaretoken]").val());
     data.append("action", action);
     $.each(params, function(name, val) {
         data.append(name, val);
