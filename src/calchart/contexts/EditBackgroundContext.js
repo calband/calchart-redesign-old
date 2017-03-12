@@ -70,11 +70,12 @@ export default class EditBackgroundContext extends BaseContext {
             let image = this._getImage();
             let oldData = this._getImageData(); // for saveBackground
             
-            let id, startWidth, startHeight, deltaX, deltaY;
+            let id, startWidth, startHeight, ratio, deltaX, deltaY;
             if (isResize) {
                 id = $(e.target).data("handle-id");
                 startWidth = image.width();
                 startHeight = image.height();
+                ratio = startWidth / startHeight;
             } else {
                 // maintain offset from top-left corner of image
                 let delta = this._handles.makeRelative(e.pageX, e.pageY);
@@ -94,6 +95,26 @@ export default class EditBackgroundContext extends BaseContext {
 
                         switch (id) {
                             case 1:
+                                if (deltaX > deltaY * ratio) {
+                                    deltaX = deltaY * ratio;
+                                } else {
+                                    deltaY = deltaX / ratio;
+                                }
+                                if (deltaY > startHeight) {
+                                    data.y = startY + startHeight;
+                                    data.height = deltaY - startHeight;
+                                } else {
+                                    data.y = startY + deltaY;
+                                    data.height = startHeight - deltaY;
+                                }
+                                if (deltaX > startWidth) {
+                                    data.x = startX + startWidth;
+                                    data.width = deltaX - startWidth;
+                                } else {
+                                    data.x = startX + deltaX;
+                                    data.width = startWidth - deltaX;
+                                }
+                                break;
                             case 2:
                                 if (deltaY > startHeight) {
                                     data.y = startY + startHeight;
@@ -104,6 +125,26 @@ export default class EditBackgroundContext extends BaseContext {
                                 }
                                 break;
                             case 3:
+                                if (deltaX > deltaY * -ratio) {
+                                    deltaX = deltaY * -ratio;
+                                } else {
+                                    deltaY = deltaX / -ratio;
+                                }
+                                if (deltaY > startHeight) {
+                                    data.y = startY + startHeight;
+                                    data.height = deltaY - startHeight;
+                                } else {
+                                    data.y = startY + deltaY;
+                                    data.height = startHeight - deltaY;
+                                }
+                                if (deltaX < -startWidth) {
+                                    data.x = startX + deltaX;
+                                    data.width = -deltaX - startWidth;
+                                } else {
+                                    data.x = startX - startWidth;
+                                    data.width = startWidth + deltaX;
+                                }
+                                break;
                             case 4:
                                 if (deltaX > startWidth) {
                                     data.x = startX + startWidth;
@@ -123,6 +164,26 @@ export default class EditBackgroundContext extends BaseContext {
                                 }
                                 break;
                             case 7:
+                                if (deltaX > deltaY * -ratio) {
+                                    deltaX = deltaY * -ratio;
+                                } else {
+                                    deltaY = deltaX / -ratio;
+                                }
+                                if (deltaY < -startHeight) {
+                                    data.y = startY + deltaY;
+                                    data.height = -deltaY - startHeight;
+                                } else {
+                                    data.y = startY - startHeight;
+                                    data.height = startHeight + deltaY;
+                                }
+                                if (deltaX > startWidth) {
+                                    data.x = startX + startWidth;
+                                    data.width = deltaX - startWidth;
+                                } else {
+                                    data.x = startX + deltaX;
+                                    data.width = startWidth - deltaX;
+                                }
+                                break;
                             case 8:
                                 if (deltaY < -startHeight) {
                                     data.y = startY + deltaY;
@@ -133,10 +194,26 @@ export default class EditBackgroundContext extends BaseContext {
                                 }
                                 break;
                             case 9:
-                        }
-
-                        if (data.width < 0) {
-                            data.x += data.width;
+                                if (deltaX > deltaY * ratio) {
+                                    deltaX = deltaY * ratio;
+                                } else {
+                                    deltaY = deltaX / ratio;
+                                }
+                                if (deltaY < -startHeight) {
+                                    data.y = startY + deltaY;
+                                    data.height = -deltaY - startHeight;
+                                } else {
+                                    data.y = startY - startHeight;
+                                    data.height = startHeight + deltaY;
+                                }
+                                if (deltaX < -startWidth) {
+                                    data.x = startX + deltaX;
+                                    data.width = -deltaX - startWidth;
+                                } else {
+                                    data.x = startX - startWidth;
+                                    data.width = startWidth + deltaX;
+                                }
+                                break;
                         }
 
                         this._handles.css({

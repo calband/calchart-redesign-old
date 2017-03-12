@@ -70,6 +70,7 @@ $sidebar-width: 200px;
     width: 100%;
     font-size: 0;
     .sidebar, .workspace {
+        @include unselectable;
         display: inline-block;
         height: 100%;
         vertical-align: top;
