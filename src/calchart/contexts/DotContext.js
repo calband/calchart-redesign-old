@@ -27,6 +27,9 @@ export default class DotContext extends BaseContext {
         // the panel to help select dots
         this._panel = $(".panel.select-dots");
         this._setupPanel();
+
+        // whether to show the Sheet's background image
+        this._backgroundVisible = false;
     }
 
     static get shortcuts() {
@@ -57,9 +60,15 @@ export default class DotContext extends BaseContext {
         super.unload();
         this.deselectDots();
         this._panel.hide();
+        this._grapher.showBackground(false);
 
         $(".toolbar .edit-dots").removeClass("active");
         $(".toolbar .edit-dots-group").addClass("hide");
+    }
+
+    refresh() {
+        super.refresh();
+        this._grapher.showBackground(this._backgroundVisible);
     }
 
     /**
@@ -113,6 +122,14 @@ export default class DotContext extends BaseContext {
             let dot = $(this).data("dot");
             dotLabels.find(`.dot-${dot.label}`).addClass("active");
         });
+    }
+
+    /**
+     * Toggle the background image for the Sheet.
+     */
+    toggleBackground() {
+        this._backgroundVisible = !this._backgroundVisible;
+        this.refresh();
     }
 
     /**

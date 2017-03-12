@@ -30,6 +30,7 @@ export default class Sheet {
      * @param {int} numBeats - The number of beats in the stuntsheet.
      * @param {Object} [options] - Optional information about a stuntsheet, such as:
      *   - {string} label - A label for the Sheet.
+     *   - {string} [background] - The URL for the background image (or undefined)
      *   - {string} fieldType - The field type, or "default" to use the same field
      *     type as the Show.
      *   - {(int|string)} beatsPerStep - The default number of beats per step for
@@ -47,6 +48,7 @@ export default class Sheet {
 
         options = _.defaults(options, {
             label: null,
+            background: undefined,
             fieldType: "default",
             beatsPerStep: "default",
             orientation: "default",
@@ -54,6 +56,7 @@ export default class Sheet {
         });
 
         this._label = options.label;
+        this._background = options.background;
         this._fieldType = options.fieldType;
         this._beatsPerStep = options.beatsPerStep;
         this._orientation = options.orientation;
@@ -137,6 +140,7 @@ export default class Sheet {
 
         data.options = {
             label: this._label,
+            background: this._background,
             fieldType: this._fieldType,
             beatsPerStep: this._beatsPerStep,
             orientation: this._orientation,
@@ -246,6 +250,18 @@ export default class Sheet {
         throw new AnimationStateError(
             `Ran out of movements for ${dot.label}: ${remaining} beats remaining`
         );
+    }
+
+    /**
+     * @return {undefined|Object} the info for the background image, including:
+     *   - {string} url
+     *   - {number} width - The width of the image, in steps
+     *   - {number} height - The height of the image, in steps
+     *   - {number} x - The number of steps from the south endzone
+     *   - {number} y - The number of steps from the west sideline
+     */
+    getBackground() {
+        return this._background;
     }
 
     /**
@@ -450,6 +466,13 @@ export default class Sheet {
     }
 
     /**
+     * Remove the background of the Sheet.
+     */
+    removeBackground() {
+        this._background = undefined;
+    }
+
+    /**
      * Remove the given continuity from the given dot type.
      *
      * @param {DotType} dotType
@@ -459,6 +482,53 @@ export default class Sheet {
         let continuities = this._continuities[dotType];
         _.pull(continuities, continuity);
         this.updateMovements(dotType);
+    }
+
+    /**
+     * Save the background with the given data.
+     *
+     * @param {Object} data - See getBackground
+     */
+    saveBackground(data) {
+        _.assign(this._background, data);
+    }
+
+    /**
+     * Set the background of the Sheet.
+     *
+     * @param {string} url
+     */
+    setBackground(url) {
+        let _this = this;
+
+        this._background = {
+            url: url,
+            width: undefined,
+            height: undefined,
+            x: 0,
+            y: 0,
+        };
+
+        // set width and height
+        $("<img>")
+            .css({
+                position: "absolute",
+                left: "-1000%",
+                top: "-1000%",
+            })
+            .attr("src", url)
+            .on("load", function() {
+                // set to 20 yards wide
+                let width = 32;
+                let ratio = $(this).height() / $(this).width();
+                let height = width * ratio;
+
+                _this._background.width = width;
+                _this._background.height = height;
+
+                $(this).remove();
+            })
+            .appendTo("body");
     }
 
     /**

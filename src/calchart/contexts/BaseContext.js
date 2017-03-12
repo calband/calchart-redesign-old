@@ -73,6 +73,12 @@ export default class BaseContext {
     }
 
     /**
+     * Refresh the UI after zooming.
+     */
+    refreshZoom() {
+    }
+
+    /**
      * @return {EditorController}
      */
     getController() {

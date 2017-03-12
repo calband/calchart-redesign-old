@@ -103,8 +103,6 @@ USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
-
-STATIC_URL = '/static/'
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),
 )
@@ -131,7 +129,9 @@ if IS_HEROKU:
     MEDIA_URL = 'https://%s/%s/' % (AWS_S3_CUSTOM_DOMAIN, MEDIAFILES_LOCATION)
     DEFAULT_FILE_STORAGE = 'base.custom_storages.MediaStorage'
 else:
-    MEDIA_ROOT = '../files/'
+    MEDIA_ROOT = os.path.join(BASE_DIR, '..', 'files')
+    STATIC_URL = '/static/'
+    MEDIA_URL = '/media/'
 
 LOGIN_REDIRECT_URL = 'home'
 LOGIN_URL = 'login'

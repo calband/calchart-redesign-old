@@ -12,13 +12,15 @@ import { empty, mapSome, parseArgs, parseNumber, underscoreKeys, update } from "
 import { round } from "utils/MathUtils";
 import {
     doAction,
-    showContextMenu,
-    showPopup,
     getData,
+    hidePopup,
+    promptFile,
     setupMenu,
     setupToolbar,
+    showContextMenu,
     showError,
     showMessage,
+    showPopup,
 } from "utils/UIUtils";
 
 /**
@@ -286,8 +288,21 @@ export default class EditorController extends ApplicationController {
      * Show the popup for editing the currently active sheet's properties.
      */
     editSheetProperties() {
-        let controller = this;
+        let _this = this;
         let sheet = this._activeSheet;
+
+        function updateBackgroundInfo(popup) {
+            let background = sheet.getBackground();
+            let fileText;
+            if (_.isUndefined(background)) {
+                fileText = "none selected";
+                popup.find(".hide-if-none").hide();
+            } else {
+                fileText = _.last(background.url.split("/"));
+                popup.find(".hide-if-none").show();
+            }
+            popup.find(".background-image .background-url").text(fileText);
+        }
 
         showPopup("edit-stuntsheet", {
             init: function(popup) {
@@ -306,6 +321,47 @@ export default class EditorController extends ApplicationController {
                     })
                     .change();
                 popup.find(".beatsPerStep > input").val(sheet.getBeatsPerStep());
+
+                updateBackgroundInfo(popup);
+
+                // add/update image
+                popup.find(".icons .edit-link")
+                    .off("click")
+                    .click(function() {
+                        promptFile(function(file) {
+                            let params = {
+                                sheet: sheet.getIndex(),
+                                image: file,
+                            };
+
+                            doAction("upload_sheet_image", params, {
+                                dataType: "json",
+                                success: function(data) {
+                                    sheet.setBackground(data.url);
+                                    updateBackgroundInfo(popup);
+                                },
+                            });
+                        });
+                    });
+
+                // edit image (move and resize)
+                popup.find(".icons .move-link")
+                    .off("click")
+                    .click(function() {
+                        let options = {
+                            previousContext: Context.name(_this._context),
+                        };
+                        _this.loadContext("background", options);
+                        hidePopup();
+                    });
+
+                // remove image
+                popup.find(".icons .clear-link")
+                    .off("click")
+                    .click(function() {
+                        sheet.removeBackground();
+                        updateBackgroundInfo(popup);
+                    });
             },
             onSubmit: function(popup) {
                 let data = getData(popup);
@@ -331,7 +387,11 @@ export default class EditorController extends ApplicationController {
                     }
                 }
 
-                controller.doAction("saveSheetProperties", [data]);
+                _this.doAction("saveSheetProperties", [data]);
+            },
+            onHide: function(popup) {
+                // refresh to show background
+                _this.refresh();
             },
         });
     }
@@ -437,14 +497,17 @@ export default class EditorController extends ApplicationController {
      * Loads a Context for the application.
      *
      * @param {string} name - The name of the Context to load.
-     * @param {Object} [options] - Any options to pass Context.load
+     * @param {Object} [options] - Any options to customize loading the context.
+     *   Will also be passed to Context.load.
+     *   - {boolean} [unload=true] - Whether to unload the current context
+     *     before loading the next one.
      */
-    loadContext(name, options) {
-        if (this._context) {
+    loadContext(name, options={}) {
+        if (_.defaultTo(options.unload, true) && this._context) {
             this._context.unload();
         }
 
-        $("body").addClass(`context-${name}`);
+        $("body").attr("class", `context-${name}`);
         this._context = Context.load(name, this, options);
         this.refresh();
     }
@@ -627,6 +690,9 @@ export default class EditorController extends ApplicationController {
         });
 
         this.refresh("grapherClear");
+        if (this._context) {
+            this._context.refreshZoom();
+        }
 
         // scroll workspace to keep same location under cursor
         let end = this._grapher.getScale().toDistanceCoordinates(start);
@@ -655,8 +721,10 @@ export default class EditorController extends ApplicationController {
             viewer: JSON.stringify(data),
         };
 
-        doAction("save_show", params, function() {
-            showMessage("Saved!");
+        doAction("save_show", params, {
+            success: function() {
+                showMessage("Saved!");
+            },
         });
     }
 

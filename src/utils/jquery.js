@@ -119,6 +119,20 @@ $.fn.lockScroll = function() {
 };
 
 /**
+ * Convert the given (x,y) page coordinates to be relative to this element.
+ *
+ * @param {number} pageX
+ * @param {number} pageY
+ * @return {[x, y]}
+ */
+$.fn.makeRelative = function(pageX, pageY) {
+    let offset = this.offset();
+    let x = pageX - offset.left + this.scrollLeft();
+    let y = pageY - offset.top + this.scrollTop();
+    return [x, y];
+};
+
+/**
  * Capture the pinch gesture on trackpads, which is the same as scrolling
  * with the ctrl key pressed (http://stackoverflow.com/a/28685082/4966649).
  *

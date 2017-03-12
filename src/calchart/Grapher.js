@@ -80,12 +80,35 @@ export default class Grapher {
         let { sheet, currentBeat=0 } = parseArgs(arguments, ["sheet", "currentBeat"]);
 
         let fieldType = sheet.getFieldType();
-        let field = this._svg.select(".field");
+        let field = this._svg.select("g.field");
 
         // re-draw field if no field is drawn or if the drawn field is of the wrong type
         if (field.empty() || !field.classed(`field-${fieldType}`)) {
             field.remove();
             this.drawField(fieldType);
+            field = this._svg.select("g.field");
+        }
+
+        let background = sheet.getBackground();
+        let image = field.select("image.background-image");
+        if (_.isUndefined(background)) {
+            image.remove();
+        } else {
+            if (image.empty() || image.attr("href") !== background.url) {
+                image.remove();
+                // insert right after field background
+                image = field.insert("image", ".field-background + *")
+                    .classed("background-image", true)
+                    .attr("preserveAspectRatio", "none");
+            }
+
+            let position = this._scale.toDistanceCoordinates(background);
+            image.attr("href", background.url)
+                .attr("width", this._scale.toDistance(background.width))
+                .attr("height", this._scale.toDistance(background.height))
+                .attr("x", position.x)
+                .attr("y", position.y);
+            this.showBackground();
         }
 
         this._drawDots(sheet, currentBeat);
@@ -231,6 +254,7 @@ export default class Grapher {
     /**
      * Set a Grapher option. Will not go into effect until draw() has been called again. The
      * available options are:
+     *  - {boolean} [backgroundVisible=false] - If true, show the background image for a sheet
      *  - {boolean} [boundDots=false] - If true, prevent dots from going out of the SVG.
      *  - {boolean} [circleSelected=false] - If true, circles the selected dot, or the last
      *    selected dot, if multiple.
@@ -260,6 +284,19 @@ export default class Grapher {
      */
     setOptions(options) {
         _.assign(this._options, options);
+    }
+
+    /**
+     * @param {boolean} [visible] - If true, show the background image; otherwise, hide the
+     *   background image. If undefined, use the backgroundVisible option.
+     */
+    showBackground(visible) {
+        if (_.isUndefined(visible)) {
+            visible = _.defaultTo(this._options.backgroundVisible);
+        }
+
+        this.setOption("backgroundVisible", visible);
+        this._svg.select("image.background-image").style("display", visible ? "block" : "none");
     }
 
     /**

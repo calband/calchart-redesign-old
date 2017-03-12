@@ -9,6 +9,7 @@
             {% if form.description %}<p>{{ form.description|safe }}</p>{% endif %}
         {% endblock %}
         <form>
+            {% block pre_fields %}{% endblock %}
             {% block popup_form %}
                 {% for field in form %}
                     {% if field.is_hidden %}

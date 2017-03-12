@@ -2,6 +2,7 @@ import * as _ from "lodash";
 
 import ContinuityContext from "calchart/contexts/ContinuityContext";
 import DotContext from "calchart/contexts/DotContext";
+import EditBackgroundContext from "calchart/contexts/EditBackgroundContext";
 
 // cache contexts after they've been created
 let contexts = {};
@@ -23,6 +24,9 @@ export default class Context {
     static load(name, controller, options={}) {
         if (_.isUndefined(contexts[name])) {
             switch (name) {
+                case "background":
+                    contexts[name] = new EditBackgroundContext(controller);
+                    break;
                 case "continuity":
                     contexts[name] = new ContinuityContext(controller);
                     break;
@@ -52,5 +56,22 @@ export default class Context {
             Context => _.invert(Context.shortcuts)
         ));
     }
+
+    /**
+     * Give the name of the given Context.
+     *
+     * @param {Context} context - The context to name.
+     * @return {string}
+     */
+    static name(context) {
+        if (context instanceof EditBackgroundContext) {
+            return "background";
+        }
+        if (context instanceof ContinuityContext) {
+            return "continuity";
+        }
+        if (context instanceof DotContext) {
+            return "dot";
+        }
+    }
 }
-    
