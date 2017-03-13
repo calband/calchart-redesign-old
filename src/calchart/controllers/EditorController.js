@@ -713,6 +713,25 @@ export default class EditorController extends ApplicationController {
     }
 
     /**
+     * Revert any actions in the redo/undo history that satisfy the given
+     * filter function.
+     *
+     * @param {function} predicate - The function that takes in the action
+     *   object and returns true if the action should be undone (if in
+     *   undoHistory) or discarded (if in redoHistory).
+     */
+    revertWhile(predicate) {
+        _.remove(this._redoHistory, predicate);
+        _.forEachRight(this._undoHistory, (action, i) => {
+            if (predicate(action)) {
+                action.undo.apply(action.context);
+                this._undoHistory.splice(i, 1);
+            }
+        });
+        this._updateHistory();
+    }
+
+    /**
      * Save the Show to the server.
      */
     saveShow() {

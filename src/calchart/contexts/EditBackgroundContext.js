@@ -11,6 +11,10 @@ export default class EditBackgroundContext extends BaseContext {
     constructor(controller) {
         super(controller);
 
+        // tracks how many times load has been called, to distinguish
+        // sessions of editing backgrounds
+        this._session = 0;
+
         // contains the context that was active before editing background image
         this._previousContext = undefined;
 
@@ -27,6 +31,7 @@ export default class EditBackgroundContext extends BaseContext {
      *    - {string} [dotType=null] - The dot type to initially load.
      */
     load(options) {
+        this._session++;
         this._previousContext = options.previousContext;
         this._grapher.setOptions({
             backgroundVisible: true,
@@ -221,6 +226,16 @@ export default class EditBackgroundContext extends BaseContext {
     }
 
     /**
+     * Revert all changes made to the background image.
+     */
+    revert() {
+        this._controller.revertWhile(action => {
+            return action.session === this._session;
+        });
+        this.unload();
+    }
+
+    /**
      * @return {jQuery} the background image
      */
     _getImage() {
@@ -249,14 +264,6 @@ export default class EditBackgroundContext extends BaseContext {
 
 class ContextActions {
     /**
-     * Revert all changes made to the background image.
-     */
-    static revert() {
-        // TODO: set initial background data
-        // TODO: remove saveBackground actions from undo/redo history
-    }
-
-    /**
      * Save the background image's position and size after modifying it.
      *
      * @param {Object} oldData - The previous position/size of the image
@@ -272,6 +279,7 @@ class ContextActions {
         this._controller.refresh();
 
         return {
+            session: this._session,
             data: [oldData, newData],
             undo: function() {
                 this._sheet.saveBackground(oldData);
