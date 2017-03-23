@@ -300,6 +300,7 @@ console.log(o); // { a1: 1, b2: 2 }
 ```
 
 Some helpful functions:
+
     - `_.each(Object, Function(value, key))`: Runs a function for each value/key in the object.
     - `_.defaults(Object, Object)`: Any `undefined` value in the first object is set to the value in the second object.
     - `_.defaultTo(val, default)`: If `val` is `undefined`, `null`, or `NaN`, return `default`, otherwise `val`.
