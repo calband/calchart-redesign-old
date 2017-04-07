@@ -767,6 +767,7 @@ class BlockTool extends BaseEdit {
         this._startX = startX;
         this._startY = startY;
 
+        // always make sure there's a grid; default to 2
         this._snap = this._getSnap();
         if (_.isNull(this._snap)) {
             let scale = this.grapher.getScale();
