@@ -42,6 +42,9 @@ export default class EditorController extends ApplicationController {
 
         this._undoHistory = [];
         this._redoHistory = [];
+
+        // track last saved state of show
+        this._savedShow = JSON.stringify(this._show.serialize());
     }
 
     static get actions() {
@@ -115,6 +118,14 @@ export default class EditorController extends ApplicationController {
             // except new sheet
             $(".toolbar .add-stuntsheet").removeClass("inactive");
         }
+
+        // prompt user if leaving while unsaved
+        $(window).on("beforeunload", () => {
+            let data = JSON.stringify(this._show.serialize());
+            if (data !== this._savedShow) {
+                return true;
+            }
+        });
     }
 
     /**
@@ -735,14 +746,15 @@ export default class EditorController extends ApplicationController {
      * Save the Show to the server.
      */
     saveShow() {
-        let data = this._show.serialize();
+        let data = JSON.stringify(this._show.serialize());
         let params = {
-            viewer: JSON.stringify(data),
+            viewer: data,
         };
 
         doAction("save_show", params, {
-            success: function() {
+            success: () => {
                 showMessage("Saved!");
+                this._savedShow = data;
             },
         });
     }
