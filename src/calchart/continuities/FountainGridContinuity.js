@@ -116,11 +116,11 @@ export default class FountainGridContinuity extends BaseContinuity {
     }
 
     popupHTML() {
-        let { end, stepType, orientation, beatsPerStep } = this._getPopupFields();
+        let { end, stepType, orientation, beatsPerStep, customText } = this._getPopupFields();
 
         return {
             name: this._isEWNS ? "EWNS" : "NSEW",
-            fields: [end, stepType, orientation, beatsPerStep],
+            fields: [end, stepType, orientation, beatsPerStep, customText],
         };
     }
 

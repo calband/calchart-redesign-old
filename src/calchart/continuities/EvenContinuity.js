@@ -60,11 +60,11 @@ export default class EvenContinuity extends BaseContinuity {
     }
 
     popupHTML() {
-        let { stepType, orientation, beatsPerStep } = this._getPopupFields();
+        let { stepType, orientation, beatsPerStep, customText } = this._getPopupFields();
 
         return {
             name: "Even",
-            fields: [stepType, orientation, beatsPerStep],
+            fields: [stepType, orientation, beatsPerStep, customText],
         };
     }
 

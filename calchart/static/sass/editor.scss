@@ -154,6 +154,16 @@ $sidebar-width: 200px;
         label {
             width: 125px;
         }
+        .customText {
+            label {
+                width: initial;
+                margin: 5px 0;
+            }
+            textarea {
+                width: 100%;
+                max-width: 100%;
+            }
+        }
     }
     &.edit-stuntsheet {
         .icons {

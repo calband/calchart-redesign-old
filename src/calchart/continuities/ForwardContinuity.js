@@ -79,11 +79,11 @@ export default class ForwardContinuity extends BaseContinuity {
     }
 
     popupHTML() {
-        let { steps, direction, stepType, beatsPerStep } = this._getPopupFields();
+        let { steps, direction, stepType, beatsPerStep, customText } = this._getPopupFields();
 
         return {
             name: "Forward March",
-            fields: [steps, direction, stepType, beatsPerStep],
+            fields: [steps, direction, stepType, beatsPerStep, customText],
         };
     }
 

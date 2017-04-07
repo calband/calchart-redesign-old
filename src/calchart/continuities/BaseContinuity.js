@@ -31,11 +31,13 @@ export default class BaseContinuity {
             stepType: "default",
             beatsPerStep: "default",
             orientation: "default",
+            customText: "",
         });
 
         this._stepType = options.stepType;
         this._beatsPerStep = options.beatsPerStep;
         this._orientation = options.orientation;
+        this._customText = options.customText;
     }
 
     /**
@@ -64,6 +66,7 @@ export default class BaseContinuity {
             stepType: this._stepType,
             beatsPerStep: this._beatsPerStep,
             orientation: this._orientation,
+            customText: this._customText,
         });
     }
 
@@ -217,6 +220,12 @@ export default class BaseContinuity {
             options: ORIENTATIONS,
             initial: this._orientation,
         }));
+
+        fields.customText = HTMLBuilder.formfield(
+            "Custom Continuity Text",
+            HTMLBuilder.make("textarea").val(this._customText),
+            "customText"
+        );
 
         return fields;
     }
