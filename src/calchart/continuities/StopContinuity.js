@@ -103,22 +103,22 @@ export default class StopContinuity extends BaseContinuity {
     }
 
     popupHTML() {
-        let { orientation, stepType, beatsPerStep, duration } = this._getPopupFields();
+        let { orientation, stepType, beatsPerStep, duration, customText } = this._getPopupFields();
 
         if (!this._marktime) {
             return {
                 name: "Close",
-                fields: [orientation],
+                fields: [orientation, customText],
             };
         } else if (_.isNull(this._duration)) {
             return {
                 name: "Mark Time Remaining",
-                fields: [orientation, stepType, beatsPerStep],
+                fields: [orientation, stepType, beatsPerStep, customText],
             };
         } else {
             return {
                 name: "Mark Time",
-                fields: [duration, orientation, stepType, beatsPerStep],
+                fields: [duration, orientation, stepType, beatsPerStep, customText],
             };
         }
     }
