@@ -47,8 +47,8 @@ export default class EditTools {
             case "arc":
                 EditTool = ArcTool;
                 break;
-            case "rectangle":
-                EditTool = RectangleTool;
+            case "block":
+                EditTool = BlockTool;
                 break;
             case "circle":
                 EditTool = CircleTool;
@@ -179,6 +179,18 @@ class BaseTool {
                 }
             },
         });
+    }
+
+    /**
+     * @return {number} the snap grid
+     */
+    _getSnap() {
+        let grid = this.context.getGrid();
+        if (grid === 0) {
+            return null;
+        } else {
+            return this.grapher.getScale().toDistance(grid);
+        }
     }
 
     /**
@@ -332,9 +344,8 @@ class SelectionTool extends BaseSelection {
 
         // snap overall movement to grid; dots can themselves be off
         // the grid, but they move in a consistent interval
-        let grid = this.context.getGrid();
-        if (grid !== 0) {
-            let snap = scale.toDistance(grid);
+        let snap = this._getSnap();
+        if (!_.isNull(snap)) {
             deltaX = round(deltaX, snap);
             deltaY = round(deltaY, snap);
         }
@@ -625,13 +636,7 @@ class ArcTool extends BaseEdit {
             .classed("edit-tool-path", true);
         this._path = $.fromD3(path);
 
-        // snap
-
-        let grid = this.context.getGrid();
-        if (grid !== 0) {
-            let scale = this.grapher.getScale();
-            this._snap = scale.toDistance(grid);
-        }
+        this._snap = this._getSnap();
 
         this.mousemove(e);
     }
@@ -648,7 +653,7 @@ class ArcTool extends BaseEdit {
         // radius
         let [x, y] = this._makeRelative(e);
         this._radius = calcDistance(this._startX, this._startY, x, y);
-        if (!_.isUndefined(this._snap)) {
+        if (!_.isNull(this._snap)) {
             this._radius = round(this._radius, this._snap);
         }
 
@@ -749,11 +754,74 @@ class ArcTool extends BaseEdit {
 }
 
 /**
- * Arrange the selected dots in a rectangle, where the user defines
- * TODO
+ * Arrange the selected dots in a block, where the user defines
+ * the top-left corner and either the number of rows or the number
+ * of columns as dragged, snapping to the grid.
+ *
+ * If the grid is not set, the user can drag a box shape and the block
+ * will fill in.
  */
-class RectangleTool extends BaseEdit {
+class BlockTool extends BaseEdit {
+    mousedown(e) {
+        let [startX, startY] = this._makeRelativeSnap(e);
+        this._startX = startX;
+        this._startY = startY;
 
+        // always make sure there's a grid; default to 2
+        this._snap = this._getSnap();
+        if (_.isNull(this._snap)) {
+            let scale = this.grapher.getScale();
+            this._snap = scale.toDistance(2);
+        }
+
+        // helper path
+        let line = this.grapher.getSVG()
+            .append("line")
+            .classed("edit-tool-path", true)
+            .attr("x1", this._startX)
+            .attr("y1", this._startY);
+        this._line = $.fromD3(line);
+
+        this.mousemove(e);
+    }
+
+    mousemove(e) {
+        let [endX, endY] = this._makeRelativeSnap(e);
+        let selection = this.controller.getSelection();
+
+        let deltaX = endX - this._startX;
+        let deltaY = endY - this._startY;
+
+        if (deltaX < 0 && deltaY < 0) {
+            return;
+        }
+
+        let numCols;
+        if (deltaX > deltaY) {
+            endY = this._line.attr("y1");
+            // include last column
+            numCols = deltaX / this._snap + 1;
+        } else {
+            endX = this._line.attr("x1");
+            // include last row
+            let numRows = deltaY / this._snap + 1;
+            numCols = Math.ceil(selection.length / numRows);
+        }
+
+        this._line.attr("x2", endX).attr("y2", endY);
+
+        // move dots
+        selection.each((i, dot) => {
+            let dotX = this._startX + (i % numCols) * this._snap;
+            let dotY = this._startY + Math.floor(i / numCols) * this._snap;
+            this.grapher.moveDotTo(dot, dotX, dotY);
+        });
+    }
+
+    mouseup(e) {
+        this._saveDotPositions();
+        this._line.remove();
+    }
 }
 
 /**
@@ -782,13 +850,7 @@ class CircleTool extends BaseEdit {
             .attr("cy", this._startY);
         this._circle = $.fromD3(circle);
 
-        // snap
-
-        let grid = this.context.getGrid();
-        if (grid !== 0) {
-            let scale = this.grapher.getScale();
-            this._snap = scale.toDistance(grid);
-        }
+        this._snap = this._getSnap();
 
         this.mousemove(e);
     }
@@ -797,7 +859,7 @@ class CircleTool extends BaseEdit {
         // radius
         let [x, y] = this._makeRelative(e);
         let radius = calcDistance(this._startX, this._startY, x, y);
-        if (!_.isUndefined(this._snap)) {
+        if (!_.isNull(this._snap)) {
             radius = round(radius, this._snap);
         }
 
