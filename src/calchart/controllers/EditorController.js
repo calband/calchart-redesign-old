@@ -746,15 +746,15 @@ export default class EditorController extends ApplicationController {
      * Save the Show to the server.
      */
     saveShow() {
-        let data = this._show.serialize();
+        let data = JSON.stringify(this._show.serialize());
         let params = {
-            viewer: JSON.stringify(data),
+            viewer: data,
         };
 
         doAction("save_show", params, {
-            success: function() {
+            success: () => {
                 showMessage("Saved!");
-                this._savedShow = JSON.stringify(data);
+                this._savedShow = data;
             },
         });
     }
