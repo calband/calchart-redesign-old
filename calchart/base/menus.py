@@ -297,7 +297,7 @@ editor_toolbar = Toolbar(
         ToolbarItem('Swap', 'exchange', 'loadTool(swap)'),
         ToolbarItem('Line', 'line', 'loadTool(line)'),
         ToolbarItem('Arc', 'arc', 'loadTool(arc)'),
-        ToolbarItem('Rectangle', 'rectangle', 'loadTool(rectangle)'),
+        ToolbarItem('Block', 'rectangle', 'loadTool(block)'),
         ToolbarItem('Circle', 'circle-o', 'loadTool(circle)'),
         classes='edit-tools',
     ),

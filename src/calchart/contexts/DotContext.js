@@ -291,7 +291,7 @@ let ContextShortcuts = {
     "w": "loadTool(swap)",
     "l": "loadTool(line)",
     "a": "loadTool(arc)",
-    "r": "loadTool(rectangle)",
+    "b": "loadTool(block)",
     "c": "loadTool(circle)",
     "left": "moveDots(-1, 0)",
     "up": "moveDots(0, -1)",
