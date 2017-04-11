@@ -33,6 +33,7 @@ export default class DiagonalContinuity extends FountainGridContinuity {
         let data = super.serialize();
         data.type = "DIAGONAL";
         data.diagFirst = this._diagFirst;
+        return data;
     }
 
     getMovements(dot, data) {
