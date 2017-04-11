@@ -55,8 +55,8 @@ export default class FountainGridContinuity extends BaseContinuity {
 
         let deltaX = end.x - start.x;
         let deltaY = end.y - start.y;
-        let dirX = deltaX < 0 ? 90 : 270;
-        let dirY = deltaY < 0 ? 180 : 0;
+        let dirX = this._getXAngle(deltaX);
+        let dirY = this._getYAngle(deltaY);
 
         let movements = [];
         let options = {
@@ -86,19 +86,14 @@ export default class FountainGridContinuity extends BaseContinuity {
         }
 
         let remaining = this._sheet.getDuration() - Math.abs(deltaX) - Math.abs(deltaY);
-        if (remaining > 0) {
-            let orientation = this.getOrientationDegrees();
-            let marktime = this._end === "MT";
-            let stop = new MovementCommandStop(end.x, end.y, orientation, remaining, marktime, options);
-            movements.push(stop);
-        }
+        this._addEnd(movements, remaining, end, options);
 
         return movements;
     }
 
     panelHTML(controller) {
         let _this = this;
-        let type = this._isEWNS ? "EWNS" : "NSEW";
+        let type = this._getType();
 
         let label = HTMLBuilder.span(type);
 
@@ -119,9 +114,18 @@ export default class FountainGridContinuity extends BaseContinuity {
         let { end, stepType, orientation, beatsPerStep, customText } = this._getPopupFields();
 
         return {
-            name: this._isEWNS ? "EWNS" : "NSEW",
+            name: this._getType(),
             fields: [end, stepType, orientation, beatsPerStep, customText],
         };
+    }
+
+    _addEnd(movements, remaining, end, options) {
+        if (remaining > 0) {
+            let orientation = this.getOrientationDegrees();
+            let marktime = this._end === "MT";
+            let stop = new MovementCommandStop(end.x, end.y, orientation, remaining, marktime, options);
+            movements.push(stop);
+        }
     }
 
     _getPopupFields() {
@@ -135,5 +139,17 @@ export default class FountainGridContinuity extends BaseContinuity {
         fields.orientation.find("label").text("Final orientation:");
 
         return fields;
+    }
+
+    _getType() {
+        return this._isEWNS ? "EWNS" : "NSEW";
+    }
+
+    _getXAngle(deltaX) {
+        return deltaX < 0 ? 90 : 270;
+    }
+
+    _getYAngle(deltaY) {
+        return deltaY < 0 ? 180 : 0;
     }
 }

@@ -294,7 +294,7 @@ export default class Sheet {
      * @return {Continuity[]}
      */
     getContinuities(dotType) {
-        return this._continuities[dotType];
+        return _.defaultTo(this._continuities[dotType], []);
     }
 
     /**
