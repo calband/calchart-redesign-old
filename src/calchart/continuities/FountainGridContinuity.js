@@ -128,18 +128,6 @@ export default class FountainGridContinuity extends BaseContinuity {
         }
     }
 
-    _getXAngle(deltaX) {
-        return deltaX < 0 ? 90 : 270;
-    }
-
-    _getYAngle(deltaY) {
-        return deltaY < 0 ? 180 : 0;
-    }
-
-    _getType() {
-        return this._isEWNS ? "EWNS" : "NSEW";
-    }
-
     _getPopupFields() {
         let fields = super._getPopupFields();
 
@@ -151,5 +139,17 @@ export default class FountainGridContinuity extends BaseContinuity {
         fields.orientation.find("label").text("Final orientation:");
 
         return fields;
+    }
+
+    _getType() {
+        return this._isEWNS ? "EWNS" : "NSEW";
+    }
+
+    _getXAngle(deltaX) {
+        return deltaX < 0 ? 90 : 270;
+    }
+
+    _getYAngle(deltaY) {
+        return deltaY < 0 ? 180 : 0;
     }
 }
