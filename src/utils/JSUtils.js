@@ -172,6 +172,21 @@ export function parseNumber(value) {
 }
 
 /**
+ * Run the given function asynchronously, using jQuery deferred objects.
+ *
+ * @param {function} callback
+ * @return {Promise}
+ */
+let queue; // the Deferred object that will be collecting asynchronous functions
+export function runAsync(callback) {
+    if (_.isUndefined(queue)) {
+        queue = $.Deferred();
+        queue.resolve(); // automatically triggers any subsequent callbacks
+    }
+    return queue.then(callback).promise();
+}
+
+/**
  * Prepend an underscore to the keys in the given data.
  *
  * @param {Object} data
