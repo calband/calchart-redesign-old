@@ -2,6 +2,7 @@ import DiagonalContinuity from "calchart/continuities/DiagonalContinuity";
 import EvenContinuity from "calchart/continuities/EvenContinuity";
 import FountainGridContinuity from "calchart/continuities/FountainGridContinuity";
 import ForwardContinuity from "calchart/continuities/ForwardContinuity";
+import GrapevineContinuity from "calchart/continuities/GrapevineContinuity";
 import StopContinuity from "calchart/continuities/StopContinuity";
 
 /**
@@ -39,6 +40,8 @@ export default class Continuity {
                 return new DiagonalContinuity(sheet, dotType, true);
             case "HSDM":
                 return new DiagonalContinuity(sheet, dotType, false);
+            case "GV":
+                return new GrapevineContinuity(sheet, dotType, 0, 90);
         }
         throw new Error("No continuity of the type: " + type);
     }
@@ -63,6 +66,8 @@ export default class Continuity {
                 return EvenContinuity.deserialize(sheet, dotType, data);
             case "DIAGONAL":
                 return DiagonalContinuity.deserialize(sheet, dotType, data);
+            case "GRAPEVINE":
+                return GrapevineContinuity.deserialize(sheet, dotType, data);
         }
         throw new Error("No continuity of the type: " + data.type);
     }

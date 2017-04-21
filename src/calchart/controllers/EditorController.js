@@ -119,13 +119,15 @@ export default class EditorController extends ApplicationController {
             $(".toolbar .add-stuntsheet").removeClass("inactive");
         }
 
-        // prompt user if leaving while unsaved
-        $(window).on("beforeunload", () => {
-            let data = JSON.stringify(this._show.serialize());
-            if (data !== this._savedShow) {
-                return true;
-            }
-        });
+        // prompt user if leaving while unsaved, unless in development
+        if (!window.isLocal) {
+            $(window).on("beforeunload", () => {
+                let data = JSON.stringify(this._show.serialize());
+                if (data !== this._savedShow) {
+                    return true;
+                }
+            });
+        }
     }
 
     /**
