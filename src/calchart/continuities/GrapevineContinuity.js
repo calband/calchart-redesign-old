@@ -1,15 +1,20 @@
-import BaseContinuity from "calchart/continuities/BaseContinuity";
+import ForwardContinuity from "calchart/continuities/ForwardContinuity";
 import MovementCommandMove from "calchart/movements/MovementCommandMove";
 
 import { DIRECTIONS } from "utils/CalchartUtils";
 import HTMLBuilder from "utils/HTMLBuilder";
 import { validatePositive, parseNumber } from "utils/JSUtils";
 
+// constrain to only north or south
+let GV_DIRECTIONS = _.clone(DIRECTIONS);
+delete GV_DIRECTIONS[0];
+delete GV_DIRECTIONS[180];
+
 /**
- * A simple forward march continuity, taking the given number
- * of steps in a given direction
+ * The Grapevine continuity, which is basically a forward march, except
+ * the orientation is not the same as direction of motion.
  */
-export default class ForwardContinuity extends BaseContinuity {
+export default class GrapevineContinuity extends ForwardContinuity {
     /**
      * @param {Sheet} sheet
      * @param {DotType} dotType
@@ -18,38 +23,20 @@ export default class ForwardContinuity extends BaseContinuity {
      * @param {object} [options] - Options for the continuity, including:
      *   - {string} stepType
      *   - {int} beatsPerStep
+     *   - {string} orientation - The direction to face during the movement.
      */
     constructor(sheet, dotType, steps, direction, options) {
-        super(sheet, dotType, options);
-
-        this._numSteps = steps;
-        this._direction = direction;
+        super(sheet, dotType, steps, direction, options);
     }
 
     static deserialize(sheet, dotType, data) {
-        return new ForwardContinuity(sheet, dotType, data.steps, data.direction, data);
+        return new GrapevineContinuity(sheet, dotType, data.steps, data.direction, data);
     }
 
     serialize() {
-        return super.serialize("FORWARD", {
-            steps: this._numSteps,
-            direction: this._direction,
-        });
-    }
-
-    getMovements(dot, data) {
-        let options = {
-            beatsPerStep: this.getBeatsPerStep(),
-            orientation: this._orientation,
-        };
-        let move = new MovementCommandMove(
-            data.position.x,
-            data.position.y,
-            this._direction,
-            this._numSteps * options.beatsPerStep,
-            options
-        );
-        return [move];
+        let data = super.serialize();
+        data.type = "GRAPEVINE";
+        return data;
     }
 
     panelHTML(controller) {
@@ -68,7 +55,7 @@ export default class ForwardContinuity extends BaseContinuity {
         });
 
         let direction = HTMLBuilder.select({
-            options: DIRECTIONS,
+            options: GV_DIRECTIONS,
             initial: this._direction,
             change: function() {
                 _this._direction = parseNumber($(this).val());
@@ -76,16 +63,13 @@ export default class ForwardContinuity extends BaseContinuity {
             },
         });
 
-        return this._wrapPanel("fm", [label, steps, direction]);
+        return this._wrapPanel("gv", [label, steps, direction]);
     }
 
     popupHTML() {
-        let { steps, direction, stepType, beatsPerStep, customText } = this._getPopupFields();
-
-        return {
-            name: "Forward March",
-            fields: [steps, direction, stepType, beatsPerStep, customText],
-        };
+        let data = super.popupHTML();
+        data.name = "Grapevine";
+        return data;
     }
 
     _getPopupFields() {
@@ -97,11 +81,9 @@ export default class ForwardContinuity extends BaseContinuity {
         }), "numSteps");
 
         fields.direction = HTMLBuilder.formfield("Direction", HTMLBuilder.select({
-            options: DIRECTIONS,
+            options: GV_DIRECTIONS,
             initial: this._direction,
         }));
-
-        delete fields.orientation;
 
         return fields;
     }
