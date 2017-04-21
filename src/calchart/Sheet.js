@@ -8,7 +8,7 @@ import DotType from "calchart/DotType";
 import MovementCommand from "calchart/MovementCommand";
 
 import { AnimationStateError } from "utils/errors";
-import { mapSome, moveElem } from "utils/JSUtils";
+import { mapSome, moveElem, runAsync } from "utils/JSUtils";
 import { roundSmall } from "utils/MathUtils";
 
 /**
@@ -574,40 +574,42 @@ export default class Sheet {
         });
 
         // update collisions
-        let allDots = this._show.getDots();
-        this._dots.forEach(info => info.collisions.clear());
+        runAsync(() => {
+            let allDots = this._show.getDots();
+            this._dots.forEach(info => info.collisions.clear());
 
-        let updateCollisions = beat => {
-            for (let i = 0; i < allDots.length; i++) {
-                let dot1 = allDots[i];
-                let state1 = this.getAnimationState(dot1, beat);
-                for (let j = i + 1; j < allDots.length; j++) {
-                    let dot2 = allDots[j];
-                    let state2 = this.getAnimationState(dot2, beat);
-                    if (
-                        Math.abs(state1.x - state2.x) <= 1 &&
-                        Math.abs(state1.y - state2.y) <= 1
-                    ) {
-                        this.getDotInfo(dot1).collisions.add(beat);
-                        this.getDotInfo(dot2).collisions.add(beat);
+            let updateCollisions = beat => {
+                for (let i = 0; i < allDots.length; i++) {
+                    let dot1 = allDots[i];
+                    let state1 = this.getAnimationState(dot1, beat);
+                    for (let j = i + 1; j < allDots.length; j++) {
+                        let dot2 = allDots[j];
+                        let state2 = this.getAnimationState(dot2, beat);
+                        if (
+                            Math.abs(state1.x - state2.x) <= 1 &&
+                            Math.abs(state1.y - state2.y) <= 1
+                        ) {
+                            this.getDotInfo(dot1).collisions.add(beat);
+                            this.getDotInfo(dot2).collisions.add(beat);
+                            break;
+                        }
+                    }
+                }
+            };
+
+            for (let beat = 0; beat < this._numBeats; beat++) {
+                try {
+                    updateCollisions(beat);
+                } catch (e) {
+                    if (e instanceof AnimationStateError) {
+                        // ignore if no movements
                         break;
+                    } else {
+                        throw e;
                     }
                 }
             }
-        }
-
-        for (let beat = 0; beat < this._numBeats; beat++) {
-            try {
-                updateCollisions(beat);
-            } catch (e) {
-                if (e instanceof AnimationStateError) {
-                    // ignore if no movements
-                    break;
-                } else {
-                    throw e;
-                }
-            }
-        }
+        });
     }
 
     /**
