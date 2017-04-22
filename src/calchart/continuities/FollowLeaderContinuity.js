@@ -54,24 +54,11 @@ export default class FollowLeaderContinuity extends BaseContinuity {
     }
 
     popupHTML() {
-        // TODO
-    }
+        let { stepType, beatsPerStep, customText } = this._getPopupFields();
 
-    _getPopupFields() {
-        // let fields = super._getPopupFields();
-
-        // fields.steps = HTMLBuilder.formfield("Number of steps", HTMLBuilder.input({
-        //     type: "number",
-        //     initial: this._numSteps,
-        // }), "numSteps");
-
-        // fields.direction = HTMLBuilder.formfield("Direction", HTMLBuilder.select({
-        //     options: GV_DIRECTIONS,
-        //     initial: this._direction,
-        // }));
-
-        // delete fields.orientation;
-
-        // return fields;
+        return {
+            name: "Follow the Leader",
+            fields: [stepType, beatsPerStep, customText],
+        };
     }
 }
