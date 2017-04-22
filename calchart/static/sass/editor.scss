@@ -348,6 +348,18 @@ body.context-background .workspace .graph {
                 outline: 0;
                 cursor: pointer;
             }
+            &.ftl {
+                .info i {
+                    cursor: pointer;
+                    margin: 0 5px;
+                    padding: 5px;
+                    background: $blue;
+                    color: $white;
+                    &:hover {
+                        background: lighten($blue, 10);
+                    }
+                }
+            }
         }
     }
     .dot-types {

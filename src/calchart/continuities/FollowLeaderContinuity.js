@@ -1,6 +1,8 @@
 import BaseContinuity from "calchart/continuities/BaseContinuity";
 import MovementCommandMove from "calchart/movements/MovementCommandMove";
 
+import HTMLBuilder from "utils/HTMLBuilder";
+
 /**
  * A follow-the-leader continuity, where the sequence of dots is defined and
  * the path for the first dot is marked.
@@ -33,31 +35,22 @@ export default class FollowLeaderContinuity extends BaseContinuity {
         });
     }
 
+    getMovements(dot, data) {
+        return [];
+    }
+
     panelHTML(controller) {
-        // let _this = this;
+        let label = HTMLBuilder.span("FTL");
 
-        // let label = HTMLBuilder.span("Move");
+        let editLabel = HTMLBuilder.label("Edit:");
+        let editDots = HTMLBuilder.icon("ellipsis-h").click(() => {
+            console.log("edit dots");
+        });
+        let editPath = HTMLBuilder.icon("crosshairs").click(() => {
+            console.log("edit path");
+        });
 
-        // let steps = HTMLBuilder.input({
-        //     class: "panel-continuity-duration",
-        //     type: "number",
-        //     initial: this._numSteps,
-        //     change: function() {
-        //         _this._numSteps = validatePositive(this);
-        //         _this._updateMovements(controller);
-        //     },
-        // });
-
-        // let direction = HTMLBuilder.select({
-        //     options: GV_DIRECTIONS,
-        //     initial: this._direction,
-        //     change: function() {
-        //         _this._direction = parseNumber($(this).val());
-        //         _this._updateMovements(controller);
-        //     },
-        // });
-
-        // return this._wrapPanel("gv", [label, steps, direction]);
+        return this._wrapPanel("ftl", [label, editLabel, editDots, editPath]);
     }
 
     popupHTML() {
