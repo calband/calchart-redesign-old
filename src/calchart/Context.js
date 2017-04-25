@@ -1,6 +1,8 @@
 import ContinuityContext from "calchart/contexts/ContinuityContext";
 import DotContext from "calchart/contexts/DotContext";
 import EditBackgroundContext from "calchart/contexts/EditBackgroundContext";
+import FTLDotContext from "calchart/contexts/FTLDotContext";
+import FTLPathContext from "calchart/contexts/FTLPathContext";
 
 // cache contexts after they've been created
 let contexts = {};
@@ -31,6 +33,12 @@ export default class Context {
                 case "dot":
                     contexts[name] = new DotContext(controller);
                     break;
+                case "ftl-dots":
+                    contexts[name] = new FTLDotContext(controller);
+                    break;
+                case "ftl-path":
+                    contexts[name] = new FTLPathContext(controller);
+                    break;
                 default:
                     throw new Error(`No context named: ${name}`);
             }
@@ -47,8 +55,11 @@ export default class Context {
      */
     static getAllShortcutCommands() {
         let contexts = [
+            EditBackgroundContext,
             ContinuityContext,
             DotContext,
+            FTLDotContext,
+            FTLPathContext,
         ];
         return _.extend({}, ... contexts.map(
             Context => _.invert(Context.shortcuts)
@@ -70,6 +81,12 @@ export default class Context {
         }
         if (context instanceof DotContext) {
             return "dot";
+        }
+        if (context instanceof FTLDotContext) {
+            return "ftl-dots";
+        }
+        if (context instanceof FTLPathContext) {
+            return "ftl-path";
         }
     }
 }

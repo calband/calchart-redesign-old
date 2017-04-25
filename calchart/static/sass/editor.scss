@@ -401,3 +401,33 @@ body.context-background .workspace .graph {
         text-align: center;
     }
 }
+
+/** FTL DOT CONTEXT **/
+
+body.context-ftl-dots .workspace .graph {
+    .dots .dot {
+        opacity: 0.5;
+    }
+}
+
+.panel.ftl-dots {
+    .panel-content {
+        padding: 5px;
+    }
+    .ftl-dot-order {
+        margin-bottom: 5px;
+        .dot {
+            padding-top: 5px;
+            text-align: center;
+            background: $light-gray;
+            cursor: ns-resize;
+            &:hover {
+                background: $medium-gray;
+            }
+        }
+    }
+    .buttons button.submit {
+        margin: 0;
+        padding: 10px 25px;
+    }
+}

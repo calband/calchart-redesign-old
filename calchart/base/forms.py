@@ -123,19 +123,10 @@ class EditContinuityPopup(PopupForm):
     name = 'edit-continuity'
     template_name = 'partials/popup_edit_continuity.html'
 
-class FTLOrderPopup(PopupForm):
-    """
-    The popup to edit the order of dots in a follow the leader continuity
-    """
-    name = 'ftl-dots'
-    template_name = 'partials/popup_ftl.html'
-    title = 'Follow the Leader: Dots'
-
 editor_popups = [
     SetUpShowPopup,
     EditShowPopup,
     AddStuntsheetPopup,
     EditStuntsheetPopup,
     EditContinuityPopup,
-    FTLOrderPopup,
 ]

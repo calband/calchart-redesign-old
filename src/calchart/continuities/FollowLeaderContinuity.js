@@ -1,4 +1,6 @@
 import BaseContinuity from "calchart/continuities/BaseContinuity";
+import Coordinate from "calchart/Coordinate";
+import Dot from "calchart/Dot";
 import MovementCommandMove from "calchart/movements/MovementCommandMove";
 
 import HTMLBuilder from "utils/HTMLBuilder";
@@ -12,7 +14,7 @@ export default class FollowLeaderContinuity extends BaseContinuity {
     /**
      * @param {Sheet} sheet
      * @param {DotType} dotType
-     * @param {Dot[]} order - The order of Dots in the line
+     * @param {int[]} order - The order of dots (as IDs) in the line
      * @param {Coordinate[]} path - The coordinates for the path of the first dot
      * @param {object} [options] - Options for the continuity, including:
      *   - {string} stepType
@@ -26,13 +28,17 @@ export default class FollowLeaderContinuity extends BaseContinuity {
     }
 
     static deserialize(sheet, dotType, data) {
-        return new FollowLeaderContinuity(sheet, dotType, data.order, data.path, data);
+        let path = data.path.map(coordData => Coordinate.deserialize(coordData));
+
+        return new FollowLeaderContinuity(sheet, dotType, data.order, path, data);
     }
 
     serialize() {
+        let path = this._path.map(coord => coord.serialize());
+
         return super.serialize("FTL", {
             order: this._order,
-            path: this._path,
+            path: path,
         });
     }
 
@@ -50,15 +56,19 @@ export default class FollowLeaderContinuity extends BaseContinuity {
         let editLabel = HTMLBuilder.label("Edit:");
 
         let editDots = HTMLBuilder.icon("ellipsis-h").click(() => {
-            showPopup("ftl-dots");
-            // TODO: popup with drag and drop dot order
-            // TODO: show error if consecutive dots not in same vertical/horizontal line
+            controller.loadContext("ftl-dots", {
+                dotType: this._dotType,
+                order: this._order,
+            });
         });
         setupTooltip(editDots, "Dots");
 
         let editPath = HTMLBuilder.icon("crosshairs").click(() => {
-            console.log("edit path");
-            // TODO: FTLPathContext
+            controller.loadContext("ftl-path", {
+                dotType: this._dotType,
+                order: this._order,
+                path: this._path,
+            });
         });
         setupTooltip(editPath, "Path");
 

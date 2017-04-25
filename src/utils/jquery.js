@@ -107,6 +107,14 @@ $.fn.exists = function() {
 };
 
 /**
+ * If this element is offscreen, position it to be onscreen.
+ */
+$.fn.keepOnscreen = function() {
+    let offset = this.offset();
+    return this.smartPosition(offset.top, offset.left);
+};
+
+/**
  * Prevent this element from scrolling.
  */
 $.fn.lockScroll = function() {

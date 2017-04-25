@@ -42,7 +42,7 @@ export default class Continuity {
             case "HSDM":
                 return new DiagonalContinuity(sheet, dotType, false);
             case "FTL":
-                let order = sheet.getDotsOfType(dotType);
+                let order = sheet.getDotsOfType(dotType).map(dot => dot.id);
                 return new FollowLeaderContinuity(sheet, dotType, order, []);
             case "GV":
                 return new GrapevineContinuity(sheet, dotType, 0, 90);
