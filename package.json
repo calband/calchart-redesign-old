@@ -9,7 +9,7 @@
   },
   "devDependencies": {
     "grunt": "=0.4.5",
-    "grunt-webpack": "latest",
+    "grunt-webpack": "=2.0.1",
     "webpack": "latest",
     "webpack-dev-server": "latest",
     "grunt-contrib-sass": "latest",

@@ -482,7 +482,7 @@ class LassoTool extends BaseSelection {
             let offset = marker.offset();
             let topElem = document.elementFromPoint(
                 offset.left + marker.width() / 2,
-                offset.top + marker.height() / 2,
+                offset.top + marker.height() / 2
             );
             if ($(topElem).is(this._path)) {
                 this.context.selectDots(dot);
