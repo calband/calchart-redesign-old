@@ -2,6 +2,7 @@ import BaseContinuity from "calchart/continuities/BaseContinuity";
 import MovementCommandMove from "calchart/movements/MovementCommandMove";
 
 import HTMLBuilder from "utils/HTMLBuilder";
+import { setupTooltip } from "utils/UIUtils";
 
 /**
  * A follow-the-leader continuity, where the sequence of dots is defined and
@@ -36,6 +37,10 @@ export default class FollowLeaderContinuity extends BaseContinuity {
     }
 
     getMovements(dot, data) {
+        // TODO: for each dot, add move to get to next dot, then add moves
+        // of the next dot, minus number of beats it takes to get to the next dot
+
+        // TODO: combine first two moves if in same direction
         return [];
     }
 
@@ -43,12 +48,19 @@ export default class FollowLeaderContinuity extends BaseContinuity {
         let label = HTMLBuilder.span("FTL");
 
         let editLabel = HTMLBuilder.label("Edit:");
+
         let editDots = HTMLBuilder.icon("ellipsis-h").click(() => {
             console.log("edit dots");
+            // TODO: popup with drag and drop dot order
+            // TODO: show error if consecutive dots not in same vertical/horizontal line
         });
+        setupTooltip(editDots, "Dots");
+
         let editPath = HTMLBuilder.icon("crosshairs").click(() => {
             console.log("edit path");
+            // TODO: FTLPathContext
         });
+        setupTooltip(editPath, "Path");
 
         return this._wrapPanel("ftl", [label, editLabel, editDots, editPath]);
     }

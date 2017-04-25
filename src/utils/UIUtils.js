@@ -270,36 +270,48 @@ export function setupToolbar(toolbar) {
                 name = `${name} (${shortcutHint})`;
             }
 
-            let tooltipTimeout = null;
-            let tooltip = HTMLBuilder.span("", "tooltip").html(name);
-            let arrow = HTMLBuilder.make("span.tooltip-arrow", tooltip);
-
-            $(this).hover(function() {
-                let offset = $(this).offset();
-                let width = $(this).outerWidth();
-
-                tooltipTimeout = setTimeout(function() {
-                    tooltip.appendTo("body");
-
-                    let left = offset.left - tooltip.outerWidth() / 2 + width / 2;
-                    if (left < 0) {
-                        left = 0;
-                        arrow.css("left", offset.left + width / 2);
-                    } else {
-                        arrow.css("left", "");
-                    }
-
-                    tooltip.css({
-                        top: offset.top - tooltip.outerHeight() - arrow.outerHeight() + 2,
-                        left: left,
-                    });
-                }, 750);
-            }, function() {
-                clearTimeout(tooltipTimeout);
-                tooltip.remove();
-            });
+            setupTooltip(this, name);
         }
     });
+}
+
+/**
+ * Set up a tooltip popup for the given element, using the given label.
+ *
+ * @param {jQuery|string} selector
+ * @param {string} label
+ */
+export function setupTooltip(selector, label) {
+    let tooltipTimeout = null;
+    let tooltip = HTMLBuilder.span("", "tooltip").html(label);
+    let arrow = HTMLBuilder.make("span.tooltip-arrow", tooltip);
+
+    $(selector)
+        .mouseenter(function() {
+            let offset = $(this).offset();
+            let width = $(this).outerWidth();
+
+            tooltipTimeout = setTimeout(function() {
+                tooltip.appendTo("body");
+
+                let left = offset.left - tooltip.outerWidth() / 2 + width / 2;
+                if (left < 0) {
+                    left = 0;
+                    arrow.css("left", offset.left + width / 2);
+                } else {
+                    arrow.css("left", "");
+                }
+
+                tooltip.css({
+                    top: offset.top - tooltip.outerHeight() - arrow.outerHeight() + 2,
+                    left: left,
+                });
+            }, 750);
+        })
+        .mouseleave(function() {
+            clearTimeout(tooltipTimeout);
+            tooltip.remove();
+        });
 }
 
 /**
