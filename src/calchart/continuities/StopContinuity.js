@@ -1,5 +1,3 @@
-import * as _ from "lodash";
-
 import BaseContinuity from "calchart/continuities/BaseContinuity";
 import MovementCommandStop from "calchart/movements/MovementCommandStop";
 

@@ -1,5 +1,3 @@
-import * as _ from "lodash";
-
 import { ActionError } from "utils/errors";
 import { setupTooltip } from "utils/UIUtils";
 

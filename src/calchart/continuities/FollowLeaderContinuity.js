@@ -2,7 +2,7 @@ import BaseContinuity from "calchart/continuities/BaseContinuity";
 import MovementCommandMove from "calchart/movements/MovementCommandMove";
 
 import HTMLBuilder from "utils/HTMLBuilder";
-import { setupTooltip } from "utils/UIUtils";
+import { setupTooltip, showPopup } from "utils/UIUtils";
 
 /**
  * A follow-the-leader continuity, where the sequence of dots is defined and
@@ -50,7 +50,7 @@ export default class FollowLeaderContinuity extends BaseContinuity {
         let editLabel = HTMLBuilder.label("Edit:");
 
         let editDots = HTMLBuilder.icon("ellipsis-h").click(() => {
-            console.log("edit dots");
+            showPopup("ftl-dots");
             // TODO: popup with drag and drop dot order
             // TODO: show error if consecutive dots not in same vertical/horizontal line
         });

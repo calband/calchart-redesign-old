@@ -1,5 +1,3 @@
-import * as _ from "lodash";
-
 import AnimationState from "calchart/AnimationState";
 import Coordinate from "calchart/Coordinate";
 import Continuity from "calchart/Continuity";

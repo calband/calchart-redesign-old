@@ -1,12 +1,13 @@
-import * as d3 from "d3";
-import * as _ from "lodash";
-
 import Coordinate from "calchart/Coordinate";
 import CollegeGrapher from "calchart/graphers/CollegeGrapher";
 import Dot from "calchart/Dot";
 
 import { getNearestOrientation } from "utils/CalchartUtils";
 import { parseArgs } from "utils/JSUtils";
+
+if (_.isUndefined(d3)) {
+    console.error("D3 is not loaded!");
+}
 
 let FIELD_RATIO = 700 / 1250; // height = width * ratio
 let BASE_WIDTH = 1250; // the width of the SVG at 100% zoom

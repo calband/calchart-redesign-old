@@ -1,5 +1,3 @@
-import * as _ from "lodash";
-
 import FountainGridContinuity from "calchart/continuities/FountainGridContinuity";
 import MovementCommandMove from "calchart/movements/MovementCommandMove";
 import MovementCommandStop from "calchart/movements/MovementCommandStop";

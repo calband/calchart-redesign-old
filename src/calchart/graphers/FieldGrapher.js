@@ -1,6 +1,3 @@
-import * as d3 from "d3";
-import * as _ from "lodash";
-
 import GrapherScale from "calchart/GrapherScale";
 
 import { NotImplementedError } from "utils/errors";

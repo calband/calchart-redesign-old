@@ -2,8 +2,6 @@
  * @file A collection of Javascript utility/helper functions.
  */
 
-import * as _ from "lodash";
-
 /**
  * true if the user is on a Mac, false otherwise.
  * https://css-tricks.com/snippets/javascript/test-mac-pc-javascript/

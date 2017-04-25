@@ -1,5 +1,3 @@
-import * as _ from "lodash";
-
 import ContinuityContext from "calchart/contexts/ContinuityContext";
 import DotContext from "calchart/contexts/DotContext";
 import EditBackgroundContext from "calchart/contexts/EditBackgroundContext";

@@ -10,8 +10,6 @@
  * - Message utilities
  */
 
-import * as _ from "lodash";
-
 import { ValidationError } from "utils/errors";
 import HTMLBuilder from "utils/HTMLBuilder";
 import { convertShortcut } from "utils/JSUtils";

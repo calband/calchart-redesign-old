@@ -1,6 +1,3 @@
-import * as d3 from "d3";
-import * as d3Scale from "d3-scale";
-
 import Coordinate from "calchart/Coordinate";
 
 /**
@@ -34,12 +31,12 @@ export default class GrapherScale {
         this._maxY = this._minY + this._height;
 
         // function that maps steps to distance
-        this._xScale = d3Scale.scaleLinear()
+        this._xScale = d3.scale.linear()
             .domain([0, grapher.FIELD_WIDTH])
             .range([this.minX, this.maxX]);
 
         // function that maps steps to distance
-        this._yScale = d3Scale.scaleLinear()
+        this._yScale = d3.scale.linear()
             .domain([0, grapher.FIELD_HEIGHT])
             .range([this.minY, this.maxY]);
 

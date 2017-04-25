@@ -3,9 +3,6 @@
  * in the DotContext.
  */
 
-import * as d3 from "d3";
-import * as _ from "lodash";
-
 import { NotImplementedError } from "utils/errors";
 import HTMLBuilder from "utils/HTMLBuilder";
 import { isSubclass } from "utils/JSUtils";

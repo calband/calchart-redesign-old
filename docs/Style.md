@@ -246,7 +246,7 @@ for (let s of ["a", "b", "c"]) {
 
 ### External Packages/Libraries
 
-Since we're using webpack to combine all of our Javascript files, we might as well package jQuery and other vendor libraries into our code instead of loading all the vendor libraries separately in the HTML.
+All external libraries are loaded in `base.html` and can be used everywhere.
 
 - jQuery: To load jQuery, do the following:
 
@@ -256,7 +256,7 @@ import "utils/jquery";
 $("h1").text("Hello world!");
 ```
 
-This will add the jQuery operator to the global scope, along with all of our custom jQuery functions (see `utils/jquery.js`). Note: with most jQuery operations, don't use arrow functions, since arrow functions define `this` as the containing object, when you probably need `this` to refer to the DOM object:
+This will add all of our custom jQuery functions (see `utils/jquery.js`) to the jQuery library. Note: with most jQuery operations, don't use arrow functions, since arrow functions define `this` as the containing object, when you probably need `this` to refer to the DOM object:
 
 ```js
 class Foo {
@@ -274,24 +274,11 @@ class Foo {
 }
 ```
 
-- D3: To use D3, simply import it. However, you will need to import all sub-packages.
-
-```js
-import * as d3 from "d3";
-
-d3.selectAll("g").append("text").text("Hello world!");
-
-import * as d3_scale from "d3-scale";
-
-let scale = d3_scale.scaleLinear().range([0, 10]);
-console.log(scale(0.5)); // 5
-```
+- D3: [D3](https://d3js.org) is used to draw the dots and the field.
 
 - lodash: [lodash](https://lodash.com/docs/4.17.4) is a library with tons of helpful utility functions. Check this library before adding functions to `JSUtils`.
 
 ```js
-import * as _ from "lodash";
-
 _.last([1, 2]); // 2
 
 let o = { a: 1, b: 2 };
@@ -322,8 +309,6 @@ import Dot from "calchart/Dot";
 Imports should be organized in three sections, with a newline between each section: external libraries, calchart modules, and utils modules. Within each section, order imports alphabetically by path.
 
 ```js
-import * as _ from "lodash";
-
 import AnimationState from "calchart/AnimationState";
 import EditorController from "calchart/controllers/EditorController";
 import Coordinate from "calchart/Coordinate";

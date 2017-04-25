@@ -5,8 +5,6 @@
  * a jQuery object.
  */
 
-import * as _ from "lodash";
-
 import { parseArgs } from "utils/JSUtils";
 
 /**

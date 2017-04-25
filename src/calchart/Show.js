@@ -1,5 +1,3 @@
-import * as _ from "lodash";
-
 import Dot from "calchart/Dot";
 import Sheet from "calchart/Sheet";
 import Song from "calchart/Song";

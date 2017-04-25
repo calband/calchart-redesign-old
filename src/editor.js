@@ -1,11 +1,13 @@
-import * as _ from "lodash";
-
 import EditorController from "calchart/controllers/EditorController";
 import Show from "calchart/Show";
 
 import { ValidationError } from "utils/errors";
 import "utils/jquery";
 import { getData, showPopup } from "utils/UIUtils";
+
+if (_ === undefined) {
+    console.error("lodash is not loaded!");
+}
 
 /**
  * Setup show, prompting user for show details if the show is new

@@ -1,5 +1,3 @@
-import * as _ from "lodash";
-
 import { STEP_TYPES, ORIENTATIONS } from "utils/CalchartUtils";
 import { NotImplementedError, ValidationError } from "utils/errors";
 import HTMLBuilder from "utils/HTMLBuilder";
