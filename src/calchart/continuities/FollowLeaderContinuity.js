@@ -1,8 +1,10 @@
 import BaseContinuity from "calchart/continuities/BaseContinuity";
+import DiagonalContinuity from "calchart/continuities/DiagonalContinuity";
 import Coordinate from "calchart/Coordinate";
 import Dot from "calchart/Dot";
 import MovementCommandMove from "calchart/movements/MovementCommandMove";
 
+import { MovementError } from "utils/errors";
 import HTMLBuilder from "utils/HTMLBuilder";
 import { setupTooltip, showPopup } from "utils/UIUtils";
 
@@ -33,6 +35,8 @@ export default class FollowLeaderContinuity extends BaseContinuity {
         return new FollowLeaderContinuity(sheet, dotType, data.order, path, data);
     }
 
+    get order() { return this._order; }
+
     serialize() {
         let path = this._path.map(coord => coord.serialize());
 
@@ -43,11 +47,27 @@ export default class FollowLeaderContinuity extends BaseContinuity {
     }
 
     getMovements(dot, data) {
-        // TODO: for each dot, add move to get to next dot, then add moves
-        // of the next dot, minus number of beats it takes to get to the next dot
+        // validate that next dot is in same x/y position
+        let index = this._order.indexOf(dot.id);
+        if (index === -1) {
+            this._order.push(dot.id);
+            index = this._order.length - 1;
+        }
 
-        // TODO: combine first two moves if in same direction
-        return [];
+        let path = _.clone(this._path);
+        let show = this._sheet.getShow();
+        for (var i = index - 1; i >= 0; i--) {
+            let dot = show.getDot(this._order[i]);
+            path.unshift(this._sheet.getDotInfo(dot).position);
+        }
+
+        let movements = [];
+        for (var i = 0; i < path.length; i++) {
+            // TODO: get movements to next position, using DiagonalContinuity.getDiagonalMoves()
+            // TODO: combine moves if same direction
+        }
+
+        return movements;
     }
 
     panelHTML(controller) {
@@ -57,8 +77,7 @@ export default class FollowLeaderContinuity extends BaseContinuity {
 
         let editDots = HTMLBuilder.icon("ellipsis-h").click(() => {
             controller.loadContext("ftl-dots", {
-                dotType: this._dotType,
-                order: this._order,
+                continuity: this,
             });
         });
         setupTooltip(editDots, "Dots");
@@ -82,5 +101,12 @@ export default class FollowLeaderContinuity extends BaseContinuity {
             name: "Follow the Leader",
             fields: [stepType, beatsPerStep, customText],
         };
+    }
+
+    /**
+     * @param {int[]} order - The new order of dots
+     */
+    setOrder(order) {
+        this._order = order;
     }
 }

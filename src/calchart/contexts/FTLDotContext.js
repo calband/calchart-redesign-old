@@ -1,7 +1,7 @@
 import BaseContext from "calchart/contexts/BaseContext";
 
 import HTMLBuilder from "utils/HTMLBuilder";
-import { setupPanel } from "utils/UIUtils";
+import { setupPanel, showError } from "utils/UIUtils";
 
 /**
  * The Context that allows a user to define the dot order in
@@ -14,11 +14,8 @@ export default class FTLDotContext extends BaseContext {
         this._panel = $(".panel.ftl-dots");
         this._setupPanel();
 
-        // string
-        this._dotType = null;
-
-        // int[]
-        this._order = null;
+        // FollowLeaderContinuity
+        this._continuity = null;
     }
 
     static get actions() {
@@ -27,32 +24,36 @@ export default class FTLDotContext extends BaseContext {
 
     /**
      * @param {Object} options - Options to customize loading the Context:
-     *    - {string} dotType - The dot type to define the order for.
-     *    - {int[]} order - The order of the dots.
+     *    - {FollowLeaderContinuity} continuity - The FTL continuity being edited
      */
     load(options) {
-        this._dotType = options.dotType;
-        this._order = [];
+        this._continuity = options.continuity;
+        let order = this._continuity.order;
 
         let show = this._controller.getShow();
-        let list = this._panel.find(".ftl-dot-order").empty();
-        options.order.forEach(id => {
+        this._list = this._panel.find(".ftl-dot-order").empty();
+        order.forEach(id => {
             let dot = show.getDot(id);
             let graphDot = this._grapher.getDot(dot);
-            let li = HTMLBuilder.li(dot.label, "dot")
-                .appendTo(list)
+            
+            HTMLBuilder.li(dot.label, `dot dot-${id}`)
+                .data("id", id)
+                .appendTo(this._list)
                 .mouseenter(() => {
                     this._grapher.selectDots(graphDot);
                 })
                 .mouseleave(() => {
                     this._grapher.deselectDots(graphDot);
                 });
-            this._order.push(li);
         });
 
-        list.sortable({
+        this._list.sortable({
+            containment: this._panel,
             update: () => {
-                // TODO: save changes action
+                let order = this._list.children().map(function() {
+                    return $(this).data("id");
+                }).get();
+                controller.doAction("changeDotOrder", [order]);
             },
         });
 
@@ -68,19 +69,21 @@ export default class FTLDotContext extends BaseContext {
 
         this._controller.loadContext("continuity", {
             unload: false,
-            // load dot type
+            // TODO: load dot type
         });
     }
 
     refresh() {
         super.refresh();
 
-        this._grapher.getDots(this._order).css("opacity", 1);
+        let order = this._continuity.order;
+
+        this._grapher.getDots(order).css("opacity", 1);
 
         // re-order dots on every refresh
-        let list = this._panel.find(".ftl-dot-order");
-        this._order.forEach(dot => {
-            list.append(dot);
+        order.forEach(id => {
+            let li = this._list.find(`li.dot-${id}`);
+            this._list.append(li);
         });
     }
 
@@ -92,11 +95,34 @@ export default class FTLDotContext extends BaseContext {
         setupPanel(this._panel);
 
         this._panel.find("button.submit").click(() => {
-            // TODO: validate order: dots next to each other
+            this.unload();
         });
     }
 }
 
 class ContextActions {
-    // TODO
+    /**
+     * Change the dot order to reflect the given order.
+     *
+     * @param {int[]} order
+     * @param {FollowLeaderContinuity} [continuity=this._continuity]
+     */
+    static changeDotOrder(order, continuity=this._continuity) {
+        let oldOrder = continuity.order;
+        continuity.setOrder(order);
+        continuity.sheet.updateMovements(continuity.dotType);
+        this._controller.checkContinuities({
+            dots: continuity.dotType,
+        });
+        this._controller.refresh();
+
+        return {
+            data: [order, continuity],
+            undo: function() {
+                continuity.setOrder(oldOrder);
+                continuity.sheet.updateMovements(continuity.dotType);
+                this._controller.refresh();
+            },
+        };
+    }
 }

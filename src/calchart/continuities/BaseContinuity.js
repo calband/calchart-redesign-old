@@ -50,6 +50,9 @@ export default class BaseContinuity {
         throw new NotImplementedError(this);
     }
 
+    get dotType() { return this._dotType; }
+    get sheet() { return this._sheet; }
+
     /**
      * Return the JSONified version of the BaseContinuity.
      *

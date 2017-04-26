@@ -43,6 +43,14 @@ export default class FountainGridContinuity extends BaseContinuity {
         });
     }
 
+    static _getXAngle(deltaX) {
+        return deltaX < 0 ? 90 : 270;
+    }
+
+    static _getYAngle(deltaY) {
+        return deltaY < 0 ? 180 : 0;
+    }
+
     getMovements(dot, data) {
         let start = data.position;
         let nextSheet = this._sheet.getNextSheet();
@@ -53,8 +61,8 @@ export default class FountainGridContinuity extends BaseContinuity {
 
         let deltaX = end.x - start.x;
         let deltaY = end.y - start.y;
-        let dirX = this._getXAngle(deltaX);
-        let dirY = this._getYAngle(deltaY);
+        let dirX = this.constructor._getXAngle(deltaX);
+        let dirY = this.constructor._getYAngle(deltaY);
 
         let movements = [];
         let options = {
@@ -141,13 +149,5 @@ export default class FountainGridContinuity extends BaseContinuity {
 
     _getType() {
         return this._isEWNS ? "EWNS" : "NSEW";
-    }
-
-    _getXAngle(deltaX) {
-        return deltaX < 0 ? 90 : 270;
-    }
-
-    _getYAngle(deltaY) {
-        return deltaY < 0 ? 180 : 0;
     }
 }
