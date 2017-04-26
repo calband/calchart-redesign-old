@@ -8,7 +8,8 @@ export default class FTLPathContext extends BaseContext {
     constructor(controller) {
         super(controller);
 
-        console.log("ftl path");
+        // FollowLeaderContinuity
+        this._continuity = null;
     }
 
     static get actions() {
@@ -17,27 +18,51 @@ export default class FTLPathContext extends BaseContext {
 
     /**
      * @param {Object} options - Options to customize loading the Context:
-     *    - {string} [dotType=null] - The dot type to initially load.
+     *    - {FollowLeaderContinuity} continuity - The FTL continuity being edited
      */
     load(options) {
-        // TODO
+        this._continuity = options.continuity;
+
+        // TODO: add to toolbar, add coordinate, remove coordinate, move coordinate (default)
+        // TODO: add panel to order coordinates
+
+        this._addEvents(".workspace", "mousedown", e => {
+            // TODO
+        });
     }
 
     unload() {
         super.unload();
 
+        this._path.remove();
+
         this._controller.loadContext("continuity", {
             unload: false,
-            // load dot type
+            dotType: this._continuity.dotType,
         });
     }
 
     refresh() {
-        // TODO
         super.refresh();
+
+        // highlight first dot in path
+        let dot = this._grapher.getDot(this._continuity.order[0]);
+        this._grapher.selectDots(dot);
+
+        let svg = this._grapher.getSVG();
+        let path = svg.select(".ftl-path-helper");
+        if (path.empty()) {
+            path = svg.append("path").classed("ftl-path-helper", true);
+        }
+        path = $.fromD3(path);
+
+        // TODO: draw path
     }
 }
 
 class ContextActions {
-    // TODO
+    // TODO: add coordinate
+    // TODO: remove coordinate
+    // TODO: move coordinate
+    // TODO: reorder coordinates
 }

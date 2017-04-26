@@ -74,6 +74,7 @@ export default class BaseContext {
      * Refresh the UI after zooming.
      */
     refreshZoom() {
+        this.refresh();
     }
 
     /**

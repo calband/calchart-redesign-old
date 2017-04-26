@@ -16,8 +16,10 @@ export default class FollowLeaderContinuity extends BaseContinuity {
     /**
      * @param {Sheet} sheet
      * @param {DotType} dotType
-     * @param {int[]} order - The order of dots (as IDs) in the line
-     * @param {Coordinate[]} path - The coordinates for the path of the first dot
+     * @param {int[]} order - The order of dots (as IDs) in the line. order[0] is
+     *   the first dot in the path.
+     * @param {Coordinate[]} path - The coordinates for the path of the first dot.
+     *   path[0] is the first coordinate to go to.
      * @param {object} [options] - Options for the continuity, including:
      *   - {string} stepType
      *   - {int} beatsPerStep
@@ -36,6 +38,7 @@ export default class FollowLeaderContinuity extends BaseContinuity {
     }
 
     get order() { return this._order; }
+    get path() { return this._path; }
 
     serialize() {
         let path = this._path.map(coord => coord.serialize());
@@ -84,9 +87,7 @@ export default class FollowLeaderContinuity extends BaseContinuity {
 
         let editPath = HTMLBuilder.icon("crosshairs").click(() => {
             controller.loadContext("ftl-path", {
-                dotType: this._dotType,
-                order: this._order,
-                path: this._path,
+                continuity: this,
             });
         });
         setupTooltip(editPath, "Path");

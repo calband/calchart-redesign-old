@@ -431,3 +431,10 @@ body.context-ftl-dots .workspace .graph {
         padding: 10px 25px;
     }
 }
+
+/** FTL PATH CONTEXT **/
+
+.ftl-path-helper {
+    stroke: $gold;
+    fill: none;
+}

@@ -87,10 +87,6 @@ export default class FTLDotContext extends BaseContext {
         });
     }
 
-    refreshZoom() {
-        this.refresh();
-    }
-
     _setupPanel() {
         setupPanel(this._panel);
 

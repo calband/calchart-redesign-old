@@ -118,10 +118,6 @@ export default class EditBackgroundContext extends BaseContext {
         }
     }
 
-    refreshZoom() {
-        this.refresh();
-    }
-
     /**
      * Handle the mousedown event on the image, to move the image.
      *
