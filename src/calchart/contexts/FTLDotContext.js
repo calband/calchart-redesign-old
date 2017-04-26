@@ -69,7 +69,7 @@ export default class FTLDotContext extends BaseContext {
 
         this._controller.loadContext("continuity", {
             unload: false,
-            // TODO: load dot type
+            dotType: this._continuity.dotType,
         });
     }
 
