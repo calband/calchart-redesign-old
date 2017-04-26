@@ -10,6 +10,9 @@ export default class FTLPathContext extends BaseContext {
 
         // FollowLeaderContinuity
         this._continuity = null;
+
+        // selection, add-point, remove-point
+        this._activeTool = null;
     }
 
     static get actions() {
@@ -23,8 +26,10 @@ export default class FTLPathContext extends BaseContext {
     load(options) {
         this._continuity = options.continuity;
 
-        // TODO: add to toolbar, add coordinate, remove coordinate, move coordinate (default)
+        this.loadTool("selection");
         // TODO: add panel to order coordinates
+
+        $(".toolbar .ftl-path-group").removeClass("hide");
 
         this._addEvents(".workspace", "mousedown", e => {
             // TODO
@@ -34,7 +39,7 @@ export default class FTLPathContext extends BaseContext {
     unload() {
         super.unload();
 
-        this._path.remove();
+        $(".toolbar .ftl-path-group").addClass("hide");
 
         this._controller.loadContext("continuity", {
             unload: false,
@@ -57,6 +62,18 @@ export default class FTLPathContext extends BaseContext {
         path = $.fromD3(path);
 
         // TODO: draw path
+    }
+
+    /**
+     * Load the given editing tool.
+     *
+     * @param {string} name
+     */
+    loadTool(name) {
+        this._activeTool = name;
+
+        $(".toolbar .ftl-path-group li").removeClass("active");
+        $(`.toolbar .ftl-path-group .${name}`).addClass("active");
     }
 }
 
