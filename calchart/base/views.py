@@ -114,6 +114,7 @@ class EditorView(CalchartMixin, TemplateView):
             ('partials/panel_edit_continuity.html', 'edit-continuity'),
             ('partials/panel_select_dots.html', 'select-dots'),
             ('partials/panel_ftl_dots.html', 'ftl-dots'),
+            ('partials/panel_ftl_path.html', 'ftl-path'),
         ]
         return context
 

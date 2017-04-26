@@ -1,7 +1,7 @@
 import BaseContext from "calchart/contexts/BaseContext";
 
 import HTMLBuilder from "utils/HTMLBuilder";
-import { setupPanel, showError } from "utils/UIUtils";
+import { setupPanel } from "utils/UIUtils";
 
 /**
  * The Context that allows a user to define the dot order in
@@ -12,6 +12,7 @@ export default class FTLDotContext extends BaseContext {
         super(controller);
 
         this._panel = $(".panel.ftl-dots");
+        this._list = this._panel.find(".ftl-dot-order");
         this._setupPanel();
 
         // FollowLeaderContinuity
@@ -31,7 +32,7 @@ export default class FTLDotContext extends BaseContext {
         let order = this._continuity.order;
 
         let show = this._controller.getShow();
-        this._list = this._panel.find(".ftl-dot-order").empty();
+        this._list.empty();
         order.forEach(id => {
             let dot = show.getDot(id);
             let graphDot = this._grapher.getDot(dot);
@@ -39,10 +40,10 @@ export default class FTLDotContext extends BaseContext {
             HTMLBuilder.li(dot.label, `dot dot-${id}`)
                 .data("id", id)
                 .appendTo(this._list)
-                .mouseenter(() => {
+                .mouseenter(e => {
                     this._grapher.selectDots(graphDot);
                 })
-                .mouseleave(() => {
+                .mouseleave(e => {
                     this._grapher.deselectDots(graphDot);
                 });
         });

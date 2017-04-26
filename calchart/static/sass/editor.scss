@@ -434,7 +434,41 @@ body.context-ftl-dots .workspace .graph {
 
 /** FTL PATH CONTEXT **/
 
+body.context-ftl-path .workspace .graph {
+    .dots .dot {
+        opacity: 0.5;
+    }
+    .ref-point {
+        fill: $gold;
+        &.highlight {
+            fill: $highlight-purple;
+        }
+    }
+}
+
 .ftl-path-helper {
     stroke: $gold;
     fill: none;
+}
+
+.panel.ftl-path {
+    .panel-content {
+        padding: 5px;
+    }
+    .ftl-path-points {
+        margin-bottom: 5px;
+        .point {
+            padding-top: 5px;
+            text-align: center;
+            background: $light-gray;
+            cursor: ns-resize;
+            &:hover {
+                background: $medium-gray;
+            }
+        }
+    }
+    .buttons button.submit {
+        margin: 0;
+        padding: 10px 25px;
+    }
 }

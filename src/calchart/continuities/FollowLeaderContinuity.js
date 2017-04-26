@@ -10,7 +10,8 @@ import { setupTooltip, showPopup } from "utils/UIUtils";
 
 /**
  * A follow-the-leader continuity, where the sequence of dots is defined and
- * the path for the first dot is marked.
+ * the path for the first dot is marked. Dots will move to each point using a
+ * DMHS continuity.
  */
 export default class FollowLeaderContinuity extends BaseContinuity {
     /**
