@@ -320,8 +320,8 @@ editor_toolbar = Toolbar(
     ),
     ToolbarContextGroup(
         'ftl-path',
-        ToolbarItem('Selection', 'mouse-pointer', 'TODO'),
-        ToolbarItem('Add Point', 'plus-square-o', 'TODO'),
-        ToolbarItem('Remove Point', 'minus-square-o', 'TODO'),
+        ToolbarItem('Selection', 'mouse-pointer', 'loadTool(selection)'),
+        ToolbarItem('Add Point', 'plus-square-o', 'loadTool(add-point)'),
+        ToolbarItem('Remove Point', 'minus-square-o', 'loadTool(remove-point)'),
     ),
 )

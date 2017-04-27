@@ -64,13 +64,11 @@ export default class DiagonalContinuity extends FountainGridContinuity {
 
         if (options.diagFirst) {
             addMovement(x1, y1, diagAngle, diagSteps, STEP_SIZES.DIAGONAL);
-
-            let mid = _.last(movements).getEndPosition();
+            let mid = movements[0].getEndPosition();
             addMovement(mid.x, mid.y, moveAngle, moveSteps, STEP_SIZES.STANDARD);
         } else {
             addMovement(x1, y1, moveAngle, moveSteps, STEP_SIZES.STANDARD);
-
-            let mid = _.last(movements).getEndPosition();
+            let mid = movements[0].getEndPosition();
             addMovement(mid.x, mid.y, diagAngle, diagSteps, STEP_SIZES.DIAGONAL);
         }
 

@@ -1,4 +1,5 @@
 import BaseContext from "calchart/contexts/BaseContext";
+import Coordinate from "calchart/Coordinate";
 
 import HTMLBuilder from "utils/HTMLBuilder";
 import { setupPanel } from "utils/UIUtils";
@@ -44,16 +45,29 @@ export default class FTLPathContext extends BaseContext {
         this._panel.show();
         $(".toolbar .ftl-path-group").removeClass("hide");
 
-        this._addEvents(".workspace", "mousedown", e => {
-            switch (this._activeTool) {
-                case "selection":
-                    break;
-                case "add-point":
-                    break;
-                case "remove-point":
-                    break;
-            }
-        });
+        let scale = this._grapher.getScale();
+        this._addEvents(".workspace", {
+            mousedown: e => {
+                if (this._activeTool === "selection" && $(e.target).is(".ref-point")) {
+                    this._movePoint(e);
+                }
+            },
+            click: e => {
+                let [x, y] = $(".workspace").makeRelative(e.pageX, e.pageY);
+                let steps = scale.toStepCoordinates({x, y});
+                // round to nearest step
+                x = Math.round(steps.x);
+                y = Math.round(steps.y);
+                switch (this._activeTool) {
+                    case "add-point":
+                        this._controller.doAction("addPoint", [x, y]);
+                        break;
+                    case "remove-point":
+                        // TODO: doAction(removePoint)
+                        break;
+                }
+            },
+        })
     }
 
     unload() {
@@ -63,6 +77,7 @@ export default class FTLPathContext extends BaseContext {
         this._panel.hide();
         $(".toolbar .ftl-path-group").addClass("hide");
 
+        this._grapher.getDots(this._continuity.order).css("opacity", "");
         this._controller.loadContext("continuity", {
             unload: false,
             dotType: this._continuity.dotType,
@@ -75,8 +90,10 @@ export default class FTLPathContext extends BaseContext {
         // highlight first dot in path
         let dot = this._grapher.getDot(this._continuity.order[0]);
         this._grapher.selectDots(dot);
+        this._grapher.getDots(this._continuity.order).css("opacity", 1);
 
         this._list.empty();
+        this._svg.selectAll(".ref-point").remove();
         let scale = this._grapher.getScale();
         let dotRadius = scale.toDistance(3/4);
 
@@ -87,18 +104,19 @@ export default class FTLPathContext extends BaseContext {
 
         // populate panel and add reference points to SVG
         this._continuity.path.forEach((coordinate, i) => {
-            let point = this._svg.select(`.ref-point.point-${i}`);
-            if (point.empty()) {
-                point = this._svg.append("circle")
-                    .classed(`ref-point point-${i}`, true)
-                    .attr("r", dotRadius);
-            }
+            let point = this._svg.append("circle")
+                .classed("ref-point", true)
+                .attr("r", dotRadius);
 
             let scaled = scale.toDistanceCoordinates(coordinate);
-            point.attr("x", scaled.x).attr("y", scaled.y);
+            point.attr("cx", scaled.x).attr("cy", scaled.y);
             if (prevPoint.x !== scaled.x && prevPoint.y !== scaled.y) {
-                let delta = Math.min(scaled.x - prevPoint.x, scaled.y - prevPoint.y);
-                pathDef += ` L ${prevPoint.x + delta} ${prevPoint.y + delta}`;
+                let deltaX = scaled.x - prevPoint.x;
+                let deltaY = scaled.y - prevPoint.y;
+                let delta = Math.min(Math.abs(deltaX), Math.abs(deltaY));
+                deltaX = Math.sign(deltaX) * delta;
+                deltaY = Math.sign(deltaY) * delta;
+                pathDef += ` L ${prevPoint.x + deltaX} ${prevPoint.y + deltaY}`;
             }
             pathDef += ` L ${scaled.x} ${scaled.y}`;
             prevPoint = scaled;
@@ -137,8 +155,41 @@ export default class FTLPathContext extends BaseContext {
     loadTool(name) {
         this._activeTool = name;
 
+        $(".workspace").off(".ftl-path-add-point");
+        if (name === "add-point") {
+            // add helper dot
+            let scale = this._grapher.getScale();
+            let dotRadius = scale.toDistance(3/4);
+            $(".workspace").on("mousemove.ftl-path-add-point", e => {
+                let [x, y] = $(".workspace").makeRelative(e.pageX, e.pageY);
+                let steps = scale.toStepCoordinates({x, y});
+                let coord = scale.toDistanceCoordinates({
+                    x: Math.round(steps.x),
+                    y: Math.round(steps.y),
+                });
+
+                let helper = this._svg.select(".ftl-path-add-point");
+                if (helper.empty()) {
+                    helper = this._svg.append("circle")
+                        .classed("ftl-path-add-point", true)
+                        .attr("r", dotRadius);
+                }
+                helper.attr("cx", coord.x).attr("cy", coord.y);
+            });
+        }
+
         $(".toolbar .ftl-path-group li").removeClass("active");
         $(`.toolbar .ftl-path-group .${name}`).addClass("active");
+    }
+
+    /**
+     * Handle the mousedown event using the selection tool.
+     *
+     * @param {Event} e
+     */
+    _movePoint(e) {
+        // TODO: mousemove: move point on graph
+        // TODO: mouseup: doAction("movePoint")
     }
 
     _setupPanel() {
@@ -151,7 +202,28 @@ export default class FTLPathContext extends BaseContext {
 }
 
 class ContextActions {
-    // TODO: add coordinate
+    /**
+     * Add a point to the end of the path.
+     *
+     * @param {int} x
+     * @param {int} y
+     * @param {FollowLeaderContinuity} [continuity=this._continuity]
+     */
+    static addPoint(x, y, continuity=this._continuity) {
+        continuity.path.push(new Coordinate(x, y));
+        continuity.sheet.updateMovements(continuity.dotType);
+        this._controller.refresh();
+
+        return {
+            data: [x, y, continuity],
+            undo: function() {
+                continuity.path.pop();
+                continuity.sheet.updateMovements(continuity.dotType);
+                this._controller.refresh();
+            },
+        };
+    }
+
     // TODO: remove coordinate
     // TODO: move coordinate
     // TODO: reorder coordinates

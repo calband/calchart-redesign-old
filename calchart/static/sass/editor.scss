@@ -451,6 +451,12 @@ body.context-ftl-path .workspace .graph {
     fill: none;
 }
 
+// add-point helper
+.ftl-path-add-point {
+    stroke: $gold;
+    fill: none;
+}
+
 .panel.ftl-path {
     .panel-content {
         padding: 5px;
