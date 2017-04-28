@@ -111,4 +111,11 @@ export default class FollowLeaderContinuity extends BaseContinuity {
     setOrder(order) {
         this._order = order;
     }
+
+    /**
+     * @param {int[]} path - The new path of dots
+     */
+    setPath(path) {
+        this._path = path;
+    }
 }

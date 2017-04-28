@@ -123,6 +123,7 @@ export default class FTLPathContext extends BaseContext {
 
             let label = `(${coordinate.x}, ${coordinate.y})`;
             let li = HTMLBuilder.li(label, "point")
+                .data("coordinate", coordinate)
                 .appendTo(this._list)
                 .mouseenter(e => {
                     point.classed("highlight", true);
@@ -135,10 +136,10 @@ export default class FTLPathContext extends BaseContext {
         this._list.sortable({
             containment: this._panel,
             update: () => {
-                // let order = this._list.children().map(function() {
-                //     return $(this).data("id");
-                // }).get();
-                // controller.doAction("changeDotOrder", [order]);
+                let path = this._list.children().map(function() {
+                    return $(this).data("coordinate");
+                }).get();
+                controller.doAction("setPath", [path]);
             },
         });
 
@@ -218,6 +219,28 @@ class ContextActions {
             data: [x, y, continuity],
             undo: function() {
                 continuity.path.pop();
+                continuity.sheet.updateMovements(continuity.dotType);
+                this._controller.refresh();
+            },
+        };
+    }
+
+    /**
+     * Set the path to the given path.
+     *
+     * @param {Coordinate[]} path
+     * @param {FollowLeaderContinuity} [continuity=this._continuity]
+     */
+    static setPath(path, continuity=this._continuity) {
+        let oldPath = continuity.path;
+        continuity.setPath(path);
+        continuity.sheet.updateMovements(continuity.dotType);
+        this._controller.refresh();
+
+        return {
+            data: [path, continuity],
+            undo: function() {
+                continuity.setPath(oldPath);
                 continuity.sheet.updateMovements(continuity.dotType);
                 this._controller.refresh();
             },
