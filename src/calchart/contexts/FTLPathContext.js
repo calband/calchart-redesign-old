@@ -2,6 +2,7 @@ import BaseContext from "calchart/contexts/BaseContext";
 import Coordinate from "calchart/Coordinate";
 
 import HTMLBuilder from "utils/HTMLBuilder";
+import { round } from "utils/MathUtils";
 import { setupPanel } from "utils/UIUtils";
 
 /**
@@ -49,18 +50,27 @@ export default class FTLPathContext extends BaseContext {
         this._addEvents(".workspace", {
             mousedown: e => {
                 if (this._activeTool === "selection" && $(e.target).is(".ref-point")) {
-                    this._movePoint(e);
+                    let point = $(e.target);
+                    $(".workspace").on({
+                        "mousemove.ftl-path-move-point": e => {
+                            let steps = this._eventToSnapSteps(e);
+                            let coord = scale.toDistanceCoordinates(steps);
+                            point.attr("cx", coord.x).attr("cy", coord.y);
+                        },
+                        "mouseup.ftl-path-move-point": e => {
+                            let coordinate = this._eventToSnapSteps(e);
+                            let index = point.data("index");
+                            this._controller.doAction("movePoint", [index, coordinate]);
+                            $(".workspace").off(".ftl-path-move-point");
+                        },
+                    });
                 }
             },
             click: e => {
-                let [x, y] = $(".workspace").makeRelative(e.pageX, e.pageY);
-                let steps = scale.toStepCoordinates({x, y});
-                // round to nearest step
-                x = Math.round(steps.x);
-                y = Math.round(steps.y);
+                let coord = this._eventToSnapSteps(e);
                 switch (this._activeTool) {
                     case "add-point":
-                        this._controller.doAction("addPoint", [x, y]);
+                        this._controller.doAction("addPoint", [coord.x, coord.y]);
                         break;
                     case "remove-point":
                         // TODO: doAction(removePoint)
@@ -107,6 +117,9 @@ export default class FTLPathContext extends BaseContext {
             let point = this._svg.append("circle")
                 .classed("ref-point", true)
                 .attr("r", dotRadius);
+
+            // reference points know their order
+            $.fromD3(point).data("index", i);
 
             let scaled = scale.toDistanceCoordinates(coordinate);
             point.attr("cx", scaled.x).attr("cy", scaled.y);
@@ -157,19 +170,15 @@ export default class FTLPathContext extends BaseContext {
         this._activeTool = name;
 
         $(".workspace").off(".ftl-path-add-point");
+        let helper = this._svg.select(".ftl-path-add-point");
         if (name === "add-point") {
             // add helper dot
             let scale = this._grapher.getScale();
             let dotRadius = scale.toDistance(3/4);
             $(".workspace").on("mousemove.ftl-path-add-point", e => {
-                let [x, y] = $(".workspace").makeRelative(e.pageX, e.pageY);
-                let steps = scale.toStepCoordinates({x, y});
-                let coord = scale.toDistanceCoordinates({
-                    x: Math.round(steps.x),
-                    y: Math.round(steps.y),
-                });
+                let steps = this._eventToSnapSteps(e);
+                let coord = scale.toDistanceCoordinates(steps);
 
-                let helper = this._svg.select(".ftl-path-add-point");
                 if (helper.empty()) {
                     helper = this._svg.append("circle")
                         .classed("ftl-path-add-point", true)
@@ -177,20 +186,12 @@ export default class FTLPathContext extends BaseContext {
                 }
                 helper.attr("cx", coord.x).attr("cy", coord.y);
             });
+        } else {
+            helper.remove();
         }
 
         $(".toolbar .ftl-path-group li").removeClass("active");
         $(`.toolbar .ftl-path-group .${name}`).addClass("active");
-    }
-
-    /**
-     * Handle the mousedown event using the selection tool.
-     *
-     * @param {Event} e
-     */
-    _movePoint(e) {
-        // TODO: mousemove: move point on graph
-        // TODO: mouseup: doAction("movePoint")
     }
 
     _setupPanel() {
@@ -199,6 +200,19 @@ export default class FTLPathContext extends BaseContext {
         this._panel.find("button.submit").click(() => {
             this.unload();
         });
+    }
+
+    /**
+     * Convert a MouseEvent into a coordinate for the current mouse position,
+     * rounded to the nearest step.
+     *
+     * @param {Event} e
+     * @return {Coordinate}
+     */
+    _eventToSnapSteps(e) {
+        let [x, y] = $(".workspace").makeRelative(e.pageX, e.pageY);
+        let steps = this._grapher.getScale().toStepCoordinates({x, y});
+        return new Coordinate(round(steps.x, 1), round(steps.y, 1));
     }
 }
 
@@ -219,6 +233,29 @@ class ContextActions {
             data: [x, y, continuity],
             undo: function() {
                 continuity.path.pop();
+                continuity.sheet.updateMovements(continuity.dotType);
+                this._controller.refresh();
+            },
+        };
+    }
+
+    /**
+     * Move the coordinate at the given index to the given position.
+     *
+     * @param {int} index
+     * @param {Coordinate} coordinate
+     * @param {FollowLeaderContinuity} [continuity=this._continuity]
+     */
+    static movePoint(index, coordinate, continuity=this._continuity) {
+        let oldCoord = continuity.path[index];
+        continuity.path[index] = coordinate;
+        continuity.sheet.updateMovements(continuity.dotType);
+        this._controller.refresh();
+
+        return {
+            data: [index, coordinate, continuity],
+            undo: function() {
+                continuity.path[index] = oldCoord;
                 continuity.sheet.updateMovements(continuity.dotType);
                 this._controller.refresh();
             },
@@ -249,5 +286,4 @@ class ContextActions {
 
     // TODO: remove coordinate
     // TODO: move coordinate
-    // TODO: reorder coordinates
 }
