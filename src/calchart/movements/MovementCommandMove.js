@@ -83,6 +83,13 @@ export default class MovementCommandMove extends BaseMovementCommand {
     }
 
     /**
+     * @return {number}
+     */
+    getDirection() {
+        return this._direction;
+    }
+
+    /**
      * Get the coordinate the dot will be at at the given beat
      *
      * @param {int} beatNum - The number of beats relative to the start of the movement.

@@ -6,6 +6,7 @@ import MovementCommandMove from "calchart/movements/MovementCommandMove";
 
 import { MovementError } from "utils/errors";
 import HTMLBuilder from "utils/HTMLBuilder";
+import { calcAngle } from "utils/MathUtils";
 import { setupTooltip, showPopup } from "utils/UIUtils";
 
 /**
@@ -51,24 +52,50 @@ export default class FollowLeaderContinuity extends BaseContinuity {
     }
 
     getMovements(dot, data) {
-        // validate that next dot is in same x/y position
         let index = this._order.indexOf(dot.id);
         if (index === -1) {
             this._order.push(dot.id);
             index = this._order.length - 1;
         }
 
-        let path = _.clone(this._path);
+        // add preceding dot positions as reference points
+        let path = this._path;
         let show = this._sheet.getShow();
-        for (var i = index - 1; i >= 0; i--) {
+        for (var i = 0; i <= index; i++) {
             let dot = show.getDot(this._order[i]);
-            path.unshift(this._sheet.getDotInfo(dot).position);
+            let position = this._sheet.getDotInfo(dot).position;
+            path = [position].concat(path);
         }
 
+        let prev = path[0];
+        let lastMove = undefined;
         let movements = [];
-        for (var i = 0; i < path.length; i++) {
-            // TODO: get movements to next position, using DiagonalContinuity.getDiagonalMoves()
-            // TODO: combine moves if same direction
+        for (var i = 1; i < path.length; i++) {
+            let next = path[i];
+            // DMHS to next position
+            let movesToNext = DiagonalContinuity.getDiagonalMoves(prev.x, prev.y, next.x, next.y, {
+                diagFirst: true,
+                beatsPerStep: this.getBeatsPerStep(),
+            });
+            movements = movements.concat(movesToNext);
+
+            // combine moves if in same direction
+            if (!_.isUndefined(lastMove)) {
+                let dir1 = lastMove.getDirection();
+                let dir2 = movesToNext[0].getDirection();
+                if (dir1 === dir2) {
+                    let start = lastMove.getStartPosition();
+                    let duration = lastMove.getDuration() + movesToNext[0].getDuration();
+                    let combined = new MovementCommandMove(start.x, start.y, dir1, duration, {
+                        beatsPerStep: this.getBeatsPerStep(),
+                    });
+                    // remove lastMove and movesToNext[0] and add combined
+                    movements.splice(movements.length - movesToNext.length - 1, 2, combined);
+                }
+            }
+
+            prev = next;
+            lastMove = _.last(movements);
         }
 
         return movements;

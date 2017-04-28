@@ -37,7 +37,7 @@ export default class DiagonalContinuity extends FountainGridContinuity {
      * @param {object} options
      *   - {boolean} diagFirst
      *   - {int} beatsPerStep
-     * @return {MovementCommand[]}
+     * @return {MovementCommandMove[]}
      */
     static getDiagonalMoves(x1, y1, x2, y2, options) {
         let deltaX = x2 - x1;
@@ -45,32 +45,45 @@ export default class DiagonalContinuity extends FountainGridContinuity {
         let absX = Math.abs(deltaX);
         let absY = Math.abs(deltaY);
 
-        let diagSteps = Math.min(absX, absY);
-        let diagAngle = calcAngle(0, 0, Math.sign(deltaX), Math.sign(deltaY));
-        let moveSteps = Math.abs(absX - absY);
-        let moveAngle = absX > absY ? this._getXAngle(deltaX) : this._getYAngle(deltaY);
+        let diagInfo = {
+            angle: calcAngle(0, 0, Math.sign(deltaX), Math.sign(deltaY)),
+            steps: Math.min(absX, absY),
+            stepSize: STEP_SIZES.DIAGONAL,
+        };
+        let moveInfo = {
+            angle: absX > absY ? this._getXAngle(deltaX) : this._getYAngle(deltaY),
+            steps: Math.abs(absX - absY),
+            stepSize: STEP_SIZES.STANDARD,
+        };
 
+        let order = options.diagFirst ? [diagInfo, moveInfo] : [moveInfo, diagInfo];
         let movements = [];
 
-        function addMovement(x, y, dir, steps, stepSize) {
-            if (steps === 0) {
+        function addMovement(x, y, i) {
+            let info = order[i];
+            if (info.steps === 0) {
                 return;
             }
-            let duration = steps * options.beatsPerStep;
-            options.stepSize = stepSize;
-            let movement = new MovementCommandMove(x, y, dir, duration, options);
+
+            let duration = info.steps * options.beatsPerStep;
+            options.stepSize = info.stepSize;
+            let movement = new MovementCommandMove(x, y, info.angle, duration, options);
             movements.push(movement);
         }
 
-        if (options.diagFirst) {
-            addMovement(x1, y1, diagAngle, diagSteps, STEP_SIZES.DIAGONAL);
-            let mid = movements[0].getEndPosition();
-            addMovement(mid.x, mid.y, moveAngle, moveSteps, STEP_SIZES.STANDARD);
+        addMovement(x1, y1, 0);
+
+        let midX, midY;
+        if (movements.length === 0) {
+            midX = x1;
+            midY = y1;
         } else {
-            addMovement(x1, y1, moveAngle, moveSteps, STEP_SIZES.STANDARD);
-            let mid = movements[0].getEndPosition();
-            addMovement(mid.x, mid.y, diagAngle, diagSteps, STEP_SIZES.DIAGONAL);
+            let pos = movements[0].getEndPosition();
+            midX = pos.x;
+            midY = pos.y;
         }
+
+        addMovement(midX, midY, 1);
 
         return movements;
     }

@@ -94,6 +94,11 @@ export default class FTLPathContext extends BaseContext {
         $(".toolbar .ftl-path-group").addClass("hide");
 
         this._grapher.getDots(this._continuity.order).css("opacity", "");
+
+        this._controller.checkContinuities({
+            dots: this._continuity.dotType,
+        });
+
         this._controller.loadContext("continuity", {
             unload: false,
             dotType: this._continuity.dotType,
