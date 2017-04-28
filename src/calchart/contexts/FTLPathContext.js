@@ -73,7 +73,10 @@ export default class FTLPathContext extends BaseContext {
                         this._controller.doAction("addPoint", [coord.x, coord.y]);
                         break;
                     case "remove-point":
-                        // TODO: doAction(removePoint)
+                        let point = $(e.target);
+                        if (point.is(".ref-point")) {
+                            this._controller.doAction("removePoint", [point.data("index")]);
+                        }
                         break;
                 }
             },
@@ -83,7 +86,10 @@ export default class FTLPathContext extends BaseContext {
     unload() {
         super.unload();
 
+        // remove helpers
+        this._svg.selectAll(".ref-point").remove();
         this._path.remove();
+
         this._panel.hide();
         $(".toolbar .ftl-path-group").addClass("hide");
 
@@ -263,6 +269,27 @@ class ContextActions {
     }
 
     /**
+     * Remove the point at the given index from the path.
+     *
+     * @param {int} index
+     * @param {FollowLeaderContinuity} [continuity=this._continuity]
+     */
+    static removePoint(index, continuity=this._continuity) {
+        let coordinate = continuity.path.splice(index, 1)[0];
+        continuity.sheet.updateMovements(continuity.dotType);
+        this._controller.refresh();
+
+        return {
+            data: [index, continuity],
+            undo: function() {
+                continuity.path.splice(index, 0, coordinate);
+                continuity.sheet.updateMovements(continuity.dotType);
+                this._controller.refresh();
+            },
+        };
+    }
+
+    /**
      * Set the path to the given path.
      *
      * @param {Coordinate[]} path
@@ -283,7 +310,4 @@ class ContextActions {
             },
         };
     }
-
-    // TODO: remove coordinate
-    // TODO: move coordinate
 }
