@@ -1,7 +1,5 @@
 /**
- * @file Exposes the jQuery operator from the jquery package, with
- * additional methods defined in the jQueryUtils object, and puts
- * the operator in the global scope. Usage:
+ * @file Adds custom jQuery functions to the jQuery operator loaded in the HTML. Usage:
  *
  * import "utils/jquery";
  * $(function() {
@@ -9,15 +7,12 @@
  * });
  */
 
-import jQuery from "jquery";
-import * as _ from "lodash";
-
-// jQuery plugins
-import "chosen-js";
-
-// expose the jQuery operator to the global scope
-window.$ = jQuery;
-window.jQuery = jQuery;
+if (_.isUndefined($)) {
+    console.error("jQuery is not loaded!");
+}
+if (_.isUndefined($.fn.chosen)) {
+    console.error("Chosen is not loaded!");
+}
 
 /**
  * Convert the given d3 selections to jQuery selections.
@@ -109,6 +104,14 @@ $.fn.dropdown = function(options) {
  */
 $.fn.exists = function() {
     return this.length !== 0;
+};
+
+/**
+ * If this element is offscreen, position it to be onscreen.
+ */
+$.fn.keepOnscreen = function() {
+    let offset = this.offset();
+    return this.smartPosition(offset.top, offset.left);
 };
 
 /**

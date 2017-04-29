@@ -1,5 +1,3 @@
-import * as _ from "lodash";
-
 import { STEP_TYPES, ORIENTATIONS } from "utils/CalchartUtils";
 import { NotImplementedError, ValidationError } from "utils/errors";
 import HTMLBuilder from "utils/HTMLBuilder";
@@ -51,6 +49,9 @@ export default class BaseContinuity {
     static deserialize(sheet, dotType, data) {
         throw new NotImplementedError(this);
     }
+
+    get dotType() { return this._dotType; }
+    get sheet() { return this._sheet; }
 
     /**
      * Return the JSONified version of the BaseContinuity.

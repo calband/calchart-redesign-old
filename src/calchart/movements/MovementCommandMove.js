@@ -1,5 +1,3 @@
-import * as _ from "lodash";
-
 import AnimationState from "calchart/AnimationState";
 import BaseMovementCommand from "calchart/movements/BaseMovementCommand";
 import Coordinate from "calchart/Coordinate";
@@ -82,6 +80,13 @@ export default class MovementCommandMove extends BaseMovementCommand {
         } else {
             return `Move ${deltaX} ${dirX}`;
         }
+    }
+
+    /**
+     * @return {number}
+     */
+    getDirection() {
+        return this._direction;
     }
 
     /**

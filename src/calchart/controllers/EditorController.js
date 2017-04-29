@@ -1,5 +1,3 @@
-import * as _ from "lodash";
-
 import ApplicationController from "calchart/ApplicationController";
 import Context from "calchart/Context";
 import Dot from "calchart/Dot";

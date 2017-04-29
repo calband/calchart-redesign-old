@@ -12,12 +12,12 @@ module.exports = function (grunt) {
                     editor: "./src/editor.js",
                 },
                 output: {
-                    path: "calchart/static/js/",
+                    path: path.resolve("calchart/static/js/"),
                     filename: "[name].js",
                 },
                 // set import paths relative to src/ directory
                 resolve: {
-                    root: [
+                    modules: [
                         path.resolve("./src")
                     ],
                 },
@@ -39,12 +39,6 @@ module.exports = function (grunt) {
                                 comments: false,
                                 cacheDirectory: true,
                             },
-                        },
-                        // add jQuery to namespace when loading chosen-js
-                        // http://reactkungfu.com/2015/10/integrating-jquery-chosen-with-webpack-using-imports-loader/
-                        {
-                            test: /chosen\.jquery\.js$/,
-                            loader: "imports?jQuery=jquery,$=jquery,this=>window",
                         },
                     ],
                 },

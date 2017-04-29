@@ -1,5 +1,3 @@
-import * as _ from "lodash";
-
 import AnimationState from "calchart/AnimationState";
 import Coordinate from "calchart/Coordinate";
 import Continuity from "calchart/Continuity";
@@ -7,7 +5,7 @@ import Dot from "calchart/Dot";
 import DotType from "calchart/DotType";
 import MovementCommand from "calchart/MovementCommand";
 
-import { AnimationStateError } from "utils/errors";
+import { AnimationStateError, MovementError } from "utils/errors";
 import { mapSome, moveElem, runAsync } from "utils/JSUtils";
 import { roundSmall } from "utils/MathUtils";
 
@@ -428,6 +426,13 @@ export default class Sheet {
      */
     getPrevSheet() {
         return this._show.getSheets()[this._index - 1] || null;
+    }
+
+    /**
+     * @return {Show}
+     */
+    getShow() {
+        return this._show;
     }
 
     /**

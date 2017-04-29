@@ -1,5 +1,3 @@
-import * as _ from "lodash";
-
 import Coordinate from "calchart/Coordinate";
 
 import { getOrientation } from "utils/CalchartUtils";

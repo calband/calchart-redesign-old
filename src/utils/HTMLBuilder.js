@@ -5,8 +5,6 @@
  * a jQuery object.
  */
 
-import * as _ from "lodash";
-
 import { parseArgs } from "utils/JSUtils";
 
 /**
@@ -100,7 +98,9 @@ export default class HTMLBuilder {
     static icon() {
         let args = parseArgs(arguments, ["name", "class"]);
 
-        return $("<i>").addClass(`icon-${args.name} ${args.class}`);
+        return $("<i>")
+            .addClass(`icon-${args.name}`)
+            .addClass(args.class);
     }
 
     /**

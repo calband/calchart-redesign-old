@@ -348,6 +348,18 @@ body.context-background .workspace .graph {
                 outline: 0;
                 cursor: pointer;
             }
+            &.ftl {
+                .info i {
+                    cursor: pointer;
+                    margin: 0 5px;
+                    padding: 5px;
+                    background: $blue;
+                    color: $white;
+                    &:hover {
+                        background: lighten($blue, 10);
+                    }
+                }
+            }
         }
     }
     .dot-types {
@@ -387,5 +399,82 @@ body.context-background .workspace .graph {
     li {
         padding: 5px;
         text-align: center;
+    }
+}
+
+/** FTL DOT CONTEXT **/
+
+body.context-ftl-dots .workspace .graph {
+    .dots .dot {
+        opacity: 0.5;
+    }
+}
+
+.panel.ftl-dots {
+    .panel-content {
+        padding: 5px;
+    }
+    .ftl-dot-order {
+        margin-bottom: 5px;
+        .dot {
+            padding-top: 5px;
+            text-align: center;
+            background: $light-gray;
+            cursor: ns-resize;
+            &:hover {
+                background: $medium-gray;
+            }
+        }
+    }
+    .buttons button.submit {
+        margin: 0;
+        padding: 10px 25px;
+    }
+}
+
+/** FTL PATH CONTEXT **/
+
+body.context-ftl-path .workspace .graph {
+    .dots .dot {
+        opacity: 0.5;
+    }
+    .ref-point {
+        fill: $gold;
+        &.highlight {
+            fill: $highlight-purple;
+        }
+    }
+}
+
+.ftl-path-helper {
+    stroke: $gold;
+    fill: none;
+}
+
+// add-point helper
+.ftl-path-add-point {
+    stroke: $gold;
+    fill: none;
+}
+
+.panel.ftl-path {
+    .panel-content {
+        padding: 5px;
+    }
+    .ftl-path-points {
+        margin-bottom: 5px;
+        .point {
+            padding-top: 5px;
+            text-align: center;
+            background: $light-gray;
+            cursor: ns-resize;
+            &:hover {
+                background: $medium-gray;
+            }
+        }
+    }
+    .buttons button.submit {
+        margin: 0;
+        padding: 10px 25px;
     }
 }

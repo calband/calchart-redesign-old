@@ -3,9 +3,6 @@
  * in the DotContext.
  */
 
-import * as d3 from "d3";
-import * as _ from "lodash";
-
 import { NotImplementedError } from "utils/errors";
 import HTMLBuilder from "utils/HTMLBuilder";
 import { isSubclass } from "utils/JSUtils";
@@ -485,7 +482,7 @@ class LassoTool extends BaseSelection {
             let offset = marker.offset();
             let topElem = document.elementFromPoint(
                 offset.left + marker.width() / 2,
-                offset.top + marker.height() / 2,
+                offset.top + marker.height() / 2
             );
             if ($(topElem).is(this._path)) {
                 this.context.selectDots(dot);

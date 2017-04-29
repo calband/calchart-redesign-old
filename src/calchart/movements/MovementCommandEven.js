@@ -1,5 +1,3 @@
-import * as _ from "lodash";
-
 import MovementCommandMove from "calchart/movements/MovementCommandMove";
 
 import { calcAngle, calcDistance } from "utils/MathUtils";

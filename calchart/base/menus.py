@@ -263,7 +263,7 @@ editor_menu = Menu(
     ]),
     SubMenu('View', [
         SubMenu('View mode', [
-            MenuItem('Music editor', 'loadContext(music)', icon='music'),
+            # MenuItem('Music editor', 'loadContext(music)', icon='music'),
             MenuItem('Dot editor', 'loadContext(dot)', icon='dot-circle-o'),
             MenuItem('Continuity editor', 'loadContext(continuity)', icon='pencil-square-o'),
             # MenuItem('3D View', 'loadContext(3d)'),
@@ -286,7 +286,7 @@ editor_toolbar = Toolbar(
         ToolbarItem('Add Stuntsheet', 'file-o', 'addStuntsheet'),
     ),
     ToolbarGroup(
-        ToolbarItem('Edit Music', 'music', 'loadContext(music)'),
+        # ToolbarItem('Edit Music', 'music', 'loadContext(music)'),
         ToolbarItem('Edit Dots', 'dot-circle-o', 'loadContext(dot)'),
         ToolbarItem('Edit Continuity', 'pencil-square-o', 'loadContext(continuity)'),
     ),
@@ -317,5 +317,11 @@ editor_toolbar = Toolbar(
         'edit-background',
         ToolbarItem('Save', 'check', 'unload'),
         ToolbarItem('Cancel', 'times', 'revert'),
+    ),
+    ToolbarContextGroup(
+        'ftl-path',
+        ToolbarItem('Selection', 'mouse-pointer', 'loadTool(selection)'),
+        ToolbarItem('Add Point', 'plus-square-o', 'loadTool(add-point)'),
+        ToolbarItem('Remove Point', 'minus-square-o', 'loadTool(remove-point)'),
     ),
 )

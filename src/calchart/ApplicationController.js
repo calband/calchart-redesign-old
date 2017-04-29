@@ -1,6 +1,5 @@
-import * as _ from "lodash";
-
 import { ActionError } from "utils/errors";
+import { setupTooltip } from "utils/UIUtils";
 
 // The singleton instance of the ApplicationController
 window.controller = null;
@@ -126,6 +125,11 @@ export default class ApplicationController {
                 this.doAction(_function);
                 e.preventDefault();
             }
+        });
+
+        // add tooltips
+        $("[data-tooltip]").each(function() {
+            setupTooltip(this, $(this).data("tooltip"));
         });
     }
 

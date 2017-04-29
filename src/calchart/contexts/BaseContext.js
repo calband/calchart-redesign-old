@@ -1,5 +1,3 @@
-import * as _ from "lodash";
-
 import { NotImplementedError } from "utils/errors";
 
 /**
@@ -76,6 +74,7 @@ export default class BaseContext {
      * Refresh the UI after zooming.
      */
     refreshZoom() {
+        this.refresh();
     }
 
     /**

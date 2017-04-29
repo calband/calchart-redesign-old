@@ -1,5 +1,3 @@
-import * as _ from "lodash";
-
 import BaseContext from "calchart/contexts/BaseContext";
 
 import { getDimensions } from "utils/MathUtils";
@@ -118,10 +116,6 @@ export default class EditBackgroundContext extends BaseContext {
 
             super.refresh();
         }
-    }
-
-    refreshZoom() {
-        this.refresh();
     }
 
     /**
