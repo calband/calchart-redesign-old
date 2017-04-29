@@ -61,9 +61,14 @@ export default class Context {
             FTLDotContext,
             FTLPathContext,
         ];
-        return _.extend({}, ... contexts.map(
-            Context => _.invert(Context.shortcuts)
-        ));
+        return _.extend({}, ... contexts.map(Context => {
+            let shortcuts = {};
+            _.each(Context.shortcuts, (cmd, action) => {
+                // if action in the form func(args), parse out function name
+                shortcuts[cmd] = action.match(/(\w+)(\(.+\))?/)[1];
+            });
+            return shortcuts;
+        }));
     }
 
     /**
