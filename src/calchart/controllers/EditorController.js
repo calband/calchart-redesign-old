@@ -946,7 +946,9 @@ export default class EditorController extends ApplicationController {
             })
             .on("contextmenu", ".stuntsheet", function(e) {
                 let sheet = $(this).data("sheet");
-                _this.loadSheet(sheet);
+                if (sheet !== _this._activeSheet) {
+                    _this.loadSheet(sheet);
+                }
 
                 showContextMenu(e, {
                     "Properties...": "editSheetProperties",
@@ -957,86 +959,25 @@ export default class EditorController extends ApplicationController {
                 return false;
             });
 
-        // sidebar clicks and drags
-        let reorder = false;
-        let index = -1;
-        let dragStart = null;
-        sidebar
-            .on("mousedown", ".stuntsheet", function(e) {
-                e.preventDefault();
-                dragStart = e;
+        // sidebar clicks
+        sidebar.on("click", ".stuntsheet", function(e) {
+            let sheet = $(this).data("sheet");
+            if (sheet !== _this._activeSheet) {
+                _this.loadSheet(sheet);
+            }
+        });
 
-                let sheet = $(this).data("sheet");
-                index = sheet.getIndex();
-                // load sheet if not already active
-                if (sheet !== _this._activeSheet) {
-                    _this.loadSheet(sheet);
-                }
-
-                $(document).mouseup(function(e) {
-                    // reordering sheets
-                    if (reorder) {
-                        $(".reorder-sheet-bar").remove();
-                        let currIndex = sheet.getIndex();
-                        if (index !== currIndex) {
-                            _this.doAction("moveSheet", [currIndex, index]);
-                        }
-                    }
-
-                    reorder = false;
-                    dragStart = null;
-
-                    $(this).off(e);
-                });
-            })
-            .on("mousemove", function(e) {
-                if (_.isNull(dragStart)) {
-                    return;
-                }
-
-                // check whether to toggle reorder
-                if (!reorder) {
-                    let deltaX = Math.abs(e.pageX - dragStart.pageX);
-                    let deltaY = Math.abs(e.pageY - dragStart.pageY);
-                    if (deltaX < 5 && deltaY < 5) {
-                        return;
-                    }
-                    reorder = true;
-                }
-
-                let stuntsheet = _this._getClosestStuntsheet(e.pageY);
-                let sheet = stuntsheet.data("sheet");
-                index = sheet.getIndex();
-
-                // if cursor is on the bottom half of the stuntsheet, try to move after sheet;
-                // else, move before sheet
-                let offset = -5;
-                if (e.pageY > stuntsheet.offset().top + stuntsheet.outerHeight() / 2) {
-                    offset = stuntsheet.outerHeight() + 5;
-                }
-
-                // move indication bar
-                let bar = $(".reorder-sheet-bar");
-                if (!bar.exists()) {
-                    bar = HTMLBuilder.div("reorder-sheet-bar")
-                        .css({
-                            width: sidebar.outerWidth(),
-                            left: sidebarOffset.left,
-                        })
-                        .appendTo(sidebar);
-                }
-
-                bar.css("top", stuntsheet.position().top + offset - bar.outerHeight() / 2);
-            })
-            .on("mouseleave", function(e) {
-                if (_.isNull(dragStart)) {
-                    return;
-                }
-
-                // remove indication bar
-                $(".reorder-sheet-bar").remove();
-                reorder = false;
-            });
+        let oldIndex;
+        sidebar.sortable({
+            containment: ".sidebar",
+            activate: (e, ui) => {
+                oldIndex = ui.item.index();
+            },
+            update: (e, ui) => {
+                let index = ui.item.index();
+                _this.doAction("moveSheet", [oldIndex, index]);
+            },
+        });
     }
 
     /**
