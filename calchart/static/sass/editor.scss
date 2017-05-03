@@ -343,7 +343,7 @@ body.context-background .workspace .graph {
                 outline: 0;
                 cursor: pointer;
             }
-            &.ftl {
+            &.ftl, &.cm {
                 .info i {
                     cursor: pointer;
                     margin: 0 5px;

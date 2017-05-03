@@ -91,7 +91,7 @@ export default class FountainGridContinuity extends BaseContinuity {
             }
         }
 
-        let remaining = this._sheet.getDuration() - Math.abs(deltaX) - Math.abs(deltaY);
+        let remaining = data.remaining - Math.abs(deltaX) - Math.abs(deltaY);
         this._addEnd(movements, remaining, end, options);
 
         return movements;

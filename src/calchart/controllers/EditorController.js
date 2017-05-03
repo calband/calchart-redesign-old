@@ -205,10 +205,7 @@ export default class EditorController extends ApplicationController {
                 final = sheet.getAnimationState(dot, duration);
             } catch (e) {
                 if (e instanceof AnimationStateError) {
-                    // ignore if no movements
-                    if (sheet.getDotInfo(dot).movements.length !== 0) {
-                        errors.lackMoves.push(dot.label);
-                    }
+                    errors.lackMoves.push(dot.label);
                     return;
                 } else {
                     throw e;

@@ -57,7 +57,7 @@ export default class MovementCommandMove extends BaseMovementCommand {
     }
 
     getAnimationState(beatNum) {
-        if (beatNum < 0 || beatNum > this._duration) {
+        if (beatNum < 0 || roundSmall(beatNum - this._duration) > 0) {
             return null;
         }
 
