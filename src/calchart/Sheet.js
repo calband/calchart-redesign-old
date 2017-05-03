@@ -552,7 +552,6 @@ export default class Sheet {
      *   either the dot type, the Dot, or a list of Dots. If undefined, updates all dots.
      */
     updateMovements(dots) {
-        console.log(this._index);
         if (_.isString(dots)) {
             dots = this.getDotsOfType(dots);
         } else if (_.isUndefined(dots)) {
