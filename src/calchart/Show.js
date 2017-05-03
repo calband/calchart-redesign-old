@@ -286,7 +286,7 @@ export default class Show {
      */
     _updateMovements(...indices) {
         indices.forEach(i => {
-            if (i > 0) {
+            if (i >= 0) {
                 this._sheets[i].updateMovements();
             }
         });
