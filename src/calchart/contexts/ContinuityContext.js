@@ -377,7 +377,7 @@ let ContextShortcuts = {
     "right": "nextBeat",
     "down": "firstBeat",
     "up": "lastBeat",
-    "ctrl+enter": "checkContinuities(message=true)",
+    "ctrl+enter": "checkContinuities(fullCheck=true)",
 };
 
 class ContextActions {
