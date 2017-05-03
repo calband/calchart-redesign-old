@@ -890,46 +890,6 @@ export default class EditorController extends ApplicationController {
     }
 
     /**
-     * Get the closest stuntsheet to the given y-coordinate. The coordinate should
-     * be within the sidebar.
-     *
-     * @param {number} y
-     * @return {jQuery}
-     */
-    _getClosestStuntsheet(y) {
-        let sidebar = $(".content .sidebar");
-        let halfSheet = $(".stuntsheet").outerHeight() / 2;
-
-        let testX = sidebar.offset().left + sidebar.outerWidth() / 2;
-        let testY = y;
-
-        let closestElem = document.elementFromPoint(testX, testY);
-        let stuntsheet = $(closestElem).closest(".stuntsheet");
-
-        // either in between stuntsheets or above/below the available stuntsheets
-        if (!stuntsheet.exists()) {
-            // try checking half a stuntsheet height below
-            testY = y + halfSheet;
-            closestElem = document.elementFromPoint(testX, testY);
-
-            // below screen, check half a stuntsheet height above
-            if (_.isNull(closestElem)) {
-                testY = y - halfSheet;
-                closestElem = document.elementFromPoint(testX, testY);
-            }
-
-            stuntsheet = $(closestElem).closest(".stuntsheet");
-        }
-
-        // below stuntsheets when sidebar not filled up completely
-        if (!stuntsheet.exists()) {
-            return $(".stuntsheet:last");
-        } else {
-            return stuntsheet;
-        }
-    }
-
-    /**
      * Set up actions to initialize the sidebar
      */
     _setupSidebar() {
