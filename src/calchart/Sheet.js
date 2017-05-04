@@ -576,9 +576,9 @@ export default class Sheet {
             info.movements = _.flatMap(continuities, continuity => {
                 let moves = continuity.getMovements(dot, _.clone(data));
                 moves.forEach(movement => {
+                    data.position = movement.getEndPosition();
                     data.remaining -= movement.getDuration();
                 });
-                data.position = _.last(moves).getEndPosition();
                 return moves;
             });
         });

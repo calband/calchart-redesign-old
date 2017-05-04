@@ -212,6 +212,11 @@ export default class EditorController extends ApplicationController {
                 }
             }
 
+            // ignore if no movements
+            if (_.isNull(final)) {
+                return;
+            }
+
             let position = nextSheet.getPosition(dot);
             if (final.x !== position.x || final.y !== position.y) {
                 errors.wrongPosition.push(dot.label);

@@ -21,6 +21,7 @@ export default class CounterMarchContinuity extends FollowLeaderContinuity {
      * @param {object} [options] - Options for the continuity, including:
      *   - {string} stepType
      *   - {int} beatsPerStep
+     *   TODO: direction (CW, CCW)
      */
     constructor(sheet, dotType, duration, order, options) {
         super(sheet, dotType, order, [], options);
@@ -108,14 +109,20 @@ export default class CounterMarchContinuity extends FollowLeaderContinuity {
                 $(this).siblings("input").prop("disabled", disabled);
             },
             initial: this._duration === null ? "remaining" : "custom",
-        }));
+        }), "duration");
         HTMLBuilder.input({
             name: "customDuration",
             type: "number",
             initial: _.defaultTo(this._duration, 0),
         }).appendTo(fields.duration);
         fields.duration.find("select").change();
+        // TODO: style this
 
         return fields;
+    }
+
+    _getMaxDuration(data) {
+        let duration = _.defaultTo(this._duration, Infinity);
+        return Math.min(data.remaining, duration);
     }
 }

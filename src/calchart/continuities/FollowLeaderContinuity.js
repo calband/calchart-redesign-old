@@ -65,8 +65,10 @@ export default class FollowLeaderContinuity extends BaseContinuity {
         let prev = path.get();
         let lastMove = undefined;
         let movements = [];
+        let beats = 0;
+        let duration = this._getMaxDuration(data);
 
-        while (data.remaining > 0 && path.hasNext()) {
+        while (beats < duration && path.hasNext()) {
             path.next();
             let next = path.get();
 
@@ -76,14 +78,15 @@ export default class FollowLeaderContinuity extends BaseContinuity {
                 beatsPerStep: this.getBeatsPerStep(),
             });
 
-            // update remaining beats
+            // update beats
             for (let i = 0; i < movesToNext.length; i++) {
                 let move = movesToNext[0];
                 let duration = move.getDuration();
-                data.remaining -= duration;
-                if (data.remaining <= 0) {
+                beats += duration;
+                // TODO: sheet.getFinalPosition is not working
+                if (beats >= data.remaining) {
                     // truncate movement duration
-                    move.setDuration(duration + data.remaining);
+                    move.setDuration(duration + data.remaining - beats);
                     // drop all further movements
                     movesToNext = _.take(movesToNext, i + 1);
                 }
@@ -175,5 +178,12 @@ export default class FollowLeaderContinuity extends BaseContinuity {
         }
 
         return new Iterator(path);
+    }
+
+    /**
+     * TODO
+     */
+    _getMaxDuration(data) {
+        return data.remaining;
     }
 }
