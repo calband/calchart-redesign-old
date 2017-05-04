@@ -410,19 +410,19 @@ body.context-background .workspace .graph {
     }
 }
 
-/** FTL DOT CONTEXT **/
+/** CONTINUITY DOT CONTEXT **/
 
-body.context-ftl-dots .workspace .graph {
+body.context-continuity-dots .workspace .graph {
     .dots .dot {
         opacity: 0.5;
     }
 }
 
-.panel.ftl-dots {
+.panel.edit-continuity-dots {
     .panel-content {
         padding: 5px;
     }
-    .ftl-dot-order {
+    .dot-order {
         margin-bottom: 5px;
         .dot {
             padding-top: 5px;

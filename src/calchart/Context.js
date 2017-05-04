@@ -1,7 +1,7 @@
 import ContinuityContext from "calchart/contexts/ContinuityContext";
+import ContinuityDotContext from "calchart/contexts/ContinuityDotContext";
 import DotContext from "calchart/contexts/DotContext";
 import EditBackgroundContext from "calchart/contexts/EditBackgroundContext";
-import FTLDotContext from "calchart/contexts/FTLDotContext";
 import FTLPathContext from "calchart/contexts/FTLPathContext";
 
 // cache contexts after they've been created
@@ -30,11 +30,11 @@ export default class Context {
                 case "continuity":
                     contexts[name] = new ContinuityContext(controller);
                     break;
+                case "continuity-dots":
+                    contexts[name] = new ContinuityDotContext(controller);
+                    break;
                 case "dot":
                     contexts[name] = new DotContext(controller);
-                    break;
-                case "ftl-dots":
-                    contexts[name] = new FTLDotContext(controller);
                     break;
                 case "ftl-path":
                     contexts[name] = new FTLPathContext(controller);
@@ -57,8 +57,8 @@ export default class Context {
         let contexts = [
             EditBackgroundContext,
             ContinuityContext,
+            ContinuityDotContext,
             DotContext,
-            FTLDotContext,
             FTLPathContext,
         ];
         return _.extend({}, ... contexts.map(
@@ -79,11 +79,11 @@ export default class Context {
         if (context instanceof ContinuityContext) {
             return "continuity";
         }
+        if (context instanceof ContinuityDotContext) {
+            return "continuity-dots";
+        }
         if (context instanceof DotContext) {
             return "dot";
-        }
-        if (context instanceof FTLDotContext) {
-            return "ftl-dots";
         }
         if (context instanceof FTLPathContext) {
             return "ftl-path";

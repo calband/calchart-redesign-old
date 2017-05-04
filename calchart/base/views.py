@@ -112,9 +112,9 @@ class EditorView(CalchartMixin, TemplateView):
         context['is_local'] = settings.IS_LOCAL
         context['panels'] = [
             ('partials/panel_edit_continuity.html', 'edit-continuity'),
-            ('partials/panel_select_dots.html', 'select-dots'),
-            ('partials/panel_ftl_dots.html', 'ftl-dots'),
+            ('partials/panel_edit_continuity_dots.html', 'edit-continuity-dots'),
             ('partials/panel_ftl_path.html', 'ftl-path'),
+            ('partials/panel_select_dots.html', 'select-dots'),
         ]
         return context
 
