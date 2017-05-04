@@ -100,7 +100,6 @@ export default class TwoStepContinuity extends BaseContinuity {
         setupTooltip(editDots, "Dots");
 
         let editContinuities = HTMLBuilder.icon("map-signs").click(() => {
-            // TODO: inherit panel_edit_continuity.html
             controller.loadContext("two-step", {
                 continuity: this,
             });
@@ -111,12 +110,11 @@ export default class TwoStepContinuity extends BaseContinuity {
     }
 
     popupHTML() {
-        // TODO
-        let { steps, direction, stepType, beatsPerStep, customText } = this._getPopupFields();
+        let { stepType, beatsPerStep, customText } = this._getPopupFields();
 
         return {
             name: "Two Step",
-            fields: [steps, direction, stepType, beatsPerStep, customText],
+            fields: [stepType, beatsPerStep, customText],
         };
     }
 
@@ -132,8 +130,6 @@ export default class TwoStepContinuity extends BaseContinuity {
 
     _getPopupFields() {
         let fields = super._getPopupFields();
-
-        // TODO
 
         delete fields.orientation;
 
