@@ -80,15 +80,17 @@ class MenuItem(object):
     """
     A Calchart MenuItem, in the format
 
-    <li data-action="{{ action }}">
+    <li data-action="{{ action }}" class="menu-item {{ classes }} {{ disabled }}">
         <i class="icon-{{ icon }}"></i>
         {{ name }}
     </li>
     """
-    def __init__(self, name, action, icon=None):
+    def __init__(self, name, action, icon=None, classes=None, disabled=False):
         self.name = name
         self.action = action
         self.icon = icon
+        self.classes = classes
+        self.disabled = disabled
 
     def render(self):
         if self.icon is None:
@@ -96,9 +98,11 @@ class MenuItem(object):
         else:
             icon = format_html('<i class="icon-{}"></i>', self.icon)
 
+        disabled = 'disabled' if self.disabled else ''
+
         return format_html(
-            '<li data-action="{}">{}{}</li>',
-            self.action, icon, self.name
+            '<li data-action="{}" class="menu-item {} {}">{}{}</li>',
+            self.action, self.classes, disabled, icon, self.name
         )
 
 class Toolbar(object):
@@ -268,8 +272,7 @@ editor_menu = Menu(
             MenuItem('Continuity editor', 'loadContext(continuity)', icon='pencil-square-o'),
             # MenuItem('3D View', 'loadContext(3d)'),
         ]),
-        # TODO: disable unless dot context
-        MenuItem('Toggle sheet background', 'toggleBackground'),
+        MenuItem('Toggle sheet background', 'toggleBackground', classes='toggle-background', disabled=True),
     ], [
         SubMenu('Zoom', [
             MenuItem('Zoom in', 'zoomIn', icon='search-plus'),

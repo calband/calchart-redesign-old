@@ -160,6 +160,14 @@ header {
     }
     li {
         color: $dark-gray;
+        &.disabled {
+            color: $semilight-gray;
+            cursor: default;
+            &:hover, &.active {
+                background: $white;
+                color: $semilight-gray;
+            }
+        }
         &:hover, &.active {
             background: $light-gray;
             color: $dark-gray;
