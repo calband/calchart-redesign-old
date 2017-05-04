@@ -96,7 +96,6 @@ export default class StopContinuity extends BaseContinuity {
 
                 let durationLabel = HTMLBuilder.span("Beats:");
                 let duration = HTMLBuilder.input({
-                    class: "panel-continuity-duration",
                     type: "number",
                     initial: this._duration,
                     change: function() {

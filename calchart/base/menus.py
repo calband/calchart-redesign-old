@@ -327,4 +327,8 @@ editor_toolbar = Toolbar(
         ToolbarItem('Add Point', 'plus-square-o', 'loadTool(add-point)'),
         ToolbarItem('Remove Point', 'minus-square-o', 'loadTool(remove-point)'),
     ),
+    ToolbarContextGroup(
+        'gate-reference',
+        ToolbarItem('Save', 'check', 'unload'),
+    ),
 )

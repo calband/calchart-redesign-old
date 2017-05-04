@@ -4,6 +4,7 @@ import EvenContinuity from "calchart/continuities/EvenContinuity";
 import FollowLeaderContinuity from "calchart/continuities/FollowLeaderContinuity";
 import ForwardContinuity from "calchart/continuities/ForwardContinuity";
 import FountainGridContinuity from "calchart/continuities/FountainGridContinuity";
+import GateTurnContinuity from "calchart/continuities/GateTurnContinuity";
 import GrapevineContinuity from "calchart/continuities/GrapevineContinuity";
 import StopContinuity from "calchart/continuities/StopContinuity";
 import TwoStepContinuity from "calchart/continuities/TwoStepContinuity";
@@ -24,7 +25,8 @@ export default class Continuity {
      * @return {Continuity}
      */
     static create(type, sheet, dotType) {
-        let dots = sheet.getDotsOfType(dotType).map(dot => dot.id);
+        let dots = sheet.getDotsOfType(dotType);
+        let dotIds = dots.map(dot => dot.id);
         switch (type) {
             case "EWNS":
                 return new FountainGridContinuity(sheet, dotType, true);
@@ -45,11 +47,14 @@ export default class Continuity {
             case "HSDM":
                 return new DiagonalContinuity(sheet, dotType, false);
             case "FTL":
-                return new FollowLeaderContinuity(sheet, dotType, dots, []);
+                return new FollowLeaderContinuity(sheet, dotType, dotIds, []);
             case "CM":
-                return new CounterMarchContinuity(sheet, dotType, null, dots);
+                return new CounterMarchContinuity(sheet, dotType, null, dotIds);
             case "TWO":
-                return new TwoStepContinuity(sheet, dotType, dots, []);
+                return new TwoStepContinuity(sheet, dotType, dotIds, []);
+            case "GT":
+                let reference = sheet.getDotInfo(dots[0]).position;
+                return new GateTurnContinuity(sheet, dotType, 90, true, reference);
             case "GV":
                 return new GrapevineContinuity(sheet, dotType, 0, 90);
         }
@@ -82,6 +87,8 @@ export default class Continuity {
                 return CounterMarchContinuity.deserialize(sheet, dotType, data);
             case "TWO":
                 return TwoStepContinuity.deserialize(sheet, dotType, data);
+            case "GATE":
+                return GateTurnContinuity.deserialize(sheet, dotType, data);
             case "GRAPEVINE":
                 return GrapevineContinuity.deserialize(sheet, dotType, data);
         }

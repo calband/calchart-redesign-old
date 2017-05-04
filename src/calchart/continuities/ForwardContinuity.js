@@ -62,7 +62,6 @@ export default class ForwardContinuity extends BaseContinuity {
         let label = HTMLBuilder.span("Move");
 
         let steps = HTMLBuilder.input({
-            class: "panel-continuity-duration",
             type: "number",
             initial: this._numSteps,
             change: function() {

@@ -3,6 +3,7 @@ import ContinuityDotContext from "calchart/contexts/ContinuityDotContext";
 import DotContext from "calchart/contexts/DotContext";
 import EditBackgroundContext from "calchart/contexts/EditBackgroundContext";
 import FTLPathContext from "calchart/contexts/FTLPathContext";
+import GateReferenceContext from "calchart/contexts/GateReferenceContext";
 import TwoStepContext from "calchart/contexts/TwoStepContext";
 
 // cache contexts after they've been created
@@ -39,6 +40,9 @@ export default class Context {
                     break;
                 case "ftl-path":
                     contexts[name] = new FTLPathContext(controller);
+                    break;
+                case "gate-reference":
+                    contexts[name] = new GateReferenceContext(controller);
                     break;
                 case "two-step":
                     contexts[name] = new TwoStepContext(controller);
