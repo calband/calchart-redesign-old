@@ -71,7 +71,7 @@ export default class GateTurnContinuity extends BaseContinuity {
             type: "number",
             initial: this._degrees,
             change: function() {
-                _this._numSteps = validatePositive(this);
+                _this._degrees = validatePositive(this);
                 _this._updateMovements(controller);
             },
         });
@@ -89,7 +89,6 @@ export default class GateTurnContinuity extends BaseContinuity {
         });
 
         let editReference = HTMLBuilder.icon("crosshairs").click(() => {
-            // TODO
             controller.loadContext("gate-reference", {
                 continuity: this,
             });
