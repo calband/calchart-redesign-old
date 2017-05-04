@@ -1403,3 +1403,6 @@
 .icon-arc:before {
   content: "\58";
 }
+.icon-reverse:before {
+  content: "\59";
+}

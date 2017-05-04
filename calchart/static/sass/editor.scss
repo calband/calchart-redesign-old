@@ -434,9 +434,14 @@ body.context-ftl-dots .workspace .graph {
             }
         }
     }
-    .buttons button.submit {
+    .buttons button {
+        display: block;
         margin: 0;
+        margin-bottom: 5px;
         padding: 10px 25px;
+        &:last-child {
+            margin-bottom: 0;
+        }
     }
 }
 
