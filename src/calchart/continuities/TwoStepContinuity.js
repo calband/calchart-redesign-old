@@ -22,12 +22,18 @@ export default class TwoStepContinuity extends BaseContinuity {
      * @param {object} [options] - Options for the continuity, including:
      *   - {string} stepType
      *   - {int} beatsPerStep
+     *   - {boolean} [isMarktime=true] - true if mark time during step two, false for close
      */
     constructor(sheet, dotType, order, continuities, options) {
         super(sheet, dotType, options);
 
+        options = _.defaults(options, {
+            isMarktime: true,
+        });
+
         this._order = order;
         this._continuities = continuities;
+        this._isMarktime = options.isMarktime;
     }
 
     static deserialize(sheet, dotType, data) {
@@ -42,6 +48,7 @@ export default class TwoStepContinuity extends BaseContinuity {
         return super.serialize("TWO", {
             order: this._order,
             continuities: continuities,
+            isMarktime: this._isMarktime,
         });
     }
 
@@ -63,7 +70,11 @@ export default class TwoStepContinuity extends BaseContinuity {
     }
 
     getMovements(dot, data) {
+        // number of beats to wait
+        let wait = this._order.indexOf(dot.id) * 2;
+
         // TODO
+
         return [];
     }
 
@@ -110,11 +121,11 @@ export default class TwoStepContinuity extends BaseContinuity {
     }
 
     popupHTML() {
-        let { stepType, beatsPerStep, customText } = this._getPopupFields();
+        let { isMarktime, stepType, beatsPerStep, customText } = this._getPopupFields();
 
         return {
             name: "Two Step",
-            fields: [stepType, beatsPerStep, customText],
+            fields: [isMarktime, stepType, beatsPerStep, customText],
         };
     }
 
@@ -130,6 +141,11 @@ export default class TwoStepContinuity extends BaseContinuity {
 
     _getPopupFields() {
         let fields = super._getPopupFields();
+
+        fields.isMarktime = HTMLBuilder.formfield("Marktime first", HTMLBuilder.input({
+            type: "checkbox",
+        }), "isMarktime");
+        fields.isMarktime.find("input").prop("checked", this._isMarktime);
 
         delete fields.orientation;
 

@@ -80,6 +80,9 @@ input {
         width: 75px;
         text-align: center;
     }
+    &[type=checkbox] {
+        width: initial;
+    }
 }
 
 select {

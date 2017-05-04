@@ -63,6 +63,9 @@ export function getData(parent) {
         let name = $(this).attr("name");
         if (name) {
             let value = $(this).val();
+            if ($(this).attr("type") === "checkbox") {
+                value = $(this).prop("checked");
+            }
             data[name] = value;
         }
     });
