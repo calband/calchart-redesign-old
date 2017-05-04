@@ -47,6 +47,8 @@ export default class GateTurnContinuity extends BaseContinuity {
         return "gate";
     }
 
+    get reference() { return this._reference; }
+
     getMovements(dot, data) {
         let sign = this._isCW ? 1 : -1;
         let movement = new MovementCommandArc(
@@ -110,6 +112,15 @@ export default class GateTurnContinuity extends BaseContinuity {
             name: "Gate Turn",
             fields: [degrees, direction, stepType, beatsPerStep, customText],
         };
+    }
+
+    /**
+     * Set the reference point
+     *
+     * @param {Coordinate} reference
+     */
+    setReference(reference) {
+        this._reference = reference;
     }
 
     validatePopup(data) {

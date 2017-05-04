@@ -490,6 +490,18 @@ body.context-ftl-path .workspace .graph {
     }
 }
 
+/** GATE REFERENCE CONTEXT **/
+
+body.context-gate-reference .workspace .graph {
+    cursor: crosshair;
+    .gate-reference-helper, .gate-reference-point {
+        fill: $gold;
+    }
+    .gate-reference-helper {
+        opacity: 0.7;
+    }
+}
+
 /** TWO STEP CONTEXT **/
 
 .panel.two-step {
