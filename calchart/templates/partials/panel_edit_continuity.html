@@ -30,5 +30,7 @@
         </select>
     </div>
     <div class="continuities"></div>
-    <ul class="dot-types" data-path="{% static 'img/dot-DOT_TYPE.png' %}"></ul>
+    {% block footer %}
+        <ul class="dot-types" data-path="{% static 'img/dot-DOT_TYPE.png' %}"></ul>
+    {% endblock %}
 {% endblock %}

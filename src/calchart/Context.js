@@ -3,6 +3,7 @@ import ContinuityDotContext from "calchart/contexts/ContinuityDotContext";
 import DotContext from "calchart/contexts/DotContext";
 import EditBackgroundContext from "calchart/contexts/EditBackgroundContext";
 import FTLPathContext from "calchart/contexts/FTLPathContext";
+import TwoStepContext from "calchart/contexts/TwoStepContext";
 
 // cache contexts after they've been created
 let contexts = {};
@@ -39,6 +40,9 @@ export default class Context {
                 case "ftl-path":
                     contexts[name] = new FTLPathContext(controller);
                     break;
+                case "two-step":
+                    contexts[name] = new TwoStepContext(controller);
+                    break;
                 default:
                     throw new Error(`No context named: ${name}`);
             }
@@ -60,6 +64,7 @@ export default class Context {
             ContinuityDotContext,
             DotContext,
             FTLPathContext,
+            TwoStepContext,
         ];
         return _.extend({}, ... contexts.map(
             Context => _.invert(Context.shortcuts)
@@ -87,6 +92,9 @@ export default class Context {
         }
         if (context instanceof FTLPathContext) {
             return "ftl-path";
+        }
+        if (context instanceof TwoStepContext) {
+            return "two-step";
         }
     }
 }

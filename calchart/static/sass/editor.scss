@@ -489,3 +489,17 @@ body.context-ftl-path .workspace .graph {
         padding: 10px 25px;
     }
 }
+
+/** TWO STEP CONTEXT **/
+
+.panel.two-step {
+    @extend .panel.edit-continuity;
+    .buttons {
+        background: $dark-gray;
+        padding: 5px;
+        button {
+            margin: 0;
+            width: 100%;
+        }
+    }
+}

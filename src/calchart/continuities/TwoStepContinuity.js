@@ -1,8 +1,10 @@
 import BaseContinuity from "calchart/continuities/BaseContinuity";
+import Continuity from "calchart/Continuity";
 import MovementCommandMove from "calchart/movements/MovementCommandMove";
 import MovementCommandStop from "calchart/movements/MovementCommandStop";
 
 import HTMLBuilder from "utils/HTMLBuilder";
+import { moveElem } from "utils/JSUtils";
 import { setupTooltip } from "utils/UIUtils";
 
 /**
@@ -29,13 +31,17 @@ export default class TwoStepContinuity extends BaseContinuity {
     }
 
     static deserialize(sheet, dotType, data) {
-        return new TwoStepContinuity(sheet, dotType, data.order, data.continuities, data);
+        let continuities = data.continuities.map(
+            continuity => Continuity.deserialize(sheet, dotType, continuity)
+        );
+        return new TwoStepContinuity(sheet, dotType, data.order, continuities, data);
     }
 
     serialize() {
+        let continuities = this._continuities.map(continuity => continuity.serialize());
         return super.serialize("TWO", {
             order: this._order,
-            continuities: this._continuities,
+            continuities: continuities,
         });
     }
 
@@ -43,11 +49,42 @@ export default class TwoStepContinuity extends BaseContinuity {
         return "two";
     }
 
+    get continuities() { return this._continuities; }
     get order() { return this._order; }
+
+    /**
+     * Add the given continuity to the two-step drill.
+     *
+     * @param {Continuity} continuity
+     */
+    addContinuity(continuity) {
+        this._continuities.push(continuity);
+        this._sheet.updateMovements(this._dotType);
+    }
 
     getMovements(dot, data) {
         // TODO
         return [];
+    }
+
+    /**
+     * Move the given continuity by the given amount in the two-step drill.
+     *
+     * @param {Continuity} continuity
+     * @param {int} delta
+     * @return {boolean} true if successful
+     */
+    moveContinuity(continuity, delta) {
+        let index = this._continuities.indexOf(continuity);
+        let newIndex = index + delta;
+        
+        if (newIndex < 0 || newIndex >= continuities.length) {
+            return false;
+        }
+
+        moveElem(this._continuities, index, newIndex);
+        this._sheet.updateMovements(this._dotType);
+        return true;
     }
 
     panelHTML(controller) {
@@ -63,8 +100,8 @@ export default class TwoStepContinuity extends BaseContinuity {
         setupTooltip(editDots, "Dots");
 
         let editContinuities = HTMLBuilder.icon("map-signs").click(() => {
-            // TODO
-            controller.loadContext("two-step-continuities", {
+            // TODO: inherit panel_edit_continuity.html
+            controller.loadContext("two-step", {
                 continuity: this,
             });
         });
@@ -81,6 +118,16 @@ export default class TwoStepContinuity extends BaseContinuity {
             name: "Two Step",
             fields: [steps, direction, stepType, beatsPerStep, customText],
         };
+    }
+
+    /**
+     * Remove the given continuity from the two-step drill.
+     *
+     * @param {Continuity} continuity
+     */
+    removeContinuity(continuity) {
+        _.pull(this._continuities, continuity);
+        this._sheet.updateMovements(this._dotType);
     }
 
     _getPopupFields() {
