@@ -324,7 +324,7 @@ body.context-background .workspace .graph {
                 label {
                     margin-right: 5px;
                 }
-                input.panel-continuity-duration {
+                input[type=number] {
                     width: 50px;
                     margin-right: 5px;
                 }

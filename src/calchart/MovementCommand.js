@@ -1,3 +1,4 @@
+import MovementCommandArc from "calchart/movements/MovementCommandArc";
 import MovementCommandMove from "calchart/movements/MovementCommandMove";
 import MovementCommandEven from "calchart/movements/MovementCommandEven";
 import MovementCommandStop from "calchart/movements/MovementCommandStop";
@@ -17,6 +18,8 @@ export default class MovementCommand {
      */
     static deserialize(data) {
         switch (data.type) {
+            case "MovementCommandArc":
+                return MovementCommandArc.deserialize(data);
             case "MovementCommandMove":
                 return MovementCommandMove.deserialize(data);
             case "MovementCommandEven":

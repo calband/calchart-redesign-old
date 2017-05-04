@@ -138,14 +138,7 @@ export function roundSmall(x) {
  * @return {number} The angle, measured in Calchart degrees.
  */
 export function toCalchartDegrees(angle) {
-    angle = 270 - angle;
-    while (angle < 0) {
-        angle += 360;
-    }
-    while (angle >= 360) {
-        angle -= 360;
-    }
-    return angle;
+    return wrap(270 - angle, 360);
 }
 
 /**
@@ -168,4 +161,16 @@ export function toDegrees(angle) {
  */
 export function toRadians(angle) {
     return angle * Math.PI / 180;
+}
+
+/**
+ * Wrap the given value so that it lies in the range [0, mod). If
+ * the value is negative, wraps it to be positive.
+ *
+ * @param {number} x
+ * @param {number} mod
+ * @return {number} positive number equivalent to x % mod
+ */
+export function wrap(x, mod) {
+    return ((x % mod) + mod) % mod;
 }
