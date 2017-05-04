@@ -40,9 +40,6 @@ export default class FollowLeaderContinuity extends BaseContinuity {
         return new FollowLeaderContinuity(sheet, dotType, data.order, path, data);
     }
 
-    get order() { return this._order; }
-    get path() { return this._path; }
-
     serialize() {
         let path = this._path.map(coord => coord.serialize());
 
@@ -51,6 +48,13 @@ export default class FollowLeaderContinuity extends BaseContinuity {
             path: path,
         });
     }
+
+    get name() {
+        return "ftl";
+    }
+
+    get order() { return this._order; }
+    get path() { return this._path; }
 
     getMovements(dot, data) {
         let index = this._order.indexOf(dot.id);
@@ -66,9 +70,9 @@ export default class FollowLeaderContinuity extends BaseContinuity {
         let lastMove = undefined;
         let movements = [];
         let beats = 0;
-        let duration = this._getMaxDuration(data);
+        let maxDuration = this._getMaxDuration(data);
 
-        while (beats < duration && path.hasNext()) {
+        while (beats < maxDuration && path.hasNext()) {
             path.next();
             let next = path.get();
 
@@ -83,10 +87,9 @@ export default class FollowLeaderContinuity extends BaseContinuity {
                 let move = movesToNext[0];
                 let duration = move.getDuration();
                 beats += duration;
-                // TODO: sheet.getFinalPosition is not working
-                if (beats >= data.remaining) {
+                if (beats >= maxDuration) {
                     // truncate movement duration
-                    move.setDuration(duration + data.remaining - beats);
+                    move.setDuration(duration + maxDuration - beats);
                     // drop all further movements
                     movesToNext = _.take(movesToNext, i + 1);
                 }
@@ -133,7 +136,7 @@ export default class FollowLeaderContinuity extends BaseContinuity {
         });
         setupTooltip(editPath, "Path");
 
-        return this._wrapPanel("ftl", [label, editLabel, editDots, editPath]);
+        return this._wrapPanel(label, editLabel, editDots, editPath);
     }
 
     popupHTML() {
@@ -181,7 +184,11 @@ export default class FollowLeaderContinuity extends BaseContinuity {
     }
 
     /**
-     * TODO
+     * Get the maximum number of beats this continuity's movements should
+     * take.
+     *
+     * @param {Object} data - See getMovements
+     * @return {int}
      */
     _getMaxDuration(data) {
         return data.remaining;

@@ -369,11 +369,10 @@ export default class Sheet {
      */
     getFinalPosition(dot) {
         let dotInfo = this.getDotInfo(dot);
-        let movement = _.last(dotInfo.movements);
-        if (_.isUndefined(movement)) {
+        if (dotInfo.movements.length === 0) {
             return dotInfo.position;
         } else {
-            return movement.getEndPosition();
+            return _.last(dotInfo.movements).getEndPosition();
         }
     }
 

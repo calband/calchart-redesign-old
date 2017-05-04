@@ -145,21 +145,6 @@ $sidebar-width: 200px;
             }
         }
     }
-    &.edit-continuity {
-        label {
-            width: 125px;
-        }
-        .customText {
-            label {
-                width: initial;
-                margin: 5px 0;
-            }
-            textarea {
-                width: 100%;
-                max-width: 100%;
-            }
-        }
-    }
     &.edit-stuntsheet {
         .icons {
             display: inline-block;
@@ -276,6 +261,34 @@ body.context-background .workspace .graph {
 }
 
 /** CONTINUITY CONTEXT **/
+
+.popup-box.edit-continuity {
+    label {
+        width: 125px;
+    }
+    .customText {
+        label {
+            width: initial;
+            margin: 5px 0;
+        }
+        textarea {
+            width: 100%;
+            max-width: 100%;
+        }
+    }
+    &.continuity-cm {
+        .duration {
+            select {
+                width: 125px;
+            }
+            & > input {
+                margin-left: 10px;
+                width: 50px;
+                vertical-align: middle;
+            }
+        }
+    }
+}
 
 .panel.edit-continuity {
     width: 300px;

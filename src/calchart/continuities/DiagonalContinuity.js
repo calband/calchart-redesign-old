@@ -27,6 +27,13 @@ export default class DiagonalContinuity extends FountainGridContinuity {
         return new DiagonalContinuity(sheet, dotType, data.diagFirst, data);
     }
 
+    serialize() {
+        let data = super.serialize();
+        data.type = "DIAGONAL";
+        data.diagFirst = this._diagFirst;
+        return data;
+    }
+
     /**
      * Get the movements for a diagonal/high step movement
      *
@@ -88,11 +95,8 @@ export default class DiagonalContinuity extends FountainGridContinuity {
         return movements;
     }
 
-    serialize() {
-        let data = super.serialize();
-        data.type = "DIAGONAL";
-        data.diagFirst = this._diagFirst;
-        return data;
+    get name() {
+        return "diagonal";
     }
 
     getMovements(dot, data) {

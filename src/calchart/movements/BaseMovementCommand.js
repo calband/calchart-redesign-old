@@ -117,13 +117,4 @@ export default class BaseMovementCommand {
     getContinuityText() {
         throw new NotImplementedError(this);
     }
-
-    /**
-     * Update the duration to the given value.
-     *
-     * @param {int} duration
-     */
-    setDuration(duration) {
-        this._duration = duration;
-    }
 }

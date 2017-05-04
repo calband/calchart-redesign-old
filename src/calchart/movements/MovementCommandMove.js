@@ -90,6 +90,19 @@ export default class MovementCommandMove extends BaseMovementCommand {
     }
 
     /**
+     * Update the duration to the given value.
+     *
+     * @param {int} duration
+     */
+    setDuration(duration) {
+        this._duration = duration;
+
+        let end = this._getPosition(duration);
+        this._endX = end.x;
+        this._endY = end.y;
+    }
+
+    /**
      * Get the coordinate the dot will be at at the given beat
      *
      * @param {int} beatNum - The number of beats relative to the start of the movement.

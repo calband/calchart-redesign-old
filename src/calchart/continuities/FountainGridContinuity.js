@@ -51,6 +51,10 @@ export default class FountainGridContinuity extends BaseContinuity {
         return deltaY < 0 ? 180 : 0;
     }
 
+    get name() {
+        return "fountain";
+    }
+
     getMovements(dot, data) {
         let start = data.position;
         let nextSheet = this._sheet.getNextSheet();
@@ -113,7 +117,7 @@ export default class FountainGridContinuity extends BaseContinuity {
             initial: this._end,
         });
 
-        return this._wrapPanel(type, [label, endLabel, endChoices]);
+        return this._wrapPanel(label, endLabel, endChoices);
     }
 
     popupHTML() {

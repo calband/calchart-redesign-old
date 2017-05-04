@@ -41,6 +41,10 @@ export default class CounterMarchContinuity extends FollowLeaderContinuity {
         return data;
     }
 
+    get name() {
+        return "cm";
+    }
+
     panelHTML(controller) {
         let label = HTMLBuilder.span("CM");
 
@@ -53,7 +57,7 @@ export default class CounterMarchContinuity extends FollowLeaderContinuity {
         });
         setupTooltip(editDots, "Dots");
 
-        return this._wrapPanel("cm", [label, editLabel, editDots]);
+        return this._wrapPanel(label, editLabel, editDots);
     }
 
     popupHTML() {
@@ -75,6 +79,8 @@ export default class CounterMarchContinuity extends FollowLeaderContinuity {
             } else if (data.duration <= 0) {
                 throw new ValidationError("Duration needs to be a positive integer.");
             }
+        } else {
+            data.duration = null;
         }
     }
 
@@ -116,7 +122,6 @@ export default class CounterMarchContinuity extends FollowLeaderContinuity {
             initial: _.defaultTo(this._duration, 0),
         }).appendTo(fields.duration);
         fields.duration.find("select").change();
-        // TODO: style this
 
         return fields;
     }

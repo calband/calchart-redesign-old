@@ -50,9 +50,6 @@ export default class BaseContinuity {
         throw new NotImplementedError(this);
     }
 
-    get dotType() { return this._dotType; }
-    get sheet() { return this._sheet; }
-
     /**
      * Return the JSONified version of the BaseContinuity.
      *
@@ -70,6 +67,17 @@ export default class BaseContinuity {
             customText: this._customText,
         });
     }
+
+    /**
+     * @return {String} The abbreviated name for the continuity to be used
+     *   in HTML classes.
+     */
+    get name() {
+        throw new NotImplementedError(this);
+    }
+
+    get dotType() { return this._dotType; }
+    get sheet() { return this._sheet; }
 
     /**
      * Get the number of beats per step for this continuity, resolving any defaults.
@@ -234,11 +242,10 @@ export default class BaseContinuity {
     /**
      * Wrap the given contents to add to the edit continuity panel.
      *
-     * @param {string} type - The type of the continuity to add.
      * @param {jQuery[]} contents - The jQuery contents.
      * @return {jQuery} The HTML element to add to the panel, in the format:
      *
-     *   <div class="continuity {type}">
+     *   <div class="continuity {continuity.name}">
      *       <div class="info">{contents}</div>
      *       <div class="actions">
      *           <i class="icon-pencil edit"></i>
@@ -246,13 +253,13 @@ export default class BaseContinuity {
      *       </div>
      *   </div>
      */
-    _wrapPanel(type, contents) {
+    _wrapPanel(...contents) {
         let iconEdit = HTMLBuilder.icon("pencil", "edit");
         let iconDelete = HTMLBuilder.icon("times", "delete");
         let actions = HTMLBuilder.div("actions", [iconEdit, iconDelete]);
         let info = HTMLBuilder.div("info", contents);
 
-        return HTMLBuilder.div("continuity " + type, [info, actions])
+        return HTMLBuilder.div(`continuity ${this.name}`, [info, actions])
             .data("continuity", this);
     }
 }

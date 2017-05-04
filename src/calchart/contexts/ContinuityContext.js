@@ -131,11 +131,15 @@ export default class ContinuityContext extends BaseContext {
 
         showPopup("edit-continuity", {
             init: function(popup) {
+                popup.addClass(`continuity-${continuity.name}`);
+
                 popup.find(".continuity-title").text(html.name);
                 popup.find("form").prepend(html.fields);
                 popup.find("select").dropdown();
             },
             onHide: function(popup) {
+                popup.removeClassRegex(/^continuity-.*$/);
+
                 popup.find("form .field").remove();
             },
             onSubmit: function(popup) {

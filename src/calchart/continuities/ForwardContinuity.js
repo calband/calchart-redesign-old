@@ -37,6 +37,10 @@ export default class ForwardContinuity extends BaseContinuity {
         });
     }
 
+    get name() {
+        return "fm";
+    }
+
     getMovements(dot, data) {
         let options = {
             beatsPerStep: this.getBeatsPerStep(),
@@ -76,7 +80,7 @@ export default class ForwardContinuity extends BaseContinuity {
             },
         });
 
-        return this._wrapPanel("fm", [label, steps, direction]);
+        return this._wrapPanel(label, steps, direction);
     }
 
     popupHTML() {
