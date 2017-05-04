@@ -19,13 +19,13 @@ export default class ContinuityContext extends BaseContext {
     constructor(controller) {
         super(controller);
 
-        this._panel = $(".panel.edit-continuity");
+        this._panel = this._getPanel();
 
         // the currently active dot type
         this._dotType = null;
 
         this._setupPanel();
-    };
+    }
 
     static get shortcuts() {
         return ContextShortcuts;
@@ -40,32 +40,8 @@ export default class ContinuityContext extends BaseContext {
      *    - {string} [dotType=null] - The dot type to initially load.
      */
     load(options) {
-        let _this = this;
-
         this._panel.show();
         this._dotType = _.defaultTo(options.dotType, null);
-
-        let panelWidth = this._panel.outerWidth();
-        let panelHeight = this._panel.outerHeight();
-
-        this._addEvents(window, {
-            // always keep panel on screen
-            resize: function() {
-                let panelOffset = _this._panel.offset();
-                let panelRight = panelOffset.left + panelWidth;
-                let panelBottom = panelOffset.top + panelHeight;
-
-                let windowWidth = $(window).width();
-                let windowHeight = $(window).height();
-
-                if (panelRight > windowWidth) {
-                    _this._panel.css("left", windowWidth - panelWidth);
-                }
-                if (panelBottom > windowHeight) {
-                    _this._panel.css("top", windowHeight - panelHeight);
-                }
-            },
-        });
 
         this._addEvents(".workspace", {
             contextmenu: function(e) {
@@ -166,10 +142,37 @@ export default class ContinuityContext extends BaseContext {
     refresh() {
         super.refresh();
 
-        if (_.isNull(this._sheet)) {
-            return;
+        if (!_.isNull(this._sheet)) {
+            this._refreshSheet();
         }
+    }
 
+    /**
+     * Retrieve the given continuity
+     *
+     * @param {(jQuery|int)} continuity - The continuity to get, either
+     *   the continuity HTML element in the panel, or the index of the
+     *   continuity in the panel.
+     * @return {Continuity}
+     */
+    _getContinuity(continuity) {
+        if (_.isNumber(continuity)) {
+            continuity = this._panel.find(".continuity").get(continuity);
+        }
+        return $(continuity).data("continuity");
+    }
+
+    /**
+     * @return {jQuery} The panel to edit continuities
+     */
+    _getPanel() {
+        return $(".panel.edit-continuity");
+    }
+
+    /**
+     * Update the page according to the state of the Sheet.
+     */
+    _refreshSheet() {
         // update tabs list in panel
         let tabs = this._panel.find(".dot-types").empty();
         let path = tabs.data("path");
@@ -204,21 +207,6 @@ export default class ContinuityContext extends BaseContext {
         let numBeats = this._sheet.getDuration();
         let position = $(".toolbar .seek").width() / numBeats * beat;
         $(".toolbar .seek .marker").css("transform", `translateX(${position}px)`);
-    }
-
-    /**
-     * Retrieve the given continuity
-     *
-     * @param {(jQuery|int)} continuity - The continuity to get, either
-     *   the continuity HTML element in the panel, or the index of the
-     *   continuity in the panel.
-     * @return {Continuity}
-     */
-    _getContinuity(continuity) {
-        if (_.isNumber(continuity)) {
-            continuity = this._panel.find(".continuity").get(continuity);
-        }
-        return $(continuity).data("continuity");
     }
 
     /**
@@ -408,6 +396,26 @@ class ContextActions {
     }
 
     /**
+     * Remove the given continuity from the given sheet for the given dot type.
+     *
+     * @param {Continuity} continuity - The Continuity to remove
+     * @param {Sheet} [sheet=this._sheet] - The sheet to remove continuity from.
+     * @param {string} [dotType=this._dotType] - The dot type to remove continuity for.
+     */
+    static removeContinuity(continuity, sheet=this._sheet, dotType=this._dotType) {
+        sheet.removeContinuity(dotType, continuity);
+        this._controller.refresh();
+
+        return {
+            data: [continuity, sheet, dotType],
+            undo: function() {
+                sheet.addContinuity(dotType, continuity);
+                this._controller.refresh();
+            },
+        };
+    }
+
+    /**
      * Reorder the given continuity by the given amount.
      *
      * @param {Continuity} continuity - The continuity to reorder.
@@ -463,26 +471,6 @@ class ContextActions {
             undo: function() {
                 continuity.savePopup(changed);
                 sheet.updateMovements(dotType);
-                this._controller.refresh();
-            },
-        };
-    }
-
-    /**
-     * Remove the given continuity from the given sheet for the given dot type.
-     *
-     * @param {Continuity} continuity - The Continuity to remove
-     * @param {Sheet} [sheet=this._sheet] - The sheet to remove continuity from.
-     * @param {string} [dotType=this._dotType] - The dot type to remove continuity for.
-     */
-    static removeContinuity(continuity, sheet=this._sheet, dotType=this._dotType) {
-        sheet.removeContinuity(dotType, continuity);
-        this._controller.refresh();
-
-        return {
-            data: [continuity, sheet, dotType],
-            undo: function() {
-                sheet.addContinuity(dotType, continuity);
                 this._controller.refresh();
             },
         };

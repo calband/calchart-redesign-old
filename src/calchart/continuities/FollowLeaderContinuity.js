@@ -123,7 +123,7 @@ export default class FollowLeaderContinuity extends BaseContinuity {
         let editLabel = HTMLBuilder.label("Edit:");
 
         let editDots = HTMLBuilder.icon("ellipsis-h").click(() => {
-            controller.loadContext("ftl-dots", {
+            controller.loadContext("continuity-dots", {
                 continuity: this,
             });
         });

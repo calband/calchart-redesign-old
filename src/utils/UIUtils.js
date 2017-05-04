@@ -63,6 +63,9 @@ export function getData(parent) {
         let name = $(this).attr("name");
         if (name) {
             let value = $(this).val();
+            if ($(this).attr("type") === "checkbox") {
+                value = $(this).prop("checked");
+            }
             data[name] = value;
         }
     });
@@ -444,6 +447,29 @@ export function setupPanel(panel, options={}) {
                 $(window).off("mousemove", movePanel);
             },
         });
+    });
+
+    // always keep panel on screen
+    $(window).resize(() => {
+        if (!$(panel).is(":visible")) {
+            return;
+        }
+
+        let panelWidth = $(panel).outerWidth();
+        let panelHeight = $(panel).outerHeight();
+        let panelOffset = $(panel).offset();
+        let panelRight = panelOffset.left + panelWidth;
+        let panelBottom = panelOffset.top + panelHeight;
+
+        let windowWidth = $(window).width();
+        let windowHeight = $(window).height();
+
+        if (panelRight > windowWidth) {
+            $(panel).css("left", windowWidth - panelWidth);
+        }
+        if (panelBottom > windowHeight) {
+            $(panel).css("top", windowHeight - panelHeight);
+        }
     });
 }
 

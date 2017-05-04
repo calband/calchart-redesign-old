@@ -4,15 +4,15 @@ import HTMLBuilder from "utils/HTMLBuilder";
 import { setupPanel } from "utils/UIUtils";
 
 /**
- * The Context that allows a user to define the dot order in
- * a follow the leader continuity.
+ * The Context that allows a user to define a dot order in
+ * a continuity that requires dots to be in order.
  */
-export default class FTLDotContext extends BaseContext {
+export default class ContinuityDotContext extends BaseContext {
     constructor(controller) {
         super(controller);
 
-        this._panel = $(".panel.ftl-dots");
-        this._list = this._panel.find(".ftl-dot-order");
+        this._panel = $(".panel.edit-continuity-dots");
+        this._list = this._panel.find(".dot-order");
         this._setupPanel();
 
         // FollowLeaderContinuity
