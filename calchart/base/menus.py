@@ -143,7 +143,7 @@ class ToolbarGroup(object):
         )
 
     def _get_classes(self):
-        return 'toolbar-group %s' % self.classes
+        return f'toolbar-group {self.classes}'
 
 class ToolbarContextGroup(ToolbarGroup):
     """
@@ -157,12 +157,12 @@ class ToolbarContextGroup(ToolbarGroup):
     def __init__(self, name, *items, **kwargs):
         items = collapse(items)
 
-        super(ToolbarContextGroup, self).__init__(*items, **kwargs)
+        super().__init__(*items, **kwargs)
         self.name = name
 
     def _get_classes(self):
-        classes = super(ToolbarContextGroup, self)._get_classes()
-        return '%s hide %s-group' % (classes, self.name)
+        classes = super()._get_classes()
+        return f'{classes} hide {self.name}-group'
 
 class ToolbarItem(object):
     """
@@ -200,11 +200,11 @@ class ImageToolbarItem(ToolbarItem):
     where the class is the slugified name
     """
     def __init__(self, name, src, action):
-        super(ImageToolbarItem, self).__init__(name, None, action)
+        super().__init__(name, None, action)
         self.src = src
 
     def _render_contents(self):
-        src = get_static_path('img/%s' % self.src)
+        src = get_static_path(f'img/{self.src}')
         return format_html('<img src="{}">', src)
 
 class CustomToolbarItem(object):
@@ -278,7 +278,7 @@ editor_menu = Menu(
             MenuItem('Zoom in', 'zoomIn', icon='search-plus'),
             MenuItem('Zoom out', 'zoomOut', icon='search-minus'),
         ], [
-            MenuItem(label, 'zoomTo(%s)' % zoom)
+            MenuItem(label, f'zoomTo({zoom})')
             for zoom, label in ZOOMS
         ], icon='search'),
     ]),

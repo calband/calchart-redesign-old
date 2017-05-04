@@ -7,7 +7,7 @@ class SelectOrInt(Select):
     A widget that renders a number input next to the select element.
     """
     def render(self, name, *args, **kwargs):
-        output = super(SelectOrInt, self).render(name, *args, **kwargs)
+        output = super().render(name, *args, **kwargs)
         return format_html(
             '{}<input name="custom{}" type="number">',
             output,
@@ -26,4 +26,4 @@ class BeatsPerStepField(ChoiceField):
             ('default', 'Default'),
             ('custom', 'Custom'),
         ]
-        super(BeatsPerStepField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)

@@ -20,7 +20,7 @@ def export(request, slug):
     """
     show = Show.objects.get(slug=slug)
     response = HttpResponse(show.viewer)
-    response['Content-Disposition'] = 'attachment; filename=%s.json' % slug
+    response['Content-Disposition'] = f'attachment; filename={slug}.json'
 
     return response
 
@@ -39,7 +39,7 @@ class LoginView(FormView):
         if request.session.get('valid'):
             return redirect('home')
         else:
-            return super(LoginView, self).dispatch(request, *args, **kwargs)
+            return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
         self.request.session['username'] = form.cleaned_data['username']
@@ -75,7 +75,7 @@ class HomeView(CalchartMixin, TemplateView):
                 'shows': shows,
             })
         else:
-            return super(HomeView, self).get(request, *args, **kwargs)
+            return super().get(request, *args, **kwargs)
 
     def get_tab(self, tab):
         # for now, show all shows for current user
@@ -102,7 +102,7 @@ class EditorView(CalchartMixin, TemplateView):
 
     def dispatch(self, request, *args, **kwargs):
         self.show = Show.objects.get(slug=kwargs['slug'])
-        return super(EditorView, self).dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super(EditorView, self).get_context_data(**kwargs)
@@ -132,7 +132,7 @@ class EditorView(CalchartMixin, TemplateView):
         """
         sheet = self.request.POST['sheet']
         image = self.request.FILES['image']
-        filename = 'backgrounds/%s/%s' % (self.show.slug, image.name)
+        filename = f'backgrounds/{self.show.slug}/{image.name}'
         if default_storage.exists(filename):
             default_storage.delete(filename)
         filename = default_storage.save(filename, image)

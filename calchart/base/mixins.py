@@ -8,12 +8,12 @@ class LoginRequiredMixin(object):
     def dispatch(self, request, *args, **kwargs):
         if not request.session.get('valid'):
             url = reverse('login')
-            return redirect('%s?next=%s' % (url, request.path))
+            return redirect(f'{url}?next={request.path}')
         else:
-            return super(LoginRequiredMixin, self).dispatch(request, *args, **kwargs)
+            return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        context = super(LoginRequiredMixin, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context['username'] = self.request.session['username']
         return context
 
@@ -30,7 +30,7 @@ class ActionsMixin(object):
             response = getattr(self, action)()
             return response or redirect('home')
         except:
-            return super(ActionsMixin, self).post(request, *args, **kwargs)
+            return super().post(request, *args, **kwargs)
 
 class PopupMixin(object):
     """
@@ -40,7 +40,7 @@ class PopupMixin(object):
     popup_forms = []
 
     def get_context_data(self, **kwargs):
-        context = super(PopupMixin, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context['popup_forms'] = [PopupForm() for PopupForm in self.popup_forms]
         return context
 

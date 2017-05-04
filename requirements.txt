@@ -1,13 +1,1 @@
-# django packages
-Django==1.9
-psycopg2==2.5.4
-boto==2.35.2
-django-storages==1.1.8
-requests[security]==2.10.0
-cryptography==1.5
-
-# production packages
-gunicorn==19.0.0
-dj-database-url==0.3.0
-newrelic==2.54.0.41
-libsass==0.11.1
+-r requirements/prod.txt

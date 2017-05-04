@@ -11,7 +11,7 @@
     <script>
         window.isLocal = {{ is_local|yesno:"true,false" }};
         {% if show.viewer %}
-            window.show = {{ show.viewer|asjson }};
+            window.show = {{ show.viewer|asjson|safe }};
         {% else %}
             window.showName = "{{ show.name }}";
             window.showSlug = "{{ show.slug }}";
