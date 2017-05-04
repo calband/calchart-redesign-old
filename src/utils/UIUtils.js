@@ -117,6 +117,10 @@ export function bindSubmenu(container, parent, submenu) {
     $(parent)
         .addClass("has-submenu")
         .mouseenter(function() {
+            if ($(this).hasClass("disabled")) {
+                return;
+            }
+
             let offset = $(parent).offset();
 
             // manually offset a pixel to accentuate hover
@@ -192,6 +196,10 @@ export function setupMenu(menu) {
             let action = $(this).data("action");
             if (action) {
                 $(this).click(function() {
+                    if ($(this).hasClass("disabled")) {
+                        return;
+                    }
+
                     window.controller.doAction(action);
                     closeSubmenus();
                 });

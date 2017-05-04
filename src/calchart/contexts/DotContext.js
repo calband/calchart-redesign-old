@@ -52,6 +52,7 @@ export default class DotContext extends BaseContext {
 
         $(".toolbar .edit-dots").addClass("active");
         $(".toolbar .edit-dots-group").removeClass("hide");
+        $(".menu-item.toggle-background").removeClass("disabled");
     }
 
     unload() {
@@ -62,6 +63,7 @@ export default class DotContext extends BaseContext {
 
         $(".toolbar .edit-dots").removeClass("active");
         $(".toolbar .edit-dots-group").addClass("hide");
+        $(".menu-item.toggle-background").addClass("disabled");
     }
 
     refresh() {
