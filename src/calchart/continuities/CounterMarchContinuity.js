@@ -16,12 +16,11 @@ export default class CounterMarchContinuity extends FollowLeaderContinuity {
      * @param {DotType} dotType
      * @param {?int} duration - The number of beats to mark time or close. If null,
      *   use remaining beats.
-     * @param {int[]} order - The order of dots (as IDs) in the line. order[0] is
-     *   the first dot in the line.
+     * @param {int[]} order - The order of dots (as IDs) in the line. order[i] moves
+     *   towards order[i+1], and order[len - 1] follows order[0].
      * @param {object} [options] - Options for the continuity, including:
      *   - {string} stepType
      *   - {int} beatsPerStep
-     *   TODO: direction (CW, CCW)
      */
     constructor(sheet, dotType, duration, order, options) {
         super(sheet, dotType, order, [], options);
