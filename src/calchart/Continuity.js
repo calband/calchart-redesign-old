@@ -6,6 +6,7 @@ import ForwardContinuity from "calchart/continuities/ForwardContinuity";
 import FountainGridContinuity from "calchart/continuities/FountainGridContinuity";
 import GrapevineContinuity from "calchart/continuities/GrapevineContinuity";
 import StopContinuity from "calchart/continuities/StopContinuity";
+import TwoStepContinuity from "calchart/continuities/TwoStepContinuity";
 
 /**
  * A proxy class for creating/deserializing all Continuity types, although
@@ -47,6 +48,8 @@ export default class Continuity {
                 return new FollowLeaderContinuity(sheet, dotType, dots, []);
             case "CM":
                 return new CounterMarchContinuity(sheet, dotType, null, dots);
+            case "TWO":
+                return new TwoStepContinuity(sheet, dotType, dots, []);
             case "GV":
                 return new GrapevineContinuity(sheet, dotType, 0, 90);
         }
@@ -77,6 +80,8 @@ export default class Continuity {
                 return FollowLeaderContinuity.deserialize(sheet, dotType, data);
             case "CM":
                 return CounterMarchContinuity.deserialize(sheet, dotType, data);
+            case "TWO":
+                return TwoStepContinuity.deserialize(sheet, dotType, data);
             case "GRAPEVINE":
                 return GrapevineContinuity.deserialize(sheet, dotType, data);
         }
