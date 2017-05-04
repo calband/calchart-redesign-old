@@ -38,6 +38,16 @@ export default class StopContinuity extends BaseContinuity {
         });
     }
 
+    get name() {
+        if (!this._marktime) {
+            return "close";
+        } else if (_.isNull(this._duration)) {
+            return "mtrm";
+        } else {
+            return "mt";
+        }
+    }
+
     getMovements(dot, data) {
         let duration = data.remaining;
         if (this._marktime && this._duration !== null) {
@@ -62,62 +72,62 @@ export default class StopContinuity extends BaseContinuity {
 
     panelHTML(controller) {
         let _this = this;
+        let label = HTMLBuilder.span();
 
-        if (!this._marktime) {
-            // close
-            let label = HTMLBuilder.span("Close");
-            return this._wrapPanel("close", [label]);
-        } else if (_.isNull(this._duration)) {
-            // mark time remaining
-            let label = HTMLBuilder.span("MTRM");
+        switch (this.name) {
+            case "close":
+                label.text("Close");
+                return this._wrapPanel(label);
+            case "mtrm":
+                label.text("MTRM");
 
-            let orientation = HTMLBuilder.select({
-                options: ORIENTATIONS,
-                change: function() {
-                    _this._orientation = $(this).val();
-                    _this._updateMovements(controller);
-                },
-                initial: this._orientation,
-            });
+                let orientation = HTMLBuilder.select({
+                    options: ORIENTATIONS,
+                    change: function() {
+                        _this._orientation = $(this).val();
+                        _this._updateMovements(controller);
+                    },
+                    initial: this._orientation,
+                });
 
-            return this._wrapPanel("mtrm", [label, orientation]);
-        } else {
-            // mark time for a duration
-            let label = HTMLBuilder.span("MT");
+                return this._wrapPanel(label, orientation);
+            case "mt":
+                label.text("MT");
 
-            let durationLabel = HTMLBuilder.span("Beats:");
-            let duration = HTMLBuilder.input({
-                class: "panel-continuity-duration",
-                type: "number",
-                initial: this._duration,
-                change: function() {
-                    _this._duration = validatePositive(this);
-                    _this._updateMovements(controller);
-                },
-            });
+                let durationLabel = HTMLBuilder.span("Beats:");
+                let duration = HTMLBuilder.input({
+                    class: "panel-continuity-duration",
+                    type: "number",
+                    initial: this._duration,
+                    change: function() {
+                        _this._duration = validatePositive(this);
+                        _this._updateMovements(controller);
+                    },
+                });
 
-            return this._wrapPanel("mt", [label, durationLabel, duration]);
+                return this._wrapPanel(label, durationLabel, duration);
         }
     }
 
     popupHTML() {
         let { orientation, stepType, beatsPerStep, duration, customText } = this._getPopupFields();
 
-        if (!this._marktime) {
-            return {
-                name: "Close",
-                fields: [orientation, customText],
-            };
-        } else if (_.isNull(this._duration)) {
-            return {
-                name: "Mark Time Remaining",
-                fields: [orientation, stepType, beatsPerStep, customText],
-            };
-        } else {
-            return {
-                name: "Mark Time",
-                fields: [duration, orientation, stepType, beatsPerStep, customText],
-            };
+        switch (this.name) {
+            case "close":
+                return {
+                    name: "Close",
+                    fields: [orientation, customText],
+                };
+            case "mtrm":
+                return {
+                    name: "Mark Time Remaining",
+                    fields: [orientation, stepType, beatsPerStep, customText],
+                };
+            case "mt":
+                return {
+                    name: "Mark Time",
+                    fields: [duration, orientation, stepType, beatsPerStep, customText],
+                };
         }
     }
 

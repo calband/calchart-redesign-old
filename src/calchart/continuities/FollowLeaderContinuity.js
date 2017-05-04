@@ -6,6 +6,7 @@ import MovementCommandMove from "calchart/movements/MovementCommandMove";
 
 import { MovementError } from "utils/errors";
 import HTMLBuilder from "utils/HTMLBuilder";
+import Iterator from "utils/Iterator";
 import { calcAngle } from "utils/MathUtils";
 import { setupTooltip, showPopup } from "utils/UIUtils";
 
@@ -39,9 +40,6 @@ export default class FollowLeaderContinuity extends BaseContinuity {
         return new FollowLeaderContinuity(sheet, dotType, data.order, path, data);
     }
 
-    get order() { return this._order; }
-    get path() { return this._path; }
-
     serialize() {
         let path = this._path.map(coord => coord.serialize());
 
@@ -51,6 +49,13 @@ export default class FollowLeaderContinuity extends BaseContinuity {
         });
     }
 
+    get name() {
+        return "ftl";
+    }
+
+    get order() { return this._order; }
+    get path() { return this._path; }
+
     getMovements(dot, data) {
         let index = this._order.indexOf(dot.id);
         if (index === -1) {
@@ -58,39 +63,50 @@ export default class FollowLeaderContinuity extends BaseContinuity {
             index = this._order.length - 1;
         }
 
-        // add preceding dot positions as reference points
-        let path = this._path;
-        let show = this._sheet.getShow();
-        for (var i = 0; i <= index; i++) {
-            let dot = show.getDot(this._order[i]);
-            let position = this._sheet.getDotInfo(dot).position;
-            path = [position].concat(path);
-        }
+        let path = this._getPath(index);
 
-        let prev = path[0];
+        path.next();
+        let prev = path.get();
         let lastMove = undefined;
         let movements = [];
-        for (var i = 1; i < path.length; i++) {
-            let next = path[i];
+        let beats = 0;
+        let maxDuration = this._getMaxDuration(data);
+
+        while (beats < maxDuration && path.hasNext()) {
+            path.next();
+            let next = path.get();
+
             // DMHS to next position
             let movesToNext = DiagonalContinuity.getDiagonalMoves(prev.x, prev.y, next.x, next.y, {
                 diagFirst: true,
                 beatsPerStep: this.getBeatsPerStep(),
             });
+
+            // update beats
+            for (let i = 0; i < movesToNext.length; i++) {
+                let move = movesToNext[0];
+                let duration = move.getDuration();
+                beats += duration;
+                if (beats >= maxDuration) {
+                    // truncate movement duration
+                    move.setDuration(duration + maxDuration - beats);
+                    // drop all further movements
+                    movesToNext = _.take(movesToNext, i + 1);
+                }
+            }
+
             movements = movements.concat(movesToNext);
+            let currMove = movesToNext[0];
 
             // combine moves if in same direction
             if (!_.isUndefined(lastMove)) {
                 let dir1 = lastMove.getDirection();
-                let dir2 = movesToNext[0].getDirection();
+                let dir2 = currMove.getDirection();
                 if (dir1 === dir2) {
-                    let start = lastMove.getStartPosition();
-                    let duration = lastMove.getDuration() + movesToNext[0].getDuration();
-                    let combined = new MovementCommandMove(start.x, start.y, dir1, duration, {
-                        beatsPerStep: this.getBeatsPerStep(),
-                    });
-                    // remove lastMove and movesToNext[0] and add combined
-                    movements.splice(movements.length - movesToNext.length - 1, 2, combined);
+                    let duration = lastMove.getDuration() + currMove.getDuration();
+                    lastMove.setDuration(duration);
+                    // remove currMove from movements
+                    _.pull(movements, currMove);
                 }
             }
 
@@ -120,7 +136,7 @@ export default class FollowLeaderContinuity extends BaseContinuity {
         });
         setupTooltip(editPath, "Path");
 
-        return this._wrapPanel("ftl", [label, editLabel, editDots, editPath]);
+        return this._wrapPanel(label, editLabel, editDots, editPath);
     }
 
     popupHTML() {
@@ -144,5 +160,37 @@ export default class FollowLeaderContinuity extends BaseContinuity {
      */
     setPath(path) {
         this._path = path;
+    }
+
+    /**
+     * Get the path for the dot at the given index to follow. The first
+     * element in the path should be the dot's initial position.
+     *
+     * @param {int} index - The index of the current dot in the order.
+     * @return {Iterator<Coordinate>}
+     */
+    _getPath(index) {
+        let path = this._path;
+        let show = this._sheet.getShow();
+
+        // add preceding dot positions as reference points
+        for (let i = 0; i <= index; i++) {
+            let dot = show.getDot(this._order[i]);
+            let position = this._sheet.getDotInfo(dot).position;
+            path = [position].concat(path);
+        }
+
+        return new Iterator(path);
+    }
+
+    /**
+     * Get the maximum number of beats this continuity's movements should
+     * take.
+     *
+     * @param {Object} data - See getMovements
+     * @return {int}
+     */
+    _getMaxDuration(data) {
+        return data.remaining;
     }
 }

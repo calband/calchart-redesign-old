@@ -1,3 +1,4 @@
+import CounterMarchContinuity from "calchart/continuities/CounterMarchContinuity";
 import DiagonalContinuity from "calchart/continuities/DiagonalContinuity";
 import EvenContinuity from "calchart/continuities/EvenContinuity";
 import FollowLeaderContinuity from "calchart/continuities/FollowLeaderContinuity";
@@ -22,6 +23,7 @@ export default class Continuity {
      * @return {Continuity}
      */
     static create(type, sheet, dotType) {
+        let dots = sheet.getDotsOfType(dotType).map(dot => dot.id);
         switch (type) {
             case "EWNS":
                 return new FountainGridContinuity(sheet, dotType, true);
@@ -42,8 +44,9 @@ export default class Continuity {
             case "HSDM":
                 return new DiagonalContinuity(sheet, dotType, false);
             case "FTL":
-                let order = sheet.getDotsOfType(dotType).map(dot => dot.id);
-                return new FollowLeaderContinuity(sheet, dotType, order, []);
+                return new FollowLeaderContinuity(sheet, dotType, dots, []);
+            case "CM":
+                return new CounterMarchContinuity(sheet, dotType, null, dots);
             case "GV":
                 return new GrapevineContinuity(sheet, dotType, 0, 90);
         }
@@ -72,6 +75,8 @@ export default class Continuity {
                 return DiagonalContinuity.deserialize(sheet, dotType, data);
             case "FTL":
                 return FollowLeaderContinuity.deserialize(sheet, dotType, data);
+            case "CM":
+                return CounterMarchContinuity.deserialize(sheet, dotType, data);
             case "GRAPEVINE":
                 return GrapevineContinuity.deserialize(sheet, dotType, data);
         }

@@ -97,6 +97,10 @@ export default class FTLDotContext extends BaseContext {
     _setupPanel() {
         setupPanel(this._panel);
 
+        this._panel.find("button.flip").click(() => {
+            this._controller.doAction("reverseDotOrder");
+        });
+
         this._panel.find("button.submit").click(() => {
             this.unload();
         });
@@ -120,6 +124,26 @@ class ContextActions {
             data: [order, continuity],
             undo: function() {
                 continuity.setOrder(oldOrder);
+                continuity.sheet.updateMovements(continuity.dotType);
+                this._controller.refresh();
+            },
+        };
+    }
+
+    /**
+     * Reverse the dot order.
+     *
+     * @param {FollowLeaderContinuity} [continuity=this._continuity]
+     */
+    static reverseDotOrder(continuity=this._continuity) {
+        continuity.order.reverse();
+        continuity.sheet.updateMovements(continuity.dotType);
+        this._controller.refresh();
+
+        return {
+            data: [continuity],
+            undo: function() {
+                continuity.order.reverse();
                 continuity.sheet.updateMovements(continuity.dotType);
                 this._controller.refresh();
             },

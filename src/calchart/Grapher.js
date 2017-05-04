@@ -356,6 +356,9 @@ export default class Grapher {
                     state = sheet.getAnimationState(dot, currentBeat);
                 } catch (e) {
                     // ran out of movements
+                    state = null;
+                }
+                if (_.isNull(state)) {
                     state = sheet.getFinalPosition(dot);
                 }
             }

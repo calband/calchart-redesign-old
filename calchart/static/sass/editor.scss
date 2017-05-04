@@ -145,21 +145,6 @@ $sidebar-width: 200px;
             }
         }
     }
-    &.edit-continuity {
-        label {
-            width: 125px;
-        }
-        .customText {
-            label {
-                width: initial;
-                margin: 5px 0;
-            }
-            textarea {
-                width: 100%;
-                max-width: 100%;
-            }
-        }
-    }
     &.edit-stuntsheet {
         .icons {
             display: inline-block;
@@ -277,6 +262,34 @@ body.context-background .workspace .graph {
 
 /** CONTINUITY CONTEXT **/
 
+.popup-box.edit-continuity {
+    label {
+        width: 125px;
+    }
+    .customText {
+        label {
+            width: initial;
+            margin: 5px 0;
+        }
+        textarea {
+            width: 100%;
+            max-width: 100%;
+        }
+    }
+    &.continuity-cm {
+        .duration {
+            select {
+                width: 125px;
+            }
+            & > input {
+                margin-left: 10px;
+                width: 50px;
+                vertical-align: middle;
+            }
+        }
+    }
+}
+
 .panel.edit-continuity {
     width: 300px;
     background: $light-gray;
@@ -343,7 +356,7 @@ body.context-background .workspace .graph {
                 outline: 0;
                 cursor: pointer;
             }
-            &.ftl {
+            &.ftl, &.cm {
                 .info i {
                     cursor: pointer;
                     margin: 0 5px;
@@ -421,9 +434,14 @@ body.context-ftl-dots .workspace .graph {
             }
         }
     }
-    .buttons button.submit {
+    .buttons button {
+        display: block;
         margin: 0;
+        margin-bottom: 5px;
         padding: 10px 25px;
+        &:last-child {
+            margin-bottom: 0;
+        }
     }
 }
 

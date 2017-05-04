@@ -30,6 +30,10 @@ export default class EvenContinuity extends BaseContinuity {
         return super.serialize("EVEN");
     }
 
+    get name() {
+        return "even";
+    }
+
     getMovements(dot, data) {
         let nextSheet = this._sheet.getNextSheet();
         if (_.isNull(nextSheet)) {
@@ -54,7 +58,7 @@ export default class EvenContinuity extends BaseContinuity {
 
     panelHTML(controller) {
         let label = HTMLBuilder.span("Even");
-        return this._wrapPanel("even", [label]);
+        return this._wrapPanel(label);
     }
 
     popupHTML() {

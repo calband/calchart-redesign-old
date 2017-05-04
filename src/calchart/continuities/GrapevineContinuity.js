@@ -39,6 +39,10 @@ export default class GrapevineContinuity extends ForwardContinuity {
         return data;
     }
 
+    get name() {
+        return "gv";
+    }
+
     panelHTML(controller) {
         let _this = this;
 
@@ -63,7 +67,7 @@ export default class GrapevineContinuity extends ForwardContinuity {
             },
         });
 
-        return this._wrapPanel("gv", [label, steps, direction]);
+        return this._wrapPanel(label, steps, direction);
     }
 
     popupHTML() {

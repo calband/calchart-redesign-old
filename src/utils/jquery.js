@@ -136,6 +136,16 @@ $.fn.makeRelative = function(pageX, pageY) {
 };
 
 /**
+ * Check that clicking on this element is not clicking in the given element
+ *
+ * @param {jQuery} element
+ * @return {boolean} true if this element is not in the given element
+ */
+$.fn.notIn = function(element) {
+    return !this.closest(element).exists();
+};
+
+/**
  * Capture the pinch gesture on trackpads, which is the same as scrolling
  * with the ctrl key pressed (http://stackoverflow.com/a/28685082/4966649).
  *
@@ -153,20 +163,17 @@ $.fn.pinch = function(callback) {
 };
 
 /**
- * Re-enable this element from scrolling after calling lockScroll.
- */
-$.fn.unlockScroll = function() {
-    this.removeClass("no-scroll");
-};
-
-/**
- * Check that clicking on this element is not clicking in the given element
+ * Remove all classes from this object that match the given pattern.
  *
- * @param {jQuery} element
- * @return {boolean} true if this element is not in the given element
+ * @param {String|regex} pattern
  */
-$.fn.notIn = function(element) {
-    return !this.closest(element).exists();
+$.fn.removeClassRegex = function(pattern) {
+    return this.each((i, elem) => {
+        let classes = elem.className.split(" ").filter(
+            cls => _.isNull(cls.match(pattern))
+        );
+        elem.className = classes.join(" ");
+    });
 };
 
 /**
@@ -328,4 +335,11 @@ $.fn.smartPosition = function(top, left, right=left) {
     }
 
     return this.css(position);
+};
+
+/**
+ * Re-enable this element from scrolling after calling lockScroll.
+ */
+$.fn.unlockScroll = function() {
+    this.removeClass("no-scroll");
 };

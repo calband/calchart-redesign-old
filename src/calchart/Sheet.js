@@ -225,12 +225,17 @@ export default class Sheet {
      *
      * @param {Dot} dot
      * @param {int} beatNum - The beat to get the state for.
-     * @return {AnimationState} An AnimationState that describes the given Dot at
-     *   a moment of the show. If the Dot has no position at the specified beat,
-     *   throw an AnimationStateError.
+     * @return {?AnimationState} An AnimationState that describes the given Dot at
+     *   a moment of the show. If the Dot has no movements in this Sheet, return
+     *   null. If the Dot has no position at the specified beat, throw an
+     *   AnimationStateError.
      */
     getAnimationState(dot, beatNum) {
         let movements = this.getDotInfo(dot).movements;
+        if (movements.length === 0) {
+            return null;
+        }
+
         let remaining = beatNum;
 
         for (let i = 0; i < movements.length; i++) {
@@ -364,11 +369,10 @@ export default class Sheet {
      */
     getFinalPosition(dot) {
         let dotInfo = this.getDotInfo(dot);
-        let movement = _.last(dotInfo.movements);
-        if (_.isUndefined(movement)) {
+        if (dotInfo.movements.length === 0) {
             return dotInfo.position;
         } else {
-            return movement.getEndPosition();
+            return _.last(dotInfo.movements).getEndPosition();
         }
     }
 
@@ -569,7 +573,7 @@ export default class Sheet {
             };
 
             info.movements = _.flatMap(continuities, continuity => {
-                let moves = continuity.getMovements(dot, data);
+                let moves = continuity.getMovements(dot, _.clone(data));
                 moves.forEach(movement => {
                     data.position = movement.getEndPosition();
                     data.remaining -= movement.getDuration();
@@ -583,13 +587,21 @@ export default class Sheet {
             let allDots = this._show.getDots();
             this._dots.forEach(info => info.collisions.clear());
 
-            let updateCollisions = beat => {
+            for (let beat = 0; beat < this._numBeats; beat++) {
                 for (let i = 0; i < allDots.length; i++) {
                     let dot1 = allDots[i];
                     let state1 = this.getAnimationState(dot1, beat);
+                    if (_.isNull(state1)) {
+                        continue;
+                    }
+
                     for (let j = i + 1; j < allDots.length; j++) {
                         let dot2 = allDots[j];
                         let state2 = this.getAnimationState(dot2, beat);
+                        if (_.isNull(state2)) {
+                            continue;
+                        }
+
                         if (
                             Math.abs(state1.x - state2.x) <= 1 &&
                             Math.abs(state1.y - state2.y) <= 1
@@ -598,19 +610,6 @@ export default class Sheet {
                             this.getDotInfo(dot2).collisions.add(beat);
                             break;
                         }
-                    }
-                }
-            };
-
-            for (let beat = 0; beat < this._numBeats; beat++) {
-                try {
-                    updateCollisions(beat);
-                } catch (e) {
-                    if (e instanceof AnimationStateError) {
-                        // ignore if no movements
-                        break;
-                    } else {
-                        throw e;
                     }
                 }
             }

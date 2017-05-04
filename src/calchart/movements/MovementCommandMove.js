@@ -57,7 +57,7 @@ export default class MovementCommandMove extends BaseMovementCommand {
     }
 
     getAnimationState(beatNum) {
-        if (beatNum < 0 || beatNum > this._duration) {
+        if (beatNum < 0 || roundSmall(beatNum - this._duration) > 0) {
             return null;
         }
 
@@ -87,6 +87,19 @@ export default class MovementCommandMove extends BaseMovementCommand {
      */
     getDirection() {
         return this._direction;
+    }
+
+    /**
+     * Update the duration to the given value.
+     *
+     * @param {int} duration
+     */
+    setDuration(duration) {
+        this._duration = duration;
+
+        let end = this._getPosition(duration);
+        this._endX = end.x;
+        this._endY = end.y;
     }
 
     /**
