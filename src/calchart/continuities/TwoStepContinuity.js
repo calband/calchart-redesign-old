@@ -22,6 +22,7 @@ export default class TwoStepContinuity extends BaseContinuity {
      * @param {object} [options] - Options for the continuity, including:
      *   - {string} stepType
      *   - {int} beatsPerStep
+     *   - {string} orientation - The direction to face in the beginning.
      *   - {boolean} [isMarktime=true] - true if mark time during step two, false for close
      */
     constructor(sheet, dotType, order, continuities, options) {
@@ -70,12 +71,32 @@ export default class TwoStepContinuity extends BaseContinuity {
     }
 
     getMovements(dot, data) {
-        // number of beats to wait
+        // number of steps to wait
         let wait = this._order.indexOf(dot.id) * 2;
+        let stop = new MovementCommandStop(
+            data.position.x,
+            data.position.y,
+            this.getOrientationDegrees(),
+            wait,
+            this._isMarktime,
+            {
+                beatsPerStep: this.getBeatsPerStep(),
+            },
+        );
 
-        // TODO
+        data.remaining -= stop.getDuration();
 
-        return [];
+        // copied from Sheet.updateMovements
+        let movements = _.flatMap(this._continuities, continuity => {
+            let moves = continuity.getMovements(dot, _.clone(data));
+            moves.forEach(movement => {
+                data.position = movement.getEndPosition();
+                data.remaining -= movement.getDuration();
+            });
+            return moves;
+        });
+
+        return [stop].concat(movements);
     }
 
     /**
@@ -146,8 +167,6 @@ export default class TwoStepContinuity extends BaseContinuity {
             type: "checkbox",
         }), "isMarktime");
         fields.isMarktime.find("input").prop("checked", this._isMarktime);
-
-        delete fields.orientation;
 
         return fields;
     }
