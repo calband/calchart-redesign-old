@@ -10,6 +10,8 @@ Using the selection tool, you can also mass select dots by clicking and dragging
 
 You can also use the lasso tool <i class="icon-lasso"></i> (shortcut: shift + S) to draw an arbitrary shape and select any dots that lie within the drawn area.
 
+You can select all dots with the keyboard shortcut ctrl + A (cmd on Mac).
+
 ## Selection panel
 
 The dot context also displays a panel on the screen. In this panel, you can select dots by label or by dot type (shift + click will add the corresponding dots to the selection).
