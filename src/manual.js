@@ -18,7 +18,7 @@ function setupNavigation() {
 
             $(submenu)
                 .css({
-                    top: offset.top + $(this).outerHeight() + 5,
+                    top: offset.top + $(this).outerHeight() + 3,
                     left: offset.left,
                 })
                 .show();

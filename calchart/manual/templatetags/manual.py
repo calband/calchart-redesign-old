@@ -15,5 +15,5 @@ def child_page(context, slug):
     """
     Output the URL for the child help page with the given slug
     """
-    path = context['request'].path
+    path = context['page'].get_url()
     return f'{path}{slug}/'

@@ -1,7 +1,10 @@
 @import "partials/vars";
 
 ul.nav {
-    margin: 15px;
+    margin: 15px 0;
+    padding: 5px 15px;
+    border-top: 1px solid $dark-gray;
+    border-bottom: 1px solid $dark-gray;
     li {
         display: inline-block;
         vertical-align: middle;
@@ -30,8 +33,9 @@ ul.nav {
 .nav-submenu {
     display: none;
     position: absolute;
-    background: $light-gray;
+    background: $white;
     padding: 5px 0;
+    box-shadow: 0 1px 4px $medium-gray;
     li a {
         display: inline-block;
         text-decoration: none;
@@ -40,12 +44,16 @@ ul.nav {
         width: 100%;
         &:hover {
             color: $dark-gray;
-            background: $semilight-gray;
+            background: $light-gray;
         }
     }
 }
 
 .help-content {
+    h1, h2, h3 {
+        margin-top: 20px;
+        margin-bottom: 5px;
+    }
     p {
         margin-bottom: 10px;
     }

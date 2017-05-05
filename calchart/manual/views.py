@@ -68,7 +68,7 @@ class BaseHelpView(LoginRequiredMixin, TemplateView):
 
     def get_markdown_context(self):
         return {
-            'request': self.request
+            'page': self,
         }
 
     def get_context_data(self, **kwargs):
@@ -146,5 +146,5 @@ while len(todo) > 0:
     page = todo.pop(0)
     parents = PARENTS[page.slug]
     for child in page.children:
-        PARENTS[child.slug] = parents[:] + [child]
+        PARENTS[child.slug] = parents + [child]
         todo.append(child)
