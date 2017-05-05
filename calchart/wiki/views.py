@@ -27,7 +27,8 @@ class BaseHelpView(LoginRequiredMixin, TemplateView):
     slug = None
     # the unique name of this page. Defaults to the slug, capitalized.
     name = None
-    # the slugs of help pages that are children of this page
+    # the slugs of help pages that are children of this page. Will be
+    # converted into the actual view class
     children = []
 
     @classmethod
@@ -150,6 +151,9 @@ class EditContinuitiesHelp(BaseHelpView):
 class FountainGridHelp(BaseHelpView):
     slug = 'fountain-grid'
     name = 'EWNS/NSEW'
+
+class ForwardMarchHelp(BaseHelpView):
+    slug = 'forward-march'
 
 # map slugs to the help view class
 ALL_PAGES = {}

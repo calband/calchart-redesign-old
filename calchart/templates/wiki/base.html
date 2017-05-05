@@ -1,6 +1,10 @@
 {% extends "base.html" %}
 {% load partials wikitags %}
 
+{% block title %}
+    Help - {{ wiki_title }}
+{% endblock %}
+
 {% block head %}
     {% add_style "wiki.css" %}
     {% add_script "wiki.js" %}
