@@ -14,7 +14,11 @@ To check for any errors in the continuities, you can click the <i class="icon-ch
 
 When in this context, a panel is displayed, containing a tab for each dot type. Clicking on a tab will display the continuities for that dot type. Use the dropdown in the panel to add a continuity for the selected dot type. The dropdown also features a search bar to quickly filter the list of continuities.
 
-To edit a continuity, click the <i class="icon-pencil"></i> icon, which will display a popup containing properties for that specific continuity.
+To edit a continuity, click the <i class="icon-pencil"></i> icon, which will display a popup containing properties for that specific continuity. Every continuity has the following fields in the popup:
+
+- **Step type**: The type of marching for movements in this continuity, overriding the step type of the stuntsheet.
+- **Beats per step**: The number of beats per step for this continuity, overriding the number of beats per step for the stuntsheet.
+- **Custom continuity text**: Every continuity renders a default message for poopsheets. Use this textbox to change the message that should be rendered for the continuity.
 
 To remove a continuity from a dot type, click the <i class="icon-times"></i> icon.
 
