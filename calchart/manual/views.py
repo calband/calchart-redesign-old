@@ -22,10 +22,9 @@ class BaseHelpView(LoginRequiredMixin, TemplateView):
     `manual/<name_without_whitespaces>.md`.
     """
     template_name = 'manual/base.html'
-    # the unique slug of this page. Defaults to the name, lowercased
-    # with hyphens
+    # the unique slug of this page
     slug = None
-    # the unique name of this page
+    # the unique name of this page. Defaults to the slug, capitalized.
     name = None
     # the slugs of help pages that are children of this page
     children = []
@@ -41,13 +40,13 @@ class BaseHelpView(LoginRequiredMixin, TemplateView):
         return None
 
     @classmethod
-    def get_slug(cls):
-        if cls.slug is None:
-            if cls.name is None:
-                raise Exception('name cannot be None')
-            return cls.name.lower().replace(' ', '-')
+    def get_name(cls):
+        if cls.name is None:
+            if cls.slug is None:
+                raise Exception('slug cannot be None')
+            return cls.slug.replace('-', ' ').title()
         else:
-            return cls.slug
+            return cls.name
 
     def dispatch(self, request, *args, **kwargs):
         """
@@ -89,13 +88,13 @@ class RootHelp(BaseHelpView):
     """
     The root of the help pages.
     """
-    name = 'Home'
+    slug = 'home'
     children = [
         'editing-dots',
     ]
 
 class EditDotsHelp(BaseHelpView):
-    name = 'Editing Dots'
+    slug = 'editing-dots'
 
 # map slugs to the help view class
 ALL_PAGES = {}
@@ -103,7 +102,7 @@ ALL_PAGES = {}
 PARENTS = {}
 for obj in list(globals().values()):
     try:
-        obj.slug = obj.get_slug()
+        obj.name = obj.get_name()
         ALL_PAGES[obj.slug] = obj
         for child_slug in obj.children:
             PARENTS[child_slug] = obj
