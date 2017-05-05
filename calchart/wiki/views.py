@@ -20,7 +20,7 @@ class BaseHelpView(LoginRequiredMixin, TemplateView):
     page.
 
     The body of each page should go into a template located at
-    `wiki/<name_without_whitespaces>.md`.
+    `wiki/<slug>.md`.
     """
     template_name = 'wiki/base.html'
     # the unique slug of this page
@@ -74,8 +74,7 @@ class BaseHelpView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        template_name = self.name.replace(' ', '')
-        template = get_template(f'wiki/{template_name}.md')
+        template = get_template(f'wiki/{self.slug}.md')
         markdown = template.render(self.get_markdown_context())
         context['wiki_body'] = MARKDOWN.convert(markdown)
         context['wiki_title'] = self.name
