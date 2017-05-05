@@ -1,4 +1,4 @@
-{% load manual %}
+{% load wikitags %}
 
 To start editing dots, click the <i class="icon-bullseye"></i> icon in the toolbar. This loads the dot editing context.
 

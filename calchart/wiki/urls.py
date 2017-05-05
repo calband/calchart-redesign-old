@@ -1,6 +1,6 @@
 from django.conf.urls import url
 
-from manual.views import *
+from wiki.views import *
 
 urlpatterns = [
     url(r'^$', RootHelp.as_view(), {'slug': ''}, name='index'),

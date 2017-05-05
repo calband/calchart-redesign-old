@@ -20,9 +20,9 @@ class BaseHelpView(LoginRequiredMixin, TemplateView):
     page.
 
     The body of each page should go into a template located at
-    `manual/<name_without_whitespaces>.md`.
+    `wiki/<name_without_whitespaces>.md`.
     """
-    template_name = 'manual/base.html'
+    template_name = 'wiki/base.html'
     # the unique slug of this page
     slug = None
     # the unique name of this page. Defaults to the slug, capitalized.
@@ -75,10 +75,10 @@ class BaseHelpView(LoginRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)
 
         template_name = self.name.replace(' ', '')
-        template = get_template(f'manual/{template_name}.md')
+        template = get_template(f'wiki/{template_name}.md')
         markdown = template.render(self.get_markdown_context())
-        context['help_body'] = MARKDOWN.convert(markdown)
-        context['help_title'] = self.name
+        context['wiki_body'] = MARKDOWN.convert(markdown)
+        context['wiki_title'] = self.name
 
         # populate navigation bar
         context['navigation'] = PARENTS[self.slug]
@@ -93,7 +93,7 @@ class BaseHelpView(LoginRequiredMixin, TemplateView):
             parent.slug for parent in PARENTS[self.slug]
             if parent.slug != 'home'
         ])
-        return reverse('help:detail', kwargs={'slug': slug})
+        return reverse('wiki:detail', kwargs={'slug': slug})
 
 class RootHelp(BaseHelpView):
     """

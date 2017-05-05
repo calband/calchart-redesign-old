@@ -8,7 +8,7 @@ def get_page(slug):
     """
     Output the URL for the given help page slug.
     """
-    return reverse('help:detail', kwargs={'slug': slug})
+    return reverse('wiki:detail', kwargs={'slug': slug})
 
 @register.simple_tag(takes_context=True)
 def child_page(context, slug):

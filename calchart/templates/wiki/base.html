@@ -1,18 +1,18 @@
 {% extends "base.html" %}
-{% load partials manual %}
+{% load partials wikitags %}
 
 {% block head %}
-    {% add_style "manual.css" %}
-    {% add_script "manual.js" %}
+    {% add_style "wiki.css" %}
+    {% add_script "wiki.js" %}
 {% endblock %}
 
 {% block content %}
-    <h1>{{ help_title }}</h1>
+    <h1>{{ wiki_title }}</h1>
     <ul class="nav">
         {% for page in navigation %}
             <li>
                 {% if page.slug == 'home' %}
-                    <a href="{% url 'help:index' %}"><i class="icon-home"></i></a>
+                    <a href="{% url 'wiki:index' %}"><i class="icon-home"></i></a>
                 {% else %}
                     <a href="{{ page.get_url }}">{{ page.name }}</a>
                 {% endif %}
@@ -26,7 +26,7 @@
             </li>
         {% endfor %}
     </ul>
-    <div class="help-content">
-        {{ help_body|safe }}
+    <div class="wiki-content">
+        {{ wiki_body|safe }}
     </div>
 {% endblock %}

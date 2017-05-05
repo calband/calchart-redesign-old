@@ -1,4 +1,4 @@
-{% load manual %}
+{% load wikitags %}
 
 ## Manual adjustments
 
