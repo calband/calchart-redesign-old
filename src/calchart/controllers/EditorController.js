@@ -552,6 +552,13 @@ export default class EditorController extends ApplicationController {
     }
 
     /**
+     * Open the help pages.
+     */
+    openHelp() {
+        window.open("/help", "_blank");
+    }
+
+    /**
      * Decrement the current beat.
      */
     prevBeat() {

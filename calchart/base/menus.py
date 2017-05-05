@@ -282,6 +282,9 @@ editor_menu = Menu(
             for zoom, label in ZOOMS
         ], icon='search'),
     ]),
+    SubMenu('Help', [
+        MenuItem('Go to help...', 'openHelp', icon='question-circle'),
+    ]),
 )
 
 editor_toolbar = Toolbar(
