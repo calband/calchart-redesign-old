@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% load partials %}
+
+{% block head %}
+    {% add_style "manual.css" %}
+    {% add_script "manual.js" %}
+{% endblock %}
+
+{% block content %}
+    <h1>{{ help_title }}</h1>
+    <ul class="nav">
+        {% for page in navigation %}
+            <li>
+                {% if page.slug == 'home' %}
+                    <a href="{% url 'help:index' %}"><i class="icon-home"></i></a>
+                {% else %}
+                    <a href="{{ slug|help_page }}">{{ page.name }}</a>
+                {% endif %}
+                {% if page.children %}
+                    <ul class="nav-submenu">
+                        {% for child in page.children %}
+                            <li><a href="{{ child.slug|help_page }}">{{ child.name }}</a></li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+    <div class="help-content">
+        {{ help_body|safe }}
+    </div>
+{% endblock %}

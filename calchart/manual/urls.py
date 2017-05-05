@@ -3,5 +3,6 @@ from django.conf.urls import url
 from manual.views import *
 
 urlpatterns = [
-    url(r'^(?P<slug>.*)/$', HelpView.as_view(), name='index'),
+    url(r'^$', RootHelp.as_view(), {'slug': ''}, name='index'),
+    url(r'^(?P<slug>.*)/$', RootHelp.as_view(), name='detail'),
 ]

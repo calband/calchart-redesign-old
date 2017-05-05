@@ -10,6 +10,7 @@ module.exports = function (grunt) {
             build: {
                 entry: {
                     editor: "./src/editor.js",
+                    manual: "./src/manual.js",
                 },
                 output: {
                     path: path.resolve("calchart/static/js/"),

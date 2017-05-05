@@ -1,0 +1,49 @@
+@import "partials/vars";
+
+ul.nav {
+    margin: 15px;
+    li {
+        display: inline-block;
+        vertical-align: middle;
+        a {
+            display: inline-block;
+            text-decoration: none;
+            vertical-align: middle;
+            // push up baseline
+            margin-bottom: -3px;
+        }
+        &:after {
+            content: "\73";
+            font-family: "icons";
+            margin-left: 5px;
+            vertical-align: middle;
+        }
+        &:first-child a {
+            // don't push up home icon
+            margin-bottom: 0;
+        }
+        &:last-child:after {
+            content: none;
+        }
+    }
+}
+
+.nav-submenu {
+    display: none;
+    position: absolute;
+    background: $light-gray;
+    padding: 5px 0;
+    li {
+        display: inline-block;
+        a {
+            display: inline-block;
+            text-decoration: none;
+            color: $dark-gray;
+            padding: 5px 10px;
+            &:hover {
+                color: $dark-gray;
+                background: $semilight-gray;
+            }
+        }
+    }
+}
