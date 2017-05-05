@@ -1,4 +1,5 @@
 from django.views.generic.base import View, TemplateView
+from django.core.urlresolvers import reverse
 from django.http import Http404
 from django.template.loader import get_template
 
@@ -62,27 +63,37 @@ class BaseHelpView(LoginRequiredMixin, TemplateView):
             if ChildView is None:
                 raise Http404
             return ChildView.as_view()(request, slug='/'.join(path[1:]))
+
         return super().dispatch(request, *args, **kwargs)
+
+    def get_markdown_context(self):
+        return {
+            'request': self.request
+        }
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
         template_name = self.name.replace(' ', '')
         template = get_template(f'manual/{template_name}.md')
-        markdown = template.render({})
+        markdown = template.render(self.get_markdown_context())
         context['help_body'] = MARKDOWN.convert(markdown)
         context['help_title'] = self.name
 
         # populate navigation bar
-        navigation = []
-        curr = self
-        while curr is not None:
-            navigation.append(curr)
-            curr = PARENTS.get(curr.slug)
-
-        context['navigation'] = reversed(navigation)
+        context['navigation'] = PARENTS[self.slug]
 
         return context
+
+    def get_url(self):
+        """
+        Get the URL for this page.
+        """
+        slug = '/'.join([
+            parent.slug for parent in PARENTS[self.slug]
+            if parent.slug != 'home'
+        ])
+        return reverse('help:detail', kwargs={'slug': slug})
 
 class RootHelp(BaseHelpView):
     """
@@ -95,17 +106,27 @@ class RootHelp(BaseHelpView):
 
 class EditDotsHelp(BaseHelpView):
     slug = 'editing-dots'
+    children = [
+        'select-dots',
+        'position-dots',
+        'change-dot-types',
+    ]
+
+class SelectDotsHelp(BaseHelpView):
+    slug = 'select-dots'
+
+class PositionDotsHelp(BaseHelpView):
+    slug = 'position-dots'
+
+class ChangeDotTypesHelp(BaseHelpView):
+    slug = 'change-dot-types'
 
 # map slugs to the help view class
 ALL_PAGES = {}
-# map slugs to parent view class
-PARENTS = {}
 for obj in list(globals().values()):
     try:
         obj.name = obj.get_name()
         ALL_PAGES[obj.slug] = obj
-        for child_slug in obj.children:
-            PARENTS[child_slug] = obj
     except:
         pass
 
@@ -115,3 +136,15 @@ for page in ALL_PAGES.values():
         ALL_PAGES[slug]
         for slug in page.children
     ]
+
+# map slugs to list of parents of the form [root, parent1, parent2, child]
+PARENTS = {
+    RootHelp.slug: [RootHelp],
+}
+todo = [RootHelp]
+while len(todo) > 0:
+    page = todo.pop(0)
+    parents = PARENTS[page.slug]
+    for child in page.children:
+        PARENTS[child.slug] = parents[:] + [child]
+        todo.append(child)

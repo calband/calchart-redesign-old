@@ -11,25 +11,37 @@ function setupNavigation() {
     let nav = $("ul.nav");
     nav.children("li").each(function() {
         let submenu = $(this).children(".nav-submenu").appendTo("body");
-        let navItem = $(this);
-        let offset = navItem.offset();
-        let height = navItem.outerHeight();
 
         $(this).children("a").mouseenter(() => {
+            $(".nav-submenu").hide();
+            let offset = $(this).offset();
+
             $(submenu)
                 .css({
-                    top: offset.top + height,
-                    left: offset.left + 2,
+                    top: offset.top + $(this).outerHeight() + 5,
+                    left: offset.left,
                 })
                 .show();
 
-            // close submenu if not hovering over the submenu or this navItem
-            $(document).mousemove(e => {
-                if ($(e.target).notIn(submenu) && $(e.target).notIn(navItem)) {
-                    $(submenu).hide();
-                    $(document).off(e);
-                }
+            // if mouse leaves, close submenu unless user enters the submenu
+            // within a specified time interval
+
+            let timer = null;
+            function hideSubmenu() {
+                $(submenu).hide();
+            }
+
+            $(this).mouseleave(e => {
+                timer = setTimeout(hideSubmenu, 100);
+                $(this).off(e);
             });
+
+            $(submenu)
+                .mouseenter(e => {
+                    clearTimeout(timer);
+                    $(submenu).off(e);
+                })
+                .mouseleave(hideSubmenu);
         });
     });
 }

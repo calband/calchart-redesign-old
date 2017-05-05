@@ -15,7 +15,6 @@ ul.nav {
         &:after {
             content: "\73";
             font-family: "icons";
-            margin-left: 5px;
             vertical-align: middle;
         }
         &:first-child a {
@@ -33,17 +32,37 @@ ul.nav {
     position: absolute;
     background: $light-gray;
     padding: 5px 0;
-    li {
+    li a {
         display: inline-block;
-        a {
-            display: inline-block;
-            text-decoration: none;
+        text-decoration: none;
+        color: $dark-gray;
+        padding: 5px 10px;
+        width: 100%;
+        &:hover {
             color: $dark-gray;
-            padding: 5px 10px;
-            &:hover {
-                color: $dark-gray;
-                background: $semilight-gray;
-            }
+            background: $semilight-gray;
         }
+    }
+}
+
+.help-content {
+    p {
+        margin-bottom: 10px;
+    }
+    ul {
+        margin-left: 15px;
+        padding-left: 10px;
+        list-style: initial;
+        li {
+            margin-bottom: 5px;
+        }
+    }
+    // make icons stand out a bit more
+    i {
+        display: inline-block;
+        margin: 0 3px;
+        padding: 3px;
+        background: $light-gray;
+        color: $dark-gray;
     }
 }

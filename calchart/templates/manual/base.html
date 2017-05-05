@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load partials %}
+{% load partials manual %}
 
 {% block head %}
     {% add_style "manual.css" %}
@@ -14,12 +14,12 @@
                 {% if page.slug == 'home' %}
                     <a href="{% url 'help:index' %}"><i class="icon-home"></i></a>
                 {% else %}
-                    <a href="{{ slug|help_page }}">{{ page.name }}</a>
+                    <a href="{{ page.get_url }}">{{ page.name }}</a>
                 {% endif %}
                 {% if page.children %}
                     <ul class="nav-submenu">
                         {% for child in page.children %}
-                            <li><a href="{{ child.slug|help_page }}">{{ child.name }}</a></li>
+                            <li><a href="{{ child.get_url }}">{{ child.name }}</a></li>
                         {% endfor %}
                     </ul>
                 {% endif %}

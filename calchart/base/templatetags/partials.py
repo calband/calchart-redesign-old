@@ -174,10 +174,3 @@ def make_menu(menu):
     Creates a menu from the given Menu or Toolbar, defined in menus.py
     """
     return menu.render()
-
-@register.filter
-def help_page(slug):
-    """
-    Output the URL for the given help page slug.
-    """
-    return reverse('help:detail', kwargs={'slug': slug})
