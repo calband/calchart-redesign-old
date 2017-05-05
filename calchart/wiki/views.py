@@ -139,7 +139,7 @@ class EditContinuitiesHelp(BaseHelpView):
         'forward-march',
         'mark-time',
         'close',
-        'even',
+        'even-step',
         'diagonal',
         'ftl',
         'counter-march',
@@ -154,6 +154,15 @@ class FountainGridHelp(BaseHelpView):
 
 class ForwardMarchHelp(BaseHelpView):
     slug = 'forward-march'
+
+class MarkTimeHelp(BaseHelpView):
+    slug = 'mark-time'
+
+class CloseHelp(BaseHelpView):
+    slug = 'close'
+
+class EvenStepHelp(BaseHelpView):
+    slug = 'even-step'
 
 # map slugs to the help view class
 ALL_PAGES = {}

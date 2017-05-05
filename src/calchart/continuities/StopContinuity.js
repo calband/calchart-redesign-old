@@ -81,6 +81,7 @@ export default class StopContinuity extends BaseContinuity {
             case "mtrm":
                 label.text("MTRM");
 
+                let orientationLabel = HTMLBuilder.label("Facing:");
                 let orientation = HTMLBuilder.select({
                     options: ORIENTATIONS,
                     change: function() {
@@ -90,11 +91,11 @@ export default class StopContinuity extends BaseContinuity {
                     initial: this._orientation,
                 });
 
-                return this._wrapPanel(label, orientation);
+                return this._wrapPanel(label, orientationLabel, orientation);
             case "mt":
                 label.text("MT");
 
-                let durationLabel = HTMLBuilder.span("Beats:");
+                let durationLabel = HTMLBuilder.label("Beats:");
                 let duration = HTMLBuilder.input({
                     type: "number",
                     initial: this._duration,
