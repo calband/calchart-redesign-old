@@ -67,6 +67,12 @@ ul.nav {
             line-height: 1.2em;
         }
     }
+    strong {
+        font-weight: bold;
+    }
+    em {
+        font-style: italic;
+    }
     // make icons stand out a bit more
     i {
         display: inline-block;

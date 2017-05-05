@@ -259,7 +259,7 @@ editor_menu = Menu(
         MenuItem('Export', 'export', icon='file-code-o'),
     ], [
         MenuItem('Preferences', 'editPreferences'),
-        MenuItem('Show properties', 'editShowProperties'),
+        MenuItem('Edit show properties', 'editShowProperties'),
     ]),
     SubMenu('Edit', [
         MenuItem('Undo', 'undo', icon='undo'),
