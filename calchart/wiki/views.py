@@ -101,8 +101,18 @@ class RootHelp(BaseHelpView):
     """
     slug = 'home'
     children = [
+        'setup-show',
+        'setup-sheet',
         'editing-dots',
+        'editing-continuities',
     ]
+
+class SetupShowHelp(BaseHelpView):
+    slug = 'setup-show'
+
+class SetupSheetHelp(BaseHelpView):
+    slug = 'setup-sheet'
+    name = 'Setup Stuntsheets'
 
 class EditDotsHelp(BaseHelpView):
     slug = 'editing-dots'
@@ -120,6 +130,9 @@ class PositionDotsHelp(BaseHelpView):
 
 class ChangeDotTypesHelp(BaseHelpView):
     slug = 'change-dot-types'
+
+class EditSheetsHelp(BaseHelpView):
+    slug = 'editing-continuities'
 
 # map slugs to the help view class
 ALL_PAGES = {}
