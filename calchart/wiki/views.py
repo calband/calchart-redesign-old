@@ -76,6 +76,7 @@ class BaseHelpView(LoginRequiredMixin, TemplateView):
 
         template = get_template(f'wiki/{self.slug}.md')
         markdown = template.render(self.get_markdown_context())
+        print(markdown)
         context['wiki_body'] = MARKDOWN.convert(markdown)
         context['wiki_title'] = self.name
 
@@ -130,8 +131,25 @@ class PositionDotsHelp(BaseHelpView):
 class ChangeDotTypesHelp(BaseHelpView):
     slug = 'change-dot-types'
 
-class EditSheetsHelp(BaseHelpView):
+class EditContinuitiesHelp(BaseHelpView):
     slug = 'editing-continuities'
+    children = [
+        'fountain-grid',
+        'forward-march',
+        'mark-time',
+        'close',
+        'even',
+        'diagonal',
+        'ftl',
+        'counter-march',
+        'two-step',
+        'gate-turn',
+        'grapevine',
+    ]
+
+class FountainGridHelp(BaseHelpView):
+    slug = 'fountain-grid'
+    name = 'EWNS/NSEW'
 
 # map slugs to the help view class
 ALL_PAGES = {}
@@ -144,10 +162,13 @@ for obj in list(globals().values()):
 
 # convert children from slugs to view class
 for page in ALL_PAGES.values():
-    page.children = [
-        ALL_PAGES[slug]
-        for slug in page.children
-    ]
+    children = []
+    for slug in page.children:
+        try:
+            children.append(ALL_PAGES[slug])
+        except KeyError:
+            print(f'[WARNING] Page does not exist: {slug}')
+    page.children = children
 
 # map slugs to list of parents of the form [root, parent1, parent2, child]
 PARENTS = {
