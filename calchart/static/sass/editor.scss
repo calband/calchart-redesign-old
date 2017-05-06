@@ -169,6 +169,7 @@ $sidebar-width: 200px;
     background: $dark-gray;
     z-index: z-index(popup);
     box-shadow: 0 0 5px $black;
+    white-space: nowrap;
     $panel-handle-height: 10px;
     .panel-handle {
         background: $medium-gray;

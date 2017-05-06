@@ -68,7 +68,15 @@ export default class DotContext extends BaseContext {
 
     refresh() {
         super.refresh();
+
         this._grapher.showBackground(this._backgroundVisible);
+
+        // highlight dots in panel
+        let dotLabels = this._panel.find(".dot-labels");
+        dotLabels.find(".active").removeClass("active");
+        this._controller.getSelectedDots().forEach(dot => {
+            dotLabels.find(`.dot-${dot.label}`).addClass("active");
+        });
     }
 
     /**
@@ -112,16 +120,7 @@ export default class DotContext extends BaseContext {
      */
     selectDots(dots, options) {
         this._controller.selectDots(dots, options);
-        
-        let dotLabels = this._panel.find(".dot-labels");
-        options = _.defaultTo(options, {});
-        if (!_.defaultTo(options.append, true)) {
-            dotLabels.find(".active").removeClass("active");
-        }
-        dots.each(function() {
-            let dot = $(this).data("dot");
-            dotLabels.find(`.dot-${dot.label}`).addClass("active");
-        });
+        this._controller.refresh("context");
     }
 
     /**
@@ -139,12 +138,7 @@ export default class DotContext extends BaseContext {
      */
     toggleDots(dots) {
         this._controller.toggleDots(dots);
-
-        let dotLabels = this._panel.find(".dot-labels");
-        dotLabels.find(".active").removeClass("active");
-        this._controller.getSelectedDots().forEach(dot => {
-            dotLabels.find(`.dot-${dot.label}`).addClass("active");
-        });
+        this._controller.refresh("context");
     }
 
     /**
@@ -201,14 +195,12 @@ export default class DotContext extends BaseContext {
                 .click(function(e) {
                     let $dot = grapher.getDot(dot);
                     if (e.ctrlKey || e.metaKey) {
-                        controller.toggleDots($dot);
+                        _this.toggleDots($dot);
 
                         if ($(this).hasClass("active")) {
-                            $(this).removeClass("active");
-                            lastSelected = undefined;
-                        } else {
-                            $(this).addClass("active");
                             lastSelected = dot;
+                        } else {
+                            lastSelected = undefined;
                         }
                     } else if (e.shiftKey && !_.isUndefined(lastSelected)) {
                         let range = $();
@@ -237,7 +229,7 @@ export default class DotContext extends BaseContext {
             let dotType = $(this).data("type");
             let dots = _this._sheet.getDotsOfType(dotType);
             let $dots = grapher.getDots(dots);
-            controller.selectDots($dots, {
+            _this.selectDots($dots, {
                 append: e.shiftKey || e.ctrlKey || e.metaKey,
             });
         });
