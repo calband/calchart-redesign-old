@@ -14,28 +14,35 @@ The available dot types and their shortcuts are:
         <td><img src="{% static 'img/dot-solid.png' %}"></td>
         <td>Solid</td>
         <td>ctrl + 2</td>
+    </tr>
     <tr>
         <td><img src="{% static 'img/dot-plain-forwardslash.png' %}"></td>
         <td>Plain Forwardslash</td>
         <td>ctrl + 3</td>
+    </tr>
     <tr>
         <td><img src="{% static 'img/dot-solid-forwardslash.png' %}"></td>
         <td>Solid Forwardslash</td>
         <td>ctrl + 4</td>
+    </tr>
     <tr>
         <td><img src="{% static 'img/dot-plain-backslash.png' %}"></td>
         <td>Plain Backslash</td>
         <td>ctrl + 5</td>
+    </tr>
     <tr>
         <td><img src="{% static 'img/dot-solid-backslash.png' %}"></td>
         <td>Solid Backslash</td>
         <td>ctrl + 6</td>
+    </tr>
     <tr>
         <td><img src="{% static 'img/dot-plain-x.png' %}"></td>
         <td>Plain Cross</td>
         <td>ctrl + 7</td>
+    </tr>
     <tr>
         <td><img src="{% static 'img/dot-solid-x.png' %}"></td>
         <td>Solid Cross</td>
         <td>ctrl + 8</td>
+    </tr>
 </table>
