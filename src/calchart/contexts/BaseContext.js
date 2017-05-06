@@ -4,6 +4,12 @@ import { NotImplementedError } from "utils/errors";
  * Represents a Context that defines a state of the editor application and
  * the actions that can be run when the editor application is in the
  * given state.
+ *
+ * Method handlers:
+ * - When the user loads the context for the first time, the constructor
+ *   is called.
+ * - Every time the user loads the context (including the first time),
+ *   load() is called.
  */
 export default class BaseContext {
     /**

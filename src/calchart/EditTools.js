@@ -84,12 +84,12 @@ export default class EditTools {
  *
  * Method handlers:
  * - When the user first selects the tool in the toolbar, the
- * tool is initialized (constructor).
+ *   tool is initialized (constructor).
  * - Whenever the user clicks down (mousedown), handle() and
- * mousedown() are run. If it's the first mousedown event, init()
- * is called.
+ *   mousedown() are run. If it's the first mousedown event, init()
+ *   is called.
  * - If the user clicks up (mouseup), _unloadTool() is run if
- * the tool has captured the total number of events (eventsToHandle).
+ *   the tool has captured the total number of events (eventsToHandle).
  */
 class BaseTool {
     /**

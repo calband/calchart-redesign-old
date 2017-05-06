@@ -106,15 +106,17 @@ export default class EditBackgroundContext extends BaseContext {
         if (this._controller.getActiveSheet() !== this._sheet) {
             this.unload();
         } else {
+            super.refresh();
+
             let image = this._getImage();
+            let dimensions = image[0].getBBox();
+
             this._handles.css({
                 left: image.attr("x"),
                 top: image.attr("y"),
-                width: image.width(),
-                height: image.height(),
+                width: dimensions.width,
+                height: dimensions.height,
             });
-
-            super.refresh();
         }
     }
 
@@ -242,6 +244,7 @@ export default class EditBackgroundContext extends BaseContext {
      */
     _getImageData() {
         let image = this._getImage();
+        let dimensions = image[0].getBBox();
         let scale = this._grapher.getScale();
         let position = scale.toStepCoordinates({
             x: parseInt(image.attr("x")),
@@ -250,8 +253,8 @@ export default class EditBackgroundContext extends BaseContext {
         return {
             x: position.x,
             y: position.y,
-            width: scale.toSteps(image.width()),
-            height: scale.toSteps(image.height()),
+            width: scale.toSteps(dimensions.width),
+            height: scale.toSteps(dimensions.height),
         };
     }
 }
