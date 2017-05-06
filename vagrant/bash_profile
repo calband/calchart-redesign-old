@@ -2,3 +2,7 @@
 
 # source /vagrant/.env
 cd /vagrant/calchart
+
+# use python3 by default
+shopt -s expand_aliases
+alias python=python3

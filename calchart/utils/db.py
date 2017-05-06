@@ -33,4 +33,4 @@ class UpdateShowVersion(Operation):
         pass
 
     def describe(self):
-        return 'Update to version %d' % self.version
+        return f'Update to version {self.version}'

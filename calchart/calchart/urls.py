@@ -9,6 +9,7 @@ urlpatterns = [
     url(r'^login/$', LoginView.as_view(), name='login'),
     url(r'^logout/$', logout_view, name='logout'),
     url(r'^editor/(?P<slug>.+)/$', EditorView.as_view(), name='editor'),
+    url(r'^help/', include('wiki.urls', namespace='wiki')),
 
     # endpoints for server-side processing
     url(r'^download/(?P<slug>\w+)\.json$', export),

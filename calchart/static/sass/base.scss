@@ -21,7 +21,7 @@ header, footer, td, th {
 }
 
 html, body {
-    height: 100%;
+    min-height: 100%;
 }
 
 body {
@@ -45,7 +45,7 @@ h2 {
 }
 
 h3 {
-    font-size: 1.2em;
+    font-size: 1.1em;
 }
 
 a {

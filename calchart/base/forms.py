@@ -45,7 +45,7 @@ class BasePopupForm(object):
     save_label = 'Save'
 
     def __init__(self, *args, **kwargs):
-        super(BasePopupForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         assert self.name is not None, 'Popup form needs a name'
 

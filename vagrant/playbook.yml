@@ -37,17 +37,13 @@
 
     - name: install requirements.txt
       pip:
-        requirements: "{{ ROOT_DIR }}/requirements.txt"
+        executable: pip3
+        requirements: "{{ ROOT_DIR }}/requirements/dev.txt"
 
     # NODE
 
     - name: install npm packages
       command: npm install {{ ROOT_DIR }} --no-bin-links
-
-    # HEROKU
-
-    - name: install heroku toolbelt
-      shell: wget -O- https://toolbelt.heroku.com/install-ubuntu.sh | sh
 
     # DJANGO
 

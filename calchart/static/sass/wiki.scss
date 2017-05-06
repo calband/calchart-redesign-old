@@ -1,0 +1,96 @@
+@import "partials/vars";
+
+ul.nav {
+    margin: 15px 0;
+    padding: 5px 15px;
+    border-top: 1px solid $dark-gray;
+    border-bottom: 1px solid $dark-gray;
+    li {
+        display: inline-block;
+        vertical-align: middle;
+        a {
+            display: inline-block;
+            text-decoration: none;
+            vertical-align: middle;
+            // push up baseline
+            margin-bottom: -3px;
+        }
+        &:after {
+            content: "\73";
+            font-family: "icons";
+            vertical-align: middle;
+        }
+        &:first-child a {
+            // don't push up home icon
+            margin-bottom: 0;
+        }
+        &:last-child:after {
+            content: none;
+        }
+    }
+}
+
+.nav-submenu {
+    display: none;
+    position: absolute;
+    background: $white;
+    padding: 5px 0;
+    box-shadow: 0 1px 4px $medium-gray;
+    li a {
+        display: inline-block;
+        text-decoration: none;
+        color: $dark-gray;
+        padding: 5px 10px;
+        width: 100%;
+        &:hover {
+            color: $dark-gray;
+            background: $light-gray;
+        }
+    }
+}
+
+.wiki-content {
+    h2 {
+        margin-top: 20px;
+        margin-bottom: 5px;
+    }
+    p {
+        margin: 10px 0;
+        line-height: 1.2em;
+    }
+    ul {
+        margin-left: 15px;
+        padding-left: 10px;
+        list-style: initial;
+        li {
+            margin-bottom: 5px;
+            line-height: 1.2em;
+            p {
+                margin: 0;
+            }
+        }
+    }
+    strong {
+        font-weight: bold;
+    }
+    em {
+        font-style: italic;
+    }
+    // make icons stand out a bit more
+    i {
+        display: inline-block;
+        margin: 0 3px;
+        padding: 3px;
+        background: $light-gray;
+        color: $dark-gray;
+    }
+    table {
+        margin: 10px 0;
+        td, th {
+            padding: 5px 10px;
+            border: 1px solid $dark-gray;
+            vertical-align: middle;
+            text-align: center;
+        }
+    }
+}

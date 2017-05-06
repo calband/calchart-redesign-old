@@ -56,7 +56,7 @@ export default class GateTurnContinuity extends BaseContinuity {
             data.position.y,
             this._reference,
             sign * this._degrees,
-            data.remaining,
+            data.remaining
         );
 
         return [movement];

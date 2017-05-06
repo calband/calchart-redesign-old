@@ -14,11 +14,15 @@ export default class EvenContinuity extends BaseContinuity {
      * @param {object} [options] - Options for the continuity, including:
      *   - {string} stepType
      *   - {int} beatsPerStep
-     *   - {string} orientation - The direction to face while moving (only for
-     *     military slides). Can also be the empty string to denote moving in the
-     *     same direction
+     *   - {string} [orientation=""] - The direction to face while moving (only for
+     *     military slides). Can also be the empty string to denote facing the
+     *     direction of travel
      */
-    constructor(sheet, dotType, options) {
+    constructor(sheet, dotType, options={}) {
+        options = _.defaults(options, {
+            orientation: "",
+        });
+
         super(sheet, dotType, options);
     }
 

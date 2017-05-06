@@ -72,6 +72,9 @@ export default class TwoStepContinuity extends BaseContinuity {
 
     getMovements(dot, data) {
         // number of steps to wait
+        let options = {
+            beatsPerStep: this.getBeatsPerStep(),
+        };
         let wait = this._order.indexOf(dot.id) * 2;
         let stop = new MovementCommandStop(
             data.position.x,
@@ -79,9 +82,7 @@ export default class TwoStepContinuity extends BaseContinuity {
             this.getOrientationDegrees(),
             wait,
             this._isMarktime,
-            {
-                beatsPerStep: this.getBeatsPerStep(),
-            },
+            options
         );
 
         data.remaining -= stop.getDuration();

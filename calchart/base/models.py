@@ -37,7 +37,7 @@ class Show(models.Model):
     def viewer(self, viewer):
         # overwrite any existing viewer file
         self.viewer_file.delete()
-        self.viewer_file.save('%s.viewer' % self.slug, ContentFile(viewer))
+        self.viewer_file.save(f'{self.slug}.viewer', ContentFile(viewer))
         self._viewer = viewer
 
     @property
@@ -53,10 +53,10 @@ class Show(models.Model):
     def beats(self, beats):
         # overwrite any existing beats file
         self.beats_file.delete()
-        self.beats_file.save('%s.beats' % self.slug, ContentFile(beats))
+        self.beats_file.save(f'{self.slug}.beats', ContentFile(beats))
         self._beats = beats
 
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.name)
-        super(Show, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)

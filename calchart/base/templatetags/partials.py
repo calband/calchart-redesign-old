@@ -1,7 +1,6 @@
-from __future__ import unicode_literals
-
 from django import template
 from django.contrib.messages import get_messages as django_get_messages
+from django.core.urlresolvers import reverse
 from django.templatetags.static import static as get_static_path
 from django.template.defaulttags import CsrfTokenNode
 from django.utils.html import format_html, format_html_join, mark_safe
@@ -173,4 +172,3 @@ def make_menu(menu):
     Creates a menu from the given Menu or Toolbar, defined in menus.py
     """
     return menu.render()
-
