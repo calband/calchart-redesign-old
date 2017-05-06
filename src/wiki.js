@@ -1,9 +1,3 @@
-import "utils/jquery";
-
-if (_ === undefined) {
-    console.error("lodash is not loaded!");
-}
-
 /**
  * Set up the navigation bar on the help pages.
  */
