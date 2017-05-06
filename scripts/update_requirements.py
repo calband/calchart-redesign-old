@@ -1,5 +1,8 @@
 """
 Update pip requirements on the Virtualbox VM
+
+Usage:
+python scripts/update_requirements.py
 """
 
 import os
