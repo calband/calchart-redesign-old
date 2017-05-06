@@ -47,7 +47,7 @@ export default class DotContext extends BaseContext {
 
         this.loadTool("selection");
         this._addEvents(".workspace", "mousedown", e => {
-            this._activeTool.handle(this, e);
+            this._activeTool.handle(e);
         });
 
         $(".toolbar .edit-dots").addClass("active");
@@ -86,7 +86,7 @@ export default class DotContext extends BaseContext {
      */
     deselectDots(dots) {
         this._controller.deselectDots(dots);
-        this._panel.find(".dot-labels .active").removeClass("active");
+        this._controller.refresh("context");
     }
 
     /**
@@ -109,7 +109,7 @@ export default class DotContext extends BaseContext {
      * @param {string} name
      */
     loadTool(name) {
-        this._activeTool = EditTools.load(name);
+        this._activeTool = EditTools.load(this, name);
     }
 
     /**
