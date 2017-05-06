@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django import template
 from django.contrib.messages import get_messages as django_get_messages
 from django.core.urlresolvers import reverse

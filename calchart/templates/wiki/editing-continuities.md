@@ -28,7 +28,6 @@ To reorder a continuity, right click on the continuity and select either "Move u
 
 ## Available continuities
 
-The continuities that are available are:
-
 {% for child in page.children %}
-- [{{ child.name }}]({{ child.get_url }}){% endfor %}
+- [{{ child.name }}]({{ child.get_url }})
+{% endfor %}
