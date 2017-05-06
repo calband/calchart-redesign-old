@@ -124,17 +124,18 @@ export function bindSubmenu(container, parent, submenu) {
                 return;
             }
 
-            let offset = $(parent).offset();
-
-            // manually offset a pixel to accentuate hover
-            let top = offset.top + 1;
-            let left = offset.left + $(parent).outerWidth() - 1;
-            let right = offset.left + 1;
-
             $(parent).addClass("active");
 
+            // manually offset a pixel to accentuate hover
+            let offset = $(parent).offset();
+            let top = offset.top + 1;
+            let left = offset.left + $(parent).outerWidth() - 1;
+
             $(submenu)
-                .smartPosition(top, left, right)
+                .smartPosition(top, left, {
+                    offRight: offset.left + 1,
+                    offBottom: $(window).height(),
+                })
                 .show();
 
             $(container).on("mouseenter", "li", function(e) {
@@ -451,24 +452,8 @@ export function setupPanel(panel, options={}) {
 
     // always keep panel on screen
     $(window).resize(() => {
-        if (!$(panel).is(":visible")) {
-            return;
-        }
-
-        let panelWidth = $(panel).outerWidth();
-        let panelHeight = $(panel).outerHeight();
-        let panelOffset = $(panel).offset();
-        let panelRight = panelOffset.left + panelWidth;
-        let panelBottom = panelOffset.top + panelHeight;
-
-        let windowWidth = $(window).width();
-        let windowHeight = $(window).height();
-
-        if (panelRight > windowWidth) {
-            $(panel).css("left", windowWidth - panelWidth);
-        }
-        if (panelBottom > windowHeight) {
-            $(panel).css("top", windowHeight - panelHeight);
+        if ($(panel).is(":visible")) {
+            $(panel).keepOnscreen();
         }
     });
 }

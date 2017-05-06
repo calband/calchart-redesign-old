@@ -111,7 +111,10 @@ $.fn.exists = function() {
  */
 $.fn.keepOnscreen = function() {
     let offset = this.offset();
-    return this.smartPosition(offset.top, offset.left);
+    return this.smartPosition(offset.top, offset.left, {
+        fromRight: 10,
+        fromBottom: 10,
+    });
 };
 
 /**
@@ -306,17 +309,35 @@ $.fn.scrollTop = function(val) {
 /**
  * Position this element at the given position in the top, left corner. If
  * the element goes offscreen to the right, position the element on the left
- * instead. If the element goes below the screen, position the element so
- * that its bottom edge is on the bottom of the screen.
+ * instead. If the element goes below the screen, position the element on the
+ * top instead.
  *
  * @param {float} top - The position of the top edge of the element, unless
  *   offscreen.
  * @param {float} left - The position of the left edge of the element,
  *   unless offscreen.
- * @param {float} [right=left] - The position of the right edge of the
- *   element, if it goes offscreen.
+ * @param {Object} [options] - Options to customize positioning:
+ *   - {float} [offTop=0] - The position of the top edge of the element, if the
+ *     top edge of the element goes offscreen.
+ *   - {float} [offLeft=0] - The position of the left edge of the element, if the
+ *     left edge of the element goes offscreen.
+ *   - {float} [offRight=left] - The position of the right edge of the element,
+ *     if the right edge of the element goes offscreen.
+ *   - {float} [offBottom=top] - The position of the bottom edge of the element,
+ *     if the bottom edge of the element goes offscreen.
+ *   - {float} [fromRight] - The distance from the right edge to the right edge
+ *     of the screen, if the right edge of the element goes offscreen.
+ *   - {float} [fromBottom] - The distance from the bottom edge to the bottom edge
+ *     of the screen, if the bottom edge of the element goes offscreen.
  */
-$.fn.smartPosition = function(top, left, right=left) {
+$.fn.smartPosition = function(top, left, options={}) {
+    options = _.defaults(options, {
+        offTop: 0,
+        offLeft: 0,
+        offRight: left,
+        offBottom: top,
+    });
+
     let position = {
         top: top,
         left: left,
@@ -324,14 +345,20 @@ $.fn.smartPosition = function(top, left, right=left) {
 
     let width = this.outerWidth();
     let maxWidth = $(window).width();
-    if (left + width > maxWidth) {
+    if (left < 0) {
+        position.left = options.offLeft;
+    } else if (left + width > maxWidth) {
+        let right = _.defaultTo(maxWidth - options.fromRight, options.offRight);
         position.left = right - width;
     }
 
     let height = this.outerHeight();
     let maxHeight = $(window).height();
-    if (top + height > maxHeight) {
-        position.top = maxHeight - height;
+    if (top < 0) {
+        position.top = options.offTop;
+    } else if (top + height > maxHeight) {
+        let bottom = _.defaultTo(maxHeight - options.fromBottom, options.offBottom);
+        position.top = bottom - height;
     }
 
     return this.css(position);
