@@ -1,6 +1,6 @@
 from django import template
-from django.utils.safestring import mark_safe
 from django.template.defaultfilters import stringfilter
+from django.utils.html import mark_safe
 
 import json
 
