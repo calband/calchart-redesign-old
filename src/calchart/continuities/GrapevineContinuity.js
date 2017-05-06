@@ -46,7 +46,7 @@ export default class GrapevineContinuity extends ForwardContinuity {
     panelHTML(controller) {
         let _this = this;
 
-        let label = HTMLBuilder.span("Move");
+        let label = HTMLBuilder.span("GV");
 
         let steps = HTMLBuilder.input({
             type: "number",

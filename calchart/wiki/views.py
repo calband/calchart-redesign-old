@@ -141,7 +141,7 @@ class EditContinuitiesHelp(BaseHelpView):
         'close',
         'even-step',
         'diagonal',
-        'ftl',
+        'follow-the-leader',
         'counter-march',
         'two-step',
         'gate-turn',
@@ -163,6 +163,25 @@ class CloseHelp(BaseHelpView):
 
 class EvenStepHelp(BaseHelpView):
     slug = 'even-step'
+
+class DiagonalHelp(BaseHelpView):
+    slug = 'diagonal'
+    name = 'DMHS/HSDM'
+
+class FTLHelp(BaseHelpView):
+    slug = 'follow-the-leader'
+
+class CounterMarchHelp(BaseHelpView):
+    slug = 'counter-march'
+
+class TwoStepHelp(BaseHelpView):
+    slug = 'two-step'
+
+class GateTurnHelp(BaseHelpView):
+    slug = 'gate-turn'
+
+class GrapevineHelp(BaseHelpView):
+    slug = 'grapevine'
 
 # map slugs to the help view class
 ALL_PAGES = {}
