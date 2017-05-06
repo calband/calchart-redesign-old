@@ -3,6 +3,6 @@ from django.conf.urls import url
 from wiki.views import *
 
 urlpatterns = [
-    url(r'^$', RootHelp.as_view(), {'slug': ''}, name='index'),
-    url(r'^(?P<slug>.*)/$', RootHelp.as_view(), name='detail'),
+    url(r'^$', HelpView.as_view(), name='home'),
+    url(r'^(?P<slug>.*)/$', HelpView.as_view(), name='page'),
 ]

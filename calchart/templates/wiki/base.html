@@ -16,7 +16,7 @@
         {% for page in navigation %}
             <li>
                 {% if page.slug == 'home' %}
-                    <a href="{% url 'wiki:index' %}"><i class="icon-home"></i></a>
+                    <a href="{% url 'wiki:home' %}"><i class="icon-home"></i></a>
                 {% else %}
                     <a href="{{ page.get_url }}">{{ page.name }}</a>
                 {% endif %}
