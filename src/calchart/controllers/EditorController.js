@@ -301,7 +301,6 @@ export default class EditorController extends ApplicationController {
      * Show the popup for editing the currently active sheet's properties.
      */
     editSheetProperties() {
-        let _this = this;
         let sheet = this._activeSheet;
 
         function updateBackgroundInfo(popup) {
@@ -318,7 +317,7 @@ export default class EditorController extends ApplicationController {
         }
 
         showPopup("edit-stuntsheet", {
-            init: function(popup) {
+            init: popup => {
                 let label = _.defaultTo(sheet.label, "");
                 popup.find(".label input").val(label);
                 popup.find(".numBeats input").val(sheet.getDuration());
@@ -360,11 +359,11 @@ export default class EditorController extends ApplicationController {
                 // edit image (move and resize)
                 popup.find(".icons .move-link")
                     .off("click")
-                    .click(function() {
+                    .click(e => {
                         let options = {
-                            previousContext: Context.name(_this._context),
+                            previousContext: Context.name(this._context),
                         };
-                        _this.loadContext("background", options);
+                        this.loadContext("background", options);
                         hidePopup();
                     });
 
@@ -376,7 +375,7 @@ export default class EditorController extends ApplicationController {
                         updateBackgroundInfo(popup);
                     });
             },
-            onSubmit: function(popup) {
+            onSubmit: popup => {
                 let data = getData(popup);
 
                 // validate data
@@ -400,11 +399,11 @@ export default class EditorController extends ApplicationController {
                     }
                 }
 
-                _this.doAction("saveSheetProperties", [data]);
+                this.doAction("saveSheetProperties", [data]);
             },
-            onHide: function(popup) {
+            onHide: popup => {
                 // refresh to show background
-                _this.refresh();
+                this.refresh();
             },
         });
     }
@@ -516,6 +515,11 @@ export default class EditorController extends ApplicationController {
      *     before loading the next one.
      */
     loadContext(name, options={}) {
+        // don't load same context
+        if (name === Context.name(this._context)) {
+            return;
+        }
+
         if (_.defaultTo(options.unload, true) && this._context) {
             this._context.unload();
         }
@@ -909,23 +913,20 @@ export default class EditorController extends ApplicationController {
         // sidebar context menus
         sidebar
             .contextmenu(function(e) {
-                showContextMenu(e, {
-                    "Add Sheet...": "addStuntsheet",
-                });
+                if ($(e.target).notIn(".stuntsheet")) {
+                    showContextMenu(e, {
+                        "Add Sheet...": "addStuntsheet",
+                    });
+                }
             })
             .on("contextmenu", ".stuntsheet", function(e) {
-                let sheet = $(this).data("sheet");
-                if (sheet !== _this._activeSheet) {
-                    _this.loadSheet(sheet);
-                }
+                $(this).click();
 
                 showContextMenu(e, {
                     "Properties...": "editSheetProperties",
                     "Duplicate Sheet": "duplicateSheet",
                     "Delete Sheet": "deleteSheet",
                 });
-
-                return false;
             });
 
         // sidebar clicks
