@@ -23,10 +23,11 @@ export default class EditTools {
     /**
      * Load the tool with the given name.
      *
+     * @param {DotContext} context
      * @param {string} name
      * @return {BaseTool}
      */
-    static load(name) {
+    static load(context, name) {
         let EditTool;
         switch (name) {
             case "selection":
@@ -67,7 +68,7 @@ export default class EditTools {
         $(".toolbar .edit-tools li").removeClass("active");
         $(`.toolbar .${name}`).addClass("active");
 
-        return EditTool;
+        return new EditTool(context);
     }
 
     /**
@@ -80,6 +81,15 @@ export default class EditTools {
 
 /**
  * The superclass for all EditTool classes.
+ *
+ * Method handlers:
+ * - When the user first selects the tool in the toolbar, the
+ * tool is initialized (constructor).
+ * - Whenever the user clicks down (mousedown), handle() and
+ * mousedown() are run. If it's the first mousedown event, init()
+ * is called.
+ * - If the user clicks up (mouseup), _unloadTool() is run if
+ * the tool has captured the total number of events (eventsToHandle).
  */
 class BaseTool {
     /**
@@ -93,23 +103,22 @@ class BaseTool {
 
     /**
      * Handle a mousedown event in the workspace. By default,
-     * initializes an instance of the class and calls the
-     * mousedown and _attachListeners methods.
+     * calls the mousedown and _attachListeners methods.
      *
-     * @param {DotContext} context
      * @param {Event} e
      */
-    static handle(context, e) {
+    handle(e) {
         e.preventDefault();
 
-        if (_.isUndefined(this.tool)) {
-            this.tool = new this(context);
-            this.tool._attachListeners();
-            this.eventCount = 0;
+        if (!this._init) {
+            this._init = true;
+            this._attachListeners();
+            this._eventCount = 0;
+            this.init();
         }
 
-        this.eventCount++;
-        this.tool.mousedown(e);
+        this._eventCount++;
+        this.mousedown(e);
     }
 
     /**
@@ -118,16 +127,15 @@ class BaseTool {
      *
      * @return {int}
      */
-    static get eventsToHandle() {
+    get eventsToHandle() {
         return 1;
     }
 
     /**
-     * @return {int} The number of mousedown events handled so far.
+     * Any actions to run when the tool is initialized (i.e. when the first
+     * mousedown is handled).
      */
-    get eventCount() {
-        return this.constructor.eventCount;
-    }
+    init() {}
 
     /**
      * The function to run when the mousedown event is triggered
@@ -160,10 +168,11 @@ class BaseTool {
     _attachListeners() {
         $(document).on({
             "mousedown.selection": e => {
-                // handle additional mousedown events not in workspace (for
-                // eventsToHandle > 1)
+                // handle additional mousedown events not in workspace, for
+                // eventsToHandle > 1 (workspace mousedown events are
+                // already captured in DotContext)
                 if ($(e.target).notIn(".workspace")) {
-                    this.constructor.handle(this.context, e);
+                    this.handle(this.context, e);
                 }
             },
             "mousemove.selection": e => {
@@ -171,7 +180,7 @@ class BaseTool {
             },
             "mouseup.selection": e => {
                 this.mouseup(e);
-                if (this.eventCount === this.constructor.eventsToHandle) {
+                if (this._eventCount === this.eventsToHandle) {
                     this._unloadTool();
                 }
             },
@@ -255,7 +264,7 @@ class BaseTool {
      */
     _unloadTool() {
         $(document).off(".selection");
-        this.constructor.tool = undefined;
+        this._init = false;
     }
 }
 
@@ -498,21 +507,29 @@ class LassoTool extends BaseSelection {
  * Swap two dots' positions
  */
 class SwapTool extends BaseTool {
+    constructor(context) {
+        super(context);
+
+        let selection = this.controller.getSelection();
+        selection = selection.not(selection.last());
+        this.context.deselectDots(selection);
+    }
+
     mousedown(e) {
         if ($(e.target).is(".dot-marker")) {
             let selection = this.controller.getSelection();
             let dot = $(e.target).parent();
 
             if (selection.length === 0) {
-                this.controller.selectDots(dot);
+                this.context.selectDots(dot);
             } else {
-                let dot1 = selection.first().data("dot");
+                let dot1 = selection.data("dot");
                 let dot2 = dot.data("dot");
                 this.controller.doAction("swapDots", [dot1, dot2]);
-                this.controller.deselectDots();
+                this.context.deselectDots();
             }
         } else {
-            this.controller.deselectDots();
+            this.context.deselectDots();
         }
     }
 }
@@ -597,15 +614,13 @@ class LineTool extends BaseEdit {
  * start position, and then click again for the end position.
  */
 class ArcTool extends BaseEdit {
-    constructor(context) {
-        super(context);
-
-        // true if user is about to select the end point
-        this._drawEnd = false;
+    get eventsToHandle() {
+        return 2;
     }
 
-    static get eventsToHandle() {
-        return 2;
+    init() {
+        // true if user is about to select the end point
+        this._drawEnd = false;
     }
 
     mousedown(e) {
@@ -695,7 +710,7 @@ class ArcTool extends BaseEdit {
     }
 
     mouseup(e) {
-        if (this.eventCount === 1) {
+        if (this._eventCount === 1) {
             this._drawEnd = true;
             this._radiusPath = this._path.attr("d");
         } else {
