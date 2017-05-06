@@ -18,13 +18,17 @@ This will display a popup with the following fields:
 - **Step type**: The type of marching for movements in this stuntsheet, overriding the step type of the show. *This can be overridden on a per-continuity basis.*
 - **Orientation**: The orientation of this stuntsheet, overriding the orientation of the show. *This can be overridden on a per-continuity basis.*
 
-## Edit background image
+### Edit background image
 
 Every stuntsheet can save a background image to use as a reference for the dots.
 
 To add a background image, click on the <i class="icon-pencil"></i> icon and select an image file to upload to the server. To remove the background image, click on the <i class="icon-times"></i> icon.
 
 To resize or move the background image, click on the <i class="icon-arrows"></i> icon. This will display the background image on the field. Dragging the image will move the image around the field, and dragging the handlers on the edges will resize the image.
+
+## Reorder stuntsheets
+
+To reorder stuntsheets, click and drag stuntsheets in the sidebar to the desired position.
 
 ## Delete stuntsheets
 
