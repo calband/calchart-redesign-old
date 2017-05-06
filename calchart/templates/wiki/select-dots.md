@@ -6,7 +6,7 @@ You can also shift + click to select multiple dots individually.
 
 ## Mass selection
 
-Using the selection tool, you can also mass select dots by clicking and dragging. Upon dragging, a rectangular box will appear, selecting dots as it overlaps them.
+Using the selection tool, you can also mass select dots by clicking and dragging. Upon dragging, a rectangular box will appear, selecting dots as it overlaps them. Holding the shift key while clicking and dragging adds the overlapped dots to the previous selection.
 
 You can also use the lasso tool <i class="icon-lasso"></i> (shortcut: shift + S) to draw an arbitrary shape and select any dots that lie within the drawn area.
 
