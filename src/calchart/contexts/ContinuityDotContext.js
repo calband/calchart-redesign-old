@@ -1,4 +1,4 @@
-import BaseContext from "calchart/contexts/BaseContext";
+import HiddenContext from "calchart/contexts/HiddenContext";
 
 import HTMLBuilder from "utils/HTMLBuilder";
 import { setupPanel } from "utils/UIUtils";
@@ -7,7 +7,7 @@ import { setupPanel } from "utils/UIUtils";
  * The Context that allows a user to define a dot order in
  * a continuity that requires dots to be in order.
  */
-export default class ContinuityDotContext extends BaseContext {
+export default class ContinuityDotContext extends HiddenContext {
     constructor(controller) {
         super(controller);
 
@@ -28,6 +28,8 @@ export default class ContinuityDotContext extends BaseContext {
      *    - {FollowLeaderContinuity} continuity - The FTL continuity being edited
      */
     load(options) {
+        super.load(options);
+
         this._continuity = options.continuity;
         let order = this._continuity.order;
 
@@ -73,11 +75,6 @@ export default class ContinuityDotContext extends BaseContext {
         this._controller.checkContinuities({
             dots: this._continuity.dotType,
         });
-
-        this._controller.loadContext("continuity", {
-            unload: false,
-            dotType: this._continuity.dotType,
-        });
     }
 
     refresh() {
@@ -94,6 +91,12 @@ export default class ContinuityDotContext extends BaseContext {
         });
     }
 
+    exit() {
+        this._controller.loadContext("continuity", {
+            dotType: this._continuity.dotType,
+        });
+    }
+
     _setupPanel() {
         setupPanel(this._panel);
 
@@ -102,7 +105,7 @@ export default class ContinuityDotContext extends BaseContext {
         });
 
         this._panel.find("button.submit").click(() => {
-            this.unload();
+            this.exit();
         });
     }
 }

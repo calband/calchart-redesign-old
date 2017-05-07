@@ -26,6 +26,8 @@ export default class TwoStepContext extends ContinuityContext {
      *    - {TwoStepContinuity} continuity - The two-step continuity being edited
      */
     load(options) {
+        super.load(options);
+
         this._panel.show();
 
         this._continuity = options.continuity;
@@ -37,9 +39,25 @@ export default class TwoStepContext extends ContinuityContext {
         this._controller.checkContinuities({
             dots: this._continuity.dotType,
         });
+    }
 
+    /**
+     * Copied from HiddenContext, since TwoStepContext needs to
+     * inherit from ContinuityContext.
+     */
+    loadSheet(sheet) {
+        if (sheet !== this._sheet) {
+            this.exit();
+        } else {
+            super.loadSheet(sheet);
+        }
+    }
+
+    /**
+     * Load continuity context if the user is done with this context.
+     */
+    exit() {
         this._controller.loadContext("continuity", {
-            unload: false,
             dotType: this._continuity.dotType,
         });
     }
@@ -60,7 +78,7 @@ export default class TwoStepContext extends ContinuityContext {
         super._setupPanel();
 
         this._panel.find("button.submit").click(() => {
-            this.unload();
+            this.exit();
         });
     }
 }

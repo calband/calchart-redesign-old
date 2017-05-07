@@ -1,11 +1,11 @@
-import BaseContext from "calchart/contexts/BaseContext";
+import HiddenContext from "calchart/contexts/HiddenContext";
 
 import { getDimensions } from "utils/MathUtils";
 
 /**
  * The Context that allows a user to move and resize the background image
  */
-export default class EditBackgroundContext extends BaseContext {
+export default class EditBackgroundContext extends HiddenContext {
     constructor(controller) {
         super(controller);
 
@@ -29,6 +29,8 @@ export default class EditBackgroundContext extends BaseContext {
      *    - {string} [dotType=null] - The dot type to initially load.
      */
     load(options) {
+        super.load(options);
+
         this._session++;
         this._previousContext = options.previousContext;
         this._grapher.setOptions({
@@ -95,29 +97,22 @@ export default class EditBackgroundContext extends BaseContext {
         this._handles.remove();
 
         $(".toolbar .edit-background-group").addClass("hide");
-
-        this._controller.loadContext(this._previousContext, {
-            unload: false,
-        });
     }
 
     refresh() {
-        // if changing stuntsheets, unload context
-        if (this._controller.getActiveSheet() !== this._sheet) {
-            this.unload();
-        } else {
-            super.refresh();
+        let image = this._getImage();
+        let dimensions = image[0].getBBox();
 
-            let image = this._getImage();
-            let dimensions = image[0].getBBox();
+        this._handles.css({
+            left: image.attr("x"),
+            top: image.attr("y"),
+            width: dimensions.width,
+            height: dimensions.height,
+        });
+    }
 
-            this._handles.css({
-                left: image.attr("x"),
-                top: image.attr("y"),
-                width: dimensions.width,
-                height: dimensions.height,
-            });
-        }
+    exit() {
+        this._controller.loadContext(this._previousContext);
     }
 
     /**
@@ -228,7 +223,7 @@ export default class EditBackgroundContext extends BaseContext {
         this._controller.revertWhile(action => {
             return action.session === this._session;
         });
-        this.unload();
+        this.exit();
     }
 
     /**

@@ -1,4 +1,4 @@
-import BaseContext from "calchart/contexts/BaseContext";
+import HiddenContext from "calchart/contexts/HiddenContext";
 import Coordinate from "calchart/Coordinate";
 
 import HTMLBuilder from "utils/HTMLBuilder";
@@ -9,7 +9,7 @@ import { setupPanel } from "utils/UIUtils";
  * The Context that allows a user to define the path in
  * a follow the leader continuity.
  */
-export default class FTLPathContext extends BaseContext {
+export default class FTLPathContext extends HiddenContext {
     constructor(controller) {
         super(controller);
 
@@ -36,6 +36,8 @@ export default class FTLPathContext extends BaseContext {
      *    - {FollowLeaderContinuity} continuity - The FTL continuity being edited
      */
     load(options) {
+        super.load(options);
+
         this._continuity = options.continuity;
 
         this.loadTool("selection");
@@ -97,11 +99,6 @@ export default class FTLPathContext extends BaseContext {
 
         this._controller.checkContinuities({
             dots: this._continuity.dotType,
-        });
-
-        this._controller.loadContext("continuity", {
-            unload: false,
-            dotType: this._continuity.dotType,
         });
     }
 
@@ -173,6 +170,15 @@ export default class FTLPathContext extends BaseContext {
     }
 
     /**
+     * Load continuity context if the user is done with this context.
+     */
+    exit() {
+        this._controller.loadContext("continuity", {
+            dotType: this._continuity.dotType,
+        });
+    }
+
+    /**
      * Load the given editing tool.
      *
      * @param {string} name
@@ -209,7 +215,7 @@ export default class FTLPathContext extends BaseContext {
         setupPanel(this._panel);
 
         this._panel.find("button.submit").click(() => {
-            this.unload();
+            this.exit();
         });
     }
 

@@ -39,6 +39,8 @@ export default class DotContext extends BaseContext {
     }
 
     load(options) {
+        super.load(options);
+
         this._setupContextMenus();
 
         this._panel.show()
@@ -67,8 +69,6 @@ export default class DotContext extends BaseContext {
     }
 
     refresh() {
-        super.refresh();
-
         this._grapher.showBackground(this._backgroundVisible);
 
         // highlight dots in panel

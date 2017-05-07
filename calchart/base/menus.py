@@ -321,7 +321,7 @@ editor_toolbar = Toolbar(
     ),
     ToolbarContextGroup(
         'edit-background',
-        ToolbarItem('Save', 'check', 'unload'),
+        ToolbarItem('Save', 'check', 'exit'),
         ToolbarItem('Cancel', 'times', 'revert'),
     ),
     ToolbarContextGroup(
@@ -332,6 +332,6 @@ editor_toolbar = Toolbar(
     ),
     ToolbarContextGroup(
         'gate-reference',
-        ToolbarItem('Save', 'check', 'unload'),
+        ToolbarItem('Save', 'check', 'exit'),
     ),
 )
