@@ -1,5 +1,3 @@
-import { NotImplementedError } from "utils/errors";
-
 /**
  * Represents a Context that defines a state of the editor application and
  * the actions that can be run when the editor application is in the
@@ -18,7 +16,7 @@ export default class BaseContext {
     constructor(controller) {
         this._controller = controller;
         this._grapher = controller.getGrapher();
-        this._sheet = controller.getActiveSheet();
+        this._sheet = null;
         this._eventListeners = new Set();
     }
 
@@ -56,7 +54,7 @@ export default class BaseContext {
      * @param {object} options - Options to customize loading the Context.
      */
     load(options) {
-        throw new NotImplementedError(this);
+        this._sheet = this._controller.getActiveSheet();
     }
 
     /**
@@ -70,18 +68,18 @@ export default class BaseContext {
     }
 
     /**
-     * Refresh the UI according to the state of the controller and context.
+     * Load the given sheet.
+     *
+     * @param {Sheet} sheet
      */
-    refresh() {
-        this._sheet = this._controller.getActiveSheet();
+    loadSheet(sheet) {
+        this._sheet = sheet;
     }
 
     /**
-     * Refresh the UI after zooming.
+     * Refresh the UI according to the state of the controller and context.
      */
-    refreshZoom() {
-        this.refresh();
-    }
+    refresh() {}
 
     /**
      * @return {EditorController}

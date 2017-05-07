@@ -511,16 +511,13 @@ export default class EditorController extends ApplicationController {
      * @param {string} name - The name of the Context to load.
      * @param {Object} [options] - Any options to customize loading the context.
      *   Will also be passed to Context.load.
-     *   - {boolean} [unload=true] - Whether to unload the current context
-     *     before loading the next one.
      */
     loadContext(name, options={}) {
-        // don't load same context
-        if (name === Context.name(this._context)) {
-            return;
-        }
-
-        if (_.defaultTo(options.unload, true) && this._context) {
+        if (this._context) {
+            // don't load same context
+            if (name === Context.name(this._context)) {
+                return;
+            }
             this._context.unload();
         }
 
@@ -537,6 +534,10 @@ export default class EditorController extends ApplicationController {
     loadSheet(sheet) {
         this._activeSheet = sheet;
         this._currBeat = 0;
+
+        if (this._context) {
+            this._context.loadSheet(sheet);
+        }
 
         this.refresh();
     }
@@ -714,9 +715,6 @@ export default class EditorController extends ApplicationController {
         });
 
         this.refresh("grapherClear");
-        if (this._context) {
-            this._context.refreshZoom();
-        }
 
         // scroll workspace to keep same location under cursor
         let end = this._grapher.getScale().toDistanceCoordinates(start);

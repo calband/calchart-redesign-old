@@ -40,6 +40,8 @@ export default class ContinuityContext extends BaseContext {
      *    - {string} [dotType=null] - The dot type to initially load.
      */
     load(options) {
+        super.load(options);
+
         this._panel.show();
         this._dotType = _.defaultTo(options.dotType, null);
 
@@ -140,8 +142,6 @@ export default class ContinuityContext extends BaseContext {
     }
 
     refresh() {
-        super.refresh();
-
         if (!_.isNull(this._sheet)) {
             this._refreshSheet();
         }
@@ -186,10 +186,14 @@ export default class ContinuityContext extends BaseContext {
         });
 
         // activate dot type tab
-        if (_.isNull(this._dotType)) {
-            this._dotType = tabs.find("li.tab:first").data("dotType");
+        let tab = tabs.find(`.${this._dotType}`);
+        if (!tab.exists()) {
+            tab = tabs.find("li.tab:first");
+            this._dotType = tab.data("dotType");
         }
-        let tab = tabs.find(`.${this._dotType}`).addClass("active");
+
+        tab.addClass("active");
+
         let continuities = this._panel.find(".continuities").empty();
         this._sheet.getContinuities(this._dotType).forEach(continuity => {
             let continuityHTML = continuity.panelHTML(this._controller);

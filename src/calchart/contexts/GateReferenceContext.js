@@ -1,4 +1,4 @@
-import BaseContext from "calchart/contexts/BaseContext";
+import HiddenContext from "calchart/contexts/HiddenContext";
 import Coordinate from "calchart/Coordinate";
 
 import HTMLBuilder from "utils/HTMLBuilder";
@@ -8,7 +8,7 @@ import { round } from "utils/MathUtils";
  * The Context that allows a user to define the reference point
  * in a GateTurnContinuity
  */
-export default class GateReferenceContext extends BaseContext {
+export default class GateReferenceContext extends HiddenContext {
     constructor(controller) {
         super(controller);
 
@@ -30,6 +30,8 @@ export default class GateReferenceContext extends BaseContext {
      *    - {GateTurnContinuity} continuity - The gate turn continuity being edited
      */
     load(options) {
+        super.load(options);
+
         this._continuity = options.continuity;
 
         $(".toolbar .gate-reference-group").removeClass("hide");
@@ -69,11 +71,6 @@ export default class GateReferenceContext extends BaseContext {
         this._controller.checkContinuities({
             dots: this._continuity.dotType,
         });
-
-        this._controller.loadContext("continuity", {
-            unload: false,
-            dotType: this._continuity.dotType,
-        });
     }
 
     refresh() {
@@ -88,6 +85,15 @@ export default class GateReferenceContext extends BaseContext {
         let scale = this._grapher.getScale();
         let point = scale.toDistanceCoordinates(this._continuity.reference);
         this._reference.attr("cx", point.x).attr("cy", point.y);
+    }
+
+    /**
+     * Load continuity context if the user is done with this context.
+     */
+    exit() {
+        this._controller.loadContext("continuity", {
+            dotType: this._continuity.dotType,
+        });
     }
 
     /**

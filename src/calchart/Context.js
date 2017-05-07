@@ -82,23 +82,19 @@ export default class Context {
      * @return {string}
      */
     static name(context) {
-        if (context instanceof EditBackgroundContext) {
-            return "background";
-        }
-        if (context instanceof ContinuityContext) {
-            return "continuity";
-        }
-        if (context instanceof ContinuityDotContext) {
-            return "continuity-dots";
-        }
-        if (context instanceof DotContext) {
-            return "dot";
-        }
-        if (context instanceof FTLPathContext) {
-            return "ftl-path";
-        }
-        if (context instanceof TwoStepContext) {
-            return "two-step";
+        switch (context.constructor.name) {
+            case "ContinuityContext":
+                return "continuity";
+            case "ContinuityDotContext":
+                return "continuity-dots";
+            case "DotContext":
+                return "dot";
+            case "EditBackgroundContext":
+                return "background";
+            case "FTLPathContext":
+                return "ftl-path";
+            case "TwoStepContext":
+                return "two-step";
         }
     }
 }
