@@ -42,9 +42,6 @@ export default class FTLPathContext extends HiddenContext {
 
         this.loadTool("selection");
 
-        let path = this._svg.append("path").classed("ftl-path-helper", true);
-        this._path = $.fromD3(path);
-
         this._panel.show();
         $(".toolbar .ftl-path-group").removeClass("hide");
 
@@ -164,6 +161,11 @@ export default class FTLPathContext extends HiddenContext {
             },
         });
 
+        this._path = this._svg.select("path.ftl-path-helper");
+        if (this._path.empty()) {
+            let path = this._svg.append("path").classed("ftl-path-helper", true);
+            this._path = $.fromD3(path);
+        }
         this._path.attr("d", pathDef);
 
         this._panel.keepOnscreen();

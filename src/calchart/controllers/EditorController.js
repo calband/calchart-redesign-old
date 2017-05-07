@@ -714,7 +714,7 @@ export default class EditorController extends ApplicationController {
             y: workspace.scrollTop() + top,
         });
 
-        this.refresh("grapherClear");
+        this.refresh("grapherClear", "context");
 
         // scroll workspace to keep same location under cursor
         let end = this._grapher.getScale().toDistanceCoordinates(start);
