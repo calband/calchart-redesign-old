@@ -85,6 +85,15 @@ export default class ContinuityContext extends BaseContext {
         $(".toolbar .edit-continuity-group").addClass("hide");
     }
 
+    refresh() {
+        // no Sheets in the show
+        if (_.isNull(this._sheet)) {
+            this._controller.loadContext("dot");
+        } else {
+            this._refreshSheet();
+        }
+    }
+
     /**
      * Delete the given continuity.
      *
@@ -139,14 +148,6 @@ export default class ContinuityContext extends BaseContext {
     moveContinuity(continuity, delta) {
         continuity = this._getContinuity(continuity);
         this._controller.doAction("reorderContinuity", [continuity, delta]);
-    }
-
-    refresh() {
-        if (_.isNull(this._sheet)) {
-            this._controller.loadContext("dot");
-        } else {
-            this._refreshSheet();
-        }
     }
 
     /**
