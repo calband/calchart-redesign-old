@@ -782,10 +782,10 @@ export default class EditorController extends ApplicationController {
      *
      * @param {jQuery} dots - The dots to select.
      * @param {Object} [options] - Options to customize selection:
-     *   - {boolean} [append=true] - If false, deselect all dots before selecting.
+     *   - {boolean} [append=false] - If false, deselect all dots before selecting.
      */
     selectDots(dots, options={}) {
-        if (!_.defaultTo(options.append, true)) {
+        if (!_.defaultTo(options.append, false)) {
             this.deselectDots();
         }
 
@@ -1019,8 +1019,12 @@ class EditorActions {
      * @param {Sheet} [sheet] - The deleted Sheet to redelete, for redo.
      */
     static deleteSheet(sheet=this._activeSheet) {
+        let prevSheet = sheet.getPrevSheet();
+        let nextSheet = sheet.getNextSheet();
+
         this._show.removeSheet(sheet);
-        this.loadSheet(_.defaultTo(sheet.getPrevSheet(), sheet.getNextSheet()));
+        this.loadSheet(_.defaultTo(prevSheet, nextSheet));
+
         return {
             data: [sheet],
             undo: function() {

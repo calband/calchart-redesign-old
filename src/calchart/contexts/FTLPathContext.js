@@ -107,7 +107,7 @@ export default class FTLPathContext extends HiddenContext {
 
         // highlight first dot in path
         let dot = this._grapher.getDot(this._continuity.order[0]);
-        this._grapher.selectDots(dot);
+        this._controller.selectDots(dot);
         this._grapher.getDots(this._continuity.order).css("opacity", 1);
 
         this._list.empty();

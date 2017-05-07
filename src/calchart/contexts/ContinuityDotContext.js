@@ -43,10 +43,10 @@ export default class ContinuityDotContext extends HiddenContext {
                 .data("id", id)
                 .appendTo(this._list)
                 .mouseenter(e => {
-                    this._grapher.selectDots(graphDot);
+                    this._controller.selectDots(graphDot);
                 })
                 .mouseleave(e => {
-                    this._grapher.deselectDots(graphDot);
+                    this._controller.deselectDots(graphDot);
                 });
         });
 

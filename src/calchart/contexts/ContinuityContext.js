@@ -142,7 +142,9 @@ export default class ContinuityContext extends BaseContext {
     }
 
     refresh() {
-        if (!_.isNull(this._sheet)) {
+        if (_.isNull(this._sheet)) {
+            this._controller.loadContext("dot");
+        } else {
             this._refreshSheet();
         }
     }
@@ -202,9 +204,7 @@ export default class ContinuityContext extends BaseContext {
 
         // select dots of the active dot type
         let dots = $(`.dot.${this._dotType}`);
-        this._controller.selectDots(dots, {
-            append: false
-        });
+        this._controller.selectDots(dots);
 
         // update seek bar
         let beat = this._controller.getCurrentBeat();

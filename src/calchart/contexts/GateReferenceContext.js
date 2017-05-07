@@ -78,9 +78,7 @@ export default class GateReferenceContext extends HiddenContext {
 
         // highlight dots
         let dots = $(`.dot.${this._continuity.dotType}`);
-        this._controller.selectDots(dots, {
-            append: false
-        });
+        this._controller.selectDots(dots);
 
         let scale = this._grapher.getScale();
         let point = scale.toDistanceCoordinates(this._continuity.reference);
