@@ -113,12 +113,17 @@ export default class DotContext extends BaseContext {
     }
 
     /**
-     * Select the given dots with the given options.
+     * Select the given dots with the given options. Defaults
+     * to appending the dots to the selection.
      *
      * @param {jQuery} dots
      * @param {Object} [options]
      */
     selectDots(dots, options) {
+        options = _.defaults(options, {
+            append: true,
+        });
+
         this._controller.selectDots(dots, options);
         this._controller.refresh("context");
     }

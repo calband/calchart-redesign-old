@@ -72,6 +72,10 @@ export default class TwoStepContext extends ContinuityContext {
             let continuityHTML = continuity.panelHTML(this._controller);
             continuities.append(continuityHTML);
         });
+
+        // select dots in continuity
+        let dots = $(`.dot.${this._continuity.dotType}`);
+        this._controller.selectDots(dots);
     }
 
     _setupPanel() {
