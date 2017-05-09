@@ -1,0 +1,20 @@
+@import "partials/vars", "partials/mixins";
+
+body {
+    @include vertically-center;
+    text-align: center;
+}
+
+.content {
+    background: $light-gray;
+    padding: 30px;
+    h1 {
+        margin: 0;
+        margin-bottom: 10px;
+        font-size: 2em;
+        text-transform: uppercase;
+    }
+    .buttons button {
+        margin: 0;
+    }
+}

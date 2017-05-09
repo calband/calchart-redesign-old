@@ -1,13 +1,37 @@
 from django import forms
-from django.forms import modelform_factory
 from django.conf import settings
+from django.contrib.auth.forms import UserCreationForm
+from django.forms import modelform_factory
 from django.utils.text import camel_case_to_spaces
 
 import requests
 
 from base.constants import *
 from base.fields import *
-from base.models import Show
+from base.models import Show, User
+
+### FORMS ###
+
+class CreateUserForm(UserCreationForm):
+    class Meta(UserCreationForm.Meta):
+        model = User
+        fields = (
+            'username',
+            'email',
+            'password1',
+            'password2',
+        )
+
+    email = forms.EmailField()
+
+    def save(self):
+        user = super().save(commit=False)
+        user.email = self.cleaned_data['email']
+        user.save()
+
+        return user
+
+### POPUPS ###
 
 class BasePopupForm(object):
     """

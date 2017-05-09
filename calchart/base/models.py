@@ -13,7 +13,7 @@ class User(AbstractUser):
     with Members Only.
     """
     api_token = models.CharField(max_length=40)
-    api_token_expiry = models.DateTimeField()
+    api_token_expiry = models.DateTimeField(null=True)
 
     def is_members_only_user(self):
         return len(self.api_token) == 0

@@ -15,16 +15,16 @@
                 <p class="current-user">Hello, {{ request.user.username }} &middot; <a href="{% url 'logout' %}">Logout</a></p>
             </header>
         {% endblock %}
-        {% block body %}
-            <div class="content">{% block content %}{% endblock %}</div>
-        {% endblock %}
+        <div class="content">{% block content %}{% endblock %}</div>
         <!-- CSRF token for AJAX requests -->
         {% csrf_token %}
         <!-- Popups -->
-        <div class="popup">
-            {% for popup in popup_forms %}
-                {% include popup.template_name with form=popup %}
-            {% endfor %}
-        </div>
+        {% if popup_forms %}
+            <div class="popup">
+                {% for popup in popup_forms %}
+                    {% include popup.template_name with form=popup %}
+                {% endfor %}
+            </div>
+        {% endif %}
     </body>
 </html>

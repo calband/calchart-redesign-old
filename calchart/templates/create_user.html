@@ -1,0 +1,16 @@
+{% extends "base_public.html" %}
+{% load partials %}
+
+{% block head2 %}
+    {% add_style "create_user.css" %}
+{% endblock %}
+
+{% block body %}
+    <p>Create a user below:</p>
+    {% get_feedback form %}
+    {% create_form form %}
+        <div class="buttons">
+            <button>Submit</button>
+        </div>
+    {% end_create_form %}
+{% endblock %}

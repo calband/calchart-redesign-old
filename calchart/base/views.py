@@ -6,11 +6,11 @@ from django.core.files.storage import default_storage
 from django.core.urlresolvers import reverse
 from django.http.response import HttpResponse, JsonResponse
 from django.shortcuts import redirect
-from django.views.generic import TemplateView, RedirectView
+from django.views.generic import TemplateView, RedirectView, CreateView
 
 import json, os
 
-from base.forms import editor_popups
+from base.forms import *
 from base.menus import *
 from base.mixins import CalchartMixin
 from base.models import User, Show
@@ -71,6 +71,15 @@ class AuthMembersOnlyView(RedirectView):
         user.api_token_expiry = timezone.now() + datetime.timedelta(days=ttl_days)
 
         login(self.request, user)
+
+class CreateUserView(CreateView):
+    template_name = 'create_user.html'
+    form_class = CreateUserForm
+
+    def form_valid(self, form):
+        form.save()
+        messages.success(self.request, 'User successfully created.')
+        return redirect('login')
 
 ### CALCHART PAGES ###
 
