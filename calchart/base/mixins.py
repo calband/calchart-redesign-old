@@ -1,21 +1,15 @@
+from django.contrib.auth.mixins import AccessMixin
 from django.core.urlresolvers import reverse
 from django.shortcuts import redirect
 
-class LoginRequiredMixin(object):
-    """
-    Checks that a user is logged in.
-    """
+class LoginRequiredMixin(AccessMixin):
     def dispatch(self, request, *args, **kwargs):
-        if not request.session.get('valid'):
-            url = reverse('login')
-            return redirect(f'{url}?next={request.path}')
-        else:
-            return super().dispatch(request, *args, **kwargs)
+        if not request.user.is_authenticated:
+            return self.handle_no_permission()
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['username'] = self.request.session['username']
-        return context
+        # TODO: check valid token, if not, reauthenticate user
+
+        return super(LoginRequiredMixin, self).dispatch(request, *args, **kwargs)
 
 class ActionsMixin(object):
     """
@@ -27,10 +21,14 @@ class ActionsMixin(object):
     def post(self, request, *args, **kwargs):
         try:
             action = request.POST['action']
-            response = getattr(self, action)()
-            return response or redirect('home')
-        except:
+        except KeyError:
             return super().post(request, *args, **kwargs)
+
+        response = getattr(self, action)()
+        if response is None:
+            return redirect(request.path)
+        else:
+            return response
 
 class PopupMixin(object):
     """

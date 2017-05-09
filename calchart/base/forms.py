@@ -9,22 +9,6 @@ from base.constants import *
 from base.fields import *
 from base.models import Show
 
-class LoginForm(forms.Form):
-    username = forms.CharField(max_length=255, required=False)
-    password = forms.CharField(widget=forms.PasswordInput, required=False)
-
-    LOGIN_URL = 'https://membersonly-prod.herokuapp.com/api/login/'
-
-    def clean(self):
-        # only authenticate on real server
-        if settings.IS_HEROKU:
-            r = requests.post(self.LOGIN_URL, data=self.cleaned_data)
-            data = r.json()
-            if not data['valid']:
-                raise forms.ValidationError('Invalid username or password', code='invalid_login')
-
-        return self.cleaned_data
-
 class BasePopupForm(object):
     """
     A popup form. A mixin to include with another Form class.

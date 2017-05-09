@@ -31,6 +31,7 @@ else:
 # Application definition
 
 INSTALLED_APPS = (
+    'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
@@ -134,5 +135,11 @@ else:
     STATIC_URL = '/static/'
     MEDIA_URL = '/media/'
 
+# Authentication
+
+AUTH_USER_MODEL = 'base.User'
+
 LOGIN_REDIRECT_URL = 'home'
 LOGIN_URL = 'login'
+LOGOUT_REDIRECT_URL = 'login'
+LOGOUT_URL = 'logout'

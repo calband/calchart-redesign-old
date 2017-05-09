@@ -1,16 +1,20 @@
-from django.views.generic import View, TemplateView, FormView
-from django.shortcuts import redirect
-from django.contrib import messages
-from django.http.response import HttpResponse, JsonResponse
-from django.core.files.storage import default_storage
 from django.conf import settings
+from django.contrib import messages
+from django.contrib.auth import login
+from django.contrib.auth.views import LoginView as DjangoLoginView
+from django.core.files.storage import default_storage
+from django.core.urlresolvers import reverse
+from django.http.response import HttpResponse, JsonResponse
+from django.shortcuts import redirect
+from django.views.generic import TemplateView, RedirectView
 
 import json, os
 
-from base.forms import LoginForm, editor_popups
+from base.forms import editor_popups
 from base.menus import *
 from base.mixins import CalchartMixin
-from base.models import Show
+from base.models import User, Show
+from utils.api import get_login_url
 
 ### ENDPOINTS ###
 
@@ -24,38 +28,51 @@ def export(request, slug):
 
     return response
 
-### PAGES ###
+### AUTH PAGES ###
 
-class LoginView(FormView):
+class LoginView(DjangoLoginView):
     """
     Logs in a user with their Members Only credentials. When a user submits their
     credentials, send a request to the Members Only server and validate that the
     credentials are valid. If so, flag the user's session as having logged in.
     """
     template_name = 'login.html'
-    form_class = LoginForm
+    redirect_authenticated_user = True
 
+class AuthMembersOnlyView(RedirectView):
+    """
+    Redirects the user to Members Only, which will redirect back to Calchart after
+    the user logs in (or immediately, if the user is already logged in).
+    """
     def dispatch(self, request, *args, **kwargs):
-        if request.session.get('valid'):
-            return redirect('home')
-        else:
-            return super().dispatch(request, *args, **kwargs)
+        if 'username' in request.GET:
+            self.login_user()
+            redirect_url = request.GET.get('next', 'home')
+            return redirect(redirect_url)
 
-    def form_valid(self, form):
-        self.request.session['username'] = form.cleaned_data['username']
-        self.request.session['valid'] = True
-        return redirect('home')
+    def get_redirect_url(self, *args, **kwargs):
+        redirect_url = self.request.build_absolute_uri()
+        if 'next' in self.request.GET:
+            after_auth = self.request.GET['next']
+            redirect_url += f'?next={after_auth}'
 
-def logout_view(request):
-    """
-    Logs out a user
-    """
-    try:
-        del request.session['valid']
-    except:
-        pass
+        return get_login_url(redirect_url)
 
-    return redirect('login')
+    def login_user(self):
+        username = self.request.GET['username']
+        api_token = self.request.GET['api_token']
+        ttl_days = self.request.GET['ttl_days']
+
+        user = User.objects.filter(username=username).first()
+        if user is None:
+            user = User.objects.create_user(username=username)
+
+        user.api_token = api_token
+        user.api_token_expiry = timezone.now() + datetime.timedelta(days=ttl_days)
+
+        login(self.request, user)
+
+### CALCHART PAGES ###
 
 class HomeView(CalchartMixin, TemplateView):
     """
