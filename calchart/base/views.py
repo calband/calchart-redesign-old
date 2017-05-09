@@ -7,8 +7,10 @@ from django.core.urlresolvers import reverse
 from django.http.response import HttpResponse, JsonResponse
 from django.shortcuts import redirect
 from django.views.generic import TemplateView, RedirectView, CreateView
+from django.utils import timezone
 
 import json, os
+from datetime import timedelta
 
 from base.forms import *
 from base.menus import *
@@ -47,16 +49,13 @@ class AuthMembersOnlyView(RedirectView):
     def dispatch(self, request, *args, **kwargs):
         if 'username' in request.GET:
             self.login_user()
-            redirect_url = request.GET.get('next', 'home')
-            return redirect(redirect_url)
+            return redirect(request.GET['next']) 
+        else:
+            return super().dispatch(request, *args, **kwargs)
 
     def get_redirect_url(self, *args, **kwargs):
-        redirect_url = self.request.build_absolute_uri()
-        if 'next' in self.request.GET:
-            after_auth = self.request.GET['next']
-            redirect_url += f'?next={after_auth}'
-
-        return get_login_url(redirect_url)
+        redirect_url = self.request.GET['next']
+        return get_login_url(self.request, redirect_url)
 
     def login_user(self):
         username = self.request.GET['username']
@@ -68,7 +67,8 @@ class AuthMembersOnlyView(RedirectView):
             user = User.objects.create_user(username=username)
 
         user.api_token = api_token
-        user.api_token_expiry = timezone.now() + datetime.timedelta(days=ttl_days)
+        user.api_token_expiry = timezone.now() + timedelta(days=int(ttl_days))
+        user.save()
 
         login(self.request, user)
 

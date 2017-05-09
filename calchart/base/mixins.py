@@ -2,12 +2,17 @@ from django.contrib.auth.mixins import AccessMixin
 from django.core.urlresolvers import reverse
 from django.shortcuts import redirect
 
+from utils.api import get_login_url
+
 class LoginRequiredMixin(AccessMixin):
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
             return self.handle_no_permission()
 
-        # TODO: check valid token, if not, reauthenticate user
+        # if not valid token, reauthenticate user
+        if not request.user.is_valid_api_token():
+            login_url = get_login_url(self.request)
+            return redirect(login_url)
 
         return super(LoginRequiredMixin, self).dispatch(request, *args, **kwargs)
 

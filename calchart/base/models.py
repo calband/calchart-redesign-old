@@ -2,6 +2,9 @@ from django.contrib.auth.models import AbstractUser
 from django.core.files.base import ContentFile
 from django.db import models
 from django.utils.text import slugify
+from django.utils import timezone
+
+from datetime import timedelta
 
 class User(AbstractUser):
     """
@@ -16,7 +19,12 @@ class User(AbstractUser):
     api_token_expiry = models.DateTimeField(null=True)
 
     def is_members_only_user(self):
-        return len(self.api_token) == 0
+        return len(self.api_token) > 0
+
+    def is_valid_api_token(self):
+        return self.is_members_only_user() and (
+            timezone.now() + timedelta(days=1) < self.api_token_expiry
+        )
 
 class Show(models.Model):
     """
