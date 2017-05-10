@@ -470,6 +470,7 @@ export function setupPanel(panel, options={}) {
  *     If any ValidationErrors are thrown, shows a UI error message and exits without
  *     closing the popup.
  *   - {function(jQuery)} onHide - Function to run after the popup is hidden.
+ *   - {boolean} [submitHide=true] - Set to false to not hide the popup when submitting.
  */
 export function showPopup(name, options={}) {
     let popup = $(`.popup-box.${name}`).addClass("active");
@@ -496,7 +497,9 @@ export function showPopup(name, options={}) {
                 }
             }
 
-            hidePopup();
+            if (_.defaultTo(options.submitHide, true)) {
+                hidePopup();
+            }
         });
 
     // event listeners to close popup
@@ -544,7 +547,7 @@ export function hidePopup() {
     $(window).off(".popup");
 
     let onHide = popup.data("onHide");
-    if (onHide) {
+    if (!_.isUndefined(onHide)) {
         onHide(popup);
     }
 }

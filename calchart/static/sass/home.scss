@@ -1,117 +1,12 @@
 @import "partials/vars", "partials/mixins";
 
 .main-buttons {
-    margin: 20px 0;
-    text-align: center;
-    font-size: 18px;
+    margin: 10px 0;
     button {
-        width: 205px;
+        margin: 0;
     }
 }
 
 .messages {
-    margin: 20px 0;
-    text-align: center;
-    font-size: 1.2em;
-    font-weight: bold;
-}
-
-table {
-    margin: 10px 0;
-    width: 100%;
-    text-align: center;
-    td, th {
-        line-height: 1.5em;
-        padding: 5px;
-        border: 1px solid #fff;
-        vertical-align: middle;
-        background: $light-gray;
-        &:first-child {
-            border-left: 0;
-        }
-        &:last-child {
-            border-right: 0;
-        }
-        &.id {
-            width: 75px;
-        }
-        &.name {
-            .icon {
-                margin-right: 10px;
-                float: right;
-            }
-            input {
-                padding: 0;
-            }
-            button {
-                margin: 0;
-                margin-left: 10px;
-                padding: 5px;
-                width: 60px;
-            }
-        }
-        &.actions {
-            width: 100px;
-        }
-    }
-    tr {
-        &:first-child th {
-            background: $dark-gray;
-            border-color: $dark-gray;
-            color: $light-gray;
-        }
-        &:nth-child(odd) td {
-            background: $semilight-gray;
-        }
-    }
-}
-
-.popup.new-show .popup-box {
-    .section {
-        padding: 15px 0;
-        border-bottom: 1px solid $semilight-gray;
-        &:first-child {
-            border-top: 1px solid $semilight-gray;
-        }
-        &.name {
-            #new-show-name {
-                width: 300px;
-            }
-        }
-        &.file-upload {
-            label {
-                @include display-button;
-                cursor: pointer;
-            }
-            input[type=file] {
-                display: none;
-            }
-            .content button {
-                margin-top: 10px;
-            }
-        }
-        h2 {
-            text-align: left;
-        }
-        .content {
-            padding-top: 20px;
-            button {
-                display: block;
-                margin: 20px auto 0;
-            }
-            .error-messages {
-                margin-top: 10px;
-                li {
-                    color: $red;
-                }
-            }
-        }
-    }
-    button.close {
-        margin-top: 30px;
-    }
-    p.message {
-        margin-top: 20px;
-        margin-bottom: 0;
-    }
+    @include hover-messages;
 }

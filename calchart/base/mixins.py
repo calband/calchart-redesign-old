@@ -1,5 +1,6 @@
 from django.contrib.auth.mixins import AccessMixin
 from django.core.urlresolvers import reverse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect
 
 from utils.api import get_login_url
@@ -32,8 +33,10 @@ class ActionsMixin(object):
         response = getattr(self, action)()
         if response is None:
             return redirect(request.path)
-        else:
+        elif isinstance(response, HttpResponse):
             return response
+        else:
+            return JsonResponse(response)
 
 class PopupMixin(object):
     """

@@ -1,45 +1,31 @@
 {% extends "base.html" %}
 {% load partials %}
 
-{% block head %}
+{% block title %}
+    - Home
 {% endblock %}
 
-{% block content %}
+{% block head %}
+    {% add_style "home.css" %}
+    {% add_script "home.js" %}
+    <script>
+        window.isStunt = {{ is_stunt|yesno:"true,false" }};
+    </script>
+{% endblock %}
+
+{% block body %}
     {% get_feedback %}
     <div class="main-buttons">
-        <button class="create">New Show</button>
-        <button class="unpublish red-button">Unpublish All</button>
+        <button class="new-show">New Show</button>
     </div>
-    <table>
-        <tr>
-            <th class="id">ID</th>
-            <th class="name">Name</th>
-            <th>Viewer</th>
-            <th>Beats</th>
-            <th>Audio</th>
-            <th>Status</th>
-            <th>Actions</th>
-        </tr>
-        {% for show in all_shows %}
-            <tr data-pk="{{ show.pk }}" data-name="{{ show.name }}">
-                <td class="id">{{ show.pk }}</td>
-                <td class="name">{{ show.name }} <a class="icon edit" href="#"></a></td>
-                <td><a href="{% url 'viewer' show.slug %}" target="_blank">Open</a></td>
-                <td><a href="{% url 'beats' show.slug %}" target="_blank">Open</a></td>
-                <td>
-                    {% if show.audio_file %}
-                        <a href="{{ show.audio_file.url }}" target="_blank">Open</a>
-                    {% else %}
-                        --
-                    {% endif %}
-                </td>
-                <td>{{ show.published|yesno:"Published,Unpublished" }}</td>
-                <td class="actions">
-                    <a class="icon edit" href="{% url 'beats-editor' show.slug %}"></a>
-                    <a class="icon {{ show.published|yesno:'unpublish,publish' }}" href="#"></a>
-                    <a class="icon delete" href="#"></a>
-                </td>
-            </tr>
+    <ul class="tabs">
+        {% for id, name in tabs %}
+            <li class="{% if forloop.first %}active{% endif %}" data-tab="{{ id }}">{{ name }}</li>
         {% endfor %}
-    </table>
+    </ul>
+    <ul class="shows">
+        {% for show in shows %}
+            <li data-slug="{{ show.slug }}">{{ show.name }}</li>
+        {% endfor %}
+    </ul>
 {% endblock %}

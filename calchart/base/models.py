@@ -24,7 +24,11 @@ class User(AbstractUser):
         return len(self.api_token) > 0
 
     def is_valid_api_token(self):
-        return self.is_members_only_user() and (
+        """
+        Return True if this User has a valid API token. Also returns
+        True if this user is not a Members Only user.
+        """
+        return not self.is_members_only_user() or (
             timezone.now() + timedelta(days=1) < self.api_token_expiry
         )
 
@@ -33,6 +37,9 @@ class User(AbstractUser):
         Check if this user is part of the given committee. See the Members
         Only API endpoint.
         """
+        if not self.is_members_only_user():
+            return False
+
         response = call_endpoint('check-committee', self, committee=committee)
         return response['has_committee']
 
@@ -93,5 +100,11 @@ class Show(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(self.name)
-        super().save(*args, **kwargs)
+            slug = slugify(self.name)
+            i = 0
+            self.slug = slug
+            while Show.objects.filter(slug=self.slug).exists():
+                i += 1 
+                self.slug = f'{slug}-{i}'
+
+        return super().save(*args, **kwargs)

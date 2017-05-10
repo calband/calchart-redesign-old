@@ -90,6 +90,9 @@ class HomeView(CalchartMixin, TemplateView):
     by the STUNT committee in a Google Drive-like format.
     """
     template_name = 'home.html'
+    popup_forms = [
+        CreateShowPopup,
+    ]
 
     def get(self, request, *args, **kwargs):
         """
@@ -111,50 +114,79 @@ class HomeView(CalchartMixin, TemplateView):
         else:
             return super().get(request, *args, **kwargs)
 
-    def get_tab(self, tab):
-        """
-        Available tabs:
-        - band: Shows created by STUNT for this year
-        - created: Shows created by the current user
-        """
-        if tab == 'band':
-            if not self.request.user.is_members_only_user():
-                raise PermissionDenied
-            return Show.objects.filter(
-                is_band=True,
-                date_added__year=timezone.now().year
-            )
-
-        if tab == 'created':
-            return Show.objects.filter(owner=self.request.user)
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
         # if Members Only user, shows this year's shows by default
         # otherwise, show the user's shows
         if self.request.user.is_members_only_user():
-            context['tab'] = 'band'
             context['is_stunt'] = self.request.user.has_committee('STUNT')
-        else:
-            context['tab'] = 'created'
+
+        tabs = self.get_tabs()
+        context['tabs'] = tabs
+        context['shows'] = self.get_tab(tabs[0][0])
 
         return context
+
+    def get_tabs(self):
+        """
+        Get all available tabs for the current user. Available tabs are:
+        - band: Shows created by STUNT for this year
+        - created: Shows created by the current user
+
+        Returns tabs in a tuple of the form (id, display_name). The first
+        tab in the list is the first tab.
+        """
+        if self.request.user.is_members_only_user():
+            year = timezone.now().year
+            return [
+                ('band', f'{year} Shows'),
+                ('owned', 'My Shows'),
+            ]
+        else:
+            return [
+                ('owned', 'My Shows'),
+            ]
+
+    def get_tab(self, tab):
+        """
+        Get Shows for the given tab (see get_tabs).
+        """
+        if tab == 'band':
+            if not self.request.user.is_members_only_user():
+                raise PermissionDenied
+            kwargs = {
+                'is_band': True,
+                'date_added__year': timezone.now().year,
+            }
+            if not self.request.user.has_committee('STUNT'):
+                kwargs['published'] = True
+
+            return Show.objects.filter(**kwargs)
+
+        if tab == 'owned':
+            return Show.objects.filter(owner=self.request.user)
 
     def create_show(self):
         """
         A POST action that creates a show with a name and audio file
         """
-        # TODO: is_band check if user is on stunt
+        if self.request.user.has_committee('STUNT'):
+            is_band = self.request.POST['is_band']
+        else:
+            is_band = False
 
         kwargs = {
-            'name': self.request.POST['name'],
+            'name': self.request.POST['show_name'],
             'owner': self.request.user,
-            'is_band': self.request.POST['is_band'],
+            'is_band': is_band,
             'audio_file': self.request.FILES.get('audio'),
         }
         show = Show.objects.create(**kwargs)
-        return redirect('editor', slug=show.slug)
+        url = reverse('editor', kwargs={'slug': show.slug})
+        return {
+            'url': url,
+        }
 
 class EditorView(CalchartMixin, TemplateView):
     """
