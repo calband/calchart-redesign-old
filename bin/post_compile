@@ -12,7 +12,8 @@ message "Running Django Migrations"
 python calchart/manage.py migrate --noinput
 
 message "Compiling staticfiles"
-grunt build
+python bin/compile_staticfiles.py
+grunt webpack:build
 python calchart/manage.py collectstatic --noinput -i *.scss -i *.map
 
 # if running on a review app, automatically create superuser
