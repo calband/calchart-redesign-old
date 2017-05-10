@@ -32,7 +32,7 @@ else:
 
 # Application definition
 
-INSTALLED_APPS = (
+INSTALLED_APPS = [
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -41,7 +41,7 @@ INSTALLED_APPS = (
     'storages',
     'base',
     'wiki', # help pages
-)
+]
 
 if IS_HEROKU:
     # collectfast staticfiles
