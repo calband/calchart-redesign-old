@@ -3,10 +3,6 @@
   "author": "Cal Band Computer Committee",
   "version": "0.0.1",
   "private": true,
-  "engines": {
-    "node": "0.10.x",
-    "npm": "1.2.x"
-  },
   "dependencies": {
     "grunt": "=0.4.5",
     "grunt-webpack": "=2.0.1",
