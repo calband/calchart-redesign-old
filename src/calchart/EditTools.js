@@ -489,7 +489,7 @@ class LassoTool extends BaseSelection {
             dot = $(dot);
             let marker = dot.find(".dot-marker");
             let offset = marker.offset();
-            let dimensions = marker[0].getBBox();
+            let dimensions = marker.getDimensions();
             let topElem = document.elementFromPoint(
                 offset.left + dimensions.width / 2,
                 offset.top + dimensions.height / 2

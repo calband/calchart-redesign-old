@@ -101,7 +101,7 @@ export default class CollegeGrapher extends FieldGrapher {
                         y = WEST - fontSize / 3;
                     }
 
-                    let width = parseFloat(label.style("width"));
+                    let width = $.fromD3(label).getDimensions().width;
                     let x = xScale(d * 8/5) - width/2;
 
                     label.attr("x", x).attr("y", y);

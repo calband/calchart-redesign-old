@@ -101,7 +101,7 @@ export default class EditBackgroundContext extends HiddenContext {
 
     refresh() {
         let image = this._getImage();
-        let dimensions = image[0].getBBox();
+        let dimensions = image.getDimensions();
 
         this._handles.css({
             left: image.attr("x"),

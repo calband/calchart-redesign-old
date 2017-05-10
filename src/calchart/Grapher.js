@@ -421,7 +421,8 @@ export default class Grapher {
                         .attr("font-size", dotRadius * 2)
                         .text(dot.label);
 
-                    let offsetX = -1.25 * parseFloat(dotLabel.style("width"));
+                    let width = $.fromD3(dotLabel).getDimensions().width
+                    let offsetX = -1.25 * width;
                     let offsetY = -1.25 * dotRadius;
                     if (options.labelLeft === false) {
                         offsetX *= -1;
