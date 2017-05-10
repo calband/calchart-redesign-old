@@ -226,11 +226,11 @@ header {
             margin: 0 1px;
             cursor: default;
             vertical-align: middle;
-            line-height: 0; // firefox heights
             &.toolbar-item {
                 padding: 5px;
                 border: 1px solid transparent;
                 border-radius: 2px;
+                line-height: 0; // firefox heights
                 &:hover, &.active, &.focus:hover {
                     border-color: darken($semilight-gray, 10);
                     box-shadow: 0 0 1px rgba($black, 0.2);
