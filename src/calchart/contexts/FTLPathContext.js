@@ -209,7 +209,7 @@ export default class FTLPathContext extends HiddenContext {
                 }
                 this._helper.attr("cx", coord.x).attr("cy", coord.y);
             });
-        } else {
+        } else if (!_.isNull(this._helper)) {
             this._helper.remove();
             this._helper = null;
         }
