@@ -96,10 +96,10 @@ export default class FollowLeaderContinuity extends BaseContinuity {
             }
 
             movements = movements.concat(movesToNext);
-            let currMove = movesToNext[0];
 
             // combine moves if in same direction
-            if (!_.isUndefined(lastMove)) {
+            if (!_.isUndefined(lastMove) && movesToNext.length > 0) {
+                let currMove = movesToNext[0];
                 let dir1 = lastMove.getDirection();
                 let dir2 = currMove.getDirection();
                 if (dir1 === dir2) {

@@ -10,27 +10,29 @@
     {% add_script "wiki.js" %}
 {% endblock %}
 
-{% block content %}
-    <h1>{{ wiki_title }}</h1>
-    <ul class="nav">
-        {% for page in navigation %}
-            <li>
-                {% if page.slug == 'home' %}
-                    <a href="{% url 'wiki:home' %}"><i class="icon-home"></i></a>
-                {% else %}
-                    <a href="{{ page.get_url }}">{{ page.name }}</a>
-                {% endif %}
-                {% if page.children %}
-                    <ul class="nav-submenu">
-                        {% for child in page.children %}
-                            <li><a href="{{ child.get_url }}">{{ child.name }}</a></li>
-                        {% endfor %}
-                    </ul>
-                {% endif %}
-            </li>
-        {% endfor %}
-    </ul>
-    <div class="wiki-content">
-        {{ wiki_body|safe }}
+{% block body %}
+    <div class="content">
+        <h1>{{ wiki_title }}</h1>
+        <ul class="nav">
+            {% for page in navigation %}
+                <li>
+                    {% if page.slug == 'home' %}
+                        <a href="{% url 'wiki:home' %}"><i class="icon-home"></i></a>
+                    {% else %}
+                        <a href="{{ page.get_url }}">{{ page.name }}</a>
+                    {% endif %}
+                    {% if page.children %}
+                        <ul class="nav-submenu">
+                            {% for child in page.children %}
+                                <li><a href="{{ child.get_url }}">{{ child.name }}</a></li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+        <div class="wiki-content">
+            {{ wiki_body|safe }}
+        </div>
     </div>
 {% endblock %}

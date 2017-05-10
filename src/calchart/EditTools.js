@@ -440,6 +440,9 @@ class SelectionTool extends BaseSelection {
                 this.mouseupSelect(e);
                 break;
         }
+
+        // update panel
+        this.controller.refresh("context");
     }
 
     mouseupDot(e) {
@@ -489,7 +492,7 @@ class LassoTool extends BaseSelection {
             dot = $(dot);
             let marker = dot.find(".dot-marker");
             let offset = marker.offset();
-            let dimensions = marker[0].getBBox();
+            let dimensions = marker.getDimensions();
             let topElem = document.elementFromPoint(
                 offset.left + dimensions.width / 2,
                 offset.top + dimensions.height / 2
@@ -499,6 +502,7 @@ class LassoTool extends BaseSelection {
             }
         });
 
+        this.controller.refresh("context");
         this._path.remove();
     }
 }
@@ -531,6 +535,10 @@ class SwapTool extends BaseTool {
         } else {
             this.context.deselectDots();
         }
+    }
+
+    mouseup(e) {
+        this.controller.refresh("context");
     }
 }
 

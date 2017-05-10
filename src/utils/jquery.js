@@ -107,6 +107,16 @@ $.fn.exists = function() {
 };
 
 /**
+ * Get the dimensions of this SVG element, because .width() and
+ * .height() don't work.
+ *
+ * @return {object} An object with the element's width, height, x, y
+ */
+$.fn.getDimensions = function() {
+    return this[0].getBBox();
+}
+
+/**
  * If this element is offscreen, position it to be onscreen.
  */
 $.fn.keepOnscreen = function() {
@@ -193,7 +203,8 @@ $.fn.removeClassRegex = function(pattern) {
  *     takes in the change in x/y positions.
  */
 $.fn.scrollIntoView = function(options={}) {
-    let { tolerance=0, margin=tolerance } = options;
+    let tolerance = _.defaultTo(options.tolerance, 0);
+    let margin = _.defaultTo(options.margin, tolerance);
 
     // top/left of the visible part of the parent
     let parent = $(_.defaultTo(options.parent, this.parent()));
@@ -218,7 +229,7 @@ $.fn.scrollIntoView = function(options={}) {
         if (this instanceof SVGElement) {
             // SVG elements don't have an outerWidth or outerHeight
             // http://stackoverflow.com/a/9131261/4966649
-            dimensions = this.getBBox();
+            dimensions = $(this).getDimensions();
         } else {
             dimensions = {
                 width: $(this).outerWidth(),
