@@ -84,9 +84,8 @@ export default class DotContext extends BaseContext {
      *
      * @param {jQuery} [dots] - Dots to deselect (defaults to all dots).
      */
-    deselectDots(dots) {
+    deselectDots(dots, refresh=true) {
         this._controller.deselectDots(dots);
-        this._controller.refresh("context");
     }
 
     /**
@@ -125,7 +124,6 @@ export default class DotContext extends BaseContext {
         });
 
         this._controller.selectDots(dots, options);
-        this._controller.refresh("context");
     }
 
     /**
@@ -143,7 +141,6 @@ export default class DotContext extends BaseContext {
      */
     toggleDots(dots) {
         this._controller.toggleDots(dots);
-        this._controller.refresh("context");
     }
 
     /**

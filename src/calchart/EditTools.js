@@ -440,6 +440,9 @@ class SelectionTool extends BaseSelection {
                 this.mouseupSelect(e);
                 break;
         }
+
+        // update panel
+        this.controller.refresh("context");
     }
 
     mouseupDot(e) {
@@ -499,6 +502,7 @@ class LassoTool extends BaseSelection {
             }
         });
 
+        this.controller.refresh("context");
         this._path.remove();
     }
 }
@@ -531,6 +535,10 @@ class SwapTool extends BaseTool {
         } else {
             this.context.deselectDots();
         }
+    }
+
+    mouseup(e) {
+        this.controller.refresh("context");
     }
 }
 

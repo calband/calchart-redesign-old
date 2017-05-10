@@ -6,7 +6,14 @@ import Sheet from "calchart/Sheet";
 
 import { ActionError, AnimationStateError, ValidationError } from "utils/errors";
 import HTMLBuilder from "utils/HTMLBuilder";
-import { empty, mapSome, parseArgs, parseNumber, underscoreKeys, update } from "utils/JSUtils";
+import {
+    empty,
+    mapSome,
+    parseArgs,
+    parseNumber,
+    underscoreKeys,
+    update,
+} from "utils/JSUtils";
 import { round } from "utils/MathUtils";
 import {
     doAction,
