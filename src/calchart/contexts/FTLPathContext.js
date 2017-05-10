@@ -25,6 +25,7 @@ export default class FTLPathContext extends HiddenContext {
 
         this._svg = this._grapher.getSVG();
         this._path = null;
+        this._helper = null;
     }
 
     static get actions() {
@@ -88,6 +89,9 @@ export default class FTLPathContext extends HiddenContext {
         // remove helpers
         this._svg.selectAll(".ref-point").remove();
         this._path.remove();
+        if (!_.isNull(this._helper)) {
+            this._helper.remove();
+        }
 
         this._panel.hide();
         $(".toolbar .ftl-path-group").addClass("hide");
@@ -198,15 +202,16 @@ export default class FTLPathContext extends HiddenContext {
                 let steps = this._eventToSnapSteps(e);
                 let coord = scale.toDistanceCoordinates(steps);
 
-                if (helper.empty()) {
-                    helper = this._svg.append("circle")
+                if (_.isNull(this._helper)) {
+                    this._helper = this._svg.append("circle")
                         .classed("ftl-path-add-point", true)
                         .attr("r", dotRadius);
                 }
-                helper.attr("cx", coord.x).attr("cy", coord.y);
+                this._helper.attr("cx", coord.x).attr("cy", coord.y);
             });
         } else {
-            helper.remove();
+            this._helper.remove();
+            this._helper = null;
         }
 
         $(".toolbar .ftl-path-group li").removeClass("active");
