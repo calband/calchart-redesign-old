@@ -12,7 +12,8 @@ import {
     calcRotatedXPos,
     calcRotatedYPos,
     getDimensions,
-    round
+    round,
+    roundSmall,
 } from "utils/MathUtils";
 
 /**
@@ -555,8 +556,8 @@ class BaseEdit extends BaseTool {
             let position = scale.toStepCoordinates($(dot).data("position"));
             return {
                 dot: $(dot).data("dot"),
-                x: position.x,
-                y: position.y,
+                x: roundSmall(position.x),
+                y: roundSmall(position.y),
             };
         })
         this.controller.doAction("moveDotsTo", [data]);

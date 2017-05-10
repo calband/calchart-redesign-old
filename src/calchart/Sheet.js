@@ -603,8 +603,8 @@ export default class Sheet {
                         }
 
                         if (
-                            Math.abs(state1.x - state2.x) <= 1 &&
-                            Math.abs(state1.y - state2.y) <= 1
+                            roundSmall(state1.x - state2.x) === 0 &&
+                            roundSmall(state1.y - state2.y) === 0
                         ) {
                             this.getDotInfo(dot1).collisions.add(beat);
                             this.getDotInfo(dot2).collisions.add(beat);
