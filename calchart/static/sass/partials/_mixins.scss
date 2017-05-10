@@ -1,4 +1,4 @@
-@import "vars", "fonts";
+@import "vars", "fonts", "functions";
 
 // create a nice visual button
 @mixin display-button($primary-color: $blue) {
@@ -64,6 +64,46 @@
     }
 }
 
+// messages that should hover at the top
+@mixin hover-messages {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 10px;
+    z-index: z-index(messages);
+    li.message {
+        background: rgba($light-gray, 0.9);
+        padding: 10px 30px;
+        border-radius: 4px;
+        text-align: center;
+        color: $blue;
+        &:not(:last-child) {
+            margin-bottom: 5px;
+        }
+        &:hover {
+            background: $light-gray;
+        }
+        &.error {
+            color: $red;
+        }
+        .close-message {
+            @include vertically-center-self;
+            right: 10px;
+            color: $gold;
+            cursor: pointer;
+        }
+    }
+}
+
+// Remove the small space between children caused by whitespace
+@mixin remove-children-space {
+    font-size: 0;
+    & > * {
+        font-size: $font-size;
+    }
+}
+
 // make user unable to highlight text in element
 @mixin unselectable {
     -moz-user-select: none;
@@ -96,12 +136,4 @@
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-}
-
-// Remove the small space between children caused by whitespace
-@mixin remove-children-space {
-    font-size: 0;
-    & > * {
-        font-size: $font-size;
-    }
 }

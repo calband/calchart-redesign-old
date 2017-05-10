@@ -1,117 +1,78 @@
-@import "partials/vars", "partials/mixins";
+@import "partials/vars", "partials/mixins", "partials/functions";
 
-.main-buttons {
-    margin: 20px 0;
-    text-align: center;
-    font-size: 18px;
-    button {
-        width: 205px;
-    }
+body {
+    padding: 0;
+    padding-top: 20px;
+}
+
+header {
+    margin-left: 20px;
+    margin-right: 20px;
 }
 
 .messages {
-    margin: 20px 0;
-    text-align: center;
-    font-size: 1.2em;
-    font-weight: bold;
+    @include hover-messages;
 }
 
-table {
-    margin: 10px 0;
-    width: 100%;
+$buttons-height: 60px;
+
+.main-buttons {
+    padding: 10px 0;
+    height: $buttons-height;
     text-align: center;
-    td, th {
-        line-height: 1.5em;
-        padding: 5px;
-        border: 1px solid #fff;
-        vertical-align: middle;
-        background: $light-gray;
-        &:first-child {
-            border-left: 0;
-        }
-        &:last-child {
-            border-right: 0;
-        }
-        &.id {
-            width: 75px;
-        }
-        &.name {
-            .icon {
-                margin-right: 10px;
-                float: right;
-            }
-            input {
-                padding: 0;
-            }
-            button {
-                margin: 0;
-                margin-left: 10px;
-                padding: 5px;
-                width: 60px;
-            }
-        }
-        &.actions {
-            width: 100px;
+    box-shadow: 0 2px 1px $medium-gray;
+    z-index: z-index(popup);
+    button {
+        margin: 0;
+    }
+}
+
+$tabs-width: 200px;
+$height-offset: $header-height + $buttons-height + 20px;
+
+.content {
+    background: $light-gray;
+    height: calc(100% - #{$height-offset});
+}
+
+.tabs, .shows {
+    @include unselectable;
+    display: inline-block;
+    vertical-align: top;
+    li {
+        padding: 15px 20px 10px;
+        cursor: pointer;
+        &:hover {
+            background: $light-gray;
         }
     }
-    tr {
-        &:first-child th {
-            background: $dark-gray;
-            border-color: $dark-gray;
-            color: $light-gray;
+}
+
+.tabs {
+    width: $tabs-width;
+    margin-top: 10px;
+    li {
+        &.active {
+            background: darken($light-gray, 10);
         }
-        &:nth-child(odd) td {
+        &:hover:not(.active) {
             background: $semilight-gray;
         }
     }
 }
 
-.popup.new-show .popup-box {
-    .section {
-        padding: 15px 0;
-        border-bottom: 1px solid $semilight-gray;
-        &:first-child {
-            border-top: 1px solid $semilight-gray;
+.shows {
+    width: calc(100% - #{$tabs-width + 110px});
+    margin: 10px 50px;
+    background: $white;
+    li {
+        border-bottom: 1px solid darken($semilight-gray, 10);
+        &:hover {
+            color: lighten($blue, 20);
+            background: $white;
         }
-        &.name {
-            #new-show-name {
-                width: 300px;
-            }
+        &:last-child {
+            border-bottom: none;
         }
-        &.file-upload {
-            label {
-                @include display-button;
-                cursor: pointer;
-            }
-            input[type=file] {
-                display: none;
-            }
-            .content button {
-                margin-top: 10px;
-            }
-        }
-        h2 {
-            text-align: left;
-        }
-        .content {
-            padding-top: 20px;
-            button {
-                display: block;
-                margin: 20px auto 0;
-            }
-            .error-messages {
-                margin-top: 10px;
-                li {
-                    color: $red;
-                }
-            }
-        }
-    }
-    button.close {
-        margin-top: 30px;
-    }
-    p.message {
-        margin-top: 20px;
-        margin-bottom: 0;
     }
 }

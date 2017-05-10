@@ -2,6 +2,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.views import LoginView as DjangoLoginView
+from django.core.exceptions import PermissionDenied
 from django.core.files.storage import default_storage
 from django.core.urlresolvers import reverse
 from django.http.response import HttpResponse, JsonResponse
@@ -89,6 +90,9 @@ class HomeView(CalchartMixin, TemplateView):
     by the STUNT committee in a Google Drive-like format.
     """
     template_name = 'home.html'
+    popup_forms = [
+        CreateShowPopup,
+    ]
 
     def get(self, request, *args, **kwargs):
         """
@@ -98,26 +102,91 @@ class HomeView(CalchartMixin, TemplateView):
         if 'tab' in request.GET:
             shows = self.get_tab(request.GET['tab'])
             return JsonResponse({
-                'shows': shows,
+                'shows': [
+                    {
+                        'slug': show.slug,
+                        'name': show.name,
+                        'published': show.published,
+                    }
+                    for show in shows
+                ],
             })
         else:
             return super().get(request, *args, **kwargs)
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # if Members Only user, shows this year's shows by default
+        # otherwise, show the user's shows
+        if self.request.user.is_members_only_user():
+            context['is_stunt'] = self.request.user.has_committee('STUNT')
+
+        tabs = self.get_tabs()
+        context['tabs'] = tabs
+        context['shows'] = self.get_tab(tabs[0][0])
+
+        return context
+
+    def get_tabs(self):
+        """
+        Get all available tabs for the current user. Available tabs are:
+        - band: Shows created by STUNT for this year
+        - created: Shows created by the current user
+
+        Returns tabs in a tuple of the form (id, display_name). The first
+        tab in the list is the first tab.
+        """
+        if self.request.user.is_members_only_user():
+            year = timezone.now().year
+            return [
+                ('band', f'{year} Shows'),
+                ('owned', 'My Shows'),
+            ]
+        else:
+            return [
+                ('owned', 'My Shows'),
+            ]
+
     def get_tab(self, tab):
-        # for now, show all shows for current user
-        return Show.objects.filter(owner=self.request.session['username'])
+        """
+        Get Shows for the given tab (see get_tabs).
+        """
+        if tab == 'band':
+            if not self.request.user.is_members_only_user():
+                raise PermissionDenied
+            kwargs = {
+                'is_band': True,
+                'date_added__year': timezone.now().year,
+            }
+            if not self.request.user.has_committee('STUNT'):
+                kwargs['published'] = True
+
+            return Show.objects.filter(**kwargs)
+
+        if tab == 'owned':
+            return Show.objects.filter(owner=self.request.user)
 
     def create_show(self):
         """
         A POST action that creates a show with a name and audio file
         """
+        if self.request.user.has_committee('STUNT'):
+            is_band = self.request.POST['is_band']
+        else:
+            is_band = False
+
         kwargs = {
-            'name': self.request.POST['name'],
-            'owner': self.request.session['username'],
-            'audio_file': self.request.FILES['audio'],
+            'name': self.request.POST['show_name'],
+            'owner': self.request.user,
+            'is_band': is_band,
+            'audio_file': self.request.FILES.get('audio'),
         }
         show = Show.objects.create(**kwargs)
-        return redirect('editor', slug=show.slug)
+        url = reverse('editor', kwargs={'slug': show.slug})
+        return {
+            'url': url,
+        }
 
 class EditorView(CalchartMixin, TemplateView):
     """

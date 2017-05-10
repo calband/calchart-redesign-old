@@ -25,7 +25,8 @@ if IS_HEROKU:
     # update to the new domain
     ALLOWED_HOSTS = ['.herokuapp.com']
 else:
-    ALLOWED_HOSTS = []
+    # add cross-vagrant host, 10.0.2.2 inside VM accesses localhost of host
+    ALLOWED_HOSTS = ['localhost', '10.0.2.2']
 
 
 # Application definition

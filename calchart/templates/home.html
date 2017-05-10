@@ -1,106 +1,33 @@
 {% extends "base.html" %}
 {% load partials %}
 
+{% block title %}
+    - Home
+{% endblock %}
+
 {% block head %}
     {% add_style "home.css" %}
     {% add_script "home.js" %}
+    <script>
+        window.isStunt = {{ is_stunt|yesno:"true,false" }};
+    </script>
 {% endblock %}
 
-{% block content %}
-<div class="main-buttons">
-    <button class="create">New Show</button>
-    <button class="unpublish red-button">Unpublish All</button>
-</div>
-{% get_feedback %}
-<table>
-    <tr>
-        <th class="id">ID</th>
-        <th class="name">Name</th>
-        <th>Viewer</th>
-        <th>Beats</th>
-        <th>Audio</th>
-        <th>Status</th>
-        <th>Actions</th>
-    </tr>
-    {% for show in all_shows %}
-        <tr data-pk="{{ show.pk }}" data-name="{{ show.name }}">
-            <td class="id">{{ show.pk }}</td>
-            <td class="name">{{ show.name }} <a class="icon edit" href="#"></a></td>
-            <td><a href="{% url 'viewer' show.slug %}" target="_blank">Open</a></td>
-            <td><a href="{% url 'beats' show.slug %}" target="_blank">Open</a></td>
-            <td>
-                {% if show.audio_file %}
-                    <a href="{{ show.audio_file.url }}" target="_blank">Open</a>
-                {% else %}
-                    --
-                {% endif %}
-            </td>
-            <td>{{ show.published|yesno:"Published,Unpublished" }}</td>
-            <td class="actions">
-                <a class="icon edit" href="{% url 'beats-editor' show.slug %}"></a>
-                <a class="icon {{ show.published|yesno:'unpublish,publish' }}" href="#"></a>
-                <a class="icon delete" href="#"></a>
-            </td>
-        </tr>
-    {% endfor %}
-</table>
-<!-- Popups -->
-<div class="popup new-show">
-    <div class="popup-box">
-        <div class="section name">
-            <h2>1. Show Name</h2>
-            <div class="content">
-                <label for="new-show-name">Name:</label>
-                <input id="new-show-name">
-                <button>Next</button>
-            </div>
-        </div>
-        <div class="section viewer file-upload">
-            <h2>2. Viewer File</h2>
-            <div class="content">
-                <label for="new-show-viewer">Upload Viewer File</label>
-                <input type="file" id="new-show-viewer">
-            </div>
-        </div>
-        <div class="section beats file-upload">
-            <h2>3. Beats File</h2>
-            <div class="content">
-                <label for="new-show-beats">Upload Beats File</label>
-                <input type="file" id="new-show-beats">
-                <p>or</p>
-                <button>Create Blank Beats File</button>
-            </div>
-        </div>
-        <div class="section audio file-upload">
-            <h2>4. Audio File</h2>
-            <div class="content">
-                <label for="new-show-audio">Upload Audio File</label>
-                <input type="file" id="new-show-audio">
-                <p>or</p>
-                <button>Skip</button>
-            </div>
-        </div>
-        <button class="close red-button">Close</button>
+{% block body %}
+    {% get_feedback %}
+    <div class="main-buttons">
+        <button class="new-show">New Show</button>
     </div>
-</div>
-<div class="popup unpublish-all">
-    <div class="popup-box">
-        <h1>Unpublish All</h1>
-        <p>Are you sure you want to unpublish all published shows?</p>
-        <div class="buttons">
-            <button class="confirm">Confirm</button>
-            <button class="close red-button">Cancel</button>
-        </div>
+    <div class="content">
+        <ul class="tabs">
+            {% for id, name in tabs %}
+                <li class="{% if forloop.first %}active{% endif %}" data-tab="{{ id }}">{{ name }}</li>
+            {% endfor %}
+        </ul>
+        <ul class="shows">
+            {% for show in shows %}
+                <li data-slug="{{ show.slug }}">{{ show.name }}</li>
+            {% endfor %}
+        </ul>
     </div>
-</div>
-<div class="popup delete-show">
-    <div class="popup-box">
-        <h1>Delete Show</h1>
-        <p>Are you sure you want to delete the "<span class="name"></span>" show?</p>
-        <div class="buttons">
-            <button class="confirm">Delete</button>
-            <button class="close red-button">Cancel</button>
-        </div>
-    </div>
-</div>
 {% endblock %}

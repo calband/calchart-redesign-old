@@ -26,6 +26,7 @@ html, body {
 
 body {
     padding: 20px;
+    font-size: 0; // eliminate space between HTML elements
 }
 
 h1, h2, h3 {
@@ -84,6 +85,14 @@ input {
     &[type=checkbox] {
         width: initial;
     }
+    &[type=file] {
+        display: block;
+        margin: 5px auto;
+        padding: 0;
+        box-shadow: none;
+        border: 0;
+        border-radius: 0;
+    }
 }
 
 select {
@@ -99,14 +108,19 @@ button {
 
 header {
     position: relative;
-    margin: 20px;
-    margin-top: 0;
+    margin-bottom: 20px;
     height: 50px;
     h1 {
         margin: 0;
         font-size: 3em;
         font-weight: bold;
         text-transform: uppercase;
+        a {
+            text-decoration: none;
+            &:hover {
+                color: $blue;
+            }
+        }
     }
     .current-user {
         position: absolute;

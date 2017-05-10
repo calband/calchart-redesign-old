@@ -4,8 +4,6 @@ from django.contrib.auth.forms import UserCreationForm
 from django.forms import modelform_factory
 from django.utils.text import camel_case_to_spaces
 
-import requests
-
 from base.constants import *
 from base.fields import *
 from base.models import Show, User
@@ -75,6 +73,18 @@ class PopupForm(BasePopupForm, forms.Form):
     the CalchartMixin.
     """
     pass
+
+### HOME POPUPS ###
+
+class CreateShowPopup(PopupForm):
+    """
+    The popup to create a show on the home page.
+    """
+    name = 'create-show'
+
+    show_name = forms.CharField(label='Name')
+    is_band = forms.BooleanField(label='For Cal Band')
+    audio = forms.FileField(label='Audio file (opt.)', required=False)
 
 ### EDITOR POPUPS ###
 
