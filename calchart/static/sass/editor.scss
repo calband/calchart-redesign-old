@@ -123,6 +123,37 @@ $sidebar-width: 200px;
     }
 }
 
+ul.messages {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 10px;
+    z-index: z-index(messages);
+    li.message {
+        background: rgba($light-gray, 0.9);
+        padding: 10px 30px;
+        border-radius: 4px;
+        text-align: center;
+        color: $blue;
+        &:not(:last-child) {
+            margin-bottom: 5px;
+        }
+        &:hover {
+            background: $light-gray;
+        }
+        &.error {
+            color: $red;
+        }
+        .close-message {
+            @include vertically-center-self;
+            right: 10px;
+            color: $gold;
+            cursor: pointer;
+        }
+    }
+}
+
 .popup-box {
     label {
         width: 90px;

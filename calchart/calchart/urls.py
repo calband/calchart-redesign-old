@@ -1,15 +1,20 @@
 from django.conf import settings
 from django.conf.urls import include, url
 from django.conf.urls.static import static
+from django.contrib.auth.views import LogoutView
 
 from base.views import *
 
 urlpatterns = [
     url(r'^$', HomeView.as_view(), name='home'),
-    url(r'^login/$', LoginView.as_view(), name='login'),
-    url(r'^logout/$', logout_view, name='logout'),
     url(r'^editor/(?P<slug>.+)/$', EditorView.as_view(), name='editor'),
     url(r'^help/', include('wiki.urls', namespace='wiki')),
+
+    # authentication
+    url(r'^login/$', LoginView.as_view(), name='login'),
+    url(r'^auth/members-only/$', AuthMembersOnlyView.as_view(), name='login-members-only'),
+    url(r'^create-user/$', CreateUserView.as_view(), name='create-user'),
+    url(r'^logout/$', LogoutView.as_view(), name='logout'),
 
     # endpoints for server-side processing
     url(r'^download/(?P<slug>\w+)\.json$', export),

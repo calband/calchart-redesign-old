@@ -1,27 +1,28 @@
-@import "partials/vars", "partials/mixins";
-
-body {
-    @include vertically-center;
-    text-align: center;
-}
+@import "partials/vars";
 
 .content {
-    background: $light-gray;
-    padding: 30px 50px;
-    h1 {
-        margin: 0;
-        margin-bottom: 10px;
-        font-size: 2em;
-        text-transform: uppercase;
-    }
     label {
         width: 90px;
     }
     input {
         width: 200px;
     }
-    .messages {
-        margin-top: 10px;
-        color: $red;
+    p {
+        margin-bottom: 5px;
+    }
+    .login-options {
+        .divider {
+            margin: 10px 0;
+            color: $dark-gray;
+            text-transform: uppercase;
+            &:before, &:after {
+                content: "";
+                display: inline-block;
+                margin: 0 10px;
+                width: 125px;
+                border-top: 1px solid $dark-gray;
+                vertical-align: middle;
+            }
+        }
     }
 }

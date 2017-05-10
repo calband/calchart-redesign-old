@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% load partials %}
+
+{% block head %}
+    {% add_style "base_public.css" %}
+    {% block head2 %}{% endblock %}
+{% endblock %}
+
+// don't include header
+{% block header %}{% endblock %}
+
+{% block content %}
+    <h1>Calchart</h1>
+    {% block content2 %}{% endblock %}
+{% endblock %}

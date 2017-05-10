@@ -31,6 +31,7 @@ else:
 # Application definition
 
 INSTALLED_APPS = (
+    'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
@@ -42,6 +43,7 @@ INSTALLED_APPS = (
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -134,5 +136,11 @@ else:
     STATIC_URL = '/static/'
     MEDIA_URL = '/media/'
 
+# Authentication
+
+AUTH_USER_MODEL = 'base.User'
+
 LOGIN_REDIRECT_URL = 'home'
 LOGIN_URL = 'login'
+LOGOUT_REDIRECT_URL = 'login'
+LOGOUT_URL = 'logout'
