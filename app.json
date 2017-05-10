@@ -1,0 +1,49 @@
+{
+    "_comment": "Manifest file used for creating review apps",
+    "_comment": "https://devcenter.heroku.com/articles/github-integration-review-apps#app-json",
+
+    "name": "Calchart",
+    "description": "A website used to make shows for the University of California Marching Band",
+    "website": "http://calchart-prod.herokuapp.com",
+    "repository": "https://github.com/calband/calchart",
+    "logo": "https://calchart-prod.s3.amazonaws.com/static/img/highstepper.png",
+
+    "_comment": "all environment variables should be inherited from the parent app, calchart-staging",
+    "env": {
+        "AWS_ACCESS_KEY": {
+            "description": "The access key for our Amazon AWS bucket."
+        },
+        "AWS_SECRET_KEY": {
+            "description": "The secret key for our Amazon AWS bucket."
+        },
+        "AWS_BUCKET_REVIEW": {
+            "description": "The bucket name for the static files for the staging app.",
+            "value": "calchart-review"
+        },
+        "MEMBERS_ONLY_STAGING": {
+            "description": "The presence of this environment variable signifies that we're on a staging app."
+        },
+        "MEMBERS_ONLY_SECRET_KEY": {
+            "description": "The secret key used by Django."
+        },
+        "DISABLE_COLLECTSTATIC": {
+            "description": "Use our own collectstatic command in the post_compile hook",
+            "value": "1"
+        },
+        "HEROKU_APP_NAME": {
+            "description": "Stores the name of this application on Heroku."
+        },
+    },
+    "addons": [
+        "heroku-postgresql",
+        "sendgrid"
+    ],
+    "buildpacks": [
+        {
+            "url": "heroku/nodejs"
+        },
+        {
+            "url": "heroku/python"
+        }
+    ]
+}

@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+# fail entire script if any operation fails
+set -eo pipefail
+
+function message {
+    echo -e "\n-----> $1"
+}
+
+message "Running Django Migrations"
+# Automatically migrate when deploying to Heroku
+python calchart/manage.py migrate --noinput
+
+message "Compiling staticfiles"
+grunt build
+python calchart/manage.py collectstatic --noinput -i *.scss -i *.map
+
+# if running on a review app, automatically create superuser
+if [[ $HEROKU_APP_NAME == membersonly-staging-pr-* ]]; then
+    message "Creating superuser"
+    python calchart/manage.py shell < scripts/createuser.py
+fi

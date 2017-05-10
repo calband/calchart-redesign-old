@@ -4,6 +4,7 @@ node_modules/
 files/
 .vagrant/
 *.map
+.env
 
 # SASS
 .sass-cache
