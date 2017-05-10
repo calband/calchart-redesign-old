@@ -18,6 +18,10 @@ export default class MovementCommandEven extends MovementCommandMove {
      */ 
     constructor(startX, startY, endX, endY, duration, options={}) {
         let direction = calcAngle(startX, startY, endX, endY);
+        if (_.isNaN(direction)) {
+            direction = 0;
+        }
+
         options.stepSize = calcDistance(startX, startY, endX, endY) / duration;
 
         super(startX, startY, direction, duration, options);
