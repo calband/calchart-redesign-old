@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.core.urlresolvers import reverse
 
+import requests
 from urllib.parse import quote
 
 APP_NAME = 'calchart'
@@ -22,3 +23,31 @@ def get_login_url(request, redirect_url=None):
         domain = 'https://membersonly-prod.heroku.com'
 
     return f'{domain}/api/auth-login/?redirect_uri={redirect_uri}&app_name={APP_NAME}'
+
+def call_endpoint(endpoint, user, method='GET', **params):
+    """
+    Call the given Members Only API endpoint on behalf of the given user
+    with the given method and parameters, returning the JSON data returned
+    by the API.
+    """
+    if method == 'GET':
+        call = requests.get
+    elif method == 'POST':
+        call = requests.post
+    else:
+        raise ValueError
+
+    params['token'] = user.api_token
+
+    if settings.IS_LOCAL:
+        # accessing a VM from another VM; need to go
+        # Calchart VM -> host -> Members Only VM
+        domain = 'http://10.0.2.2:8000'
+    else:
+        domain = 'https://membersonly-prod.heroku.com'
+
+    r = call(f'{domain}/api/{endpoint}/', params=params, timeout=1)
+    # error if bad status code
+    r.raise_for_status()
+
+    return r.json()

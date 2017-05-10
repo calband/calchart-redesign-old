@@ -6,6 +6,8 @@ from django.utils import timezone
 
 from datetime import timedelta
 
+from utils.api import call_endpoint
+
 class User(AbstractUser):
     """
     A user can either be a Calchart user (create an account specifically
@@ -26,6 +28,14 @@ class User(AbstractUser):
             timezone.now() + timedelta(days=1) < self.api_token_expiry
         )
 
+    def has_committee(self, committee):
+        """
+        Check if this user is part of the given committee. See the Members
+        Only API endpoint.
+        """
+        response = call_endpoint('check-committee', self, committee=committee)
+        return response['has_committee']
+
 class Show(models.Model):
     """
     A Show contains all of the data for a show (saved as a JSON file), along
@@ -33,9 +43,10 @@ class Show(models.Model):
     """
     name = models.CharField(max_length=255, unique=True)
     slug = models.SlugField()
-    owner = models.CharField(max_length=255) # owner's username
+    owner = models.ForeignKey(User)
     published = models.BooleanField(default=False)
     date_added = models.DateTimeField(auto_now_add=True)
+    is_band = models.BooleanField(default=False)
 
     # the json file that dictates all the movements of a show
     viewer_file = models.FileField(upload_to='viewer')

@@ -4,8 +4,6 @@ from django.contrib.auth.forms import UserCreationForm
 from django.forms import modelform_factory
 from django.utils.text import camel_case_to_spaces
 
-import requests
-
 from base.constants import *
 from base.fields import *
 from base.models import Show, User

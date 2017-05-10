@@ -2,6 +2,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.views import LoginView as DjangoLoginView
+from django.core.exceptions import PermissionDenied
 from django.core.files.storage import default_storage
 from django.core.urlresolvers import reverse
 from django.http.response import HttpResponse, JsonResponse
@@ -98,23 +99,59 @@ class HomeView(CalchartMixin, TemplateView):
         if 'tab' in request.GET:
             shows = self.get_tab(request.GET['tab'])
             return JsonResponse({
-                'shows': shows,
+                'shows': [
+                    {
+                        'slug': show.slug,
+                        'name': show.name,
+                        'published': show.published,
+                    }
+                    for show in shows
+                ],
             })
         else:
             return super().get(request, *args, **kwargs)
 
     def get_tab(self, tab):
-        # for now, show all shows for current user
-        return Show.objects.filter(owner=self.request.session['username'])
+        """
+        Available tabs:
+        - band: Shows created by STUNT for this year
+        - created: Shows created by the current user
+        """
+        if tab == 'band':
+            if not self.request.user.is_members_only_user():
+                raise PermissionDenied
+            return Show.objects.filter(
+                is_band=True,
+                date_added__year=timezone.now().year
+            )
+
+        if tab == 'created':
+            return Show.objects.filter(owner=self.request.user)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # if Members Only user, shows this year's shows by default
+        # otherwise, show the user's shows
+        if self.request.user.is_members_only_user():
+            context['tab'] = 'band'
+            context['is_stunt'] = self.request.user.has_committee('STUNT')
+        else:
+            context['tab'] = 'created'
+
+        return context
 
     def create_show(self):
         """
         A POST action that creates a show with a name and audio file
         """
+        # TODO: is_band check if user is on stunt
+
         kwargs = {
             'name': self.request.POST['name'],
-            'owner': self.request.session['username'],
-            'audio_file': self.request.FILES['audio'],
+            'owner': self.request.user,
+            'is_band': self.request.POST['is_band'],
+            'audio_file': self.request.FILES.get('audio'),
         }
         show = Show.objects.create(**kwargs)
         return redirect('editor', slug=show.slug)
