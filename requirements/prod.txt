@@ -4,4 +4,5 @@
 gunicorn==19.0.0
 dj-database-url==0.3.0
 newrelic==2.54.0.41
+Collectfast==0.2.3
 libsass==0.12.3

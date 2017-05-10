@@ -43,6 +43,10 @@ INSTALLED_APPS = (
     'wiki', # help pages
 )
 
+if IS_HEROKU:
+    # collectfast staticfiles
+    INSTALLED_APPS.insert(0, 'collectfast')
+
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
