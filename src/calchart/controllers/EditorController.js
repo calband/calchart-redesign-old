@@ -769,6 +769,8 @@ export default class EditorController extends ApplicationController {
             viewer: data,
         };
 
+        showMessage("Saving...");
+
         doAction("save_show", params, {
             success: () => {
                 showMessage("Saved!");
@@ -818,7 +820,9 @@ export default class EditorController extends ApplicationController {
         let select = dots.not(this._selectedDots);
         let deselect = dots.filter(this._selectedDots);
 
-        this.selectDots(select);
+        this.selectDots(select, {
+            append: true,
+        });
         this.deselectDots(deselect);
     }
 

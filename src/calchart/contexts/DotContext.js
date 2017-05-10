@@ -220,6 +220,8 @@ export default class DotContext extends BaseContext {
                         });
                         lastSelected = dot;
                     }
+
+                    _this._controller.refresh("context");
                 })
                 .appendTo(dotLabels);
         });
@@ -234,6 +236,7 @@ export default class DotContext extends BaseContext {
             _this.selectDots($dots, {
                 append: e.shiftKey || e.ctrlKey || e.metaKey,
             });
+            _this._controller.refresh("context");
         });
     }
 
