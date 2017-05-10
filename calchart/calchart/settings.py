@@ -12,7 +12,6 @@ IS_PROD = bool(os.environ.get('CALCHART_PROD'))
 IS_STAGING = bool(os.environ.get('CALCHART_STAGING'))
 IS_REVIEW = os.environ.get('HEROKU_APP_NAME', '').startswith('calchart-staging-pr-')
 IS_HEROKU = IS_STAGING or IS_PROD or IS_REVIEW
-IS_PROD = IS_HEROKU and not IS_REVIEW
 IS_LOCAL = not IS_HEROKU
 
 # Quick-start development settings - unsuitable for production
