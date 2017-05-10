@@ -8,9 +8,10 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 # environment checks: based on the environment variables, we can determine what
 # environment the app is running in
-IS_HEROKU = bool(os.environ.get('IS_HEROKU'))
-IS_REVIEW = IS_HEROKU and bool(os.environ.get('IS_REVIEW'))
-IS_PROD = IS_HEROKU and not IS_REVIEW
+IS_PROD = bool(os.environ.get('CALCHART_PROD'))
+IS_STAGING = bool(os.environ.get('CALCHART_STAGING'))
+IS_REVIEW = os.environ.get('HEROKU_APP_NAME', '').startswith('calchart-staging-pr-')
+IS_HEROKU = IS_STAGING or IS_PROD or IS_REVIEW
 IS_LOCAL = not IS_HEROKU
 
 # Quick-start development settings - unsuitable for production
@@ -19,7 +20,7 @@ IS_LOCAL = not IS_HEROKU
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get('SECRET_KEY', 'shhhhhdonttellanyoneaboutthispassworditsasecret')
 
-DEBUG = IS_LOCAL
+DEBUG = not IS_HEROKU
 
 if IS_HEROKU:
     # update to the new domain
@@ -121,17 +122,30 @@ if IS_REVIEW:
 
 # use local static files for development
 if IS_HEROKU:
-    AWS_S3_HOST = 's3-us-west-1.amazonaws.com'
-    AWS_STORAGE_BUCKET_NAME = os.environ['AWS_BUCKET']
+    if IS_PROD:
+        AWS_STORAGE_BUCKET_NAME = os.environ['AWS_BUCKET_PROD']
+    elif IS_REVIEW:
+        AWS_STORAGE_BUCKET_NAME = os.environ['AWS_BUCKET_REVIEW']
+    else:
+        AWS_STORAGE_BUCKET_NAME = os.environ['AWS_BUCKET_STAGING']
+
     AWS_ACCESS_KEY_ID = os.environ['AWS_ACCESS_KEY']
     AWS_SECRET_ACCESS_KEY = os.environ['AWS_SECRET_KEY']
     AWS_PRELOAD_METADATA = True
-    AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
+    AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
 
     STATICFILES_STORAGE = 'base.custom_storages.StaticStorage'
-    STATIC_URL = 'https://%s/%s/' % (AWS_S3_CUSTOM_DOMAIN, STATICFILES_LOCATION)
-    MEDIA_URL = 'https://%s/%s/' % (AWS_S3_CUSTOM_DOMAIN, MEDIAFILES_LOCATION)
     DEFAULT_FILE_STORAGE = 'base.custom_storages.MediaStorage'
+    STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{STATICFILES_LOCATION}/'
+    MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{MEDIAFILES_LOCATION}/'
+
+    # email settings
+    EMAIL_HOST = 'smtp.sendgrid.net'
+    EMAIL_HOST_USER = os.environ['SENDGRID_USERNAME']
+    EMAIL_HOST_PASSWORD = os.environ['SENDGRID_PASSWORD']
+    EMAIL_PORT = 587
+    EMAIL_USE_TLS = True
+    DEFAULT_FROM_EMAIL = 'Calchart <calband-compcomm@lists.berkeley.edu>'
 else:
     MEDIA_ROOT = os.path.join(BASE_DIR, '..', 'files')
     STATIC_URL = '/static/'

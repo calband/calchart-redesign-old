@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+# fail entire script if any operation fails
+set -eo pipefail
+
+BUILD_DIR=.
+source bin/post_compile

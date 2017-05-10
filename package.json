@@ -1,17 +1,13 @@
 {
-  "name": "calchart-server",
+  "name": "calchart",
   "author": "Cal Band Computer Committee",
   "version": "0.0.1",
   "private": true,
-  "engines": {
-    "node": "0.10.x",
-    "npm": "1.2.x"
-  },
-  "devDependencies": {
+  "dependencies": {
     "grunt": "=0.4.5",
     "grunt-webpack": "=2.0.1",
-    "webpack": "latest",
-    "webpack-dev-server": "latest",
+    "grunt-cli": "latest",
+    "webpack": "=2.5.1",
     "grunt-contrib-sass": "latest",
     "grunt-contrib-watch": "latest",
     "babel-loader": "latest",
@@ -19,7 +15,5 @@
     "babel-preset-es2015": "latest",
     "babel-plugin-transform-builtin-extend": "latest",
     "imports-loader": "latest"
-  },
-  "dependencies": {
   }
 }
