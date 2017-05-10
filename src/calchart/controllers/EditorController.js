@@ -769,6 +769,8 @@ export default class EditorController extends ApplicationController {
             viewer: data,
         };
 
+        showMessage("Saving...");
+
         doAction("save_show", params, {
             success: () => {
                 showMessage("Saved!");
