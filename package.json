@@ -7,7 +7,7 @@
     "node": "0.10.x",
     "npm": "1.2.x"
   },
-  "devDependencies": {
+  "dependencies": {
     "grunt": "=0.4.5",
     "grunt-webpack": "=2.0.1",
     "webpack": "latest",
@@ -19,7 +19,5 @@
     "babel-preset-es2015": "latest",
     "babel-plugin-transform-builtin-extend": "latest",
     "imports-loader": "latest"
-  },
-  "dependencies": {
   }
 }
