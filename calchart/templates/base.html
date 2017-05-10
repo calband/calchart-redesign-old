@@ -11,7 +11,7 @@
     <body>
         {% block header %}
             <header>
-                <h1>Calchart</h1>
+                <h1><a href="{% url 'home' %}">Calchart</a></h1>
                 <p class="current-user">Hello, {{ request.user.username }} &middot; <a href="{% url 'logout' %}">Logout</a></p>
             </header>
         {% endblock %}

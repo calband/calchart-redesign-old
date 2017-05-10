@@ -1,4 +1,5 @@
 import { ValidationError } from "utils/errors";
+import HTMLBuilder from "utils/HTMLBuilder";
 import "utils/jquery";
 import { doAction, getData, showPopup } from "utils/UIUtils";
 
@@ -7,7 +8,36 @@ if (_ === undefined) {
 }
 
 $(function() {
-    // TODO: tabs
+    $(".tabs li").click(function() {
+        if ($(this).hasClass("active")) {
+            return;
+        }
+
+        let tab = $(this).data("tab");
+
+        $.ajax({
+            data: {
+                tab: tab,
+            },
+            dataType: "json",
+            success: data => {
+                $(".shows li").remove();
+                data.shows.forEach(show => {
+                    HTMLBuilder.li(show.name)
+                        .data("slug", show.slug)
+                        .appendTo(".shows");
+                });
+
+                $(".tabs li.active").removeClass("active");
+                $(this).addClass("active");
+            },
+        });
+    });
+
+    $(".shows li").click(function() {
+        let slug = $(this).data("slug");
+        location.href = `/editor/${slug}`;
+    });
 
     $(".main-buttons button.new-show").click(e => {
         showPopup("create-show", {

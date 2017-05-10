@@ -1,12 +1,78 @@
-@import "partials/vars", "partials/mixins";
+@import "partials/vars", "partials/mixins", "partials/functions";
+
+body {
+    padding: 0;
+    padding-top: 20px;
+}
+
+header {
+    margin-left: 20px;
+    margin-right: 20px;
+}
+
+.messages {
+    @include hover-messages;
+}
+
+$buttons-height: 60px;
 
 .main-buttons {
-    margin: 10px 0;
+    padding: 10px 0;
+    height: $buttons-height;
+    text-align: center;
+    box-shadow: 0 2px 1px $medium-gray;
+    z-index: z-index(popup);
     button {
         margin: 0;
     }
 }
 
-.messages {
-    @include hover-messages;
+$tabs-width: 200px;
+$height-offset: $header-height + $buttons-height + 20px;
+
+.content {
+    background: $light-gray;
+    height: calc(100% - #{$height-offset});
+}
+
+.tabs, .shows {
+    @include unselectable;
+    display: inline-block;
+    vertical-align: top;
+    li {
+        padding: 15px 20px 10px;
+        cursor: pointer;
+        &:hover {
+            background: $light-gray;
+        }
+    }
+}
+
+.tabs {
+    width: $tabs-width;
+    margin-top: 10px;
+    li {
+        &.active {
+            background: darken($light-gray, 10);
+        }
+        &:hover:not(.active) {
+            background: $semilight-gray;
+        }
+    }
+}
+
+.shows {
+    width: calc(100% - #{$tabs-width + 110px});
+    margin: 10px 50px;
+    background: $white;
+    li {
+        border-bottom: 1px solid darken($semilight-gray, 10);
+        &:hover {
+            color: lighten($blue, 20);
+            background: $white;
+        }
+        &:last-child {
+            border-bottom: none;
+        }
+    }
 }

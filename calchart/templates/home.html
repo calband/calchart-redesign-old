@@ -18,14 +18,16 @@
     <div class="main-buttons">
         <button class="new-show">New Show</button>
     </div>
-    <ul class="tabs">
-        {% for id, name in tabs %}
-            <li class="{% if forloop.first %}active{% endif %}" data-tab="{{ id }}">{{ name }}</li>
-        {% endfor %}
-    </ul>
-    <ul class="shows">
-        {% for show in shows %}
-            <li data-slug="{{ show.slug }}">{{ show.name }}</li>
-        {% endfor %}
-    </ul>
+    <div class="content">
+        <ul class="tabs">
+            {% for id, name in tabs %}
+                <li class="{% if forloop.first %}active{% endif %}" data-tab="{{ id }}">{{ name }}</li>
+            {% endfor %}
+        </ul>
+        <ul class="shows">
+            {% for show in shows %}
+                <li data-slug="{{ show.slug }}">{{ show.name }}</li>
+            {% endfor %}
+        </ul>
+    </div>
 {% endblock %}
