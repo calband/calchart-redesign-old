@@ -90,9 +90,7 @@ export default class BaseContinuity {
     }
 
     /**
-     * Get the movements for the given dot for the given stuntsheet. Throws
-     * an AnimationStateError if movements could not be generated for this
-     * continuity.
+     * Get the movements for the given dot for the given stuntsheet.
      *
      * @param {Dot} dot - The dot to get movements for.
      * @param {Object} data - Data about the Sheet at the beginning of the
