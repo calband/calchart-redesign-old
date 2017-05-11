@@ -8,7 +8,8 @@ import { validatePositive, parseNumber } from "utils/JSUtils";
 import { calcAngle } from "utils/MathUtils";
 
 /**
- * TODO
+ * A grapevine continuity, which moves north or south to get to the next sheet's
+ * position and marks time or closes for the rest of the beats.
  */
 export default class GrapevineContinuity extends BaseContinuity {
     /**
