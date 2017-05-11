@@ -69,10 +69,11 @@ export default class BaseContinuity {
     }
 
     /**
-     * @return {String} The abbreviated name for the continuity to be used
-     *   in HTML classes.
+     * @return {object} meta info for this continuity, including the following keys:
+     *   - {string} type - The short, unique ID of the continuity; e.g. "fm"
+     *   - {string} name - The name of the continuity; e.g. "Forward March"
      */
-    get name() {
+    get info() {
         throw new NotImplementedError(this);
     }
 
@@ -124,33 +125,69 @@ export default class BaseContinuity {
     }
 
     /**
+     * Get the HTML elements to add to the Edit Continuity panel.
+     *
+     * @param {EditorController} controller
+     * @return {jQuery[]}
+     */
+    getPanel(controller) {
+        return [];
+    }
+
+    /**
+     * Get the fields to add to the edit continuity popup. The form fields
+     * need to have their name match the instance variable, e.g. "orientation"
+     * for this._orientation.
+     *
+     * @return {jQuery[]}
+     */
+    getPopup() {
+        let stepType = HTMLBuilder.formfield("Step type", HTMLBuilder.select({
+            options: STEP_TYPES,
+            initial: this._stepType,
+        }));
+
+        let orientation = HTMLBuilder.formfield("Orientation", HTMLBuilder.select({
+            options: ORIENTATIONS,
+            initial: this._orientation,
+        }));
+
+        // beats per step is a select between default/custom, which disables/enables an
+        // input for a custom beats per step
+        let beatsPerStep = HTMLBuilder.formfield("Beats per step", HTMLBuilder.select({
+            options: {
+                default: "Default",
+                custom: "Custom",
+            },
+            change: function() {
+                let disabled = $(this).val() !== "custom";
+                $(this).siblings("input").prop("disabled", disabled);
+            },
+            initial: this._beatsPerStep === "default" ? "default" : "custom",
+        }));
+        HTMLBuilder.input({
+            name: "customBeatsPerStep",
+            type: "number",
+            initial: this.getBeatsPerStep(),
+        }).appendTo(beatsPerStep);
+        beatsPerStep.find("select").change();
+
+        let customText = HTMLBuilder.formfield(
+            "Custom Continuity Text",
+            HTMLBuilder.make("textarea").val(this._customText),
+            "customText"
+        );
+
+        return [stepType, orientation, beatsPerStep, customText];
+    }
+
+    /**
      * Get this continuity's step type, resolving any defaults.
      *
      * @return {string} Step type (see CalchartUtils.STEP_TYPES).
      */
     getStepType() {
         return this._stepType === "default" ? this._sheet.getStepType() : this._stepType;
-    }
-
-    /**
-     * Get the HTML element to add to the Edit Continuity panel.
-     *
-     * @param {EditorController} controller
-     * @return {jQuery}
-     */
-    panelHTML(controller) {
-        throw new NotImplementedError(this);
-    }
-
-    /**
-     * @return {Object} The data to populate the Edit Continuity popup, with the values:
-     *   - {string} name - The name of the continuity.
-     *   - {jQuery[]} fields - The fields to add to the form. The fields need
-     *     to have their name match the instance variable, e.g. "orientation" for
-     *     this._orientation.
-     */
-    popupHTML() {
-        throw new NotImplementedError(this);
     }
 
     /**
@@ -189,77 +226,5 @@ export default class BaseContinuity {
     _updateMovements(controller) {
         this._sheet.updateMovements(this._dotType);
         controller.refresh();
-    }
-
-    /**
-     * Get the form fields for the popup.
-     *
-     * @return {Object} An object whose keys are the names of the fields and
-     *   the values are the jQuery form fields.
-     */
-    _getPopupFields() {
-        let fields = {};
-
-        fields.stepType = HTMLBuilder.formfield("Step type", HTMLBuilder.select({
-            options: STEP_TYPES,
-            initial: this._stepType,
-        }));
-
-        // beats per step is a select between default/custom, which disables/enables an
-        // input for a custom beats per step
-        fields.beatsPerStep = HTMLBuilder.formfield("Beats per step", HTMLBuilder.select({
-            options: {
-                default: "Default",
-                custom: "Custom",
-            },
-            change: function() {
-                let disabled = $(this).val() !== "custom";
-                $(this).siblings("input").prop("disabled", disabled);
-            },
-            initial: this._beatsPerStep === "default" ? "default" : "custom",
-        }));
-        HTMLBuilder.input({
-            name: "customBeatsPerStep",
-            type: "number",
-            initial: this.getBeatsPerStep(),
-        }).appendTo(fields.beatsPerStep);
-        fields.beatsPerStep.find("select").change();
-
-        fields.orientation = HTMLBuilder.formfield("Orientation", HTMLBuilder.select({
-            options: ORIENTATIONS,
-            initial: this._orientation,
-        }));
-
-        fields.customText = HTMLBuilder.formfield(
-            "Custom Continuity Text",
-            HTMLBuilder.make("textarea").val(this._customText),
-            "customText"
-        );
-
-        return fields;
-    }
-
-    /**
-     * Wrap the given contents to add to the edit continuity panel.
-     *
-     * @param {jQuery[]} contents - The jQuery contents.
-     * @return {jQuery} The HTML element to add to the panel, in the format:
-     *
-     *   <div class="continuity {continuity.name}">
-     *       <div class="info">{contents}</div>
-     *       <div class="actions">
-     *           <i class="icon-pencil edit"></i>
-     *           <i class="icon-times delete"></i>
-     *       </div>
-     *   </div>
-     */
-    _wrapPanel(...contents) {
-        let iconEdit = HTMLBuilder.icon("pencil", "edit");
-        let iconDelete = HTMLBuilder.icon("times", "delete");
-        let actions = HTMLBuilder.div("actions", [iconEdit, iconDelete]);
-        let info = HTMLBuilder.div("info", contents);
-
-        return HTMLBuilder.div(`continuity ${this.name}`, [info, actions])
-            .data("continuity", this);
     }
 }

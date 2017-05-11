@@ -95,8 +95,11 @@ export default class DiagonalContinuity extends FountainGridContinuity {
         return movements;
     }
 
-    get name() {
-        return "diagonal";
+    get info() {
+        return {
+            type: "diagonal",
+            name: this._diagFirst ? "DMHS" : "HSDM",
+        };
     }
 
     getMovements(dot, data) {
@@ -120,9 +123,5 @@ export default class DiagonalContinuity extends FountainGridContinuity {
         this._addEnd(movements, remaining, end, options);
 
         return movements;
-    }
-
-    _getType() {
-        return this._diagFirst ? "DMHS" : "HSDM";
     }
 }

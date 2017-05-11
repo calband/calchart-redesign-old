@@ -43,8 +43,11 @@ export default class GateTurnContinuity extends BaseContinuity {
         });
     }
 
-    get name() {
-        return "gate";
+    get info() {
+        return {
+            type: "gate",
+            name: "Gate Turn",
+        };
     }
 
     get reference() { return this._reference; }
@@ -62,7 +65,7 @@ export default class GateTurnContinuity extends BaseContinuity {
         return [movement];
     }
 
-    panelHTML(controller) {
+    getPanel(controller) {
         let _this = this;
 
         let label = HTMLBuilder.span("GATE");
@@ -95,22 +98,26 @@ export default class GateTurnContinuity extends BaseContinuity {
         });
         setupTooltip(editReference, "Reference Point");
 
-        return this._wrapPanel(label, degrees, direction, editReference);
+        return [label, degrees, direction, editReference];
     }
 
-    popupHTML() {
-        let {
-            degrees,
-            direction,
-            stepType,
-            beatsPerStep,
-            customText,
-        } = this._getPopupFields();
+    getPopup() {
+        let [stepType, orientation, beatsPerStep, customText] = super.getPopup();
 
-        return {
-            name: "Gate Turn",
-            fields: [degrees, direction, stepType, beatsPerStep, customText],
-        };
+        let degrees = HTMLBuilder.formfield("Degrees to turn", HTMLBuilder.input({
+            type: "number",
+            initial: this._degrees,
+        }), "degrees");
+
+        let direction = HTMLBuilder.formfield("Direction", HTMLBuilder.select({
+            options: {
+                CW: "Clockwise",
+                CCW: "Counter-clockwise",
+            },
+            initial: this._isCW ? "CW" : "CCW",
+        }), "isCW");
+
+        return [degrees, direction, stepType, beatsPerStep, customText];
     }
 
     /**
@@ -126,26 +133,5 @@ export default class GateTurnContinuity extends BaseContinuity {
         super.validatePopup(data);
 
         data.isCW = data.isCW === "CW";
-    }
-
-    _getPopupFields() {
-        let fields = super._getPopupFields();
-
-        fields.degrees = HTMLBuilder.formfield("Degrees to turn", HTMLBuilder.input({
-            type: "number",
-            initial: this._degrees,
-        }), "degrees");
-
-        fields.direction = HTMLBuilder.formfield("Direction", HTMLBuilder.select({
-            options: {
-                CW: "Clockwise",
-                CCW: "Counter-clockwise",
-            },
-            initial: this._isCW ? "CW" : "CCW",
-        }), "isCW");
-
-        delete fields.orientation;
-
-        return fields;
     }
 }

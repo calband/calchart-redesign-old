@@ -113,26 +113,25 @@ export default class ContinuityContext extends BaseContext {
      */
     editContinuity(continuity) {
         continuity = this._getContinuity(continuity);
-        let controller = this._controller;
-        let html = continuity.popupHTML();
+        let contents = continuity.getPopup();
 
         showPopup("edit-continuity", {
-            init: function(popup) {
+            init: popup => {
                 popup.addClass(`continuity-${continuity.name}`);
 
-                popup.find(".continuity-title").text(html.name);
-                popup.find("form").prepend(html.fields);
+                popup.find(".continuity-title").text(continuity.info.name);
+                popup.find("form").prepend(contents);
                 popup.find("select").dropdown();
             },
-            onHide: function(popup) {
+            onHide: popup => {
                 popup.removeClassRegex(/^continuity-.*$/);
 
                 popup.find("form .field").remove();
             },
-            onSubmit: function(popup) {
+            onSubmit: popup => {
                 let data = getData(popup);
                 continuity.validatePopup(data);
-                controller.doAction("saveContinuity", [continuity, data]);
+                this._controller.doAction("saveContinuity", [continuity, data]);
             },
         });
     }
@@ -173,6 +172,25 @@ export default class ContinuityContext extends BaseContext {
     }
 
     /**
+     * Get the panel HTML element for the given continuity.
+     *
+     * @param {Continuity} continuity
+     * @return {jQuery}
+     */
+    _getPanelContinuity(continuity) {
+        let contents = continuity.getPanel(this._controller);
+        let info = HTMLBuilder.div("info", contents);
+
+        let iconEdit = HTMLBuilder.icon("pencil", "edit");
+        let iconDelete = HTMLBuilder.icon("times", "delete");
+        let actions = HTMLBuilder.div("actions", [iconEdit, iconDelete]);
+
+        let classes = `continuity ${continuity.info.type}`;
+        return HTMLBuilder.div(classes, [info, actions.clone()])
+            .data("continuity", continuity);
+    }
+
+    /**
      * Update the page according to the state of the Sheet.
      */
     _refreshSheet() {
@@ -199,8 +217,8 @@ export default class ContinuityContext extends BaseContext {
 
         let continuities = this._panel.find(".continuities").empty();
         this._sheet.getContinuities(this._dotType).forEach(continuity => {
-            let continuityHTML = continuity.panelHTML(this._controller);
-            continuities.append(continuityHTML);
+            let $continuity = this._getPanelContinuity(continuity);
+            continuities.append($continuity);
         });
 
         // select dots of the active dot type

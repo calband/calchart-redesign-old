@@ -38,13 +38,22 @@ export default class StopContinuity extends BaseContinuity {
         });
     }
 
-    get name() {
+    get info() {
         if (!this._marktime) {
-            return "close";
+            return {
+                type: "close",
+                name: "Close",
+            };
         } else if (_.isNull(this._duration)) {
-            return "mtrm";
+            return {
+                type: "mtrm",
+                name: "Mark Time Remaining",
+            };
         } else {
-            return "mt";
+            return {
+                type: "mt",
+                name: "Mark Time",
+            };
         }
     }
 
@@ -70,14 +79,14 @@ export default class StopContinuity extends BaseContinuity {
         return [move];
     }
 
-    panelHTML(controller) {
+    getPanel(controller) {
         let _this = this;
         let label = HTMLBuilder.span();
 
         switch (this.name) {
             case "close":
                 label.text("Close");
-                return this._wrapPanel(label);
+                return [label];
             case "mtrm":
                 label.text("MTRM");
 
@@ -91,7 +100,7 @@ export default class StopContinuity extends BaseContinuity {
                     initial: this._orientation,
                 });
 
-                return this._wrapPanel(label, orientationLabel, orientation);
+                return [label, orientationLabel, orientation];
             case "mt":
                 label.text("MT");
 
@@ -105,40 +114,24 @@ export default class StopContinuity extends BaseContinuity {
                     },
                 });
 
-                return this._wrapPanel(label, durationLabel, duration);
+                return [label, durationLabel, duration];
         }
     }
 
-    popupHTML() {
-        let { orientation, stepType, beatsPerStep, duration, customText } = this._getPopupFields();
+    getPopup() {
+        let [stepType, orientation, beatsPerStep, customText] = super.getPopup();
 
         switch (this.name) {
             case "close":
-                return {
-                    name: "Close",
-                    fields: [orientation, customText],
-                };
+                return [orientation, customText];
             case "mtrm":
-                return {
-                    name: "Mark Time Remaining",
-                    fields: [orientation, stepType, beatsPerStep, customText],
-                };
+                return [orientation, stepType, beatsPerStep, customText];
             case "mt":
-                return {
-                    name: "Mark Time",
-                    fields: [duration, orientation, stepType, beatsPerStep, customText],
-                };
+                let duration = HTMLBuilder.formfield("Number of beats", HTMLBuilder.input({
+                    type: "number",
+                    initial: this._duration,
+                }), "duration");
+                return [duration, orientation, stepType, beatsPerStep, customText];
         }
-    }
-
-    _getPopupFields() {
-        let fields = super._getPopupFields();
-
-        fields.duration = HTMLBuilder.formfield("Number of beats", HTMLBuilder.input({
-            type: "number",
-            initial: this._duration,
-        }), "duration");
-
-        return fields;
     }
 }

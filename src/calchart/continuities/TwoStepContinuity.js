@@ -53,8 +53,11 @@ export default class TwoStepContinuity extends BaseContinuity {
         });
     }
 
-    get name() {
-        return "two";
+    get info() {
+        return {
+            type: "two",
+            name: "Two Step",
+        };
     }
 
     get continuities() { return this._continuities; }
@@ -120,7 +123,7 @@ export default class TwoStepContinuity extends BaseContinuity {
         return true;
     }
 
-    panelHTML(controller) {
+    getPanel(controller) {
         let label = HTMLBuilder.span("2-Step");
 
         let editLabel = HTMLBuilder.label("Edit:");
@@ -139,16 +142,18 @@ export default class TwoStepContinuity extends BaseContinuity {
         });
         setupTooltip(editContinuities, "Continuities");
 
-        return this._wrapPanel(label, editLabel, editDots, editContinuities);
+        return [label, editLabel, editDots, editContinuities];
     }
 
-    popupHTML() {
-        let { isMarktime, stepType, beatsPerStep, customText } = this._getPopupFields();
+    getPopup() {
+        let [stepType, orientation, beatsPerStep, customText] = super.getPopup();
 
-        return {
-            name: "Two Step",
-            fields: [isMarktime, stepType, beatsPerStep, customText],
-        };
+        let isMarktime = HTMLBuilder.formfield("Marktime first", HTMLBuilder.input({
+            type: "checkbox",
+            initial: this._isMarktime,
+        }), "isMarktime");
+
+        return [isMarktime, stepType, beatsPerStep, customText];
     }
 
     /**
@@ -159,16 +164,5 @@ export default class TwoStepContinuity extends BaseContinuity {
     removeContinuity(continuity) {
         _.pull(this._continuities, continuity);
         this._sheet.updateMovements(this._dotType);
-    }
-
-    _getPopupFields() {
-        let fields = super._getPopupFields();
-
-        fields.isMarktime = HTMLBuilder.formfield("Marktime first", HTMLBuilder.input({
-            type: "checkbox",
-        }), "isMarktime");
-        fields.isMarktime.find("input").prop("checked", this._isMarktime);
-
-        return fields;
     }
 }

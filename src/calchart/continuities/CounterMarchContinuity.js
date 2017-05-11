@@ -40,11 +40,14 @@ export default class CounterMarchContinuity extends FollowLeaderContinuity {
         return data;
     }
 
-    get name() {
-        return "cm";
+    get info() {
+        return {
+            type: "cm",
+            name: "Counter March",
+        };
     }
 
-    panelHTML(controller) {
+    getPanel(controller) {
         let label = HTMLBuilder.span("CM");
 
         let editLabel = HTMLBuilder.label("Edit:");
@@ -56,16 +59,33 @@ export default class CounterMarchContinuity extends FollowLeaderContinuity {
         });
         setupTooltip(editDots, "Dots");
 
-        return this._wrapPanel(label, editLabel, editDots);
+        return [label, editLabel, editDots];
     }
 
-    popupHTML() {
-        let { duration, stepType, beatsPerStep, customText } = this._getPopupFields();
+    getPopup() {
+        let [stepType, orientation, beatsPerStep, customText] = super.getPopup();
 
-        return {
-            name: "Counter March",
-            fields: [duration, stepType, beatsPerStep, customText],
-        };
+        // duration is a select between remaining/custom, which disables/enables an
+        // input for a custom duration
+        let duration = HTMLBuilder.formfield("Number of beats", HTMLBuilder.select({
+            options: {
+                remaining: "Remaining",
+                custom: "Custom",
+            },
+            change: function() {
+                let disabled = $(this).val() !== "custom";
+                $(this).siblings("input").prop("disabled", disabled);
+            },
+            initial: this._duration === null ? "remaining" : "custom",
+        }), "duration");
+        HTMLBuilder.input({
+            name: "customDuration",
+            type: "number",
+            initial: _.defaultTo(this._duration, 0),
+        }).appendTo(duration);
+        duration.find("select").change();
+
+        return [duration, stepType, beatsPerStep, customText];
     }
 
     validatePopup(data) {
@@ -97,32 +117,6 @@ export default class CounterMarchContinuity extends FollowLeaderContinuity {
         return new Iterator(path, {
             cycle: true,
         });
-    }
-
-    _getPopupFields() {
-        let fields = super._getPopupFields();
-
-        // duration is a select between remaining/custom, which disables/enables an
-        // input for a custom duration
-        fields.duration = HTMLBuilder.formfield("Number of beats", HTMLBuilder.select({
-            options: {
-                remaining: "Remaining",
-                custom: "Custom",
-            },
-            change: function() {
-                let disabled = $(this).val() !== "custom";
-                $(this).siblings("input").prop("disabled", disabled);
-            },
-            initial: this._duration === null ? "remaining" : "custom",
-        }), "duration");
-        HTMLBuilder.input({
-            name: "customDuration",
-            type: "number",
-            initial: _.defaultTo(this._duration, 0),
-        }).appendTo(fields.duration);
-        fields.duration.find("select").change();
-
-        return fields;
     }
 
     _getMaxDuration(data) {

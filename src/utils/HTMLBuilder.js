@@ -124,12 +124,18 @@ export default class HTMLBuilder {
     static input() {
         let args = parseArgs(arguments, ["class", "type", "name", "initial", "change"]);
 
-        return $("<input>")
+        let input = $("<input>")
             .addClass(args.class)
             .attr("type", args.type)
             .attr("name", args.name)
             .attr("value", args.initial)
             .change(args.change);
+
+        if (args.type === "checkbox") {
+            input.prop("checked", args.initial);
+        }
+
+        return input;
     }
 
     /**

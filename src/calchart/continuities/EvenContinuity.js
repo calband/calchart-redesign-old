@@ -34,8 +34,11 @@ export default class EvenContinuity extends BaseContinuity {
         return super.serialize("EVEN");
     }
 
-    get name() {
-        return "even";
+    get info() {
+        return {
+            type: "even",
+            name: "Even",
+        };
     }
 
     getMovements(dot, data) {
@@ -60,24 +63,15 @@ export default class EvenContinuity extends BaseContinuity {
         return [move];
     }
 
-    panelHTML(controller) {
+    getPanel(controller) {
         let label = HTMLBuilder.span("Even");
-        return this._wrapPanel(label);
+        return [label];
     }
 
-    popupHTML() {
-        let { stepType, orientation, beatsPerStep, customText } = this._getPopupFields();
+    getPopup() {
+        let [stepType, orientation, beatsPerStep, customText] = super.getPopup();
 
-        return {
-            name: "Even",
-            fields: [stepType, orientation, beatsPerStep, customText],
-        };
-    }
-
-    _getPopupFields() {
-        let fields = super._getPopupFields();
-
-        fields.orientation = HTMLBuilder.formfield("Orientation", HTMLBuilder.select({
+        let select = HTMLBuilder.select({
             options: {
                 "": "Direction of Travel",
                 "default": "Default",
@@ -85,8 +79,10 @@ export default class EvenContinuity extends BaseContinuity {
                 "west": "West",
             },
             initial: this._orientation,
-        }));
+        });
+        orientation.find("select").remove();
+        orientation.append(select);
 
-        return fields;
-    };
+        return [stepType, orientation, beatsPerStep, customText];
+    }
 }

@@ -13,10 +13,6 @@ export default class TwoStepContext extends ContinuityContext {
         this._continuity = null;
     }
 
-    static get shortcuts() {
-        return {};
-    }
-
     static get actions() {
         return ContextActions;
     }
@@ -69,13 +65,19 @@ export default class TwoStepContext extends ContinuityContext {
     _refreshSheet() {
         let continuities = this._panel.find(".continuities").empty();
         this._continuity.continuities.forEach(continuity => {
-            let continuityHTML = continuity.panelHTML(this._controller);
-            continuities.append(continuityHTML);
+            let $continuity = this._getPanelContinuity(continuity);
+            continuities.append($continuity);
         });
 
         // select dots in continuity
         let dots = $(`.dot.${this._continuity.dotType}`);
         this._controller.selectDots(dots);
+
+        // update seek bar
+        let beat = this._controller.getCurrentBeat();
+        let numBeats = this._sheet.getDuration();
+        let position = $(".toolbar .seek").width() / numBeats * beat;
+        $(".toolbar .seek .marker").css("transform", `translateX(${position}px)`);
     }
 
     _setupPanel() {

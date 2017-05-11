@@ -37,8 +37,11 @@ export default class ForwardContinuity extends BaseContinuity {
         });
     }
 
-    get name() {
-        return "fm";
+    get info() {
+        return {
+            type: "fm",
+            name: "Forward March",
+        };
     }
 
     getMovements(dot, data) {
@@ -56,7 +59,7 @@ export default class ForwardContinuity extends BaseContinuity {
         return [move];
     }
 
-    panelHTML(controller) {
+    getPanel(controller) {
         let _this = this;
 
         let label = HTMLBuilder.span("Move");
@@ -79,33 +82,22 @@ export default class ForwardContinuity extends BaseContinuity {
             },
         });
 
-        return this._wrapPanel(label, steps, direction);
+        return [label, steps, direction];
     }
 
-    popupHTML() {
-        let { steps, direction, stepType, beatsPerStep, customText } = this._getPopupFields();
+    getPopup() {
+        let [stepType, orientation, beatsPerStep, customText] = super.getPopup();
 
-        return {
-            name: "Forward March",
-            fields: [steps, direction, stepType, beatsPerStep, customText],
-        };
-    }
-
-    _getPopupFields() {
-        let fields = super._getPopupFields();
-
-        fields.steps = HTMLBuilder.formfield("Number of steps", HTMLBuilder.input({
+        let steps = HTMLBuilder.formfield("Number of steps", HTMLBuilder.input({
             type: "number",
             initial: this._numSteps,
         }), "numSteps");
 
-        fields.direction = HTMLBuilder.formfield("Direction", HTMLBuilder.select({
+        let direction = HTMLBuilder.formfield("Direction", HTMLBuilder.select({
             options: DIRECTIONS,
             initial: this._direction,
         }));
 
-        delete fields.orientation;
-
-        return fields;
+        return [steps, direction, stepType, beatsPerStep, customText];
     }
 }

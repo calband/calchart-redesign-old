@@ -41,8 +41,11 @@ export default class GrapevineContinuity extends BaseContinuity {
         });
     }
 
-    get name() {
-        return "gv";
+    get info() {
+        return {
+            type: "gv",
+            name: "Grapevine",
+        };
     }
 
     getMovements(dot, data) {
@@ -81,7 +84,7 @@ export default class GrapevineContinuity extends BaseContinuity {
         return [move, stop];
     }
 
-    panelHTML(controller) {
+    getPanel(controller) {
         let _this = this;
 
         let label = HTMLBuilder.span("GV");
@@ -96,16 +99,18 @@ export default class GrapevineContinuity extends BaseContinuity {
             initial: this._end,
         });
 
-        return this._wrapPanel(label, endChoices);
+        return [label, endLabel, endChoices];
     }
 
-    popupHTML() {
-        let { end, stepType, orientation, beatsPerStep, customText } = this._getPopupFields();
+    getPopup() {
+        let fields = super.getPopup();
 
-        return {
-            name: "Grapevine",
-            fields: [end, stepType, orientation, beatsPerStep, customText],
-        };
+        let end = HTMLBuilder.formfield("End", HTMLBuilder.select({
+            options: ENDINGS,
+            initial: this._end,
+        }));
+
+        return [end].concat(fields);
     }
 
     _getPopupFields() {

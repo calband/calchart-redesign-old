@@ -48,8 +48,11 @@ export default class FollowLeaderContinuity extends BaseContinuity {
         });
     }
 
-    get name() {
-        return "ftl";
+    get info() {
+        return {
+            type: "ftl",
+            name: "Follow the Leader",
+        };
     }
 
     get order() { return this._order; }
@@ -116,7 +119,7 @@ export default class FollowLeaderContinuity extends BaseContinuity {
         return movements;
     }
 
-    panelHTML(controller) {
+    getPanel(controller) {
         let label = HTMLBuilder.span("FTL");
 
         let editLabel = HTMLBuilder.label("Edit:");
@@ -135,16 +138,13 @@ export default class FollowLeaderContinuity extends BaseContinuity {
         });
         setupTooltip(editPath, "Path");
 
-        return this._wrapPanel(label, editLabel, editDots, editPath);
+        return [label, editLabel, editDots, editPath];
     }
 
-    popupHTML() {
-        let { stepType, beatsPerStep, customText } = this._getPopupFields();
+    getPopup() {
+        let [stepType, orientation, beatsPerStep, customText] = super.getPopup();
 
-        return {
-            name: "Follow the Leader",
-            fields: [stepType, beatsPerStep, customText],
-        };
+        return [stepType, beatsPerStep, customText];
     }
 
     /**

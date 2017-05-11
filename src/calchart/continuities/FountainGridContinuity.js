@@ -51,8 +51,11 @@ export default class FountainGridContinuity extends BaseContinuity {
         return deltaY < 0 ? 180 : 0;
     }
 
-    get name() {
-        return "fountain";
+    get info() {
+        return {
+            type: "fountain",
+            name: this._isEWNS ? "EWNS" : "NSEW",
+        };
     }
 
     getMovements(dot, data) {
@@ -101,11 +104,10 @@ export default class FountainGridContinuity extends BaseContinuity {
         return movements;
     }
 
-    panelHTML(controller) {
+    getPanel(controller) {
         let _this = this;
-        let type = this._getType();
 
-        let label = HTMLBuilder.span(type);
+        let label = HTMLBuilder.span(this.info.name);
 
         let endLabel = HTMLBuilder.label("End:");
         let endChoices = HTMLBuilder.select({
@@ -117,16 +119,18 @@ export default class FountainGridContinuity extends BaseContinuity {
             initial: this._end,
         });
 
-        return this._wrapPanel(label, endLabel, endChoices);
+        return [label, endLabel, endChoices];
     }
 
-    popupHTML() {
-        let { end, stepType, orientation, beatsPerStep, customText } = this._getPopupFields();
+    getPopup() {
+        let fields = super.getPopup();
 
-        return {
-            name: this._getType(),
-            fields: [end, stepType, orientation, beatsPerStep, customText],
-        };
+        let end = HTMLBuilder.formfield("End", HTMLBuilder.select({
+            options: ENDINGS,
+            initial: this._end,
+        }));
+
+        return [end].concat(fields);
     }
 
     _addEnd(movements, remaining, end, options) {
@@ -149,9 +153,5 @@ export default class FountainGridContinuity extends BaseContinuity {
         fields.orientation.find("label").text("Final orientation:");
 
         return fields;
-    }
-
-    _getType() {
-        return this._isEWNS ? "EWNS" : "NSEW";
     }
 }
