@@ -121,7 +121,7 @@ MEDIAFILES_LOCATION = 'files'
 
 # use different directories for review apps
 if IS_REVIEW:
-    review_num = int(os.environ['HEROKU_APP_NAME'].split('calchart-server-pr-')[1])
+    review_num = int(os.environ['HEROKU_APP_NAME'].split('calchart-staging-pr-')[1])
     STATICFILES_LOCATION = 'static-pr-%d' % review_num
 
 # use local static files for development
