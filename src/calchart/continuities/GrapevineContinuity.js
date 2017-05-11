@@ -1,46 +1,67 @@
-import ForwardContinuity from "calchart/continuities/ForwardContinuity";
+import BaseContinuity from "calchart/continuities/BaseContinuity";
 import MovementCommandMove from "calchart/movements/MovementCommandMove";
 
-import { DIRECTIONS } from "utils/CalchartUtils";
+import { ORIENTATIONS } from "utils/CalchartUtils";
 import HTMLBuilder from "utils/HTMLBuilder";
 import { validatePositive, parseNumber } from "utils/JSUtils";
-
-// constrain to only north or south
-let GV_DIRECTIONS = _.clone(DIRECTIONS);
-delete GV_DIRECTIONS[0];
-delete GV_DIRECTIONS[180];
+import { calcAngle } from "utils/MathUtils";
 
 /**
- * The Grapevine continuity, which is basically a forward march, except
- * the orientation is not the same as direction of motion.
+ * TODO
  */
-export default class GrapevineContinuity extends ForwardContinuity {
+export default class GrapevineContinuity extends BaseContinuity {
     /**
      * @param {Sheet} sheet
      * @param {DotType} dotType
-     * @param {int} steps - The number of steps to move.
-     * @param {int} direction - The direction to march, in Calchart degrees.
      * @param {object} [options] - Options for the continuity, including:
      *   - {string} stepType
      *   - {int} beatsPerStep
      *   - {string} orientation - The direction to face during the movement.
      */
-    constructor(sheet, dotType, steps, direction, options) {
-        super(sheet, dotType, steps, direction, options);
+    constructor(sheet, dotType, options) {
+        super(sheet, dotType, options);
     }
 
     static deserialize(sheet, dotType, data) {
-        return new GrapevineContinuity(sheet, dotType, data.steps, data.direction, data);
+        return new GrapevineContinuity(sheet, dotType, data);
     }
 
     serialize() {
-        let data = super.serialize();
-        data.type = "GRAPEVINE";
-        return data;
+        return super.serialize("GRAPEVINE");
     }
 
     get name() {
         return "gv";
+    }
+
+    getMovements(dot, data) {
+        let nextSheet = this._sheet.getNextSheet();
+        if (_.isNull(nextSheet)) {
+            return [];
+        }
+        let end = nextSheet.getPosition(dot);
+        let options = {
+            orientation: this.getOrientationDegrees(),
+            beatsPerStep: this.getBeatsPerStep(),
+        };
+
+        let direction = calcAngle(data.position.x, data.position.y, end.x, end.y);
+        if (_.isNaN(direction)) {
+            direction = 0;
+        }
+
+        // TODO: error if not north or south
+        // TODO: duration = deltaX
+        // TODO: end mt or close
+
+        let move = new MovementCommandMove(
+            data.position.x,
+            data.position.y,
+            direction,
+            data.remaining,
+            options
+        );
+        return [move];
     }
 
     panelHTML(controller) {
@@ -48,46 +69,24 @@ export default class GrapevineContinuity extends ForwardContinuity {
 
         let label = HTMLBuilder.span("GV");
 
-        let steps = HTMLBuilder.input({
-            type: "number",
-            initial: this._numSteps,
+        let orientation = HTMLBuilder.select({
+            options: ORIENTATIONS,
+            initial: this._orientation,
             change: function() {
-                _this._numSteps = validatePositive(this);
+                _this._orientation = $(this).val();
                 _this._updateMovements(controller);
             },
         });
 
-        let direction = HTMLBuilder.select({
-            options: GV_DIRECTIONS,
-            initial: this._direction,
-            change: function() {
-                _this._direction = parseNumber($(this).val());
-                _this._updateMovements(controller);
-            },
-        });
-
-        return this._wrapPanel(label, steps, direction);
+        return this._wrapPanel(label, orientation);
     }
 
     popupHTML() {
-        let data = super.popupHTML();
-        data.name = "Grapevine";
-        return data;
-    }
+        let { stepType, orientation, beatsPerStep, customText } = this._getPopupFields();
 
-    _getPopupFields() {
-        let fields = super._getPopupFields();
-
-        fields.steps = HTMLBuilder.formfield("Number of steps", HTMLBuilder.input({
-            type: "number",
-            initial: this._numSteps,
-        }), "numSteps");
-
-        fields.direction = HTMLBuilder.formfield("Direction", HTMLBuilder.select({
-            options: GV_DIRECTIONS,
-            initial: this._direction,
-        }));
-
-        return fields;
+        return {
+            name: "Grapevine",
+            fields: [stepType, orientation, beatsPerStep, customText],
+        };
     }
 }
