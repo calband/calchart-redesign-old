@@ -558,37 +558,51 @@ export function hidePopup() {
  * Show a message at the top of the screen.
  *
  * @param {string} message
- * @param {boolean} isError - true if message is an error message.
+ * @param {object} [options] - Options to customize the message displayed:
+ *   - {boolean} [isError=false] - true if message is an error message
+ *   - {boolean} [autohide=true] - Automatically hides the message after
+ *     a given time.
+ * @return {jQuery} the message <li> element. Call li.delayHide() to hide
+ *   the message after a given time.
  */
-export function showMessage(message, isError) {
+export function showMessage(message, options={}) {
+    options = _.defaults(options, {
+        autohide: true,
+        isError: false,
+    });
+
     let container = $("ul.messages");
     if (!container.exists()) {
         container = HTMLBuilder.make("ul.messages", "body");
     }
 
     let li = HTMLBuilder.li(message, "message").appendTo(container);
-    if (isError) {
+    if (options.isError) {
         li.addClass("error");
     }
 
-    function removeMessage() {
-        li.fadeOut(function() {
-            if (!container.children(":visible").exists()) {
-                container.remove();
-            }
-        });
+    li.delayHide = function() {
+        setTimeout(function() {
+            li.fadeOut(function() {
+                if (!container.children(":visible").exists()) {
+                    container.remove();
+                }
+            });
+        }, 2000);
+        return this;
+    };
+
+    if (options.autohide) {
+        li.delayHide();
     }
 
-    HTMLBuilder.icon("times", "close-message")
-        .click(removeMessage)
-        .appendTo(li);
-
-    setTimeout(removeMessage, 2000);
+    return li;
 }
 
 /**
  * Show an error message at the top of the screen.
  */
-export function showError(message) {
-    showMessage(message, true);
+export function showError(message, options={}) {
+    options.isError = true;
+    return showMessage(message, true, options);
 }

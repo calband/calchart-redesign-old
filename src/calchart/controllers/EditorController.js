@@ -772,11 +772,11 @@ export default class EditorController extends ApplicationController {
             viewer: data,
         };
 
-        showMessage("Saving...");
+        let li = showMessage("Saving...");
 
         doAction("save_show", params, {
             success: () => {
-                showMessage("Saved!");
+                li.text("Saved!").delayHide();
                 this._savedShow = data;
             },
         });
