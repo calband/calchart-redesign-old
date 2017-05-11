@@ -7,7 +7,7 @@ import MovementCommand from "calchart/MovementCommand";
 
 import { AnimationStateError, MovementError } from "utils/errors";
 import { mapSome, moveElem, runAsync } from "utils/JSUtils";
-import { roundSmall } from "utils/MathUtils";
+import { isEqual, roundSmall } from "utils/MathUtils";
 
 /**
  * A Sheet represents a stuntsheet, containing the following information:
@@ -602,10 +602,7 @@ export default class Sheet {
                             continue;
                         }
 
-                        if (
-                            roundSmall(state1.x - state2.x) === 0 &&
-                            roundSmall(state1.y - state2.y) === 0
-                        ) {
+                        if (isEqual(state1.x, state2.x) && isEqual(state1.y, state2.y)) {
                             this.getDotInfo(dot1).collisions.add(beat);
                             this.getDotInfo(dot2).collisions.add(beat);
                             break;

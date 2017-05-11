@@ -14,7 +14,10 @@ import {
     underscoreKeys,
     update,
 } from "utils/JSUtils";
-import { round } from "utils/MathUtils";
+import {
+    isEqual,
+    round,
+} from "utils/MathUtils";
 import {
     doAction,
     getData,
@@ -225,7 +228,7 @@ export default class EditorController extends ApplicationController {
             }
 
             let position = nextSheet.getPosition(dot);
-            if (final.x !== position.x || final.y !== position.y) {
+            if (!isEqual(final.x, position.x) || !isEqual(final.y, position.y)) {
                 errors.wrongPosition.push(dot.label);
             }
         });
@@ -769,11 +772,11 @@ export default class EditorController extends ApplicationController {
             viewer: data,
         };
 
-        showMessage("Saving...");
+        let li = showMessage("Saving...");
 
         doAction("save_show", params, {
             success: () => {
-                showMessage("Saved!");
+                li.text("Saved!").delayHide();
                 this._savedShow = data;
             },
         });

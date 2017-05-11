@@ -329,6 +329,10 @@ class SelectionTool extends BaseSelection {
         }
 
         this._box = HTMLBuilder.div("selection-box", null, ".workspace");
+        this._scrollOffset = {
+            top: 0,
+            left: 0,
+        };
     }
 
     mousemove(e) {
@@ -381,8 +385,8 @@ class SelectionTool extends BaseSelection {
         let {x, y, width, height} = getDimensions(
             e.pageX,
             e.pageY,
-            this._dragStart.pageX,
-            this._dragStart.pageY
+            this._dragStart.pageX - this._scrollOffset.left,
+            this._dragStart.pageY - this._scrollOffset.top
         );
         let [minX, minY] = this._makeRelative(x, y);
         let maxX = minX + width;
@@ -398,6 +402,10 @@ class SelectionTool extends BaseSelection {
             })
             .scrollIntoView({
                 parent: ".workspace",
+                callback: (dx, dy) => {
+                    this._scrollOffset.left += dx;
+                    this._scrollOffset.top += dy;
+                },
             });
 
         if (!this._metaKey) {
@@ -833,7 +841,7 @@ class BlockTool extends BaseEdit {
         this._line.attr("x2", endX).attr("y2", endY);
 
         // move dots
-        selection.each((i, dot) => {
+        selection.get().reverse().forEach((dot, i) => {
             let dotX = this._startX + (i % numCols) * this._snap;
             let dotY = this._startY + Math.floor(i / numCols) * this._snap;
             this.grapher.moveDotTo(dot, dotX, dotY);

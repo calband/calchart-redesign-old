@@ -96,6 +96,17 @@ export function getDimensions(x1, y1, x2, y2) {
 }
 
 /**
+ * Check equality of the two numbers, rounding for small errors.
+ *
+ * @param {number} x
+ * @param {number} y
+ * @return {boolean}
+ */
+export function isEqual(x, y) {
+    return roundSmall(x - y) === 0;
+}
+
+/**
  * Rotate the given angle by a quarter-turn in the specified direction.
  *
  * @param {float} angle - The angle to rotate, in radians.

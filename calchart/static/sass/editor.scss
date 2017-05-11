@@ -432,6 +432,8 @@ body.context-continuity-dots .workspace .graph {
     }
     .dot-order {
         margin-bottom: 5px;
+        max-height: 300px;
+        overflow-y: auto;
         .dot {
             padding-top: 5px;
             text-align: center;
