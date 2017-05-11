@@ -23,7 +23,7 @@
         "CALCHART_STAGING": {
             "description": "The presence of this environment variable signifies that we're on a staging app."
         },
-        "CALCHART_SECRET_KEY": {
+        "SECRET_KEY": {
             "description": "The secret key used by Django."
         },
         "DISABLE_COLLECTSTATIC": {
