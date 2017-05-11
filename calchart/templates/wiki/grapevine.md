@@ -1,8 +1,7 @@
 ## Description
 
-This continuity tells dots to move a given number steps in a given direction, using the grapevine step type.
+This continuity tells dots to move to the next stuntsheet in grapevine steps, ending in a marktime or close.
 
 ## Parameters
 
-- **Number of steps**: This field tells dots how many steps to move.
-- **Direction**: This field tells dots which direction to move in.
+- **End**: This field tells dots what to do after arriving at their spot. Dots can either mark time or close after finishing their movements.

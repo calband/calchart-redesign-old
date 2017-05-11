@@ -604,5 +604,5 @@ export function showMessage(message, options={}) {
  */
 export function showError(message, options={}) {
     options.isError = true;
-    return showMessage(message, true, options);
+    return showMessage(message, options);
 }

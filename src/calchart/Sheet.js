@@ -5,7 +5,7 @@ import Dot from "calchart/Dot";
 import DotType from "calchart/DotType";
 import MovementCommand from "calchart/MovementCommand";
 
-import { AnimationStateError, MovementError } from "utils/errors";
+import { AnimationStateError } from "utils/errors";
 import { mapSome, moveElem, runAsync } from "utils/JSUtils";
 import { isEqual, roundSmall } from "utils/MathUtils";
 
