@@ -1,7 +1,8 @@
 import BaseContinuity from "calchart/continuities/BaseContinuity";
 import MovementCommandMove from "calchart/movements/MovementCommandMove";
+import MovementCommandStop from "calchart/movements/MovementCommandStop";
 
-import { ORIENTATIONS } from "utils/CalchartUtils";
+import { ENDINGS } from "utils/CalchartUtils";
 import HTMLBuilder from "utils/HTMLBuilder";
 import { validatePositive, parseNumber } from "utils/JSUtils";
 import { calcAngle } from "utils/MathUtils";
@@ -17,9 +18,16 @@ export default class GrapevineContinuity extends BaseContinuity {
      *   - {string} stepType
      *   - {int} beatsPerStep
      *   - {string} orientation - The direction to face during the movement.
+     *   - {string} end - Whether to marktime or close at the end (default MT).
      */
     constructor(sheet, dotType, options) {
         super(sheet, dotType, options);
+
+        options = _.defaults(options, {
+            end: "MT",
+        });
+
+        this._end = options.end;
     }
 
     static deserialize(sheet, dotType, data) {
@@ -27,7 +35,9 @@ export default class GrapevineContinuity extends BaseContinuity {
     }
 
     serialize() {
-        return super.serialize("GRAPEVINE");
+        return super.serialize("GRAPEVINE", {
+            end: this._end,
+        });
     }
 
     get name() {
@@ -45,23 +55,29 @@ export default class GrapevineContinuity extends BaseContinuity {
             beatsPerStep: this.getBeatsPerStep(),
         };
 
-        let direction = calcAngle(data.position.x, data.position.y, end.x, end.y);
-        if (_.isNaN(direction)) {
-            direction = 0;
+        let deltaX = end.x - data.position.x;
+        if (deltaX === 0) {
+            return [];
         }
-
-        // TODO: error if not north or south
-        // TODO: duration = deltaX
-        // TODO: end mt or close
 
         let move = new MovementCommandMove(
             data.position.x,
             data.position.y,
-            direction,
-            data.remaining,
+            deltaX < 0 ? 90 : 270,
+            deltaX,
             options
         );
-        return [move];
+
+        let stop = new MovementCommandStop(
+            data.position.x + deltaX,
+            data.position.y,
+            options.orientation,
+            data.remaining - deltaX,
+            this._end === "MT",
+            options
+        );
+
+        return [move, stop];
     }
 
     panelHTML(controller) {
@@ -69,24 +85,36 @@ export default class GrapevineContinuity extends BaseContinuity {
 
         let label = HTMLBuilder.span("GV");
 
-        let orientation = HTMLBuilder.select({
-            options: ORIENTATIONS,
-            initial: this._orientation,
+        let endLabel = HTMLBuilder.label("End:");
+        let endChoices = HTMLBuilder.select({
+            options: ENDINGS,
             change: function() {
-                _this._orientation = $(this).val();
+                _this._end = $(this).val();
                 _this._updateMovements(controller);
             },
+            initial: this._end,
         });
 
-        return this._wrapPanel(label, orientation);
+        return this._wrapPanel(label, endChoices);
     }
 
     popupHTML() {
-        let { stepType, orientation, beatsPerStep, customText } = this._getPopupFields();
+        let { end, stepType, orientation, beatsPerStep, customText } = this._getPopupFields();
 
         return {
             name: "Grapevine",
-            fields: [stepType, orientation, beatsPerStep, customText],
+            fields: [end, stepType, orientation, beatsPerStep, customText],
         };
+    }
+
+    _getPopupFields() {
+        let fields = super._getPopupFields();
+
+        fields.end = HTMLBuilder.formfield("End", HTMLBuilder.select({
+            options: ENDINGS,
+            initial: this._end,
+        }));
+
+        return fields;
     }
 }

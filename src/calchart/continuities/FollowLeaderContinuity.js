@@ -4,7 +4,6 @@ import Coordinate from "calchart/Coordinate";
 import Dot from "calchart/Dot";
 import MovementCommandMove from "calchart/movements/MovementCommandMove";
 
-import { MovementError } from "utils/errors";
 import HTMLBuilder from "utils/HTMLBuilder";
 import Iterator from "utils/Iterator";
 import { calcAngle } from "utils/MathUtils";
