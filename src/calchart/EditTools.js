@@ -833,7 +833,7 @@ class BlockTool extends BaseEdit {
         this._line.attr("x2", endX).attr("y2", endY);
 
         // move dots
-        selection.each((i, dot) => {
+        selection.get().reverse().forEach((dot, i) => {
             let dotX = this._startX + (i % numCols) * this._snap;
             let dotY = this._startY + Math.floor(i / numCols) * this._snap;
             this.grapher.moveDotTo(dot, dotX, dotY);
