@@ -20,10 +20,10 @@
             "description": "The bucket name for the static files for the staging app.",
             "value": "calchart-review"
         },
-        "MEMBERS_ONLY_STAGING": {
+        "CALCHART_STAGING": {
             "description": "The presence of this environment variable signifies that we're on a staging app."
         },
-        "MEMBERS_ONLY_SECRET_KEY": {
+        "CALCHART_SECRET_KEY": {
             "description": "The secret key used by Django."
         },
         "DISABLE_COLLECTSTATIC": {
