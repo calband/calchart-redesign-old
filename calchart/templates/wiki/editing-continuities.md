@@ -14,7 +14,11 @@ To check for any errors in the continuities, you can click the <i class="icon-ch
 
 ## Edit continuities
 
-When in this context, a panel is displayed, containing a tab for each dot type. Clicking on a tab will display the continuities for that dot type. Use the dropdown in the panel to add a continuity for the selected dot type. The dropdown also features a search bar to quickly filter the list of continuities.
+When in this context, a panel is displayed, containing a tab for each dot type. Clicking on a tab will display the continuities for that dot type.
+
+There are also two tabs labelled "All". Put continuities in the first "All" tab to add continuities for all dots at the beginning of the stuntsheet. Put continuities in the latter "All" tab to add continuities at the end of the stuntsheet.
+
+Use the dropdown in the panel to add a continuity for the selected dot type. The dropdown also features a search bar to quickly filter the list of continuities.
 
 To edit a continuity, click the <i class="icon-pencil"></i> icon, which will display a popup containing properties for that specific continuity. Every continuity has the following fields in the popup:
 
