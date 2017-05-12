@@ -16,8 +16,8 @@ export default class CounterMarchContinuity extends FollowLeaderContinuity {
      * @param {DotType} dotType
      * @param {?int} duration - The number of beats to mark time or close. If null,
      *   use remaining beats.
-     * @param {int[]} order - The order of dots (as IDs) in the line. order[i] moves
-     *   towards order[i+1], and order[len - 1] follows order[0].
+     * @param {Dot[]} order - The order of dots in the line. order[i] moves towards
+     *   order[i+1], and order[len - 1] follows order[0].
      * @param {object} [options] - Options for the continuity, including:
      *   - {string} stepType
      *   - {int} beatsPerStep
@@ -29,7 +29,9 @@ export default class CounterMarchContinuity extends FollowLeaderContinuity {
     }
 
     static deserialize(sheet, dotType, data) {
-        return new CounterMarchContinuity(sheet, dotType, data.duration, data.order, data);
+        let show = sheet.getShow();
+        let order = data.order.map(dotId => show.getDot(dotId));
+        return new CounterMarchContinuity(sheet, dotType, data.duration, order, data);
     }
 
     serialize() {
@@ -103,11 +105,7 @@ export default class CounterMarchContinuity extends FollowLeaderContinuity {
     }
 
     _getPath(index) {
-        let show = this._sheet.getShow();
-        let path = this._order.map(id => {
-            let dot = show.getDot(id);
-            return this._sheet.getDotInfo(dot).position;
-        });
+        let path = this._order.map(dot => this._sheet.getDotInfo(dot).position);
 
         // move preceding dots to end of path
         let shifted = path.splice(0, index);

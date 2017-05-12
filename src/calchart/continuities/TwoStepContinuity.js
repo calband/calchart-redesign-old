@@ -15,8 +15,8 @@ export default class TwoStepContinuity extends BaseContinuity {
     /**
      * @param {Sheet} sheet
      * @param {DotType} dotType
-     * @param {int[]} order - The order of dots (as IDs) in the line. order[0] is
-     *   the first dot in the path.
+     * @param {Dot[]} order - The order of dots in the line. order[0] is the first
+     *   dot in the path.
      * @param {Continuity[]} continuities - The continuities each dot should execute
      *   after waiting the appropriate amount of time.
      * @param {object} [options] - Options for the continuity, including:
@@ -38,16 +38,19 @@ export default class TwoStepContinuity extends BaseContinuity {
     }
 
     static deserialize(sheet, dotType, data) {
+        let show = sheet.getShow();
+        let order = data.order.map(dotId => show.getDot(dotId));
         let continuities = data.continuities.map(
             continuity => Continuity.deserialize(sheet, dotType, continuity)
         );
-        return new TwoStepContinuity(sheet, dotType, data.order, continuities, data);
+        return new TwoStepContinuity(sheet, dotType, order, continuities, data);
     }
 
     serialize() {
+        let order = this._order.map(dot => dot.id);
         let continuities = this._continuities.map(continuity => continuity.serialize());
         return super.serialize({
-            order: this._order,
+            order: order,
             continuities: continuities,
             isMarktime: this._isMarktime,
         });
@@ -78,7 +81,7 @@ export default class TwoStepContinuity extends BaseContinuity {
         let options = {
             beatsPerStep: this.getBeatsPerStep(),
         };
-        let wait = this._order.indexOf(dot.id) * 2;
+        let wait = this._order.indexOf(dot) * 2;
         let stop = new MovementCommandStop(
             data.position.x,
             data.position.y,
@@ -164,5 +167,12 @@ export default class TwoStepContinuity extends BaseContinuity {
     removeContinuity(continuity) {
         _.pull(this._continuities, continuity);
         this._sheet.updateMovements(this._dotType);
+    }
+
+    /**
+     * @param {Dot[]} order - The new order of dots
+     */
+    setOrder(order) {
+        this._order = order;
     }
 }

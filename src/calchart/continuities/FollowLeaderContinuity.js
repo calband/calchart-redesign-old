@@ -18,8 +18,8 @@ export default class FollowLeaderContinuity extends BaseContinuity {
     /**
      * @param {Sheet} sheet
      * @param {DotType} dotType
-     * @param {int[]} order - The order of dots (as IDs) in the line. order[0] is
-     *   the first dot in the path.
+     * @param {Dot[]} order - The order of dots in the line. order[0] is the
+     *   first dot in the path.
      * @param {Coordinate[]} path - The coordinates for the path of the first dot.
      *   path[0] is the first coordinate to go to.
      * @param {object} [options] - Options for the continuity, including:
@@ -34,16 +34,19 @@ export default class FollowLeaderContinuity extends BaseContinuity {
     }
 
     static deserialize(sheet, dotType, data) {
+        let show = sheet.getShow();
+        let order = data.order.map(dotId => show.getDot(dotId));
         let path = data.path.map(coordData => Coordinate.deserialize(coordData));
 
-        return new FollowLeaderContinuity(sheet, dotType, data.order, path, data);
+        return new FollowLeaderContinuity(sheet, dotType, order, path, data);
     }
 
     serialize() {
+        let order = this._order.map(dot => dot.id);
         let path = this._path.map(coord => coord.serialize());
 
         return super.serialize({
-            order: this._order,
+            order: order,
             path: path,
         });
     }
@@ -59,9 +62,9 @@ export default class FollowLeaderContinuity extends BaseContinuity {
     get path() { return this._path; }
 
     getMovements(dot, data) {
-        let index = this._order.indexOf(dot.id);
+        let index = this._order.indexOf(dot);
         if (index === -1) {
-            this._order.push(dot.id);
+            this._order.push(dot);
             index = this._order.length - 1;
         }
 
@@ -148,7 +151,7 @@ export default class FollowLeaderContinuity extends BaseContinuity {
     }
 
     /**
-     * @param {int[]} order - The new order of dots
+     * @param {Dot[]} order - The new order of dots
      */
     setOrder(order) {
         this._order = order;
@@ -174,7 +177,7 @@ export default class FollowLeaderContinuity extends BaseContinuity {
 
         // add preceding dot positions as reference points
         for (let i = 0; i <= index; i++) {
-            let dot = show.getDot(this._order[i]);
+            let dot = this._order[i];
             let position = this._sheet.getDotInfo(dot).position;
             path = [position].concat(path);
         }

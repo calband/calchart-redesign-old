@@ -26,7 +26,6 @@ export default class Continuity {
      */
     static create(type, sheet, dotType) {
         let dots = sheet.getDotsOfType(dotType);
-        let dotIds = dots.map(dot => dot.id);
         switch (type) {
             case "EWNS":
                 return new FountainGridContinuity(sheet, dotType, true);
@@ -45,11 +44,11 @@ export default class Continuity {
             case "HSDM":
                 return new DiagonalContinuity(sheet, dotType, false);
             case "FTL":
-                return new FollowLeaderContinuity(sheet, dotType, dotIds, []);
+                return new FollowLeaderContinuity(sheet, dotType, dots, []);
             case "CM":
-                return new CounterMarchContinuity(sheet, dotType, null, dotIds);
+                return new CounterMarchContinuity(sheet, dotType, null, dots);
             case "TWO":
-                return new TwoStepContinuity(sheet, dotType, dotIds, []);
+                return new TwoStepContinuity(sheet, dotType, dots, []);
             case "GT":
                 let reference = sheet.getDotInfo(dots[0]).position;
                 return new GateTurnContinuity(sheet, dotType, 90, true, reference);

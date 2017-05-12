@@ -31,16 +31,13 @@ export default class ContinuityDotContext extends HiddenContext {
         super.load(options);
 
         this._continuity = options.continuity;
-        let order = this._continuity.order;
 
-        let show = this._controller.getShow();
         this._list.empty();
-        order.forEach(id => {
-            let dot = show.getDot(id);
+        this._continuity.order.forEach(dot => {
             let graphDot = this._grapher.getDot(dot);
             
-            HTMLBuilder.li(dot.label, `dot dot-${id}`)
-                .data("id", id)
+            HTMLBuilder.li(dot.label, `dot dot-${dot.id}`)
+                .data("dot", dot)
                 .appendTo(this._list)
                 .mouseenter(e => {
                     this._controller.selectDots(graphDot);
@@ -54,7 +51,7 @@ export default class ContinuityDotContext extends HiddenContext {
             containment: this._panel,
             update: () => {
                 let order = this._list.children().map(function() {
-                    return $(this).data("id");
+                    return $(this).data("dot");
                 }).get();
                 controller.doAction("changeDotOrder", [order]);
             },
@@ -70,7 +67,8 @@ export default class ContinuityDotContext extends HiddenContext {
 
         this._panel.hide();
 
-        this._grapher.getDots(this._continuity.order).css("opacity", "");
+        let dots = this._continuity.order.map(dot => dot.id);
+        this._grapher.getDots(dots).css("opacity", "");
 
         this._controller.checkContinuities({
             dots: this._continuity.dotType,
@@ -80,8 +78,7 @@ export default class ContinuityDotContext extends HiddenContext {
     refresh() {
         super.refresh();
 
-        let order = this._continuity.order;
-
+        let order = this._continuity.order.map(dot => dot.id);
         this._grapher.getDots(order).css("opacity", 1);
 
         // re-order dots on every refresh
