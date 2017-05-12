@@ -302,10 +302,9 @@ body.context-background .workspace .graph {
 
 .panel.edit-continuity {
     width: 300px;
-    background: $light-gray;
     .add-continuity {
-        padding: 0 10px;
-        margin: 10px 0;
+        padding: 10px;
+        background: $light-gray;
         select {
             width: 100%;
         }
@@ -315,9 +314,11 @@ body.context-background .workspace .graph {
     }
     .continuities {
         height: 125px;
-        padding: 0 10px;
-        margin: 10px 0;
+        padding: 10px;
+        padding-top: 0;
         overflow-y: auto;
+        border-bottom: 2px solid $black;
+        background: $light-gray;
         .continuity {
             @include vertically-center(false);
             padding: 10px;
@@ -386,16 +387,19 @@ body.context-background .workspace .graph {
     .dot-types {
         @include unselectable;
         height: 35px;
-        padding: 0 10px;
-        border-top: 2px solid $black;
+        padding: 0 10px 5px;
+        top: -2px;
         background: $dark-gray;
+        overflow-x: auto;
         li {
             display: inline-block;
             padding: 5px 7px;
-            top: -2px;
             background: $medium-gray;
             border: 2px solid $black;
             cursor: pointer;
+            font-size: 14px;
+            vertical-align: top;
+            color: $black;
             &:hover {
                 background: lighten($medium-gray, 5);
             }
@@ -405,9 +409,14 @@ body.context-background .workspace .graph {
             &.active {
                 background: $light-gray;
                 border-top-color: transparent;
+                color: $blue;
+            }
+            &.all-before, &.all-after {
+                padding-top: 6px;
+                padding-bottom: 4px;
             }
             img {
-                height: 14px;
+                height: 1em;
             }
         }
     }

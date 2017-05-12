@@ -1,5 +1,6 @@
 import BaseContext from "calchart/contexts/BaseContext";
 import Continuity from "calchart/Continuity";
+import DotType from "calchart/DotType";
 
 import { ActionError } from "utils/errors";
 import HTMLBuilder from "utils/HTMLBuilder";
@@ -198,12 +199,16 @@ export default class ContinuityContext extends BaseContext {
         let tabs = this._panel.find(".dot-types").empty();
         let path = tabs.data("path");
         this._sheet.getDotTypes().forEach(dotType => {
-            let dot = HTMLBuilder.img(path.replace("DOT_TYPE", dotType));
-
-            HTMLBuilder.make("li.tab", tabs)
+            let tab = HTMLBuilder.make("li.tab", tabs)
                 .addClass(dotType)
-                .append(dot)
                 .data("dotType", dotType);
+
+            if (DotType.isAll(dotType)) {
+                tab.text("All");
+            } else {
+                let icon = HTMLBuilder.img(path.replace("DOT_TYPE", dotType));
+                tab.append(icon);
+            }
         });
 
         // activate dot type tab

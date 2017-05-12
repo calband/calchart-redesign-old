@@ -90,7 +90,9 @@ export default class Sheet {
             };
         });
 
+        sheet._continuities[DotType.ALL_BEFORE] = [];
         sheet._continuities[DotType.PLAIN] = [];
+        sheet._continuities[DotType.ALL_AFTER] = [];
 
         return sheet;
     }
@@ -321,11 +323,15 @@ export default class Sheet {
      * @return {Dot[]}
      */
     getDotsOfType(dotType) {
-        return mapSome(this._dots, (info, i) => {
-            if (info.type === dotType) {
-                return this._show.getDot(i);
-            }
-        });
+        if (DotType.isAll(dotType)) {
+            return this._show.getDots();
+        } else {
+            return mapSome(this._dots, (info, i) => {
+                if (info.type === dotType) {
+                    return this._show.getDot(i);
+                }
+            });
+        }
     }
 
     /**
@@ -343,6 +349,11 @@ export default class Sheet {
      */
     getDotTypes() {
         let dotTypes = new Set(_.map(this._dots, "type"));
+
+        // always include continuities for ALL
+        dotTypes.add(DotType.ALL_BEFORE);
+        dotTypes.add(DotType.ALL_AFTER);
+
         return DotType.sort(dotTypes);
     }
 
@@ -564,9 +575,16 @@ export default class Sheet {
             dots = [dots];
         }
 
+        let allBefore = this._continuities[DotType.ALL_BEFORE];
+        let allAfter = this._continuities[DotType.ALL_AFTER];
+
         dots.forEach(dot => {
             let info = this.getDotInfo(dot);
             let continuities = this._continuities[info.type];
+
+            // continuities for all dot types
+            continuities = allBefore.concat(continuities).concat(allAfter);
+
             let data = {
                 position: info.position,
                 remaining: this._numBeats,
