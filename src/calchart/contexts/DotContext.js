@@ -48,8 +48,22 @@ export default class DotContext extends BaseContext {
             .scrollTop(0);
 
         this.loadTool("selection");
-        this._addEvents(".workspace", "mousedown", e => {
-            this._activeTool.handle(e);
+        this._addEvents(".workspace", {
+            mousedown: e => {
+                this._activeTool.mousedown(e);
+
+                $(document).on({
+                    "mousemove.edit-tool": e => {
+                        this._activeTool.mousemove(e);
+                    },
+                    "mouseup.edit-tool": e => {
+                        this._activeTool.mouseup(e);
+                        if (this._activeTool.isDone()) {
+                            $(document).off(".edit-tool");
+                        }
+                    },
+                })
+            },
         });
 
         $(".toolbar .edit-dots").addClass("active");

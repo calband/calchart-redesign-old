@@ -301,6 +301,7 @@ editor_toolbar = Toolbar(
         ToolbarItem('Selection', 'mouse-pointer', 'loadTool(selection)'),
         ToolbarItem('Lasso', 'lasso', 'loadTool(lasso)'),
         ToolbarItem('Swap', 'exchange', 'loadTool(swap)'),
+        ToolbarItem('Stretch', 'arrows', 'loadTool(stretch)'),
         ToolbarItem('Line', 'line', 'loadTool(line)'),
         ToolbarItem('Arc', 'arc', 'loadTool(arc)'),
         ToolbarItem('Block', 'rectangle', 'loadTool(block)'),

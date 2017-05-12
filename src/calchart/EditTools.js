@@ -5,7 +5,6 @@
 
 import { NotImplementedError } from "utils/errors";
 import HTMLBuilder from "utils/HTMLBuilder";
-import { isSubclass } from "utils/JSUtils";
 import {
     calcAngle,
     calcDistance,
@@ -40,6 +39,9 @@ export default class EditTools {
             case "swap":
                 EditTool = SwapTool;
                 break;
+            case "stretch":
+                EditTool = StretchTool;
+                break;
             case "line":
                 EditTool = LineTool;
                 break;
@@ -56,11 +58,13 @@ export default class EditTools {
                 throw new Error(`No tool named: ${name}`);
         }
 
-        if (isSubclass(BaseSelection, EditTool)) {
+        let tool = new EditTool(context);
+
+        if (tool instanceof BaseSelection) {
             this._lastSelectionTool = name;
         }
 
-        if (isSubclass(BaseEdit, EditTool)) {
+        if (tool instanceof BaseEdit) {
             $(".workspace").addClass("edit-tools-active");
         } else {
             $(".workspace").removeClass("edit-tools-active");
@@ -69,7 +73,8 @@ export default class EditTools {
         $(".toolbar .edit-tools li").removeClass("active");
         $(`.toolbar .${name}`).addClass("active");
 
-        return new EditTool(context);
+        tool.load();
+        return tool;
     }
 
     /**
@@ -84,13 +89,13 @@ export default class EditTools {
  * The superclass for all EditTool classes.
  *
  * Method handlers:
- * - When the user first selects the tool in the toolbar, the
- *   tool is initialized (constructor).
- * - Whenever the user clicks down (mousedown), handle() and
- *   mousedown() are run. If it's the first mousedown event, init()
- *   is called.
- * - If the user clicks up (mouseup), _unloadTool() is run if
- *   the tool has captured the total number of events (eventsToHandle).
+ * - User clicks tool in toolbar: load()
+ * - User clicks down in workspace: mousedown(). Start listening
+ *   for mousemove and mouseup events
+ * - User moves mouse (dragging): mousemove()
+ * - User clicks up: mouseup()
+ * - If isDone() returns true, stop listening for mousemove and
+ *   mouseup events
  */
 class BaseTool {
     /**
@@ -103,40 +108,17 @@ class BaseTool {
     }
 
     /**
-     * Handle a mousedown event in the workspace. By default,
-     * calls the mousedown and _attachListeners methods.
-     *
-     * @param {Event} e
+     * Runs any actions when the tool is loaded from the toolbar.
      */
-    handle(e) {
-        e.preventDefault();
-
-        if (!this._init) {
-            this._init = true;
-            this._attachListeners();
-            this._eventCount = 0;
-            this.init();
-        }
-
-        this._eventCount++;
-        this.mousedown(e);
-    }
+    load() {}
 
     /**
-     * The number of mousedown/mouseup events to handle before creating a
-     * new instance in BaseTool#handle.
-     *
-     * @return {int}
+     * @return {boolean} true if mousemove/mouseup events should
+     *   stop being listened for.
      */
-    get eventsToHandle() {
-        return 1;
+    isDone() {
+        return true;
     }
-
-    /**
-     * Any actions to run when the tool is initialized (i.e. when the first
-     * mousedown is handled).
-     */
-    init() {}
 
     /**
      * The function to run when the mousedown event is triggered
@@ -163,32 +145,6 @@ class BaseTool {
     mouseup(e) {}
 
     /**
-     * The function to run after the mousedown event is handled. By
-     * default, adds the mousemove and mouseup listeners to the document.
-     */
-    _attachListeners() {
-        $(document).on({
-            "mousedown.selection": e => {
-                // handle additional mousedown events not in workspace, for
-                // eventsToHandle > 1 (workspace mousedown events are
-                // already captured in DotContext)
-                if ($(e.target).notIn(".workspace")) {
-                    this.handle(this.context, e);
-                }
-            },
-            "mousemove.selection": e => {
-                this.mousemove(e);
-            },
-            "mouseup.selection": e => {
-                this.mouseup(e);
-                if (this._eventCount === this.eventsToHandle) {
-                    this._unloadTool();
-                }
-            },
-        });
-    }
-
-    /**
      * @return {number} the snap grid
      */
     _getSnap() {
@@ -205,10 +161,14 @@ class BaseTool {
      * the workspace. Can also pass in an Event object, which will have
      * its pageX and pageY values taken.
      *
+     * Usage:
+     * let [x, y] = this._makeRelative(e);
+     * let [x, y] = this._makeRelative(pageX, pageY);
+     *
      * @param {Event} [e]
      * @param {number} [pageX]
      * @param {number} [pageY]
-     * @return {[x, y]}
+     * @return {number[]} The coordinates as [x, y].
      */
     _makeRelative(pageX, pageY) {
         if (arguments.length === 1) {
@@ -221,7 +181,7 @@ class BaseTool {
     }
 
     /**
-     * Same as _makeRelative, except the returned values are constrained
+     * Same as _makeRelative, except the returned values are snapped
      * to the grid, if applicable.
      */
     _makeRelativeSnap() {
@@ -240,32 +200,6 @@ class BaseTool {
         }
 
         return [x, y];
-    }
-
-    /**
-     * Calculate the angle between the given points and snap to
-     * 45 degree intervals;
-     *
-     * @param {number} x1
-     * @param {number} y1
-     * @param {number} x2
-     * @param {number} y2
-     * @return {number}
-     */
-    _snapAngle(x1, y1, x2, y2) {
-        let angle = calcAngle(x1, y1, x2, y2);
-        angle = round(angle, 45);
-        return angle === 360 ? 0 : angle;
-    }
-
-    /**
-     * The function to run after the mouseup event is handled. By
-     * default, removes the mousemove and mouseup listeners from the
-     * document and reverts to the SelectionTool.
-     */
-    _unloadTool() {
-        $(document).off(".selection");
-        this._init = false;
     }
 }
 
@@ -382,6 +316,8 @@ class SelectionTool extends BaseSelection {
     }
 
     mousemoveSelect(e) {
+        // TODO: fix scrolloffset
+
         let {x, y, width, height} = getDimensions(
             e.pageX,
             e.pageY,
@@ -520,9 +456,7 @@ class LassoTool extends BaseSelection {
  * Swap two dots' positions
  */
 class SwapTool extends BaseTool {
-    constructor(context) {
-        super(context);
-
+    load() {
         let selection = this.controller.getSelection();
         selection = selection.not(selection.last());
         this.context.deselectDots(selection);
@@ -544,17 +478,26 @@ class SwapTool extends BaseTool {
         } else {
             this.context.deselectDots();
         }
-    }
-
-    mouseup(e) {
         this.controller.refresh("context");
     }
+}
+
+/**
+ * Stretch and rotate the selected dots.
+ */
+class StretchTool extends BaseTool {
+
 }
 
 /**
  * A superclass for all tools that edit dots.
  */
 class BaseEdit extends BaseTool {
+    mouseup(e) {
+        this._saveDotPositions();
+        this.context.loadTool(EditTools.lastSelectionTool);
+    }
+
     /**
      * Save the currently selected dots' positions.
      */
@@ -569,11 +512,6 @@ class BaseEdit extends BaseTool {
             };
         })
         this.controller.doAction("moveDotsTo", [data]);
-    }
-
-    _unloadTool() {
-        super._unloadTool();
-        this.context.loadTool(EditTools.lastSelectionTool);
     }
 }
 
@@ -619,7 +557,7 @@ class LineTool extends BaseEdit {
     }
 
     mouseup(e) {
-        this._saveDotPositions();
+        super.mouseup(e);
         this._line.remove();
     }
 }
@@ -631,13 +569,14 @@ class LineTool extends BaseEdit {
  * start position, and then click again for the end position.
  */
 class ArcTool extends BaseEdit {
-    get eventsToHandle() {
-        return 2;
-    }
-
-    init() {
+    load() {
         // true if user is about to select the end point
         this._drawEnd = false;
+    }
+
+    isDone() {
+        this._drawEnd = !this._drawEnd;
+        return !this._drawEnd;
     }
 
     mousedown(e) {
@@ -727,12 +666,11 @@ class ArcTool extends BaseEdit {
     }
 
     mouseup(e) {
-        if (this._eventCount === 1) {
-            this._drawEnd = true;
-            this._radiusPath = this._path.attr("d");
-        } else {
-            this._saveDotPositions();
+        if (this._drawEnd) {
+            super.mouseup(e);
             this._path.remove();
+        } else {
+            this._radiusPath = this._path.attr("d");
         }
     }
 
@@ -780,6 +718,22 @@ class ArcTool extends BaseEdit {
             // CCW: 0, CW: 1
             sweepFlag: length < 0 ? 0 : 1,
         };
+    }
+
+    /**
+     * Calculate the angle between the given points and snap to
+     * 45 degree intervals;
+     *
+     * @param {number} x1
+     * @param {number} y1
+     * @param {number} x2
+     * @param {number} y2
+     * @return {number}
+     */
+    _snapAngle(x1, y1, x2, y2) {
+        let angle = calcAngle(x1, y1, x2, y2);
+        angle = round(angle, 45);
+        return angle === 360 ? 0 : angle;
     }
 }
 
@@ -849,7 +803,7 @@ class BlockTool extends BaseEdit {
     }
 
     mouseup(e) {
-        this._saveDotPositions();
+        super.mouseup(e);
         this._line.remove();
     }
 }
@@ -911,7 +865,7 @@ class CircleTool extends BaseEdit {
     }
 
     mouseup(e) {
-        this._saveDotPositions();
+        super.mouseup(e);
         this._line.remove();
         this._circle.remove();
     }
