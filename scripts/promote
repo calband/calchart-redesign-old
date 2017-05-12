@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-set -e
-
 echo "Putting calchart-prod into maintenance mode..."
 heroku maintenance:on -a calchart-prod
 
