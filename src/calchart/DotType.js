@@ -19,9 +19,20 @@ export default class DotType {
             }
         }));
     }
+
+    /**
+     * Check whether the given dot type is an ALL dot type.
+     *
+     * @param {string} dotType
+     * @return {boolean}
+     */
+    static isAll(dotType) {
+        return dotType === this.ALL_BEFORE || dotType === this.ALL_AFTER;
+    }
 }
 
 makeEnum(DotType, [
+    "all-before",
     "plain",
     "solid",
     "plain-forwardslash",
@@ -30,4 +41,5 @@ makeEnum(DotType, [
     "solid-backslash",
     "plain-x",
     "solid-x",
+    "all-after",
 ]);
