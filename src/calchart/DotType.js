@@ -8,8 +8,8 @@ export default class DotType {
      * Sort the given dot types according to the order specified
      * in the object.
      *
-     * @param {Iterable.<string>} dotTypes - The dot types to sort.
-     * @return {string[]} The sorted dot types
+     * @param {Iterable.<DotType>} dotTypes - The dot types to sort.
+     * @return {DotType[]} The sorted dot types
      */
     static sort(dotTypes) {
         let types = new Set(dotTypes);
@@ -23,7 +23,7 @@ export default class DotType {
     /**
      * Check whether the given dot type is an ALL dot type.
      *
-     * @param {string} dotType
+     * @param {DotType} dotType
      * @return {boolean}
      */
     static isAll(dotType) {
