@@ -22,7 +22,7 @@ def update_continuity(continuity):
     _type = continuity['type']
 
     if _type == 'STOP':
-        if not continuity['isMarktime']:
+        if not continuity['isMarkTime']:
             _type = 'close'
         elif continuity['duration'] is None:
             _type = 'mtrm'
