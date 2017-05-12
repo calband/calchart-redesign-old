@@ -50,6 +50,7 @@ export default class DotContext extends BaseContext {
         this.loadTool("selection");
         this._addEvents(".workspace", {
             mousedown: e => {
+                e.preventDefault();
                 this._activeTool.mousedown(e);
 
                 $(document).on({
