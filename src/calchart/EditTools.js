@@ -316,8 +316,6 @@ class SelectionTool extends BaseSelection {
     }
 
     mousemoveSelect(e) {
-        // TODO: fix scrolloffset
-
         let {x, y, width, height} = getDimensions(
             e.pageX,
             e.pageY,

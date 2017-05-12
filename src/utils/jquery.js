@@ -203,11 +203,16 @@ $.fn.removeClassRegex = function(pattern) {
  *     takes in the change in x/y positions.
  */
 $.fn.scrollIntoView = function(options={}) {
-    let tolerance = _.defaultTo(options.tolerance, 0);
+    options = _.defaults(options, {
+        tolerance: 0,
+        parent: this.parent(),
+    });
+
+    let tolerance = options.tolerance;
     let margin = _.defaultTo(options.margin, tolerance);
 
     // top/left of the visible part of the parent
-    let parent = $(_.defaultTo(options.parent, this.parent()));
+    let parent = $(options.parent);
     let parentOffset = parent.offset();
     let parentHeight = parent.outerHeight();
     let parentWidth = parent.outerWidth();
