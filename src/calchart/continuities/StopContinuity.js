@@ -83,7 +83,7 @@ export default class StopContinuity extends BaseContinuity {
         let _this = this;
         let label = HTMLBuilder.span();
 
-        switch (this.name) {
+        switch (this.info.type) {
             case "close":
                 label.text("Close");
                 return [label];
@@ -121,7 +121,7 @@ export default class StopContinuity extends BaseContinuity {
     getPopup() {
         let [stepType, orientation, beatsPerStep, customText] = super.getPopup();
 
-        switch (this.name) {
+        switch (this.info.type) {
             case "close":
                 return [orientation, customText];
             case "mtrm":
