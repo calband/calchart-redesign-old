@@ -35,8 +35,6 @@ export default class Continuity {
             case "FM":
                 return new ForwardContinuity(sheet, dotType, 0, 0);
             case "MT":
-                return new StopContinuity(sheet, dotType, true, 0);
-            case "MTRM":
                 return new StopContinuity(sheet, dotType, true, null);
             case "CL":
                 return new StopContinuity(sheet, dotType, false, null);
@@ -76,7 +74,6 @@ export default class Continuity {
             case "fm":
                 return ForwardContinuity.deserialize(sheet, dotType, data);
             case "close":
-            case "mtrm":
             case "mt":
                 return StopContinuity.deserialize(sheet, dotType, data);
             case "even":
