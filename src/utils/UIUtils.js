@@ -560,16 +560,16 @@ export function hidePopup() {
  * @param {string} message
  * @param {object} [options] - Options to customize the message displayed:
  *   - {boolean} [isError=false] - true if message is an error message
- *   - {boolean} [autohide=true] - Automatically hides the message after
+ *   - {boolean} [autohide=!isError] - Automatically hide the message after
  *     a given time.
  * @return {jQuery} the message <li> element. Call li.delayHide() to hide
  *   the message after a given time.
  */
 export function showMessage(message, options={}) {
     options = _.defaults(options, {
-        autohide: true,
         isError: false,
     });
+    options.autohide = _.defaultTo(options.autohide, !options.isError);
 
     let container = $("ul.messages");
     if (!container.exists()) {
@@ -581,19 +581,25 @@ export function showMessage(message, options={}) {
         li.addClass("error");
     }
 
+    function hideMessage() {
+        li.fadeOut(function() {
+            if (!container.children(":visible").exists()) {
+                container.remove();
+            }
+        });
+    }
+
     li.delayHide = function() {
-        setTimeout(function() {
-            li.fadeOut(function() {
-                if (!container.children(":visible").exists()) {
-                    container.remove();
-                }
-            });
-        }, 2000);
+        setTimeout(hideMessage, 1000);
         return this;
     };
 
     if (options.autohide) {
         li.delayHide();
+    } else {
+        HTMLBuilder.icon("times", "close-message")
+            .click(hideMessage)
+            .appendTo(li);
     }
 
     return li;
