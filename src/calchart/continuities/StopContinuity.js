@@ -32,7 +32,7 @@ export default class StopContinuity extends BaseContinuity {
     }
 
     serialize() {
-        return super.serialize("STOP", {
+        return super.serialize({
             isMarkTime: this._marktime,
             duration: this._duration,
         });

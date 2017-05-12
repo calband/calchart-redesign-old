@@ -31,7 +31,7 @@ export default class ForwardContinuity extends BaseContinuity {
     }
 
     serialize() {
-        return super.serialize("FORWARD", {
+        return super.serialize({
             steps: this._numSteps,
             direction: this._direction,
         });

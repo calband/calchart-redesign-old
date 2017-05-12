@@ -36,7 +36,7 @@ export default class GrapevineContinuity extends BaseContinuity {
     }
 
     serialize() {
-        return super.serialize("GRAPEVINE", {
+        return super.serialize({
             end: this._end,
         });
     }

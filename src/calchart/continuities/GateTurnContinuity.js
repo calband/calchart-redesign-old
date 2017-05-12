@@ -36,7 +36,7 @@ export default class GateTurnContinuity extends BaseContinuity {
     }
 
     serialize() {
-        return super.serialize("GATE", {
+        return super.serialize({
             degrees: this._degrees,
             isCW: this._isCW,
             reference: this._reference.serialize(),

@@ -37,7 +37,7 @@ export default class FountainGridContinuity extends BaseContinuity {
     }
 
     serialize() {
-        return super.serialize("FOUNTAIN", {
+        return super.serialize({
             ewns: this._isEWNS,
             end: this._end,
         });

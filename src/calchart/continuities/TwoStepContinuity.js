@@ -46,7 +46,7 @@ export default class TwoStepContinuity extends BaseContinuity {
 
     serialize() {
         let continuities = this._continuities.map(continuity => continuity.serialize());
-        return super.serialize("TWO", {
+        return super.serialize({
             order: this._order,
             continuities: continuities,
             isMarktime: this._isMarktime,

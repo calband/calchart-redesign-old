@@ -42,7 +42,7 @@ export default class FollowLeaderContinuity extends BaseContinuity {
     serialize() {
         let path = this._path.map(coord => coord.serialize());
 
-        return super.serialize("FTL", {
+        return super.serialize({
             order: this._order,
             path: path,
         });

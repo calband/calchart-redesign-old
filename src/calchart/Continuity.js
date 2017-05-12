@@ -71,25 +71,27 @@ export default class Continuity {
      */
     static deserialize(sheet, dotType, data) {
         switch (data.type) {
-            case "FOUNTAIN":
+            case "fountain":
                 return FountainGridContinuity.deserialize(sheet, dotType, data);
-            case "FORWARD":
+            case "fm":
                 return ForwardContinuity.deserialize(sheet, dotType, data);
-            case "STOP":
+            case "close":
+            case "mtrm":
+            case "mt":
                 return StopContinuity.deserialize(sheet, dotType, data);
-            case "EVEN":
+            case "even":
                 return EvenContinuity.deserialize(sheet, dotType, data);
-            case "DIAGONAL":
+            case "diagonal":
                 return DiagonalContinuity.deserialize(sheet, dotType, data);
-            case "FTL":
+            case "ftl":
                 return FollowLeaderContinuity.deserialize(sheet, dotType, data);
-            case "CM":
+            case "cm":
                 return CounterMarchContinuity.deserialize(sheet, dotType, data);
-            case "TWO":
+            case "two":
                 return TwoStepContinuity.deserialize(sheet, dotType, data);
-            case "GATE":
+            case "gate":
                 return GateTurnContinuity.deserialize(sheet, dotType, data);
-            case "GRAPEVINE":
+            case "gv":
                 return GrapevineContinuity.deserialize(sheet, dotType, data);
         }
         throw new Error("No continuity of the type: " + data.type);

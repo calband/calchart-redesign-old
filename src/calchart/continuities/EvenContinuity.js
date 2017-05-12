@@ -30,10 +30,6 @@ export default class EvenContinuity extends BaseContinuity {
         return new EvenContinuity(sheet, dotType, data);
     }
 
-    serialize() {
-        return super.serialize("EVEN");
-    }
-
     get info() {
         return {
             type: "even",

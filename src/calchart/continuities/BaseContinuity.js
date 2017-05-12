@@ -53,14 +53,13 @@ export default class BaseContinuity {
     /**
      * Return the JSONified version of the BaseContinuity.
      *
-     * @param {string} type - The type of the Continuity (@see Continuity.deserialize).
      * @param {Object} [data] - Additional data to add to the serialized data.
      *   Can be used by subclasses to easily add data to the serialization.
      * @return {Object}
      */
-    serialize(type, data={}) {
+    serialize(data={}) {
         return _.extend({}, data, {
-            type: type,
+            type: this.info.type,
             stepType: this._stepType,
             beatsPerStep: this._beatsPerStep,
             orientation: this._orientation,
@@ -125,7 +124,7 @@ export default class BaseContinuity {
     }
 
     /**
-     * Get the HTML elements to add to the Edit Continuity panel.
+     * Get the HTML elements to add to the ContinuityContext panel.
      *
      * @param {EditorController} controller
      * @return {jQuery[]}
@@ -135,7 +134,7 @@ export default class BaseContinuity {
     }
 
     /**
-     * Get the fields to add to the edit continuity popup. The form fields
+     * Get the fields to add to the Edit Continuity popup. The form fields
      * need to have their name match the instance variable, e.g. "orientation"
      * for this._orientation.
      *

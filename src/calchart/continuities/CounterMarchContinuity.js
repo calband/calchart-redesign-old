@@ -34,7 +34,6 @@ export default class CounterMarchContinuity extends FollowLeaderContinuity {
 
     serialize() {
         let data = super.serialize();
-        data.type = "CM";
         data.duration = this._duration;
         delete data.path;
         return data;

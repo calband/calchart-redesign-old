@@ -19,7 +19,6 @@ class UpdateShowVersion(Operation):
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         for show in Show.objects.all():
-            # show.viewer doesn't seem to work
             data = json.loads(show.viewer)
 
             if data['version'] < self.version:
