@@ -128,10 +128,10 @@ export default class StopContinuity extends BaseContinuity {
             },
             initial: _.isNull(this._duration) ? "remaining" : "custom",
             change: function() {
-                numBeats.prop("disabled", $(this).val() === "custom");
+                numBeats.find("input").prop("disabled", $(this).val() !== "custom");
             },
         }));
-        duration.change();
+        duration.find("select").change();
 
         switch (this.info.type) {
             case "close":
