@@ -376,6 +376,11 @@ body.context-background .workspace .graph {
                     background: lighten($blue, 10);
                 }
             }
+            &.mt, &.close {
+                select {
+                    margin-right: 5px;
+                }
+            }
         }
     }
     .dot-types {

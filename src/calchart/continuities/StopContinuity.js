@@ -2,6 +2,7 @@ import BaseContinuity from "calchart/continuities/BaseContinuity";
 import MovementCommandStop from "calchart/movements/MovementCommandStop";
 
 import { ORIENTATIONS } from "utils/CalchartUtils";
+import { ValidationError } from "utils/errors";
 import HTMLBuilder from "utils/HTMLBuilder";
 import { validatePositive } from "utils/JSUtils";
 
@@ -39,28 +40,23 @@ export default class StopContinuity extends BaseContinuity {
     }
 
     get info() {
-        if (!this._marktime) {
-            return {
-                type: "close",
-                name: "Close",
-            };
-        } else if (_.isNull(this._duration)) {
-            return {
-                type: "mtrm",
-                name: "Mark Time Remaining",
-            };
-        } else {
+        if (this._marktime) {
             return {
                 type: "mt",
                 name: "Mark Time",
+            };
+        } else {
+            return {
+                type: "close",
+                name: "Close",
             };
         }
     }
 
     getMovements(dot, data) {
-        let duration = data.remaining;
-        if (this._marktime && this._duration !== null) {
-            duration = this._duration;
+        let duration = this._duration;
+        if (_.isNull(this._duration)) {
+            duration = data.remaining;
         }
 
         let options = {
@@ -81,57 +77,82 @@ export default class StopContinuity extends BaseContinuity {
 
     getPanel(controller) {
         let _this = this;
-        let label = HTMLBuilder.span();
 
-        switch (this.info.type) {
-            case "close":
-                label.text("Close");
-                return [label];
-            case "mtrm":
-                label.text("MTRM");
+        let label = HTMLBuilder.span(this.info.type === "close" ? "Close" : "MT");
 
-                let orientationLabel = HTMLBuilder.label("Facing:");
-                let orientation = HTMLBuilder.select({
-                    options: ORIENTATIONS,
-                    change: function() {
-                        _this._orientation = $(this).val();
+        let numBeats = HTMLBuilder.input({
+            type: "number",
+            initial: this._duration,
+            change: function() {
+                _this._duration = validatePositive(this);
+                _this._updateMovements(controller);
+            },
+        });
+
+        let duration = HTMLBuilder.select({
+            options: {
+                remaining: "To End",
+                custom: "Custom",
+            },
+            initial: _.isNull(this._duration) ? "remaining" : "custom",
+            change: function() {
+                switch ($(this).val()) {
+                    case "custom":
+                        numBeats.prop("disabled", false).change();
+                        break;
+                    case "remaining":
+                        numBeats.prop("disabled", true);
+                        _this._duration = null;
                         _this._updateMovements(controller);
-                    },
-                    initial: this._orientation,
-                });
+                }
+            },
+        });
 
-                return [label, orientationLabel, orientation];
-            case "mt":
-                label.text("MT");
+        numBeats.prop("disabled", _.isNull(this._duration));
 
-                let durationLabel = HTMLBuilder.label("Beats:");
-                let duration = HTMLBuilder.input({
-                    type: "number",
-                    initial: this._duration,
-                    change: function() {
-                        _this._duration = validatePositive(this);
-                        _this._updateMovements(controller);
-                    },
-                });
-
-                return [label, durationLabel, duration];
-        }
+        return [label, duration, numBeats];
     }
 
     getPopup() {
         let [stepType, orientation, beatsPerStep, customText] = super.getPopup();
 
+        let numBeats = HTMLBuilder.formfield("Number of beats", HTMLBuilder.input({
+            type: "number",
+            initial: this._duration,
+        }), "numBeats");
+
+        let duration = HTMLBuilder.formfield("Duration", HTMLBuilder.select({
+            options: {
+                remaining: "To End",
+                custom: "Custom",
+            },
+            initial: _.isNull(this._duration) ? "remaining" : "custom",
+            change: function() {
+                numBeats.find("input").prop("disabled", $(this).val() !== "custom");
+            },
+        }));
+        duration.find("select").change();
+
         switch (this.info.type) {
             case "close":
-                return [orientation, customText];
-            case "mtrm":
-                return [orientation, stepType, beatsPerStep, customText];
+                return [duration, numBeats, orientation, customText];
             case "mt":
-                let duration = HTMLBuilder.formfield("Number of beats", HTMLBuilder.input({
-                    type: "number",
-                    initial: this._duration,
-                }), "duration");
-                return [duration, orientation, stepType, beatsPerStep, customText];
+                return [duration, numBeats, orientation, stepType, beatsPerStep, customText];
+        }
+    }
+
+    validatePopup(data) {
+        super.validatePopup(data);
+
+        if (data.duration === "remaining") {
+            data.duration = null;
+        } else {
+            data.duration = parseInt(data.numBeats);
+            if (_.isNaN(data.duration)) {
+                throw new ValidationError("Please provide the number of beats.");
+            } else if (data.duration <= 0) {
+                throw new ValidationError("Duration needs to be a positive integer.");
+            }
         }
     }
 }
