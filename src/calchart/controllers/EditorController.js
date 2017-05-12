@@ -772,7 +772,9 @@ export default class EditorController extends ApplicationController {
             viewer: data,
         };
 
-        let li = showMessage("Saving...");
+        let li = showMessage("Saving...", {
+            autohide: false,
+        });
 
         doAction("save_show", params, {
             success: () => {
