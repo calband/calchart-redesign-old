@@ -502,27 +502,40 @@ class SwapTool extends BaseTool {
  */
 class StretchTool extends BaseTool {
     load() {
-        // TODO: rotate
         this._box = HTMLBuilder.div("stretch-box", null, ".workspace");
         addHandles(this._box);
 
+        // margin between dots and box
+        this.MARGIN = 5;
+
         this.refresh();
+
+        let bounds = this._getDotBounds();
+
+        this._positions = [];
+        this.controller.getSelection().each((i, $dot) => {
+            let dot = $($dot).data("dot");
+            let position = $($dot).data("position");
+
+            // dot ID to ratio of position to top/left of box
+            this._positions.push({
+                top: (position.y - bounds.top) / bounds.height,
+                left: (position.x - bounds.left) / bounds.width,
+            });
+        });
     }
 
     refresh() {
-        let selection = this.controller.getSelection();
-        let bounds = selection.getBounds();
+        let bounds = this.controller.getSelection().getBounds();
         let offset = $(".workspace").offset();
         let top = $(".workspace").scrollTop() + bounds.top - offset.top;
         let left = $(".workspace").scrollLeft() + bounds.left - offset.left;
 
-        let margin = 5;
-
         this._box.css({
-            top: top - margin,
-            left: left - margin,
-            height: (bounds.bottom - bounds.top) + 2 * margin,
-            width: (bounds.right - bounds.left) + 2 * margin,
+            top: top - this.MARGIN,
+            left: left - this.MARGIN,
+            height: (bounds.bottom - bounds.top) + 2 * this.MARGIN,
+            width: (bounds.right - bounds.left) + 2 * this.MARGIN,
         });
     }
 
@@ -531,16 +544,19 @@ class StretchTool extends BaseTool {
     }
 
     mousedown(e) {
-        if ($(e.target).is(".handle")) {
-            this._handle = $(e.target).data("handle-id");
-            this._start = {
-                event: e,
-                width: this._box.outerWidth(),
-                height: this._box.outerHeight(),
-            };
-        } else {
+        // TODO: rotate
+
+        if (!$(e.target).is(".handle")) {
             this._handle = null;
+            return;
         }
+
+        this._handle = $(e.target).data("handle-id");
+        this._start = {
+            event: e,
+            width: this._box.outerWidth(),
+            height: this._box.outerHeight(),
+        };
     }
 
     mousemove(e) {
@@ -558,11 +574,30 @@ class StretchTool extends BaseTool {
 
         this._box.css(data);
 
-        // TODO: move dots
+        let bounds = this._getDotBounds();
+
+        this.controller.getSelection().each((i, $dot) => {
+            let ratio = this._positions[i];
+            let x = ratio.left * bounds.width + bounds.left;
+            let y = ratio.top * bounds.height + bounds.top;
+            this.grapher.moveDotTo($dot, x, y);
+        });
     }
 
     mouseup(e) {
         // TODO: doAction to save
+    }
+
+    /**
+     * @return {object} The bounds for the dots relative to the helper box.
+     */
+    _getDotBounds() {
+        return {
+            top: parseInt(this._box.css("top")) + this.MARGIN,
+            left: parseInt(this._box.css("left")) + this.MARGIN,
+            width: parseInt(this._box.css("width")) - 2 * this.MARGIN,
+            height: parseInt(this._box.css("height")) - 2 * this.MARGIN,
+        };
     }
 }
 
