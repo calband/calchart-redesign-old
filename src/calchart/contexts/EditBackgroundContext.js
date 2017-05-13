@@ -122,8 +122,9 @@ export default class EditBackgroundContext extends HiddenContext {
         let image = this._getImage();
 
         let [startX, startY] = $(".workspace").makeRelative(e.pageX, e.pageY);
-        let startWidth = image.width();
-        let startHeight = image.height();
+        let dimensions = image.getDimensions();
+        let startWidth = dimensions.width;
+        let startHeight = dimensions.height;
         let ratio = startWidth / startHeight;
 
         let id = $(e.target).data("handle-id");
