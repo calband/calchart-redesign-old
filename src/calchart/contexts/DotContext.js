@@ -86,6 +86,8 @@ export default class DotContext extends BaseContext {
     refresh() {
         this._grapher.showBackground(this._backgroundVisible);
 
+        this._activeTool.refresh();
+
         // highlight dots in panel
         let dotLabels = this._panel.find(".dot-labels");
         dotLabels.find(".active").removeClass("active");
@@ -98,9 +100,19 @@ export default class DotContext extends BaseContext {
      * Deselect the given dots.
      *
      * @param {jQuery} [dots] - Dots to deselect (defaults to all dots).
+     * @param {Object} [options]
+     *   - {boolean} [refresh=true] - Set to false to manually
+     *     refresh the context (optimization).
      */
-    deselectDots(dots) {
+    deselectDots(dots, options={}) {
+        options = _.defaults(options, {
+            refresh: true,
+        });
+
         this._controller.deselectDots(dots);
+        if (options.refresh) {
+            this.refresh();
+        }
     }
 
     /**
@@ -123,6 +135,9 @@ export default class DotContext extends BaseContext {
      * @param {string} name
      */
     loadTool(name) {
+        if (this._activeTool) {
+            this._activeTool.unload();
+        }
         this._activeTool = EditTools.load(this, name);
     }
 
@@ -132,13 +147,21 @@ export default class DotContext extends BaseContext {
      *
      * @param {jQuery} dots
      * @param {Object} [options]
+     *   - {boolean} [append=true] - Set to false to deselect
+     *     dots before selecting
+     *   - {boolean} [refresh=true] - Set to false to manually
+     *     refresh the context (optimization).
      */
-    selectDots(dots, options) {
+    selectDots(dots, options={}) {
         options = _.defaults(options, {
             append: true,
+            refresh: true,
         });
 
         this._controller.selectDots(dots, options);
+        if (options.refresh) {
+            this.refresh();
+        }
     }
 
     /**
@@ -153,9 +176,19 @@ export default class DotContext extends BaseContext {
      * Toggle the given dots.
      *
      * @param {jQuery} dots
+     * @param {Object} [options]
+     *   - {boolean} [refresh=true] - Set to false to manually
+     *     refresh the context (optimization).
      */
-    toggleDots(dots) {
+    toggleDots(dots, options={}) {
+        options = _.defaults(options, {
+            refresh: true,
+        });
+
         this._controller.toggleDots(dots);
+        if (options.refresh) {
+            this.refresh();
+        }
     }
 
     /**

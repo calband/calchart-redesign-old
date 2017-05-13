@@ -107,14 +107,63 @@ $.fn.exists = function() {
 };
 
 /**
- * Get the dimensions of this SVG element, because .width() and
- * .height() don't work.
+ * Get the top/left/bottom/right edges of this group of elements. If
+ * just one element, this is equivalent to getting
  *
- * @return {object} An object with the element's width, height, x, y
+ * {
+ *    top: $(this).offset().top,
+ *    bottom: $(this).offset().top + $(this).outerHeight(),
+ *    left: $(this).offset().left,
+ *    right: $(this).offset().left + $(this).outerWidth(),
+ * }
+ *
+ * @return {object}
+ */
+$.fn.getBounds = function() {
+    let bounds = {
+        top: Infinity,
+        bottom: -Infinity,
+        left: Infinity,
+        right: -Infinity,
+    };
+
+    this.each(function() {
+        let offset = $(this).offset();
+        let dimensions = $(this).getDimensions();
+
+        let top = offset.top;
+        let bottom = top + dimensions.height;
+        let left = offset.left;
+        let right = left + dimensions.width;
+
+        bounds.top = Math.min(bounds.top, top);
+        bounds.bottom = Math.max(bounds.bottom, bottom);
+        bounds.left = Math.min(bounds.left, left);
+        bounds.right = Math.max(bounds.right, right);
+    });
+
+    return bounds;
+};
+
+/**
+ * Get the dimensions of this element. Necessary because .width() and
+ * .height() don't work for SVG elements.
+ *
+ * @return {object} An object with the element's width, height
  */
 $.fn.getDimensions = function() {
-    return this[0].getBBox();
-}
+    // http://stackoverflow.com/a/20749186/4966649
+    if (this[0] instanceof SVGElement) {
+        // SVG elements don't have an outerWidth or outerHeight
+        // http://stackoverflow.com/a/9131261/4966649
+        return this[0].getBBox();
+    } else {
+        return {
+            width: this.outerWidth(),
+            height: this.outerHeight(),
+        };
+    }
+};
 
 /**
  * If this element is offscreen, position it to be onscreen.
@@ -217,43 +266,12 @@ $.fn.scrollIntoView = function(options={}) {
     let parentHeight = parent.outerHeight();
     let parentWidth = parent.outerWidth();
 
-    // track furthest distance needed to scroll
-    let scroll = {
-        top: Infinity,
-        bottom: -Infinity,
-        left: Infinity,
-        right: -Infinity,
-    };
-
-    this.each(function() {
-        // relative to document; i.e. accounts for scroll
-        let thisOffset = $(this).offset();
-        let dimensions;
-
-        // http://stackoverflow.com/a/20749186/4966649
-        if (this instanceof SVGElement) {
-            // SVG elements don't have an outerWidth or outerHeight
-            // http://stackoverflow.com/a/9131261/4966649
-            dimensions = $(this).getDimensions();
-        } else {
-            dimensions = {
-                width: $(this).outerWidth(),
-                height: $(this).outerHeight(),
-            };
-        }
-
-        // distance from left/right/top/bottom of the visible part of
-        // the parent to the corresponding edge of this element
-        let top = thisOffset.top - parentOffset.top;
-        let bottom = top + dimensions.height - parentHeight;
-        let left = thisOffset.left - parentOffset.left;
-        let right = left + dimensions.width - parentWidth;
-
-        scroll.top = Math.min(scroll.top, top);
-        scroll.bottom = Math.max(scroll.bottom, bottom);
-        scroll.left = Math.min(scroll.left, left);
-        scroll.right = Math.max(scroll.right, right);
-    });
+    // furthest distance needed to scroll
+    let scroll = this.getBounds();
+    scroll.top -= parentOffset.top;
+    scroll.bottom -= parentOffset.top + parentHeight;
+    scroll.left -= parentOffset.left;
+    scroll.right -= parentOffset.left + parentWidth;
 
     let deltaY;
     if (scroll.top <= tolerance && scroll.bottom >= -tolerance) {

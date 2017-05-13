@@ -14,6 +14,7 @@ import {
     round,
     roundSmall,
 } from "utils/MathUtils";
+import { addHandles } from "utils/UIUtils";
 
 /**
  * The proxy class that can load any tools used to edit dots
@@ -96,6 +97,7 @@ export default class EditTools {
  * - User clicks up: mouseup()
  * - If isDone() returns true, stop listening for mousemove and
  *   mouseup events
+ * - User clicks another tool in toolbar: unload()
  */
 class BaseTool {
     /**
@@ -111,6 +113,16 @@ class BaseTool {
      * Runs any actions when the tool is loaded from the toolbar.
      */
     load() {}
+
+    /**
+     * Runs any actions whenever the context is refreshed.
+     */
+    refresh() {}
+
+    /**
+     * Runs any actions when the tool is unloaded from the toolbar.
+     */
+    unload() {}
 
     /**
      * @return {boolean} true if mousemove/mouseup events should
@@ -342,8 +354,12 @@ class SelectionTool extends BaseSelection {
                 },
             });
 
+        let options = {
+            refresh: false,
+        };
+
         if (!this._metaKey) {
-            this.context.deselectDots();
+            this.context.deselectDots(undefined, options);
         }
 
         // select dots within the selection box
@@ -359,17 +375,17 @@ class SelectionTool extends BaseSelection {
             if (this._metaKey) {
                 if (inRange) {
                     if (this._selected.has(id)) {
-                        this.context.deselectDots(dot);
+                        this.context.deselectDots(dot, options);
                     } else {
-                        this.context.selectDots(dot);
+                        this.context.selectDots(dot, options);
                     }
                 } else if (this._selected.has(id)) {
-                    this.context.selectDots(dot);
+                    this.context.selectDots(dot, options);
                 } else {
-                    this.context.deselectDots(dot);
+                    this.context.deselectDots(dot, options);
                 }
             } else if (inRange) {
-                this.context.selectDots(dot);
+                this.context.selectDots(dot, options);
             }
         });
     }
@@ -385,7 +401,7 @@ class SelectionTool extends BaseSelection {
         }
 
         // update panel
-        this.controller.refresh("context");
+        this.context.refresh();
     }
 
     mouseupDot(e) {
@@ -441,7 +457,9 @@ class LassoTool extends BaseSelection {
                 offset.top + dimensions.height / 2
             );
             if ($(topElem).is(this._path)) {
-                this.context.selectDots(dot);
+                this.context.selectDots(dot, {
+                    refresh: false,
+                });
             }
         });
 
@@ -476,7 +494,6 @@ class SwapTool extends BaseTool {
         } else {
             this.context.deselectDots();
         }
-        this.controller.refresh("context");
     }
 }
 
@@ -484,7 +501,32 @@ class SwapTool extends BaseTool {
  * Stretch and rotate the selected dots.
  */
 class StretchTool extends BaseTool {
+    load() {
+        this._box = HTMLBuilder.div("stretch-box", null, ".workspace");
+        addHandles(this._box);
+        this.refresh();
+    }
 
+    refresh() {
+        let selection = this.controller.getSelection();
+        let bounds = selection.getBounds();
+        let offset = $(".workspace").offset();
+        let top = $(".workspace").scrollTop() + bounds.top - offset.top;
+        let left = $(".workspace").scrollLeft() + bounds.left - offset.left;
+
+        let margin = 5;
+
+        this._box.css({
+            top: top - margin,
+            left: left - margin,
+            height: (bounds.bottom - bounds.top) + 2 * margin,
+            width: (bounds.right - bounds.left) + 2 * margin,
+        });
+    }
+
+    unload() {
+        this._box.remove();
+    }
 }
 
 /**

@@ -8,6 +8,7 @@
  * - Panel utilities
  * - Popup utilities
  * - Message utilities
+ * - Misc. utilities
  */
 
 import { ValidationError } from "utils/errors";
@@ -611,4 +612,41 @@ export function showMessage(message, options={}) {
 export function showError(message, options={}) {
     options.isError = true;
     return showMessage(message, options);
+}
+
+/**** MISC ****/
+
+/**
+ * Add handles to the given container. The handles can be identified
+ * by $("span.handle").data("handle-id"), which returns a number 0-8
+ * like a T9 phone (minus 1).
+ *
+ * @param {jQuery} container
+ */
+export function addHandles(container) {
+    _.range(3).forEach(i => {
+        _.range(3).forEach(j => {
+            let dir;
+            if (i === 1 && j === 1) {
+                return;
+            } else if (i === 1) {
+                dir = "vertical";
+            } else if (j === 1) {
+                dir = "horizontal";
+            } else if (i === j) {
+                dir = "nwse";
+            } else {
+                dir = "nesw";
+            }
+
+            $("<span>")
+                .addClass(`handle ${dir}`)
+                .data("handle-id", j * 3 + i)
+                .css({
+                    left: `calc(${i * 50}% - 5px)`,
+                    top: `calc(${j * 50}% - 5px)`,
+                })
+                .appendTo(container);
+        });
+    });
 }

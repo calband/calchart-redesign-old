@@ -423,3 +423,22 @@ svg.graph {
         pointer-events: none;
     }
 }
+
+.handle {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border: 2px solid $gold;
+    &.vertical {
+        cursor: ns-resize;
+    }
+    &.horizontal {
+        cursor: ew-resize;
+    }
+    &.nesw {
+        cursor: nesw-resize;
+    }
+    &.nwse {
+        cursor: nwse-resize;
+    }
+}
