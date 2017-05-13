@@ -14,7 +14,7 @@ import {
     round,
     roundSmall,
 } from "utils/MathUtils";
-import { addHandles } from "utils/UIUtils";
+import { addHandles, resizeHandles } from "utils/UIUtils";
 
 /**
  * The proxy class that can load any tools used to edit dots
@@ -502,8 +502,10 @@ class SwapTool extends BaseTool {
  */
 class StretchTool extends BaseTool {
     load() {
+        // TODO: rotate
         this._box = HTMLBuilder.div("stretch-box", null, ".workspace");
         addHandles(this._box);
+
         this.refresh();
     }
 
@@ -526,6 +528,41 @@ class StretchTool extends BaseTool {
 
     unload() {
         this._box.remove();
+    }
+
+    mousedown(e) {
+        if ($(e.target).is(".handle")) {
+            this._handle = $(e.target).data("handle-id");
+            this._start = {
+                event: e,
+                width: this._box.outerWidth(),
+                height: this._box.outerHeight(),
+            };
+        } else {
+            this._handle = null;
+        }
+    }
+
+    mousemove(e) {
+        if (_.isNull(this._handle)) {
+            return;
+        }
+
+        let data = resizeHandles(
+            this._handle,
+            this._start.width,
+            this._start.height,
+            this._start.event,
+            e
+        );
+
+        this._box.css(data);
+
+        // TODO: move dots
+    }
+
+    mouseup(e) {
+        // TODO: doAction to save
     }
 }
 

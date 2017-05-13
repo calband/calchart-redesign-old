@@ -2,7 +2,7 @@ import HiddenContext from "calchart/contexts/HiddenContext";
 
 import HTMLBuilder from "utils/HTMLBuilder";
 import { getDimensions } from "utils/MathUtils";
-import { addHandles } from "utils/UIUtils";
+import { addHandles, resizeHandles } from "utils/UIUtils";
 
 /**
  * The Context that allows a user to move and resize the background image
@@ -119,75 +119,22 @@ export default class EditBackgroundContext extends HiddenContext {
      * @return {Function}
      */
     mousedownResize(e) {
+        let handle = $(e.target).data("handle-id");
+        let start = e;
+        
         let image = this._getImage();
-
-        let [startX, startY] = $(".workspace").makeRelative(e.pageX, e.pageY);
-        let dimensions = image.getDimensions();
+        let dimensions = $(image).getDimensions();
         let startWidth = dimensions.width;
         let startHeight = dimensions.height;
-        let ratio = startWidth / startHeight;
-
-        let id = $(e.target).data("handle-id");
-        let div = Math.floor(id / 3);
-        let mod = id % 3;
-        // multipliers to make math work
-        if (id % 8 !== 0) {
-            ratio *= -1;
-        }
-        if (mod !== 0) {
-            startWidth *= -1;
-        }
-        if (div !== 0) {
-            startHeight *= -1;
-        }
 
         return e => {
-            let [endX, endY] = $(".workspace").makeRelative(e.pageX, e.pageY);
-            let deltaX = endX - startX;
-            let deltaY = endY - startY;
-
-            // diagonal handles
-            if (id % 2 === 0) {
-                if (deltaX > deltaY * ratio) {
-                    deltaX = deltaY * ratio;
-                } else {
-                    deltaY = deltaX / ratio;
-                }
-            }
-
-            // handles to change width
-            if (mod !== 1) {
-                let x, width;
-                if (deltaX > startWidth) {
-                    x = startX + startWidth;
-                    width = deltaX - startWidth;
-                } else {
-                    x = startX + deltaX;
-                    width = startWidth - deltaX;
-                }
-                this._handles.css({
-                    left: x,
-                    width: width,
-                });
-                image.attr("x", x).attr("width", width);
-            }
-
-            // handles to change height
-            if (div !== 1) {
-                let y, height;
-                if (deltaY > startHeight) {
-                    y = startY + startHeight;
-                    height = deltaY - startHeight;
-                } else {
-                    y = startY + deltaY;
-                    height = startHeight - deltaY;
-                }
-                this._handles.css({
-                    top: y,
-                    height: height,
-                });
-                image.attr("y", y).attr("height", height);
-            }
+            let data = resizeHandles(handle, startWidth, startHeight, start, e);
+            image
+                .attr("x", data.left)
+                .attr("width", data.width)
+                .attr("y", data.top)
+                .attr("height", data.height);
+            this._handles.css(data);
         };
     }
 

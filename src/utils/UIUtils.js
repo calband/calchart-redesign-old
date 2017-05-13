@@ -8,7 +8,7 @@
  * - Panel utilities
  * - Popup utilities
  * - Message utilities
- * - Misc. utilities
+ * - Handles utilities
  */
 
 import { ValidationError } from "utils/errors";
@@ -614,7 +614,7 @@ export function showError(message, options={}) {
     return showMessage(message, options);
 }
 
-/**** MISC ****/
+/**** HANDLES ****/
 
 /**
  * Add handles to the given container. The handles can be identified
@@ -649,4 +649,79 @@ export function addHandles(container) {
                 .appendTo(container);
         });
     });
+}
+
+/**
+ * Get the data needed to resize an element using a handle.
+ *
+ * @param {int} handle - The ID of the handle being used.
+ * @param {number} startWidth - The width of the element before resizing.
+ * @param {number} startHeight - The height of the element before resizing.
+ * @param {Event} start - The mousedown event starting the resize.
+ * @param {Event} end - The mousemove event triggering the resize.
+ * @return {object} The values to resize the element to, including top, left,
+ *   width, and height. Values that shouldn't change are set to undefined.
+ */
+export function resizeHandles(handle, startWidth, startHeight, start, end) {
+    let [startX, startY] = $(".workspace").makeRelative(start.pageX, start.pageY);
+    let [endX, endY] = $(".workspace").makeRelative(end.pageX, end.pageY);
+    let deltaX = endX - startX;
+    let deltaY = endY - startY;
+
+    let ratio = startWidth / startHeight;
+
+    let div = Math.floor(handle / 3);
+    let mod = handle % 3;
+
+    // multipliers to make math work
+    if (handle % 8 !== 0) {
+        ratio *= -1;
+    }
+    if (mod !== 0) {
+        startWidth *= -1;
+    }
+    if (div !== 0) {
+        startHeight *= -1;
+    }
+
+    // diagonal handles
+    if (handle % 2 === 0) {
+        if (deltaX > deltaY * ratio) {
+            deltaX = deltaY * ratio;
+        } else {
+            deltaY = deltaX / ratio;
+        }
+    }
+
+    let data = {};
+
+    // handles to change width
+    if (mod !== 1) {
+        let x, width;
+        if (deltaX > startWidth) {
+            // handle on right side of element
+            data.left = startX + startWidth;
+            data.width = deltaX - startWidth;
+        } else {
+            // handle on left side of element
+            data.left = startX + deltaX;
+            data.width = startWidth - deltaX;
+        }
+    }
+
+    // handles to change height
+    if (div !== 1) {
+        let y, height;
+        if (deltaY > startHeight) {
+            // handle on bottom side of element
+            data.top = startY + startHeight;
+            data.height = deltaY - startHeight;
+        } else {
+            // handle of top side of element
+            data.top = startY + deltaY;
+            data.height = startHeight - deltaY;
+        }
+    }
+
+    return data;
 }
