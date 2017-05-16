@@ -655,37 +655,41 @@ export function addHandles(container) {
  * Get the data needed to resize an element using a handle.
  *
  * @param {int} handle - The ID of the handle being used.
- * @param {number} startWidth - The width of the element before resizing.
- * @param {number} startHeight - The height of the element before resizing.
- * @param {Event} start - The mousedown event starting the resize.
+ * @param {object} start - An object containing the starting data of the
+ *   resizable element. Contains the keys top, left, width, and height.
  * @param {Event} end - The mousemove event triggering the resize.
  * @return {object} The values to resize the element to, including top, left,
  *   width, and height. Values that shouldn't change are set to undefined.
  */
-export function resizeHandles(handle, startWidth, startHeight, start, end) {
-    let [startX, startY] = $(".workspace").makeRelative(start.pageX, start.pageY);
-    let [endX, endY] = $(".workspace").makeRelative(end.pageX, end.pageY);
-    let deltaX = endX - startX;
-    let deltaY = endY - startY;
-
+export function resizeHandles(handle, start, end) {
+    let startWidth = start.width;
+    let startHeight = start.height;
     let ratio = startWidth / startHeight;
 
     let div = Math.floor(handle / 3);
     let mod = handle % 3;
 
-    // multipliers to make math work
-    if (handle % 8 !== 0) {
-        ratio *= -1;
-    }
-    if (mod !== 0) {
+    let startX = start.left;
+    let startY = start.top;
+
+    if (mod === 2) {
+        startX += start.width;
         startWidth *= -1;
     }
-    if (div !== 0) {
+    if (div === 2) {
+        startY += start.height;
         startHeight *= -1;
     }
 
+    let [endX, endY] = $(".workspace").makeRelative(end.pageX, end.pageY);
+    let deltaX = endX - startX;
+    let deltaY = endY - startY;
+
     // diagonal handles
     if (handle % 2 === 0) {
+        if (handle % 8 !== 0) {
+            ratio *= -1;
+        }
         if (deltaX > deltaY * ratio) {
             deltaX = deltaY * ratio;
         } else {

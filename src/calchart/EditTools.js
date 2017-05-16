@@ -552,8 +552,11 @@ class StretchTool extends BaseTool {
         }
 
         this._handle = $(e.target).data("handle-id");
+        let offset = this._box.offset();
+        let [x, y] = $(".workspace").makeRelative(offset.left, offset.top);
         this._start = {
-            event: e,
+            top: y,
+            left: x,
             width: this._box.outerWidth(),
             height: this._box.outerHeight(),
         };
@@ -564,18 +567,10 @@ class StretchTool extends BaseTool {
             return;
         }
 
-        let data = resizeHandles(
-            this._handle,
-            this._start.width,
-            this._start.height,
-            this._start.event,
-            e
-        );
-
+        let data = resizeHandles(this._handle, this._start, e);
         this._box.css(data);
 
         let bounds = this._getDotBounds();
-
         this.controller.getSelection().each((i, $dot) => {
             let ratio = this._positions[i];
             let x = ratio.left * bounds.width + bounds.left;

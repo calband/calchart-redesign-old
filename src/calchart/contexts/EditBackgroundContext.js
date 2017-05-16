@@ -120,15 +120,18 @@ export default class EditBackgroundContext extends HiddenContext {
      */
     mousedownResize(e) {
         let handle = $(e.target).data("handle-id");
-        let start = e;
-        
         let image = this._getImage();
-        let dimensions = $(image).getDimensions();
-        let startWidth = dimensions.width;
-        let startHeight = dimensions.height;
+        let dimensions = image.getDimensions();
+
+        let start = {
+            top: parseInt(image.attr("y")),
+            left: parseInt(image.attr("x")),
+            width: dimensions.width,
+            height: dimensions.height,
+        };
 
         return e => {
-            let data = resizeHandles(handle, startWidth, startHeight, start, e);
+            let data = resizeHandles(handle, start, e);
             image
                 .attr("x", data.left)
                 .attr("width", data.width)
