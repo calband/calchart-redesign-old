@@ -498,9 +498,35 @@ class SwapTool extends BaseTool {
 }
 
 /**
+ * A superclass for all tools that edit dots.
+ */
+class BaseEdit extends BaseTool {
+    mouseup(e) {
+        this._saveDotPositions();
+        this.context.loadTool(EditTools.lastSelectionTool);
+    }
+
+    /**
+     * Save the currently selected dots' positions.
+     */
+    _saveDotPositions() {
+        let scale = this.grapher.getScale();
+        let data = _.map(this.controller.getSelection(), dot => {
+            let position = scale.toStepCoordinates($(dot).data("position"));
+            return {
+                dot: $(dot).data("dot"),
+                x: roundSmall(position.x),
+                y: roundSmall(position.y),
+            };
+        })
+        this.controller.doAction("moveDotsTo", [data]);
+    }
+}
+
+/**
  * Stretch and rotate the selected dots.
  */
-class StretchTool extends BaseTool {
+class StretchTool extends BaseEdit {
     load() {
         this._box = HTMLBuilder.div("stretch-box", null, ".workspace");
         addHandles(this._box);
@@ -531,6 +557,7 @@ class StretchTool extends BaseTool {
         let top = $(".workspace").scrollTop() + bounds.top - offset.top;
         let left = $(".workspace").scrollLeft() + bounds.left - offset.left;
 
+        // TODO: maintain margins as ratio
         this._box.css({
             top: top - this.MARGIN,
             left: left - this.MARGIN,
@@ -580,7 +607,8 @@ class StretchTool extends BaseTool {
     }
 
     mouseup(e) {
-        // TODO: doAction to save
+        // don't load selection tool
+        this._saveDotPositions();
     }
 
     /**
@@ -593,32 +621,6 @@ class StretchTool extends BaseTool {
             width: parseInt(this._box.css("width")) - 2 * this.MARGIN,
             height: parseInt(this._box.css("height")) - 2 * this.MARGIN,
         };
-    }
-}
-
-/**
- * A superclass for all tools that edit dots.
- */
-class BaseEdit extends BaseTool {
-    mouseup(e) {
-        this._saveDotPositions();
-        this.context.loadTool(EditTools.lastSelectionTool);
-    }
-
-    /**
-     * Save the currently selected dots' positions.
-     */
-    _saveDotPositions() {
-        let scale = this.grapher.getScale();
-        let data = _.map(this.controller.getSelection(), dot => {
-            let position = scale.toStepCoordinates($(dot).data("position"));
-            return {
-                dot: $(dot).data("dot"),
-                x: roundSmall(position.x),
-                y: roundSmall(position.y),
-            };
-        })
-        this.controller.doAction("moveDotsTo", [data]);
     }
 }
 
