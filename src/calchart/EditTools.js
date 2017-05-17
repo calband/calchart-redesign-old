@@ -531,38 +531,34 @@ class StretchTool extends BaseEdit {
         this._box = HTMLBuilder.div("stretch-box", null, ".workspace");
         addHandles(this._box);
 
-        // margin between dots and box
-        this.MARGIN = 5;
-
-        this.refresh();
-
         let bounds = this._getDotBounds();
+        bounds.height = bounds.bottom - bounds.top;
+        bounds.width = bounds.right - bounds.left;
 
-        this._positions = [];
+        // dot ID to ratio of position to top/left-most dot
+        this._positions = {};
         this.controller.getSelection().each((i, $dot) => {
             let dot = $($dot).data("dot");
             let position = $($dot).data("position");
 
-            // dot ID to ratio of position to top/left of box
-            this._positions.push({
+            this._positions[dot.id] = {
                 top: (position.y - bounds.top) / bounds.height,
                 left: (position.x - bounds.left) / bounds.width,
-            });
+            };
         });
+
+        this.refresh();
     }
 
     refresh() {
-        let bounds = this.controller.getSelection().getBounds();
-        let offset = $(".workspace").offset();
-        let top = $(".workspace").scrollTop() + bounds.top - offset.top;
-        let left = $(".workspace").scrollLeft() + bounds.left - offset.left;
+        let bounds = this._getDotBounds();
+        this._margin = this._getDotRadius() + 5;
 
-        // TODO: maintain margins as ratio
         this._box.css({
-            top: top - this.MARGIN,
-            left: left - this.MARGIN,
-            height: (bounds.bottom - bounds.top) + 2 * this.MARGIN,
-            width: (bounds.right - bounds.left) + 2 * this.MARGIN,
+            top: bounds.top - this._margin,
+            left: bounds.left - this._margin,
+            height: (bounds.bottom - bounds.top) + 2 * this._margin,
+            width: (bounds.right - bounds.left) + 2 * this._margin,
         });
     }
 
@@ -597,11 +593,16 @@ class StretchTool extends BaseEdit {
         let data = resizeHandles(this._handle, this._start, e);
         this._box.css(data);
 
-        let bounds = this._getDotBounds();
+        let left = data.left + this._margin;
+        let top = data.top + this._margin;
+        let width = data.width - 2 * this._margin;
+        let height = data.height - 2 * this._margin;
+
         this.controller.getSelection().each((i, $dot) => {
-            let ratio = this._positions[i];
-            let x = ratio.left * bounds.width + bounds.left;
-            let y = ratio.top * bounds.height + bounds.top;
+            let dot = $($dot).data("dot");
+            let ratio = this._positions[dot.id];
+            let x = ratio.left * width + left;
+            let y = ratio.top * height + top;
             this.grapher.moveDotTo($dot, x, y);
         });
     }
@@ -612,15 +613,31 @@ class StretchTool extends BaseEdit {
     }
 
     /**
-     * @return {object} The bounds for the dots relative to the helper box.
+     * @return {object} The bounds for the dots. bounds.left is equivalent to
+     *   the x-coordinate of the left-most dot.
      */
     _getDotBounds() {
-        return {
-            top: parseInt(this._box.css("top")) + this.MARGIN,
-            left: parseInt(this._box.css("left")) + this.MARGIN,
-            width: parseInt(this._box.css("width")) - 2 * this.MARGIN,
-            height: parseInt(this._box.css("height")) - 2 * this.MARGIN,
-        };
+        let bounds = this.controller.getSelection().getBounds();
+
+        let scrollLeft = $(".workspace").scrollLeft();
+        let scrollTop = $(".workspace").scrollTop();
+        let offset = $(".workspace").offset();
+
+        // make bounds relative to center of dots instead of edge of dot
+        let dotRadius = this._getDotRadius();
+        bounds.left += scrollLeft + dotRadius - offset.left;
+        bounds.top += scrollTop + dotRadius - offset.top;
+        bounds.right += scrollLeft - dotRadius - offset.left;
+        bounds.bottom += scrollTop - dotRadius - offset.top;
+
+        return bounds;
+    }
+
+    /**
+     * @return {number} The radius of a dot.
+     */
+    _getDotRadius() {
+        return this.controller.getSelection().first().getDimensions().width / 2;
     }
 }
 

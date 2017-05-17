@@ -659,7 +659,7 @@ export function addHandles(container) {
  *   resizable element. Contains the keys top, left, width, and height.
  * @param {Event} end - The mousemove event triggering the resize.
  * @return {object} The values to resize the element to, including top, left,
- *   width, and height. Values that shouldn't change are set to undefined.
+ *   width, and height.
  */
 export function resizeHandles(handle, start, end) {
     let startWidth = start.width;
@@ -697,7 +697,7 @@ export function resizeHandles(handle, start, end) {
         }
     }
 
-    let data = {};
+    let data = _.clone(start);
 
     // handles to change width
     if (mod !== 1) {
