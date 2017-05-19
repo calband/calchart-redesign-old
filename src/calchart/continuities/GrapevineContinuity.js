@@ -63,12 +63,13 @@ export default class GrapevineContinuity extends BaseContinuity {
         if (deltaX === 0) {
             return [];
         }
+        let duration = Math.abs(deltaX);
 
         let move = new MovementCommandMove(
             data.position.x,
             data.position.y,
             deltaX < 0 ? 90 : 270,
-            deltaX,
+            duration,
             options
         );
 
@@ -76,7 +77,7 @@ export default class GrapevineContinuity extends BaseContinuity {
             data.position.x + deltaX,
             data.position.y,
             options.orientation,
-            data.remaining - deltaX,
+            data.remaining - duration,
             this._end === "MT",
             options
         );
