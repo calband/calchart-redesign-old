@@ -8,6 +8,7 @@
  * - Panel utilities
  * - Popup utilities
  * - Message utilities
+ * - Handles utilities
  */
 
 import { ValidationError } from "utils/errors";
@@ -611,4 +612,120 @@ export function showMessage(message, options={}) {
 export function showError(message, options={}) {
     options.isError = true;
     return showMessage(message, options);
+}
+
+/**** HANDLES ****/
+
+/**
+ * Add handles to the given container. The handles can be identified
+ * by $("span.handle").data("handle-id"), which returns a number 0-8
+ * like a T9 phone (minus 1).
+ *
+ * @param {jQuery} container
+ */
+export function addHandles(container) {
+    _.range(3).forEach(i => {
+        _.range(3).forEach(j => {
+            let dir;
+            if (i === 1 && j === 1) {
+                return;
+            } else if (i === 1) {
+                dir = "vertical";
+            } else if (j === 1) {
+                dir = "horizontal";
+            } else if (i === j) {
+                dir = "nwse";
+            } else {
+                dir = "nesw";
+            }
+
+            $("<span>")
+                .addClass(`handle ${dir}`)
+                .data("handle-id", j * 3 + i)
+                .css({
+                    left: `calc(${i * 50}% - 5px)`,
+                    top: `calc(${j * 50}% - 5px)`,
+                })
+                .appendTo(container);
+        });
+    });
+}
+
+/**
+ * Get the data needed to resize an element using a handle.
+ *
+ * @param {int} handle - The ID of the handle being used.
+ * @param {object} start - An object containing the starting data of the
+ *   resizable element. Contains the keys top, left, width, and height.
+ * @param {Event} end - The mousemove event triggering the resize.
+ * @return {object} The values to resize the element to, including top, left,
+ *   width, and height.
+ */
+export function resizeHandles(handle, start, end) {
+    let startWidth = start.width;
+    let startHeight = start.height;
+    let ratio = startWidth / startHeight;
+
+    let div = Math.floor(handle / 3);
+    let mod = handle % 3;
+
+    let startX = start.left;
+    let startY = start.top;
+
+    if (mod === 2) {
+        startX += start.width;
+        startWidth *= -1;
+    }
+    if (div === 2) {
+        startY += start.height;
+        startHeight *= -1;
+    }
+
+    let [endX, endY] = $(".workspace").makeRelative(end.pageX, end.pageY);
+    let deltaX = endX - startX;
+    let deltaY = endY - startY;
+
+    // diagonal handles
+    if (handle % 2 === 0) {
+        if (handle % 8 !== 0) {
+            ratio *= -1;
+        }
+        if (deltaX > deltaY * ratio) {
+            deltaX = deltaY * ratio;
+        } else {
+            deltaY = deltaX / ratio;
+        }
+    }
+
+    let data = _.clone(start);
+
+    // handles to change width
+    if (mod !== 1) {
+        let x, width;
+        if (deltaX > startWidth) {
+            // handle on right side of element
+            data.left = startX + startWidth;
+            data.width = deltaX - startWidth;
+        } else {
+            // handle on left side of element
+            data.left = startX + deltaX;
+            data.width = startWidth - deltaX;
+        }
+    }
+
+    // handles to change height
+    if (div !== 1) {
+        let y, height;
+        if (deltaY > startHeight) {
+            // handle on bottom side of element
+            data.top = startY + startHeight;
+            data.height = deltaY - startHeight;
+        } else {
+            // handle of top side of element
+            data.top = startY + deltaY;
+            data.height = startHeight - deltaY;
+        }
+    }
+
+    return data;
 }

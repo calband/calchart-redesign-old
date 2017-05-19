@@ -83,10 +83,6 @@ export function calcRotatedYPos(angle) {
  * @return {Object} an object containing x, y, width, and height
  */
 export function getDimensions(x1, y1, x2, y2) {
-    let x = Math.min(x1, x2);
-    let y = Math.min(y1, y2);
-    let width = Math.abs(x2 - x1);
-    let height = Math.abs(y2 - y1);
     return {
         x: Math.min(x1, x2),
         y: Math.min(y1, y2),

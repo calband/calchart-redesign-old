@@ -117,14 +117,6 @@ $sidebar-width: 200px;
     }
     .workspace {
         width: calc(100% - #{$sidebar-width});
-        .selection-box {
-            position: absolute;
-            border: 2px solid rgba($white, 0.8);
-            background: rgba($white, 0.2);
-        }
-        &.edit-tools-active {
-            cursor: crosshair;
-        }
     }
 }
 
@@ -201,24 +193,6 @@ body.context-background .workspace .graph {
 .background-image-handles {
     position: absolute;
     cursor: move;
-    .handle {
-        position: absolute;
-        width: 10px;
-        height: 10px;
-        border: 2px solid $gold;
-    }
-    .vertical {
-        cursor: ns-resize;
-    }
-    .horizontal {
-        cursor: ew-resize;
-    }
-    .nesw {
-        cursor: nesw-resize;
-    }
-    .nwse {
-        cursor: nwse-resize;
-    }
 }
 
 /** DOT CONTEXT **/
@@ -261,13 +235,26 @@ body.context-background .workspace .graph {
     }
 }
 
-.edit-tool-path {
-    stroke: $gold;
-    fill: none;
-}
-
-.lasso-path {
-    fill: rgba($light-gray, 0.3);
+.workspace {
+    &.edit-tools-active {
+        cursor: crosshair;
+    }
+    .selection-box {
+        position: absolute;
+        border: 2px solid rgba($white, 0.8);
+        background: rgba($white, 0.2);
+    }
+    .stretch-box {
+        position: absolute;
+        border: 1px solid $gold;
+    }
+    .edit-tool-path {
+        stroke: $gold;
+        fill: none;
+    }
+    .lasso-path {
+        fill: rgba($light-gray, 0.3);
+    }
 }
 
 /** CONTINUITY CONTEXT **/

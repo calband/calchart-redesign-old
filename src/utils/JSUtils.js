@@ -65,18 +65,6 @@ export function empty(array) {
 }
 
 /**
- * Check if the given child class is the same as or a subclass of parent.
- * Source: http://stackoverflow.com/a/30993664/4966649
- *
- * @param {function} parent
- * @param {function} child
- * @return {boolean}
- */
-export function isSubclass(parent, child) {
-    return parent === child || parent.isPrototypeOf(child);
-}
-
-/**
  * Map a function to each element in an array, getting rid of any undefined
  * values that are returned.
  *

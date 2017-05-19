@@ -5,7 +5,6 @@
 
 import { NotImplementedError } from "utils/errors";
 import HTMLBuilder from "utils/HTMLBuilder";
-import { isSubclass } from "utils/JSUtils";
 import {
     calcAngle,
     calcDistance,
@@ -15,6 +14,7 @@ import {
     round,
     roundSmall,
 } from "utils/MathUtils";
+import { addHandles, resizeHandles } from "utils/UIUtils";
 
 /**
  * The proxy class that can load any tools used to edit dots
@@ -40,6 +40,9 @@ export default class EditTools {
             case "swap":
                 EditTool = SwapTool;
                 break;
+            case "stretch":
+                EditTool = StretchTool;
+                break;
             case "line":
                 EditTool = LineTool;
                 break;
@@ -56,11 +59,13 @@ export default class EditTools {
                 throw new Error(`No tool named: ${name}`);
         }
 
-        if (isSubclass(BaseSelection, EditTool)) {
+        let tool = new EditTool(context);
+
+        if (tool instanceof BaseSelection) {
             this._lastSelectionTool = name;
         }
 
-        if (isSubclass(BaseEdit, EditTool)) {
+        if (tool instanceof BaseEdit) {
             $(".workspace").addClass("edit-tools-active");
         } else {
             $(".workspace").removeClass("edit-tools-active");
@@ -69,7 +74,8 @@ export default class EditTools {
         $(".toolbar .edit-tools li").removeClass("active");
         $(`.toolbar .${name}`).addClass("active");
 
-        return new EditTool(context);
+        tool.load();
+        return tool;
     }
 
     /**
@@ -84,13 +90,14 @@ export default class EditTools {
  * The superclass for all EditTool classes.
  *
  * Method handlers:
- * - When the user first selects the tool in the toolbar, the
- *   tool is initialized (constructor).
- * - Whenever the user clicks down (mousedown), handle() and
- *   mousedown() are run. If it's the first mousedown event, init()
- *   is called.
- * - If the user clicks up (mouseup), _unloadTool() is run if
- *   the tool has captured the total number of events (eventsToHandle).
+ * - User clicks tool in toolbar: load()
+ * - User clicks down in workspace: mousedown(). Start listening
+ *   for mousemove and mouseup events
+ * - User moves mouse (dragging): mousemove()
+ * - User clicks up: mouseup()
+ * - If isDone() returns true, stop listening for mousemove and
+ *   mouseup events
+ * - User clicks another tool in toolbar: unload()
  */
 class BaseTool {
     /**
@@ -103,40 +110,27 @@ class BaseTool {
     }
 
     /**
-     * Handle a mousedown event in the workspace. By default,
-     * calls the mousedown and _attachListeners methods.
-     *
-     * @param {Event} e
+     * Runs any actions when the tool is loaded from the toolbar.
      */
-    handle(e) {
-        e.preventDefault();
-
-        if (!this._init) {
-            this._init = true;
-            this._attachListeners();
-            this._eventCount = 0;
-            this.init();
-        }
-
-        this._eventCount++;
-        this.mousedown(e);
-    }
+    load() {}
 
     /**
-     * The number of mousedown/mouseup events to handle before creating a
-     * new instance in BaseTool#handle.
-     *
-     * @return {int}
+     * Runs any actions whenever the context is refreshed.
      */
-    get eventsToHandle() {
-        return 1;
-    }
+    refresh() {}
 
     /**
-     * Any actions to run when the tool is initialized (i.e. when the first
-     * mousedown is handled).
+     * Runs any actions when the tool is unloaded from the toolbar.
      */
-    init() {}
+    unload() {}
+
+    /**
+     * @return {boolean} true if mousemove/mouseup events should
+     *   stop being listened for.
+     */
+    isDone() {
+        return true;
+    }
 
     /**
      * The function to run when the mousedown event is triggered
@@ -163,32 +157,6 @@ class BaseTool {
     mouseup(e) {}
 
     /**
-     * The function to run after the mousedown event is handled. By
-     * default, adds the mousemove and mouseup listeners to the document.
-     */
-    _attachListeners() {
-        $(document).on({
-            "mousedown.selection": e => {
-                // handle additional mousedown events not in workspace, for
-                // eventsToHandle > 1 (workspace mousedown events are
-                // already captured in DotContext)
-                if ($(e.target).notIn(".workspace")) {
-                    this.handle(this.context, e);
-                }
-            },
-            "mousemove.selection": e => {
-                this.mousemove(e);
-            },
-            "mouseup.selection": e => {
-                this.mouseup(e);
-                if (this._eventCount === this.eventsToHandle) {
-                    this._unloadTool();
-                }
-            },
-        });
-    }
-
-    /**
      * @return {number} the snap grid
      */
     _getSnap() {
@@ -205,10 +173,14 @@ class BaseTool {
      * the workspace. Can also pass in an Event object, which will have
      * its pageX and pageY values taken.
      *
+     * Usage:
+     * let [x, y] = this._makeRelative(e);
+     * let [x, y] = this._makeRelative(pageX, pageY);
+     *
      * @param {Event} [e]
      * @param {number} [pageX]
      * @param {number} [pageY]
-     * @return {[x, y]}
+     * @return {number[]} The coordinates as [x, y].
      */
     _makeRelative(pageX, pageY) {
         if (arguments.length === 1) {
@@ -221,7 +193,7 @@ class BaseTool {
     }
 
     /**
-     * Same as _makeRelative, except the returned values are constrained
+     * Same as _makeRelative, except the returned values are snapped
      * to the grid, if applicable.
      */
     _makeRelativeSnap() {
@@ -240,32 +212,6 @@ class BaseTool {
         }
 
         return [x, y];
-    }
-
-    /**
-     * Calculate the angle between the given points and snap to
-     * 45 degree intervals;
-     *
-     * @param {number} x1
-     * @param {number} y1
-     * @param {number} x2
-     * @param {number} y2
-     * @return {number}
-     */
-    _snapAngle(x1, y1, x2, y2) {
-        let angle = calcAngle(x1, y1, x2, y2);
-        angle = round(angle, 45);
-        return angle === 360 ? 0 : angle;
-    }
-
-    /**
-     * The function to run after the mouseup event is handled. By
-     * default, removes the mousemove and mouseup listeners from the
-     * document and reverts to the SelectionTool.
-     */
-    _unloadTool() {
-        $(document).off(".selection");
-        this._init = false;
     }
 }
 
@@ -408,8 +354,12 @@ class SelectionTool extends BaseSelection {
                 },
             });
 
+        let options = {
+            refresh: false,
+        };
+
         if (!this._metaKey) {
-            this.context.deselectDots();
+            this.context.deselectDots(undefined, options);
         }
 
         // select dots within the selection box
@@ -425,17 +375,17 @@ class SelectionTool extends BaseSelection {
             if (this._metaKey) {
                 if (inRange) {
                     if (this._selected.has(id)) {
-                        this.context.deselectDots(dot);
+                        this.context.deselectDots(dot, options);
                     } else {
-                        this.context.selectDots(dot);
+                        this.context.selectDots(dot, options);
                     }
                 } else if (this._selected.has(id)) {
-                    this.context.selectDots(dot);
+                    this.context.selectDots(dot, options);
                 } else {
-                    this.context.deselectDots(dot);
+                    this.context.deselectDots(dot, options);
                 }
             } else if (inRange) {
-                this.context.selectDots(dot);
+                this.context.selectDots(dot, options);
             }
         });
     }
@@ -451,7 +401,7 @@ class SelectionTool extends BaseSelection {
         }
 
         // update panel
-        this.controller.refresh("context");
+        this.context.refresh();
     }
 
     mouseupDot(e) {
@@ -507,7 +457,9 @@ class LassoTool extends BaseSelection {
                 offset.top + dimensions.height / 2
             );
             if ($(topElem).is(this._path)) {
-                this.context.selectDots(dot);
+                this.context.selectDots(dot, {
+                    refresh: false,
+                });
             }
         });
 
@@ -520,9 +472,7 @@ class LassoTool extends BaseSelection {
  * Swap two dots' positions
  */
 class SwapTool extends BaseTool {
-    constructor(context) {
-        super(context);
-
+    load() {
         let selection = this.controller.getSelection();
         selection = selection.not(selection.last());
         this.context.deselectDots(selection);
@@ -545,16 +495,17 @@ class SwapTool extends BaseTool {
             this.context.deselectDots();
         }
     }
-
-    mouseup(e) {
-        this.controller.refresh("context");
-    }
 }
 
 /**
  * A superclass for all tools that edit dots.
  */
 class BaseEdit extends BaseTool {
+    mouseup(e) {
+        this._saveDotPositions();
+        this.context.loadTool(EditTools.lastSelectionTool);
+    }
+
     /**
      * Save the currently selected dots' positions.
      */
@@ -570,10 +521,123 @@ class BaseEdit extends BaseTool {
         })
         this.controller.doAction("moveDotsTo", [data]);
     }
+}
 
-    _unloadTool() {
-        super._unloadTool();
-        this.context.loadTool(EditTools.lastSelectionTool);
+/**
+ * Stretch and rotate the selected dots.
+ */
+class StretchTool extends BaseEdit {
+    load() {
+        this._box = HTMLBuilder.div("stretch-box", null, ".workspace");
+        addHandles(this._box);
+
+        let bounds = this._getDotBounds();
+        bounds.height = bounds.bottom - bounds.top;
+        bounds.width = bounds.right - bounds.left;
+
+        // dot ID to ratio of position to top/left-most dot
+        this._positions = {};
+        this.controller.getSelection().each((i, $dot) => {
+            let dot = $($dot).data("dot");
+            let position = $($dot).data("position");
+
+            this._positions[dot.id] = {
+                top: (position.y - bounds.top) / bounds.height,
+                left: (position.x - bounds.left) / bounds.width,
+            };
+        });
+
+        this.refresh();
+    }
+
+    refresh() {
+        let bounds = this._getDotBounds();
+        this._margin = this._getDotRadius() + 5;
+
+        this._box.css({
+            top: bounds.top - this._margin,
+            left: bounds.left - this._margin,
+            height: (bounds.bottom - bounds.top) + 2 * this._margin,
+            width: (bounds.right - bounds.left) + 2 * this._margin,
+        });
+    }
+
+    unload() {
+        this._box.remove();
+    }
+
+    mousedown(e) {
+        // TODO: rotate
+
+        if (!$(e.target).is(".handle")) {
+            this._handle = null;
+            return;
+        }
+
+        this._handle = $(e.target).data("handle-id");
+        let offset = this._box.offset();
+        let [x, y] = $(".workspace").makeRelative(offset.left, offset.top);
+        this._start = {
+            top: y,
+            left: x,
+            width: this._box.outerWidth(),
+            height: this._box.outerHeight(),
+        };
+    }
+
+    mousemove(e) {
+        if (_.isNull(this._handle)) {
+            return;
+        }
+
+        let data = resizeHandles(this._handle, this._start, e);
+        this._box.css(data);
+
+        let left = data.left + this._margin;
+        let top = data.top + this._margin;
+        let width = data.width - 2 * this._margin;
+        let height = data.height - 2 * this._margin;
+
+        this.controller.getSelection().each((i, $dot) => {
+            let dot = $($dot).data("dot");
+            let ratio = this._positions[dot.id];
+            let x = ratio.left * width + left;
+            let y = ratio.top * height + top;
+            this.grapher.moveDotTo($dot, x, y);
+        });
+    }
+
+    mouseup(e) {
+        // don't load selection tool
+        this._saveDotPositions();
+    }
+
+    /**
+     * @return {object} The bounds for the dots. bounds.left is equivalent to
+     *   the x-coordinate of the left-most dot.
+     */
+    _getDotBounds() {
+        let bounds = this.controller.getSelection().getBounds();
+
+        let scrollLeft = $(".workspace").scrollLeft();
+        let scrollTop = $(".workspace").scrollTop();
+        let offset = $(".workspace").offset();
+
+        // make bounds relative to center of dots instead of edge of dot
+        let dotRadius = this._getDotRadius();
+        bounds.left += scrollLeft + dotRadius - offset.left;
+        bounds.top += scrollTop + dotRadius - offset.top;
+        bounds.right += scrollLeft - dotRadius - offset.left;
+        bounds.bottom += scrollTop - dotRadius - offset.top;
+
+        return bounds;
+    }
+
+    /**
+     * @return {number} The radius of a dot.
+     */
+    _getDotRadius() {
+        return this.controller.getSelection().first().getDimensions().width / 2;
     }
 }
 
@@ -619,7 +683,7 @@ class LineTool extends BaseEdit {
     }
 
     mouseup(e) {
-        this._saveDotPositions();
+        super.mouseup(e);
         this._line.remove();
     }
 }
@@ -631,13 +695,14 @@ class LineTool extends BaseEdit {
  * start position, and then click again for the end position.
  */
 class ArcTool extends BaseEdit {
-    get eventsToHandle() {
-        return 2;
-    }
-
-    init() {
+    load() {
         // true if user is about to select the end point
         this._drawEnd = false;
+    }
+
+    isDone() {
+        this._drawEnd = !this._drawEnd;
+        return !this._drawEnd;
     }
 
     mousedown(e) {
@@ -727,12 +792,11 @@ class ArcTool extends BaseEdit {
     }
 
     mouseup(e) {
-        if (this._eventCount === 1) {
-            this._drawEnd = true;
-            this._radiusPath = this._path.attr("d");
-        } else {
-            this._saveDotPositions();
+        if (this._drawEnd) {
+            super.mouseup(e);
             this._path.remove();
+        } else {
+            this._radiusPath = this._path.attr("d");
         }
     }
 
@@ -780,6 +844,22 @@ class ArcTool extends BaseEdit {
             // CCW: 0, CW: 1
             sweepFlag: length < 0 ? 0 : 1,
         };
+    }
+
+    /**
+     * Calculate the angle between the given points and snap to
+     * 45 degree intervals;
+     *
+     * @param {number} x1
+     * @param {number} y1
+     * @param {number} x2
+     * @param {number} y2
+     * @return {number}
+     */
+    _snapAngle(x1, y1, x2, y2) {
+        let angle = calcAngle(x1, y1, x2, y2);
+        angle = round(angle, 45);
+        return angle === 360 ? 0 : angle;
     }
 }
 
@@ -849,7 +929,7 @@ class BlockTool extends BaseEdit {
     }
 
     mouseup(e) {
-        this._saveDotPositions();
+        super.mouseup(e);
         this._line.remove();
     }
 }
@@ -911,7 +991,7 @@ class CircleTool extends BaseEdit {
     }
 
     mouseup(e) {
-        this._saveDotPositions();
+        super.mouseup(e);
         this._line.remove();
         this._circle.remove();
     }
