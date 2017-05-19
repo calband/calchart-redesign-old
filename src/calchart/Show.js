@@ -16,7 +16,7 @@ import { moveElem } from "utils/JSUtils";
  * After incrementing this variable, add a migration to update all Shows in
  * the database. See docs/Versioning.md for more details on this variable.
  */
-let VERSION = 3;
+let VERSION = 4;
 
 /**
  * A Show represents a Calchart show, containing the following information:
@@ -55,7 +55,7 @@ export default class Show {
         this._dotFormat = metadata.dotFormat;
         this._version = metadata.version;
 
-        if (this._version !== VERSION) {
+        if (this._version < VERSION) {
             alert("WARNING: You are running an outdated version of a Calchart show!");
         }
 
