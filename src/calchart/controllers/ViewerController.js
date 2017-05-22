@@ -112,6 +112,7 @@ export default class ViewerController extends ApplicationController {
      */
     play() {
         // TODO
+        console.log("play!");
     }
 
     /**
@@ -119,6 +120,7 @@ export default class ViewerController extends ApplicationController {
      */
     stop() {
         // TODO
+        console.log("stop!");
     }
 
     /**** CONTROLS ****/
@@ -205,13 +207,17 @@ export default class ViewerController extends ApplicationController {
      * start the animation.
      */
     togglePlay() {
+        let icon = $(".controls .toggle-play").removeClassRegex(/icon-*/);
+
         if (this._isPlaying) {
-            // TODO: change icon
+            icon.addClass("icon-play");
             this.stop();
         } else {
-            // TODO: change icon
+            icon.addClass("icon-pause");
             this.play();
         }
+
+        this._isPlaying = !this._isPlaying;
     }
 
     /**
@@ -286,5 +292,5 @@ let EditorShortcuts = {
     "right": "nextBeat",
     "shift+left": "prevSheet",
     "shift+right": "nextSheet",
-    "space": "togglePlay", // TODO: add space to shortcut keys
+    "space": "togglePlay",
 };
