@@ -1,61 +1,62 @@
 @import "partials/vars", "partials/mixins", "partials/functions";
 
+body {
+    min-width: 1000px;
+}
+
 .content {
-    width: 1000px;
+    width: 900px;
     margin: 0 auto;
-    h1 {
-        text-align: center;
+    text-align: center;
+    .details {
+        margin: 10px 0;
+        p {
+            display: inline-block;
+            font-size: 18px;
+            margin-right: 20px;
+            &:last-child {
+                margin-right: 0;
+            }
+            span {
+                font-size: 1em;
+            }
+            select {
+                width: 85px;
+            }
+        }
     }
     .viewer {
-        height: 450px;
+        height: 475px;
+    }
+    .seek {
+        @include vertically-center;
+        $marker-size: 16px;
+        height: $marker-size;
+        margin: 20px 50px;
+        padding: 0 #{$marker-size/2};
+        cursor: pointer;
+        .marker {
+            position: absolute;
+            width: $marker-size;
+            height: $marker-size;
+            top: 0;
+            left: 0;
+            border-radius: 50%;
+            background: $blue;
+        }
+        .bar {
+            width: 100%;
+            height: 3px;
+            background: $medium-gray;
+        }
     }
     .controls {
-        text-align: center;
-        .seek {
-            @include vertically-center;
-            $marker-size: 16px;
-            height: $marker-size;
-            margin: 20px 50px;
-            padding: 0 #{$marker-size/2};
+        @include unselectable;
+        margin-top: 20px;
+        i {
             cursor: pointer;
-            .marker {
-                position: absolute;
-                width: $marker-size;
-                height: $marker-size;
-                top: 0;
-                left: 0;
-                border-radius: 50%;
-                background: $blue;
-            }
-            .bar {
-                width: 100%;
-                height: 3px;
-                background: $medium-gray;
-            }
-        }
-        .details {
-            p {
-                display: inline-block;
-                font-size: 18px;
-                margin-right: 20px;
-                &:last-child {
-                    margin-right: 0;
-                }
-                span {
-                    font-size: 1em;
-                }
-                select {
-                    width: 75px;
-                }
-            }
-        }
-        .buttons {
-            margin-top: 20px;
-            i {
-                cursor: pointer;
-                font-size: 24px;
-                margin: 0 10px;
-            }
+            font-size: 24px;
+            margin: 0 10px;
         }
     }
 }

@@ -22,7 +22,7 @@ export default class MovementCommandMove extends BaseMovementCommand {
      *   - {int} beatsPerStep
      */ 
     constructor(startX, startY, direction, duration, options={}) {
-        options = _.defaults(options, {
+        options = _.defaults({}, options, {
             stepSize: STEP_SIZES.STANDARD,
             orientation: direction,
         });

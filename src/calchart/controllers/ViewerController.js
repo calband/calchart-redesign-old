@@ -1,6 +1,7 @@
 import ApplicationController from "calchart/ApplicationController";
 import Grapher from "calchart/Grapher";
 
+import HTMLBuilder from "utils/HTMLBuilder";
 import { round, roundSmall } from "utils/MathUtils";
 
 /**
@@ -17,6 +18,7 @@ export default class ViewerController extends ApplicationController {
         this._grapher = null;
         this._currSheet = show.getSheets()[0];
         this._currBeat = 0;
+        this._currDot = null;
         this._isPlaying = false;
 
         // cache the cumulative beats for each sheet; i.e. the number of beats
@@ -42,9 +44,37 @@ export default class ViewerController extends ApplicationController {
 
         this._setupSeek();
 
-        // TODO: set up buttons
+        // controls
+        $(".controls .prev-sheet").click(e => this.prevSheet());
+        $(".controls .prev-beat").click(e => this.prevBeat());
+        $(".controls .toggle-play").click(e => this.togglePlay());
+        $(".controls .next-beat").click(e => this.nextBeat());
+        $(".controls .next-sheet").click(e => this.nextSheet());
+
+        // select dot
+        let dots = $(".select-dot");
+        this._show.getDots().forEach(dot => {
+            HTMLBuilder.make("option")
+                .text(dot.label)
+                .data("dot", dot)
+                .appendTo(dots);
+        });
+        dots.dropdown({
+                placeholder_text_single: "None",
+                allow_single_deselect: true,
+            })
+            .change(e => {
+                let dot = dots.find("option:selected");
+                if (dot.exists()) {
+                    let $dot = this._grapher.getDot(dot.data("dot"));
+                    this._currDot = $dot;
+                } else {
+                    this._currDot = null;
+                }
+                this.refresh();
+            });
+
         // TODO: set up clicking dots in graph
-        // TODO: set up selecting dots in controls
     }
 
     /**
@@ -58,6 +88,8 @@ export default class ViewerController extends ApplicationController {
         }
 
         this._grapher.draw(this._currSheet, this._currBeat);
+        this._grapher.selectDots(this._currDot);
+
         $(".details .sheet").text(this._currSheet.getLabel());
         let beatNum = this._currBeat === 0 ? "Hup" : this._currBeat;
         $(".details .beat-num").text(beatNum);
@@ -209,7 +241,7 @@ export default class ViewerController extends ApplicationController {
      * Set up the seekbar
      */
     _setupSeek() {
-        let seek = $(".controls .seek");
+        let seek = $(".seek");
         let marker = seek.find(".marker");
         let markerRadius = marker.width() / 2;
         let seekLeft = seek.offset().left;

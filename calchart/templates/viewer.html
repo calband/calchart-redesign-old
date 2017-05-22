@@ -20,24 +20,22 @@
 {% block body %}
     <div class="content">
         <h1>{{ show.name }}</h1>
+        <div class="details">
+            <p>Stuntsheet: <span class="sheet">--</span></p>
+            <p>Beat: <span class="beat-num">0</span>/<span class="beat-total">0</span></p>
+            <p>Dot: <select class="select-dot"><option></option></select></p>
+        </div>
         <div class="viewer"></div>
+        <div class="seek">
+            <span class="bar"></span>
+            <span class="marker"></span>
+        </div>
         <div class="controls">
-            <div class="seek">
-                <span class="bar"></span>
-                <span class="marker"></span>
-            </div>
-            <div class="details">
-                <p>Stuntsheet: <span class="sheet">--</span></p>
-                <p>Beat: <span class="beat-num">0</span>/<span class="beat-total">0</span></p>
-                <p>Dot: <select class="select-dot"></select></p>
-            </div>
-            <div class="buttons">
-                <i class="icon-fast-backward" data-tooltip="Previous Sheet"></i>
-                <i class="icon-step-backward" data-tooltip="Previous Beat"></i>
-                <i class="icon-play" data-tooltip="Animate"></i>
-                <i class="icon-step-forward" data-tooltip="Next Beat"></i>
-                <i class="icon-fast-forward" data-tooltip="Next Sheet"></i>
-            </div>
+            <i class="prev-sheet icon-fast-backward" data-tooltip="Previous Sheet"></i>
+            <i class="prev-beat icon-step-backward" data-tooltip="Previous Beat"></i>
+            <i class="toggle-play icon-play" data-tooltip="Animate"></i>
+            <i class="next-beat icon-step-forward" data-tooltip="Next Beat"></i>
+            <i class="next-sheet icon-fast-forward" data-tooltip="Next Sheet"></i>
         </div>
     </div>
 {% endblock %}

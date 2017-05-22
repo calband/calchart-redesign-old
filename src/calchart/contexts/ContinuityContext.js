@@ -118,7 +118,7 @@ export default class ContinuityContext extends BaseContext {
 
         showPopup("edit-continuity", {
             init: popup => {
-                popup.addClass(`continuity-${continuity.name}`);
+                popup.addClass(`continuity-${continuity.info.name}`);
 
                 popup.find(".continuity-title").text(continuity.info.name);
                 popup.find("form").prepend(contents);
