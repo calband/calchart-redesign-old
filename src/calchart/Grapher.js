@@ -31,9 +31,6 @@ export default class Grapher {
         // the GrapherScale containing data about scale
         this._scale = null;
 
-        // maps dot label to dot SVG element
-        this._dots = {};
-
         this._svg = d3.select(this._drawTarget.get(0))
             .append("svg")
             .attr("class", "graph");

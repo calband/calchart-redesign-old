@@ -24,6 +24,9 @@ body {
     }
     .viewer {
         height: 475px;
+        .dot {
+            cursor: pointer;
+        }
     }
     .seek {
         @include vertically-center;

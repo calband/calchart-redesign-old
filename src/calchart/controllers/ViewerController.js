@@ -56,6 +56,7 @@ export default class ViewerController extends ApplicationController {
         this._show.getDots().forEach(dot => {
             HTMLBuilder.make("option")
                 .text(dot.label)
+                .attr("value", dot.id)
                 .data("dot", dot)
                 .appendTo(dots);
         });
@@ -74,7 +75,10 @@ export default class ViewerController extends ApplicationController {
                 this.refresh();
             });
 
-        // TODO: set up clicking dots in graph
+        this._grapher.getGraph().on("click", ".dot", e => {
+            let dot = $(e.currentTarget).data("dot");
+            dots.choose(dot.id).change();
+        });
     }
 
     /**
