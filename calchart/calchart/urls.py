@@ -8,6 +8,7 @@ from base.views import *
 urlpatterns = [
     url(r'^$', HomeView.as_view(), name='home'),
     url(r'^editor/(?P<slug>.+)/$', EditorView.as_view(), name='editor'),
+    url(r'^viewer/(?P<slug>.+)/$', ViewerView.as_view(), name='viewer'),
     url(r'^help/', include('wiki.urls', namespace='wiki')),
 
     # authentication

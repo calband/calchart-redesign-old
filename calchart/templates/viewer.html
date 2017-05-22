@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% load partials utils %}
+
+{% block title %}
+    Viewer - {{ show.name }}
+{% endblock %}
+
+{% block head %}
+    {% add_script "viewer.js" %}
+    <script>
+        {% if show.viewer %}
+            window.show = {{ show.viewer|asjson|safe }};
+        {% else %}
+            window.show = null;
+        {% endif %}
+    </script>
+{% endblock %}
+
+{% block body %}
+    <div class="content">
+        <div class="viewer"></div>
+        <div class="controls">
+            <div class="seek"></div>
+            <div class="details">
+                <p>Stuntsheet: <span class="sheet">--</span></p>
+                <p>Beat: <span class="beat-num">0</span>/<span class="beat-total">0</span></p>
+            </div>
+            <div class="buttons">
+                <i class="icon-fast-backward" data-tooltip="Previous Sheet"></i>
+                <i class="icon-step-backward" data-tooltip="Previous Beat"></i>
+                <i class="icon-play" data-tooltip="Animate"></i>
+                <i class="icon-step-forward" data-tooltip="Next Beat"></i>
+                <i class="icon-fast-forward" data-tooltip="Next Sheet"></i>
+            </div>
+        </div>
+    </div>
+{% endblock %}
