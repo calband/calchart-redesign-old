@@ -6,6 +6,7 @@
 {% endblock %}
 
 {% block head %}
+    {% add_style "viewer.css" %}
     {% add_script "viewer.js" %}
     <script>
         {% if show.viewer %}
@@ -18,12 +19,17 @@
 
 {% block body %}
     <div class="content">
+        <h1>{{ show.name }}</h1>
         <div class="viewer"></div>
         <div class="controls">
-            <div class="seek"></div>
+            <div class="seek">
+                <span class="bar"></span>
+                <span class="marker"></span>
+            </div>
             <div class="details">
                 <p>Stuntsheet: <span class="sheet">--</span></p>
                 <p>Beat: <span class="beat-num">0</span>/<span class="beat-total">0</span></p>
+                <p>Dot: <select class="select-dot"></select></p>
             </div>
             <div class="buttons">
                 <i class="icon-fast-backward" data-tooltip="Previous Sheet"></i>
