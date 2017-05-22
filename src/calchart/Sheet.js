@@ -420,7 +420,7 @@ export default class Sheet {
             case "east":
                 return 0;
             case "west":
-                return 90;
+                return 270;
         }
         throw new Error(`Invalid orientation: ${this._orientation}`);
     }
