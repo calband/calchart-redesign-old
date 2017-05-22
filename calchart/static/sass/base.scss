@@ -14,8 +14,6 @@ html, body, div, span, h1, h2, h3, h4, h5, h6,
 p, a, ul, li, label, form, input, textarea,
 header, footer, td, th {
     position: relative;
-    color: $blue;
-    font-family: sans-serif("DIN Next");
     font-size: $font-size;
     box-sizing: border-box; // padding included in width
 }
@@ -27,6 +25,8 @@ html, body {
 body {
     padding: 20px;
     font-size: 0; // eliminate space between HTML elements
+    color: $blue;
+    font-family: sans-serif("DIN Next");
 }
 
 h1, h2, h3 {
@@ -51,9 +51,14 @@ h3 {
 
 a {
     color: $blue;
+    font-size: 1em;
     &:hover {
         color: $gold;
     }
+}
+
+span {
+    font-size: 1em;
 }
 
 label {
@@ -93,6 +98,11 @@ input {
         border: 0;
         border-radius: 0;
     }
+}
+
+input, textarea {
+    color: $blue;
+    font-family: sans-serif("DIN Next");
 }
 
 select {
@@ -297,6 +307,15 @@ ul.messages {
         &.error {
             color: $red;
         }
+    }
+}
+
+.chosen-container {
+    .chosen-single {
+        color: $blue;
+    }
+    .chosen-results {
+        color: $blue;
     }
 }
 
