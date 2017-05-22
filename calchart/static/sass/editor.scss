@@ -295,8 +295,14 @@ body.context-background .workspace .graph {
         select {
             width: 100%;
         }
-        .chosen-container .chosen-results {
-            max-height: 125px;
+        .chosen-container {
+            .chosen-default {
+                color: $blue;
+                font-size: $font-size;
+            }
+            .chosen-results {
+                max-height: 125px;
+            }
         }
     }
     .continuities {

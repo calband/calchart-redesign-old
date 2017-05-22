@@ -9,9 +9,10 @@ module.exports = function (grunt) {
         webpack: {
             build: {
                 entry: {
-                    editor: "./src/editor.js",
-                    wiki: "./src/wiki.js",
                     home: "./src/home.js",
+                    editor: "./src/editor.js",
+                    viewer: "./src/viewer.js",
+                    wiki: "./src/wiki.js",
                 },
                 output: {
                     path: path.resolve("calchart/static/js/"),

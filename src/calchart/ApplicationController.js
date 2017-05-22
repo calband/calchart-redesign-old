@@ -105,6 +105,8 @@ export default class ApplicationController {
                     pressedKeys.push("tab"); break;
                 case 13:
                     pressedKeys.push("enter"); break;
+                case 32:
+                    pressedKeys.push("space"); break;
                 case 37:
                     pressedKeys.push("left"); break;
                 case 38:

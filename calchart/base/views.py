@@ -6,7 +6,7 @@ from django.core.exceptions import PermissionDenied
 from django.core.files.storage import default_storage
 from django.core.urlresolvers import reverse
 from django.http.response import HttpResponse, JsonResponse
-from django.shortcuts import redirect
+from django.shortcuts import get_object_or_404, redirect
 from django.views.generic import TemplateView, RedirectView, CreateView
 from django.utils import timezone
 
@@ -196,11 +196,11 @@ class EditorView(CalchartMixin, TemplateView):
     popup_forms = editor_popups
 
     def dispatch(self, request, *args, **kwargs):
-        self.show = Show.objects.get(slug=kwargs['slug'])
+        self.show = get_object_or_404(Show, slug=kwargs['slug'])
         return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        context = super(EditorView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context['show'] = self.show
         context['menu'] = editor_menu
         context['toolbar'] = editor_toolbar
@@ -235,3 +235,18 @@ class EditorView(CalchartMixin, TemplateView):
         return JsonResponse({
             'url': settings.MEDIA_URL + filename,
         })
+
+class ViewerView(CalchartMixin, TemplateView):
+    """
+    The view that can view shows
+    """
+    template_name = 'viewer.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        self.show = get_object_or_404(Show, slug=kwargs['slug'])
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['show'] = self.show
+        return context

@@ -1,3 +1,4 @@
+import AnimationState from "calchart/AnimationState";
 import Coordinate from "calchart/Coordinate";
 import CollegeGrapher from "calchart/graphers/CollegeGrapher";
 import Dot from "calchart/Dot";
@@ -29,9 +30,6 @@ export default class Grapher {
 
         // the GrapherScale containing data about scale
         this._scale = null;
-
-        // maps dot label to dot SVG element
-        this._dots = {};
 
         this._svg = d3.select(this._drawTarget.get(0))
             .append("svg")
@@ -347,20 +345,24 @@ export default class Grapher {
         }
         
         dotGroups.each(function(dot) {
-            // special case in case dots are positioned without having movements
             let state;
-            if (currentBeat === 0) {
-                state = sheet.getPosition(dot);
-            } else {
-                try {
-                    state = sheet.getAnimationState(dot, currentBeat);
-                } catch (e) {
-                    // ran out of movements
-                    state = null;
+            try {
+                state = sheet.getAnimationState(dot, currentBeat);
+            } catch (e) {
+                // ran out of movements
+                state = null;
+            }
+
+            // ran out of movements or no movements for dot
+            if (_.isNull(state)) {
+                let position;
+                if (currentBeat === 0) {
+                    position = sheet.getPosition(dot);
+                } else {
+                    position = sheet.getFinalPosition(dot);
                 }
-                if (_.isNull(state)) {
-                    state = sheet.getFinalPosition(dot);
-                }
+                // face sheet orientation
+                state = new AnimationState(position, sheet.getOrientationDegrees());
             }
 
             // save dot in jQuery data also
