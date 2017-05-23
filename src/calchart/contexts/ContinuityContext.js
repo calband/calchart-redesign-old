@@ -36,6 +36,13 @@ export default class ContinuityContext extends BaseContext {
         return ContextActions;
     }
 
+    static get info() {
+        return {
+            name: "continuity",
+            toolbar: "edit-continuity",
+        };
+    }
+
     /**
      * @param {Object} options - Options to customize loading the Context:
      *    - {string} [dotType=null] - The dot type to initially load.
@@ -64,9 +71,6 @@ export default class ContinuityContext extends BaseContext {
         this._grapher.setOptions({
             showCollisions: true,
         });
-        
-        $(".toolbar .edit-continuity").addClass("active");
-        $(".toolbar .edit-continuity-group").removeClass("hide");
 
         this._setupSeek();
     }
@@ -81,9 +85,6 @@ export default class ContinuityContext extends BaseContext {
         this._grapher.setOptions({
             showCollisions: false,
         });
-
-        $(".toolbar .edit-continuity").removeClass("active");
-        $(".toolbar .edit-continuity-group").addClass("hide");
     }
 
     refresh() {

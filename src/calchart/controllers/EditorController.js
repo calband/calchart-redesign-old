@@ -371,7 +371,7 @@ export default class EditorController extends ApplicationController {
                     .off("click")
                     .click(e => {
                         let options = {
-                            previousContext: Context.name(this._context),
+                            previousContext: this._context.info.name,
                         };
                         this.loadContext("background", options);
                         hidePopup();
@@ -525,7 +525,7 @@ export default class EditorController extends ApplicationController {
     loadContext(name, options={}) {
         if (this._context) {
             // don't load same context
-            if (name === Context.name(this._context)) {
+            if (name === this._context.info.name) {
                 return;
             }
             this._context.unload();

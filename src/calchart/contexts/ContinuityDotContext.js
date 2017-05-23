@@ -23,6 +23,12 @@ export default class ContinuityDotContext extends HiddenContext {
         return ContextActions;
     }
 
+    static get info() {
+        return {
+            name: "continuity-dots",
+        };
+    }
+
     /**
      * @param {Object} options - Options to customize loading the Context:
      *    - {FollowLeaderContinuity} continuity - The FTL continuity being edited

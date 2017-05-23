@@ -38,6 +38,13 @@ export default class DotContext extends BaseContext {
         return ContextActions;
     }
 
+    static get info() {
+        return {
+            name: "dot",
+            toolbar: "edit-dots",
+        };
+    }
+
     load(options) {
         super.load(options);
 
@@ -67,8 +74,6 @@ export default class DotContext extends BaseContext {
             },
         });
 
-        $(".toolbar .edit-dots").addClass("active");
-        $(".toolbar .edit-dots-group").removeClass("hide");
         $(".menu-item.toggle-background").removeClass("disabled");
     }
 
@@ -78,8 +83,6 @@ export default class DotContext extends BaseContext {
         this._panel.hide();
         this._grapher.showBackground(false);
 
-        $(".toolbar .edit-dots").removeClass("active");
-        $(".toolbar .edit-dots-group").addClass("hide");
         $(".menu-item.toggle-background").addClass("disabled");
     }
 

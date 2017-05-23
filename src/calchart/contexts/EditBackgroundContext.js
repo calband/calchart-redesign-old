@@ -26,6 +26,13 @@ export default class EditBackgroundContext extends HiddenContext {
         return ContextActions;
     }
 
+    static get info() {
+        return {
+            name: "background",
+            toolbar: "edit-background",
+        };
+    }
+
     /**
      * @param {Object} options - Options to customize loading the Context:
      *    - {string} [dotType=null] - The dot type to initially load.
@@ -58,8 +65,6 @@ export default class EditBackgroundContext extends HiddenContext {
                 }
             });
         });
-
-        $(".toolbar .edit-background-group").removeClass("hide");
     }
 
     unload() {
@@ -69,8 +74,6 @@ export default class EditBackgroundContext extends HiddenContext {
         });
 
         this._handles.remove();
-
-        $(".toolbar .edit-background-group").addClass("hide");
     }
 
     refresh() {

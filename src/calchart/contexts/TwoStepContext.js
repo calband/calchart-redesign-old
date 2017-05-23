@@ -17,6 +17,12 @@ export default class TwoStepContext extends ContinuityContext {
         return ContextActions;
     }
 
+    static get info() {
+        return {
+            name: "two-step",
+        };
+    }
+
     /**
      * @param {Object} options - Options to customize loading the Context:
      *    - {TwoStepContinuity} continuity - The two-step continuity being edited

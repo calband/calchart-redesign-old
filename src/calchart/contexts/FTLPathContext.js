@@ -32,6 +32,12 @@ export default class FTLPathContext extends HiddenContext {
         return ContextActions;
     }
 
+    static get info() {
+        return {
+            name: "ftl-path",
+        };
+    }
+
     /**
      * @param {Object} options - Options to customize loading the Context:
      *    - {FollowLeaderContinuity} continuity - The FTL continuity being edited
@@ -44,7 +50,6 @@ export default class FTLPathContext extends HiddenContext {
         this.loadTool("selection");
 
         this._panel.show();
-        $(".toolbar .ftl-path-group").removeClass("hide");
 
         let scale = this._grapher.getScale();
         this._addEvents(".workspace", {
@@ -94,7 +99,6 @@ export default class FTLPathContext extends HiddenContext {
         }
 
         this._panel.hide();
-        $(".toolbar .ftl-path-group").addClass("hide");
 
         this._grapher.getDots(this._continuity.order).css("opacity", "");
 

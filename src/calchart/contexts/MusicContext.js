@@ -17,18 +17,21 @@ export default class MusicContext extends BaseContext {
         return ContextActions;
     }
 
+    static get info() {
+        return {
+            name: "music",
+            toolbar: "edit-music",
+        };
+    }
+
     load(options) {
         super.load(options);
 
         this._setupContextMenus();
-
-        $(".toolbar .edit-music").addClass("active");
     }
 
     unload() {
         super.unload();
-
-        $(".toolbar .edit-music").removeClass("active");
     }
 
     refresh() {

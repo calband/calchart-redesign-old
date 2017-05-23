@@ -49,12 +49,27 @@ export default class BaseContext {
     get actions() { return this.constructor.actions; }
 
     /**
+     * @return {object} meta info for this context, including the following keys:
+     *   - {string} name - The name of the context, the string used for Context.load.
+     *   - {string} [toolbar=name] - The class of the toolbar item for the context.
+     */
+    static get info() {
+        throw new NotImplementedError(this);
+    }
+
+    get info() { return this.constructor.info; }
+
+    /**
      * Runs any actions to load this context in the editor application.
      *
      * @param {object} options - Options to customize loading the Context.
      */
     load(options) {
         this._sheet = this._controller.getActiveSheet();
+
+        let toolbar = _.defaultTo(this.info.toolbar, this.info.name);
+        $(`.toolbar .${toolbar}`).addClass("active");
+        $(`.toolbar .${toolbar}-group`).removeClass("hide");
     }
 
     /**
@@ -65,6 +80,10 @@ export default class BaseContext {
         for (let element of this._eventListeners) {
             $(element).off(".app-context");
         }
+
+        let toolbar = _.defaultTo(this.info.toolbar, this.info.name);
+        $(`.toolbar .${toolbar}`).removeClass("active");
+        $(`.toolbar .${toolbar}-group`).addClass("hide");
     }
 
     /**

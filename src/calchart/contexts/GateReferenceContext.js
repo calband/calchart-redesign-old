@@ -25,6 +25,12 @@ export default class GateReferenceContext extends HiddenContext {
         return ContextActions;
     }
 
+    static get info() {
+        return {
+            name: "gate-reference",
+        };
+    }
+
     /**
      * @param {Object} options - Options to customize loading the Context:
      *    - {GateTurnContinuity} continuity - The gate turn continuity being edited
@@ -33,8 +39,6 @@ export default class GateReferenceContext extends HiddenContext {
         super.load(options);
 
         this._continuity = options.continuity;
-
-        $(".toolbar .gate-reference-group").removeClass("hide");
 
         let scale = this._grapher.getScale();
         let dotRadius = scale.toDistance(3/4);
@@ -65,8 +69,6 @@ export default class GateReferenceContext extends HiddenContext {
         // remove helpers
         this._helper.remove();
         this._reference.remove();
-
-        $(".toolbar .gate-reference-group").addClass("hide");
 
         this._controller.checkContinuities({
             dots: this._continuity.dotType,
