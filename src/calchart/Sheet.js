@@ -28,24 +28,26 @@ export default class Sheet {
      * @param {int} numBeats - The number of beats in the stuntsheet.
      * @param {Object} [options] - Optional information about a stuntsheet, such as:
      *   - {string} label - A label for the Sheet.
+     *   - {?string} song - The name of the song this sheet is a part of.
      *   - {string} [background] - The URL for the background image (or undefined)
      *   - {string} fieldType - The field type, or "default" to use the same field
-     *     type as the Show.
+     *     type as the associated song/show.
      *   - {(int|string)} beatsPerStep - The default number of beats per step for
      *       continuities in the Sheet, or "default" to get the number of beats per
-     *       step from the Show.
+     *       step from the associated song/show.
      *   - {string} orientation - The default orientation for continuities in the
-     *       Sheet, or "default" to get the orientation from the Show.
+     *       Sheet, or "default" to get the orientation from the associated song/show.
      *   - {string} stepType - The default step type for continuities in the Sheet,
-     *       or "default" to get the step type from the Show.
+     *       or "default" to get the step type from the associated song/show.
      */
     constructor(show, index, numBeats, options) {
         this._show = show;
         this._index = index;
         this._numBeats = numBeats;
 
-        options = _.defaults(options, {
+        options = _.defaults({}, options, {
             label: null,
+            song: null,
             background: undefined,
             fieldType: "default",
             beatsPerStep: "default",
@@ -59,6 +61,12 @@ export default class Sheet {
         this._beatsPerStep = options.beatsPerStep;
         this._orientation = options.orientation;
         this._stepType = options.stepType;
+
+        if (_.isNull(options.song)) {
+            this._song = null;
+        } else {
+            this._song = this._show.getSong(options.song);
+        }
 
         // @type {Object[]} see Sheet.getDotInfo
         this._dots = [];
@@ -140,6 +148,7 @@ export default class Sheet {
 
         data.options = {
             label: this._label,
+            song: _.isNull(this._song) ? null : this._song.getName(),
             background: this._background,
             fieldType: this._fieldType,
             beatsPerStep: this._beatsPerStep,
@@ -170,6 +179,15 @@ export default class Sheet {
     get label() { return this._label; }
     get orientation() { return this._orientation; }
     get stepType() { return this._stepType; }
+
+    /**
+     * Get the parent of this Sheet for resolving defaults.
+     *
+     * @return {(Song|Show)}
+     */
+    get parent() {
+        return _.defaultTo(this._song, this._show);
+    }
 
     /**
      * Add the given continuity to the given dot type.
@@ -208,15 +226,19 @@ export default class Sheet {
      * @return {Sheet}
      */
     clone() {
-        // dont clone show
+        // dont clone foreign keys
         let show = this._show;
+        let song = this._song;
         this._show = null;
+        this._song = null;
 
         let sheet = _.cloneDeep(this);
         this._show = show;
+        this._song = song;
 
         sheet._show = show;
         sheet._index = undefined;
+        sheet._song = song;
 
         return sheet;
     }
@@ -275,7 +297,7 @@ export default class Sheet {
      * @return {int}
      */
     getBeatsPerStep() {
-        return this._beatsPerStep === "default" ? this._show.getBeatsPerStep() : this._beatsPerStep;
+        return this._beatsPerStep === "default" ? this.parent.getBeatsPerStep() : this._beatsPerStep;
     }
 
     /**
@@ -365,11 +387,10 @@ export default class Sheet {
     }
 
     /**
-     * @return {string} The field type for the stuntsheet, defaulting to the field
-     *   type of the Show.
+     * @return {string} The field type for the stuntsheet, resolving any defaults.
      */
     getFieldType() {
-        return this._fieldType === "default" ? this._show.getFieldType() : this._fieldType;
+        return this._fieldType === "default" ? this.parent.getFieldType() : this._fieldType;
     }
 
     /**
@@ -406,17 +427,16 @@ export default class Sheet {
      *   is the last sheet.
      */
     getNextSheet() {
-        return this._show.getSheets()[this._index + 1] || null;
+        return this._show.getSheet(this._index + 1) || null;
     }
 
     /**
-     * @return {int} The sheet's orientation, defaulting to the Show's orientation, in
-     *   Calchart degrees.
+     * @return {int} The sheet's orientation in Calchart degrees, resolving any defaults.
      */
     getOrientationDegrees() {
         switch (this._orientation) {
             case "default":
-                return this._show.getOrientationDegrees();
+                return this.parent.getOrientationDegrees();
             case "east":
                 return 0;
             case "west":
@@ -440,7 +460,7 @@ export default class Sheet {
      *   this is the first sheet.
      */
     getPrevSheet() {
-        return this._show.getSheets()[this._index - 1] || null;
+        return this._show.getSheet(this._index - 1) || null;
     }
 
     /**
@@ -451,11 +471,17 @@ export default class Sheet {
     }
 
     /**
-     * @return {string} The sheet's step type, defaulting to the show's step type.
-     *   (@see CalchartUtils.STEP_TYPES)
+     * @return {Song}
+     */
+    getSong() {
+        return this._song;
+    }
+
+    /**
+     * @return {string} The sheet's step type, resolving any defaults. (@see CalchartUtils.STEP_TYPES)
      */
     getStepType() {
-        return this._stepType === "default" ? this._show.getStepType() : this._stepType;
+        return this._stepType === "default" ? this.parent.getStepType() : this._stepType;
     }
 
     /**
@@ -558,6 +584,15 @@ export default class Sheet {
      */
     setIndex(index) {
         this._index = index;
+    }
+
+    /**
+     * Set the song of this Sheet.
+     *
+     * @param {?Song} song - The song to set. Null if unset a song from the Sheet.
+     */
+    setSong(song) {
+        this._song = song;
     }
 
     /**

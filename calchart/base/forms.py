@@ -112,6 +112,14 @@ class EditShowPopup(PopupForm):
     stepType = forms.ChoiceField(choices=STEP_TYPES)
     orientation = forms.ChoiceField(choices=ORIENTATIONS)
 
+class AddSongPopup(PopupForm):
+    """
+    The popup to add a song
+    """
+    name = 'add-song'
+
+    title = forms.CharField(label='Name of song')
+
 class AddStuntsheetPopup(PopupForm):
     """
     The popup to add a stuntsheet
@@ -144,6 +152,7 @@ class EditContinuityPopup(PopupForm):
 editor_popups = [
     SetUpShowPopup,
     EditShowPopup,
+    AddSongPopup,
     AddStuntsheetPopup,
     EditStuntsheetPopup,
     EditContinuityPopup,

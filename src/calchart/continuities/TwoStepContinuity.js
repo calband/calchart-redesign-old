@@ -28,7 +28,7 @@ export default class TwoStepContinuity extends BaseContinuity {
     constructor(sheet, dotType, order, continuities, options) {
         super(sheet, dotType, options);
 
-        options = _.defaults(options, {
+        options = _.defaults({}, options, {
             isMarktime: true,
         });
 

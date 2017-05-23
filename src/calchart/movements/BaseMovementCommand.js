@@ -27,7 +27,7 @@ export default class BaseMovementCommand {
         this._endY = endY;
         this._duration = duration;
 
-        options = _.defaults(options, {
+        options = _.defaults({}, options, {
             orientation: undefined,
             beatsPerStep: 1,
         });

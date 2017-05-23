@@ -61,10 +61,10 @@ export default class Show {
 
         this._dots = dots.map(data => Dot.deserialize(data));
         this._sheets = sheets.map(data => Sheet.deserialize(this, data));
-        this._songs = songs.map(data => Song.deserialize(data));
+        this._songs = songs.map(data => Song.deserialize(this, data));
         this._fieldType = fieldType;
 
-        options = _.defaults(options, {
+        options = _.defaults({}, options, {
             beatsPerStep: 1,
             stepType: "HS",
             orientation: "east",
@@ -167,7 +167,7 @@ export default class Show {
             case "east":
                 return 0;
             case "west":
-                return 90;
+                return 180;
         }
         throw new Error(`Invalid orientation: ${this._orientation}`);
     }
@@ -213,6 +213,16 @@ export default class Show {
      */
     getSheets() {
         return this._sheets;
+    }
+
+    /**
+     * Get the Sheet at the given index
+     *
+     * @param {number} i
+     * @return {Sheet}
+     */
+    getSheet(i) {
+        return this._sheets[i];
     }
 
     /**
@@ -293,5 +303,49 @@ export default class Show {
     }
 
     /**** SONGS ****/
-    // TODO
+
+    /**
+     * Get all songs in the show.
+     *
+     * @return {Song[]}
+     */
+    getSongs() {
+        return this._songs;
+    }
+
+    /**
+     * Get the song with the given name. Returns undefined if
+     * the song could not be found.
+     *
+     * @param {string} name
+     * @return {Song}
+     */
+    getSong(name) {
+        return _.find(this._songs, song => song.getName() === name);
+    }
+
+    /**
+     * Add a song to the Show.
+     *
+     * @param {string} name - Name of the song.
+     */
+    addSong(name) {
+        let song = new Song(this, name, []);
+        this._songs.push(song);
+    }
+
+    /**
+     * Remove a song from the Show.
+     *
+     * @param {Song} song
+     */
+    removeSong(song) {
+        let sheets = song.getSheets();
+        sheets.forEach(sheet => {
+            sheet.setSong(null);
+            sheet.updateMovements();
+        });
+
+        _.pull(this._songs, song);
+    }
 }

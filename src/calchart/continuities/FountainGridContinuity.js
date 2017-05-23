@@ -25,7 +25,7 @@ export default class FountainGridContinuity extends BaseContinuity {
 
         this._isEWNS = isEWNS;
 
-        options = _.defaults(options, {
+        options = _.defaults({}, options, {
             end: "MT",
         });
 

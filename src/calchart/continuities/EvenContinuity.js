@@ -19,7 +19,7 @@ export default class EvenContinuity extends BaseContinuity {
      *     direction of travel
      */
     constructor(sheet, dotType, options={}) {
-        options = _.defaults(options, {
+        options = _.defaults({}, options, {
             orientation: "",
         });
 

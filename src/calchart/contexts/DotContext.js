@@ -105,7 +105,7 @@ export default class DotContext extends BaseContext {
      *     refresh the context (optimization).
      */
     deselectDots(dots, options={}) {
-        options = _.defaults(options, {
+        options = _.defaults({}, options, {
             refresh: true,
         });
 
@@ -153,7 +153,7 @@ export default class DotContext extends BaseContext {
      *     refresh the context (optimization).
      */
     selectDots(dots, options={}) {
-        options = _.defaults(options, {
+        options = _.defaults({}, options, {
             append: true,
             refresh: true,
         });
@@ -181,7 +181,7 @@ export default class DotContext extends BaseContext {
      *     refresh the context (optimization).
      */
     toggleDots(dots, options={}) {
-        options = _.defaults(options, {
+        options = _.defaults({}, options, {
             refresh: true,
         });
 

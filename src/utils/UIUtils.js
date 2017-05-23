@@ -567,7 +567,7 @@ export function hidePopup() {
  *   the message after a given time.
  */
 export function showMessage(message, options={}) {
-    options = _.defaults(options, {
+    options = _.defaults({}, options, {
         isError: false,
     });
     options.autohide = _.defaultTo(options.autohide, !options.isError);

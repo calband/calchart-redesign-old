@@ -25,7 +25,7 @@ export default class BaseContinuity {
         this._sheet = sheet;
         this._dotType = dotType;
 
-        options = _.defaults(options, {
+        options = _.defaults({}, options, {
             stepType: "default",
             beatsPerStep: "default",
             orientation: "default",
@@ -115,7 +115,7 @@ export default class BaseContinuity {
             case "east":
                 return 0;
             case "west":
-                return 90;
+                return 180;
             case "":
                 // for EvenContinuity, moving in direction of travel
                 return undefined;

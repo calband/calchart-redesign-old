@@ -24,7 +24,7 @@ export default class GrapevineContinuity extends BaseContinuity {
     constructor(sheet, dotType, options) {
         super(sheet, dotType, options);
 
-        options = _.defaults(options, {
+        options = _.defaults({}, options, {
             end: "MT",
         });
 

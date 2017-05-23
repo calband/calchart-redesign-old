@@ -89,7 +89,7 @@ $.fn.dropdown = function(options) {
     if (!this.is(":visible")) {
         defaults.width = this.css("width");
     }
-    options = $.extend(defaults, options);
+    options = _.defaults({}, options, defaults);
 
     // destroy Chosen if exists
     if (this.data("chosen") !== undefined) {
@@ -252,7 +252,7 @@ $.fn.removeClassRegex = function(pattern) {
  *     takes in the change in x/y positions.
  */
 $.fn.scrollIntoView = function(options={}) {
-    options = _.defaults(options, {
+    options = _.defaults({}, options, {
         tolerance: 0,
         parent: this.parent(),
     });
@@ -365,7 +365,7 @@ $.fn.scrollTop = function(val) {
  *     of the screen, if the bottom edge of the element goes offscreen.
  */
 $.fn.smartPosition = function(top, left, options={}) {
-    options = _.defaults(options, {
+    options = _.defaults({}, options, {
         offTop: 0,
         offLeft: 0,
         offRight: left,
