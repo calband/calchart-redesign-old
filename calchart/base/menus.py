@@ -267,7 +267,7 @@ editor_menu = Menu(
     ]),
     SubMenu('View', [
         SubMenu('View mode', [
-            # MenuItem('Music editor', 'loadContext(music)', icon='music'),
+            MenuItem('Music editor', 'loadContext(music)', icon='music'),
             MenuItem('Dot editor', 'loadContext(dot)', icon='dot-circle-o'),
             MenuItem('Continuity editor', 'loadContext(continuity)', icon='pencil-square-o'),
             # MenuItem('3D View', 'loadContext(3d)'),
@@ -292,7 +292,7 @@ editor_toolbar = Toolbar(
         ToolbarItem('Add Stuntsheet', 'file-o', 'addStuntsheet'),
     ),
     ToolbarGroup(
-        # ToolbarItem('Edit Music', 'music', 'loadContext(music)'),
+        ToolbarItem('Edit Music', 'music', 'loadContext(music)'),
         ToolbarItem('Edit Dots', 'dot-circle-o', 'loadContext(dot)'),
         ToolbarItem('Edit Continuity', 'pencil-square-o', 'loadContext(continuity)'),
     ),

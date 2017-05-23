@@ -4,6 +4,7 @@ import DotContext from "calchart/contexts/DotContext";
 import EditBackgroundContext from "calchart/contexts/EditBackgroundContext";
 import FTLPathContext from "calchart/contexts/FTLPathContext";
 import GateReferenceContext from "calchart/contexts/GateReferenceContext";
+import MusicContext from "calchart/contexts/MusicContext";
 import TwoStepContext from "calchart/contexts/TwoStepContext";
 
 // cache contexts after they've been created
@@ -44,6 +45,9 @@ export default class Context {
                 case "gate-reference":
                     contexts[name] = new GateReferenceContext(controller);
                     break;
+                case "music":
+                    contexts[name] = new MusicContext(controller);
+                    break;
                 case "two-step":
                     contexts[name] = new TwoStepContext(controller);
                     break;
@@ -68,6 +72,7 @@ export default class Context {
             ContinuityDotContext,
             DotContext,
             FTLPathContext,
+            MusicContext,
             TwoStepContext,
         ];
         return _.extend({}, ... contexts.map(
@@ -93,6 +98,8 @@ export default class Context {
                 return "background";
             case "FTLPathContext":
                 return "ftl-path";
+            case "MusicContext":
+                return "music";
             case "TwoStepContext":
                 return "two-step";
         }
