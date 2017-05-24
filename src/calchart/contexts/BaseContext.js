@@ -15,6 +15,7 @@ export default class BaseContext {
      */
     constructor(controller) {
         this._controller = controller;
+        this._show = controller.getShow();
         this._eventListeners = new Set();
     }
 
@@ -87,12 +88,12 @@ export default class BaseContext {
      *
      * @param {...String} [targets] - The elements to refresh. When refresh() is called with
      *   one of the names in the list, refresh<target>() will be called. For example,
-     *   refresh("foo") will call refreshFoo(). Passing in no targets will use all the targets
-     *   in refreshTargets.
+     *   refresh("foo") will call refreshFoo(). Passing in no targets or passing in "all" will
+     *   include all the targets in refreshTargets.
      */
     refresh(...targets) {
-        if (targets.length === 0) {
-            targets = this.constructor.refreshTargets;
+        if (targets.length === 0 || _.includes(targets, "all")) {
+            targets = targets.concat(this.constructor.refreshTargets);
         }
         targets.forEach(target => {
             target = _.capitalize(target);

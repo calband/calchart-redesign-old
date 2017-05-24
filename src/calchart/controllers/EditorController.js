@@ -60,13 +60,6 @@ export default class EditorController extends ApplicationController {
         setupMenu(".menu");
         setupToolbar(".toolbar");
 
-        // mark entire toolbar as inactive if there are no sheets
-        if (this._show.getSheets().length === 0) {
-            $(".toolbar li").addClass("inactive");
-            // except new sheet
-            $(".toolbar .add-stuntsheet").removeClass("inactive");
-        }
-
         // prompt user if leaving while unsaved, unless in development
         if (!window.isLocal) {
             $(window).on("beforeunload", () => {

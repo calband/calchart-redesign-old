@@ -275,8 +275,8 @@ editor_menu = Menu(
         MenuItem('Toggle sheet background', 'toggleBackground', classes='toggle-background', disabled=True),
     ], [
         SubMenu('Zoom', [
-            MenuItem('Zoom in', 'zoomIn', icon='search-plus'),
-            MenuItem('Zoom out', 'zoomOut', icon='search-minus'),
+            MenuItem('Zoom in', 'zoom(0.1)', icon='search-plus'),
+            MenuItem('Zoom out', 'zoom(-0.1)', icon='search-minus'),
         ], [
             MenuItem(label, f'zoomTo({zoom})')
             for zoom, label in ZOOMS
@@ -289,12 +289,13 @@ editor_menu = Menu(
 
 editor_toolbar = Toolbar(
     ToolbarGroup(
-        ToolbarItem('Add Stuntsheet', 'file-o', 'addStuntsheet'),
-    ),
-    ToolbarGroup(
         ToolbarItem('Edit Music', 'music', 'loadContext(music)'),
         ToolbarItem('Edit Dots', 'dot-circle-o', 'loadContext(dot)'),
         ToolbarItem('Edit Continuity', 'pencil-square-o', 'loadContext(continuity)'),
+    ),
+    ToolbarContextGroup(
+        'graph-context',
+        ToolbarItem('Add Stuntsheet', 'file-o', 'addStuntsheet'),
     ),
     ToolbarContextGroup(
         'edit-dots',

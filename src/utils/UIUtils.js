@@ -13,7 +13,7 @@
 
 import { ValidationError } from "utils/errors";
 import HTMLBuilder from "utils/HTMLBuilder";
-import { convertShortcut } from "utils/JSUtils";
+import { attempt, convertShortcut } from "utils/JSUtils";
 
 /**** FORMS ****/
 
@@ -486,15 +486,14 @@ export function showPopup(name, options={}) {
             e.preventDefault();
 
             if (!_.isUndefined(options.onSubmit)) {
-                try {
-                    options.onSubmit(popup);
-                } catch (e) {
-                    if (e instanceof ValidationError) {
-                        showError(e.message);
-                        return;
-                    } else {
-                        throw e;
-                    }
+                let result = attempt(() => options.onSubmit(popup), {
+                    ValidationError: ex => {
+                        showError(ex.message);
+                    },
+                });
+
+                if (_.isNull(result)) {
+                    return;
                 }
             }
 

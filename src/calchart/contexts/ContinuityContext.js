@@ -358,7 +358,6 @@ export default class ContinuityContext extends GraphContext {
             // don't redraw screen if the beat didn't change
             if (x !== prev) {
                 _this._controller.setBeat(beat);
-                _this._controller.refresh();
             }
         }
 

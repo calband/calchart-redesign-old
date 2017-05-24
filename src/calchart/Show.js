@@ -242,7 +242,7 @@ export default class Show {
     }
 
     /**
-     * Insert the given stuntsheet at the given index.
+     * Insert the given sheet at the given index.
      *
      * @param {Sheet} sheet
      * @param {int} index
@@ -250,7 +250,7 @@ export default class Show {
     insertSheet(sheet, index) {
         this._sheets.splice(index, 0, sheet);
 
-        _.range(index + 1, this._sheets.length).forEach(i => {
+        _.range(index, this._sheets.length).forEach(i => {
             this._sheets[i].setIndex(i);
         });
 

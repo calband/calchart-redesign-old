@@ -1,4 +1,5 @@
 import { ActionError } from "utils/errors";
+import { attempt } from "utils/JSUtils";
 import { setupTooltip } from "utils/UIUtils";
 
 // The singleton instance of the ApplicationController
@@ -241,18 +242,19 @@ export default class ApplicationController {
                 arg = arg.trim();
 
                 // float or array
-                try {
-                    return JSON.parse(arg);
-                } catch (e) {}
+                let json = attempt(() => JSON.parse(arg));
+                if (!_.isNull(json)) {
+                    return json;
+                }
 
                 // object
                 if (arg.includes("=")) {
                     let [key, val] = arg.split("=");
 
                     // try to parse as JSON, otherwise it's a string
-                    try {
+                    attempt(() => {
                         val = JSON.parse(val);
-                    } catch (e) {}
+                    });
 
                     return {
                         [key]: val,
