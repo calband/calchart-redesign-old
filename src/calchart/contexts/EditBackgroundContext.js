@@ -49,21 +49,23 @@ export default class EditBackgroundContext extends HiddenContext {
         this._handles = HTMLBuilder.div("background-image-handles", null, ".workspace");
         addHandles(this._handles);
 
-        this._addEvents(this._handles, "mousedown", e => {
-            // for saveBackground
-            let oldData = this._getImageData();
+        this._addEvents(this._handles, {
+            mousedown: e => {
+                // for saveBackground
+                let oldData = this._getImageData();
 
-            let mousemove = $(e.target).is(".handle")
-                ? this.mousedownResize(e)
-                : this.mousedownMove(e);
+                let mousemove = $(e.target).is(".handle")
+                    ? this.mousedownResize(e)
+                    : this.mousedownMove(e);
 
-            $(document).on({
-                "mousemove.edit-background": mousemove,
-                "mouseup.edit-background": e => {
-                    this._controller.doAction("saveBackground", [oldData]);
-                    $(document).off(".edit-background");
-                }
-            });
+                $(document).on({
+                    "mousemove.edit-background": mousemove,
+                    "mouseup.edit-background": e => {
+                        this._controller.doAction("saveBackground", [oldData]);
+                        $(document).off(".edit-background");
+                    }
+                });
+            },
         });
     }
 

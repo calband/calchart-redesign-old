@@ -26,8 +26,6 @@ export default class MusicContext extends BaseContext {
 
     load(options) {
         super.load(options);
-
-        this._setupContextMenus();
     }
 
     unload() {
@@ -35,18 +33,6 @@ export default class MusicContext extends BaseContext {
     }
 
     refresh() {
-    }
-
-    /**
-     * Set up the events for showing context menus.
-     */
-    _setupContextMenus() {
-        this._addEvents(".workspace", {
-            contextmenu: e => {
-                showContextMenu(e, {
-                });
-            },
-        });
     }
 }
 

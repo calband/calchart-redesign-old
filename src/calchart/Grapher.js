@@ -45,16 +45,8 @@ export default class Grapher {
     /**
      * Clear the Grapher of all graphics.
      */
-    clear() {
-        this._svg.selectAll("*").remove();
-    }
-
-    /**
-     * Clear the Grapher of all the dots (i.e. keeping the field).
-     */
-    clearDots() {
-        this._svg.select(".dots").remove();
-        this._svg.select(".dot-labels").remove();
+    clearField() {
+        this._svg.select(".field").remove();
     }
 
     /**
@@ -75,9 +67,7 @@ export default class Grapher {
      * @param {int} [currentBeat=0] - The beat to draw, relative to the start
      *   of the Sheet.
      */
-    draw() {
-        let { sheet, currentBeat=0 } = parseArgs(arguments, ["sheet", "currentBeat"]);
-
+    draw(sheet, currentBeat=0) {
         let fieldType = sheet.getFieldType();
         let field = this._svg.select("g.field");
 
@@ -199,6 +189,11 @@ export default class Grapher {
      * @return {GrapherScale} The scale of the Grapher field.
      */
     getScale() {
+        // initialize scale if not initialized
+        if (_.isNull(this._scale)) {
+            this.drawField();
+            this.clearField();
+        }
         return this._scale;
     }
 
@@ -308,6 +303,8 @@ export default class Grapher {
         this._options.zoom = zoom + delta;
     }
 
+    /**** HELPERS ****/
+
     /**
      * Draw the dots in the given Sheet at the given beat onto the SVG.
      *
@@ -382,29 +379,33 @@ export default class Grapher {
             if (dotMarker.empty()) {
                 // draw slashes first, to keep behind dot-marker
                 if (options.drawDotType) {
-                    let start = -1.1 * dotRadius;
-                    let end = 1.1 * dotRadius;
                     dotGroup
                         .append("line")
-                        .classed("fslash", true)
-                        .attr("x1", start)
-                        .attr("y1", end)
-                        .attr("x2", end)
-                        .attr("y2", start);
+                        .classed("fslash", true);
                     dotGroup
                         .append("line")
-                        .classed("bslash", true)
-                        .attr("x1", start)
-                        .attr("y1", start)
-                        .attr("x2", end)
-                        .attr("y2", end);
+                        .classed("bslash", true);
                 }
 
                 dotMarker = dotGroup
                     .append("circle")
-                    .attr("r", dotRadius)
                     .classed("dot-marker", true);
             }
+
+            // resize in case of zoom
+            dotMarker.attr("r", dotRadius);
+            let start = -1.1 * dotRadius;
+            let end = 1.1 * dotRadius;
+            dotMarker.select(".fslash")
+                .attr("x1", start)
+                .attr("y1", end)
+                .attr("x2", end)
+                .attr("y2", start);
+            dotMarker.select(".bslash")
+                .attr("x1", start)
+                .attr("y1", start)
+                .attr("x2", end)
+                .attr("y2", end);
 
             if (options.circleSelected) {
                 let circle = dotGroup.selectAll("circle.selected-circle");
@@ -420,18 +421,20 @@ export default class Grapher {
                 if (dotLabel.empty()) {
                     dotLabel = labelsGroup.append("text")
                         .classed(`dot-label-${dot.id}`, true)
-                        .attr("font-size", dotRadius * 2)
                         .text(dot.label);
-
-                    let width = $.fromD3(dotLabel).getDimensions().width
-                    let offsetX = -1.25 * width;
-                    let offsetY = -1.25 * dotRadius;
-                    if (options.labelLeft === false) {
-                        offsetX *= -1;
-                    }
-
-                    dotLabel.attr("x", offsetX).attr("y", offsetY);
                 }
+
+                let width = $.fromD3(dotLabel).getDimensions().width
+                let offsetX = -1.25 * width;
+                let offsetY = -1.25 * dotRadius;
+                if (options.labelLeft === false) {
+                    offsetX *= -1;
+                }
+
+                dotLabel
+                    .attr("font-size", dotRadius * 2)
+                    .attr("x", offsetX)
+                    .attr("y", offsetY);
             } else {
                 dotLabel.remove();
             }

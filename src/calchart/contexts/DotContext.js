@@ -1,4 +1,4 @@
-import BaseContext from "calchart/contexts/BaseContext";
+import GraphContext from "calchart/contexts/GraphContext";
 import DotType from "calchart/DotType";
 import EditTools from "calchart/EditTools";
 
@@ -11,7 +11,7 @@ import { setupPanel, showContextMenu } from "utils/UIUtils";
  * The Context that allows a user to select and edit dots with a drag
  * and drop interface.
  */
-export default class DotContext extends BaseContext {
+export default class DotContext extends GraphContext {
     constructor(controller) {
         super(controller);
 
@@ -43,6 +43,10 @@ export default class DotContext extends BaseContext {
             name: "dot",
             toolbar: "edit-dots",
         };
+    }
+
+    static get refreshTargets() {
+        return super.refreshTargets.concat(["panel", "tool"]);
     }
 
     load(options) {
@@ -86,18 +90,26 @@ export default class DotContext extends BaseContext {
         $(".menu-item.toggle-background").addClass("disabled");
     }
 
-    refresh() {
+    refreshGrapher() {
+        super.refreshGrapher();
+
         this._grapher.showBackground(this._backgroundVisible);
+    }
 
-        this._activeTool.refresh();
-
+    refreshPanel() {
         // highlight dots in panel
         let dotLabels = this._panel.find(".dot-labels");
         dotLabels.find(".active").removeClass("active");
-        this._controller.getSelectedDots().forEach(dot => {
+        this.getSelectedDots().forEach(dot => {
             dotLabels.find(`.dot-${dot.label}`).addClass("active");
         });
     }
+
+    refreshTool() {
+        this._activeTool.refresh();
+    }
+
+    /**** METHODS ****/
 
     /**
      * Deselect the given dots.
@@ -517,7 +529,7 @@ class ContextActions {
             });
         }
 
-        let result = this.actions.moveDotsTo.call(this, data, sheet);
+        let result = this.constructor.actions.moveDotsTo.call(this, data, sheet);
         return {
             data: [data, sheet],
             undo: result.undo,

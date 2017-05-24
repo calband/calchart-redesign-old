@@ -25,9 +25,13 @@
         {% make_menu menu %}
         {% make_menu toolbar %}
     </div>
-    <div class="content">
-        <div class="sidebar"></div>
-        <div class="workspace"></div>
+    <div class="content graph-content">
+        <div class="sidebar graph-sidebar"></div>
+        <div class="workspace graph-workspace"></div>
+    </div>
+    <div class="content music-content">
+        <div class="sidebar music-sidebar"></div>
+        <div class="workspace music-workspace"></div>
     </div>
     {% for template, name in panels %}
         {% include template with name=name only %}

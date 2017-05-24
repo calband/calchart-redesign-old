@@ -85,7 +85,12 @@ $sidebar-width: 200px;
         width: $sidebar-width;
         padding: 20px;
         border-right: 3px double $medium-gray;
-        .stuntsheet {
+    }
+    .workspace {
+        width: calc(100% - #{$sidebar-width});
+    }
+    &.graph-content {
+        .graph-sidebar .stuntsheet {
             margin-bottom: 10px;
             height: $sidebar-width * 0.6;
             &:last-child {
@@ -115,8 +120,8 @@ $sidebar-width: 200px;
             }
         }
     }
-    .workspace {
-        width: calc(100% - #{$sidebar-width});
+    &.music-content {
+        display: none;
     }
 }
 

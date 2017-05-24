@@ -1,4 +1,4 @@
-import BaseContext from "calchart/contexts/BaseContext";
+import GraphContext from "calchart/contexts/GraphContext";
 
 import { NotImplementedError } from "utils/errors";
 
@@ -7,7 +7,7 @@ import { NotImplementedError } from "utils/errors";
  * when editing a sheet's background image, users don't realize
  * that a new context, EditBackgroundContext, is being loaded.
  */
-export default class HiddenContext extends BaseContext {
+export default class HiddenContext extends GraphContext {
     loadSheet(sheet) {
         if (sheet !== this._sheet) {
             this.exit();

@@ -1,4 +1,4 @@
-import BaseContext from "calchart/contexts/BaseContext";
+import GraphContext from "calchart/contexts/GraphContext";
 import Continuity from "calchart/Continuity";
 import DotType from "calchart/DotType";
 
@@ -16,7 +16,7 @@ import {
  * The Context that allows a user to edit continuities for dot types
  * and step through marching a Sheet.
  */
-export default class ContinuityContext extends BaseContext {
+export default class ContinuityContext extends GraphContext {
     constructor(controller) {
         super(controller);
 

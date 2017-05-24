@@ -66,8 +66,6 @@ export default class ApplicationController {
         return {};
     }
 
-    get shortcuts() { return this.constructor.shortcuts; }
-
     /**
      * Initialize this controller.
      */
@@ -157,7 +155,7 @@ export default class ApplicationController {
      *   should be passed to {@link ApplicationController#doAction}.
      */
     getShortcut(shortcut) {
-        return this.shortcuts[shortcut] || null;
+        return this.constructor.shortcuts[shortcut] || null;
     }
 
     /**

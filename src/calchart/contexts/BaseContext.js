@@ -15,8 +15,6 @@ export default class BaseContext {
      */
     constructor(controller) {
         this._controller = controller;
-        this._grapher = controller.getGrapher();
-        this._sheet = null;
         this._eventListeners = new Set();
     }
 
@@ -29,14 +27,9 @@ export default class BaseContext {
         return {};
     }
 
-    get shortcuts() { return this.constructor.shortcuts; }
-
     /**
      * All actions in the context. Actions are any methods that modify the Show and
-     * can be undone/redone. All actions must return an object containing:
-     *   - {function(this:Context)} undo - The function that will undo this action.
-     *   - {string} [label] -- optional label to use for the Undo/Redo menu item.
-     *     Defaults to the name of the action, capitalized and spaced out.
+     * can be undone/redone. See EditorController.actions for more details.
      *
      * @return {function} A class that defines static functions that run undoable
      *   actions on the controller/context. Functions have `this` defined as the
@@ -45,8 +38,6 @@ export default class BaseContext {
     static get actions() {
         return {};
     }
-
-    get actions() { return this.constructor.actions; }
 
     /**
      * @return {object} meta info for this context, including the following keys:
@@ -60,13 +51,18 @@ export default class BaseContext {
     get info() { return this.constructor.info; }
 
     /**
+     * @return {string[]} Targets to use when no arguments are passed to refresh().
+     */
+    static get refreshTargets() {
+        return [];
+    }
+
+    /**
      * Runs any actions to load this context in the editor application.
      *
      * @param {object} options - Options to customize loading the Context.
      */
     load(options) {
-        this._sheet = this._controller.getActiveSheet();
-
         let toolbar = _.defaultTo(this.info.toolbar, this.info.name);
         $(`.toolbar .${toolbar}`).addClass("active");
         $(`.toolbar .${toolbar}-group`).removeClass("hide");
@@ -87,18 +83,24 @@ export default class BaseContext {
     }
 
     /**
-     * Load the given sheet.
+     * Refresh the UI according to the state of the context.
      *
-     * @param {Sheet} sheet
+     * @param {...String} [targets] - The elements to refresh. When refresh() is called with
+     *   one of the names in the list, refresh<target>() will be called. For example,
+     *   refresh("foo") will call refreshFoo(). Passing in no targets will use all the targets
+     *   in refreshTargets.
      */
-    loadSheet(sheet) {
-        this._sheet = sheet;
+    refresh(...targets) {
+        if (targets.length === 0) {
+            targets = this.constructor.refreshTargets;
+        }
+        targets.forEach(target => {
+            target = _.capitalize(target);
+            this[`refresh${target}`]();
+        });
     }
 
-    /**
-     * Refresh the UI according to the state of the controller and context.
-     */
-    refresh() {}
+    /**** METHODS ****/
 
     /**
      * @return {EditorController}
@@ -107,27 +109,28 @@ export default class BaseContext {
         return this._controller;
     }
 
+    /**** HELPERS ****/
+
     /**
-     * Add the given events to the given element. Can either give as two parameters as
-     * described below, or three parameters, where the second parameter is the event
-     * name and the third parameter is the event handler.
+     * Add the given events to the given element.
      *
      * @param {jQuery|string} element - The jQuery selector or element to add events to.
+     * @param {string} [selector] - An optional selector string to filter the descendants
+     *   of the selected elements that trigger the event (see jQuery's .on function).
      * @param {Object.<string, function(Event)>} events - The events to add, mapping event
      *   name to handler.
      */
-    _addEvents(element, events) {
-        if (arguments.length === 3) {
-            let name = arguments[1];
-            events = {
-                [name]: arguments[2],
-            };
+    _addEvents(element, selector, events) {
+        if (arguments.length === 2) {
+            element = arguments[0];
+            selector = null;
+            events = arguments[1];
         }
 
         // namespace events
         events = _.mapKeys(events, (handler, name) => `${name}.app-context`);
 
-        $(element).on(events);
+        $(element).on(events, selector);
         this._eventListeners.add(element);
     }
 }
