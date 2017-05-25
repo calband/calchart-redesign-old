@@ -404,13 +404,13 @@ class ContextActions {
     static addContinuity(type, sheet=this._sheet, dotType=this._dotType) {
         let continuity = Continuity.create(type, sheet, dotType);
         sheet.addContinuity(dotType, continuity);
-        this._controller.refresh();
+        this.refresh("grapher", "panel");
 
         return {
             data: [type, sheet, dotType],
             undo: function() {
                 sheet.removeContinuity(dotType, continuity);
-                this._controller.refresh();
+                this.refresh("grapher", "panel");
             },
         };
     }
@@ -424,13 +424,13 @@ class ContextActions {
      */
     static removeContinuity(continuity, sheet=this._sheet, dotType=this._dotType) {
         sheet.removeContinuity(dotType, continuity);
-        this._controller.refresh();
+        this.refresh("grapher", "panel");
 
         return {
             data: [continuity, sheet, dotType],
             undo: function() {
                 sheet.addContinuity(dotType, continuity);
-                this._controller.refresh();
+                this.refresh("grapher", "panel");
             },
         };
     }
@@ -453,18 +453,18 @@ class ContextActions {
         } else if (newIndex < 0 || newIndex >= continuities.length) {
             return false;
         }
+
         sheet.moveContinuity(dotType, index, newIndex);
-
-        // no need to checkContinuities, since changing order of movements (vectors) doesn't
-        // change the cumulative movement (vector)?
-
-        this._controller.refresh();
+        this.checkContinuities({
+            dots: dotType,
+        });
+        this.refresh("grapher", "panel");
 
         return {
             data: [continuity, delta, sheet, dotType],
             undo: function() {
                 sheet.moveContinuity(dotType, newIndex, index);
-                this._controller.refresh();
+                this.refresh("grapher", "panel");
             },
         };
     }
@@ -481,17 +481,17 @@ class ContextActions {
         let changed = continuity.savePopup(data);
 
         sheet.updateMovements(dotType);
-        this._controller.checkContinuities({
+        this.checkContinuities({
             dots: dotType,
         });
-        this._controller.refresh();
+        this.refresh("grapher", "panel");
 
         return {
             data: [continuity, data, sheet, dotType],
             undo: function() {
                 continuity.savePopup(changed);
                 sheet.updateMovements(dotType);
-                this._controller.refresh();
+                this.refresh("grapher", "panel");
             },
         };
     }
