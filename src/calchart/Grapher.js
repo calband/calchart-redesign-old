@@ -91,7 +91,7 @@ export default class Grapher {
                     .attr("preserveAspectRatio", "none");
             }
 
-            let position = this._scale.toDistanceCoordinates(background);
+            let position = this._scale.toDistance(background);
             image.attr("href", background.url)
                 .attr("width", this._scale.toDistance(background.width))
                 .attr("height", this._scale.toDistance(background.height))
@@ -171,6 +171,13 @@ export default class Grapher {
     }
 
     /**
+     * @return {number} The radius of the dots in the Grapher.
+     */
+    getDotRadius() {
+        return this._scale.toDistance(3/4);
+    }
+
+    /**
      * @return {jQuery} The SVG graph element.
      */
     getGraph() {
@@ -236,10 +243,9 @@ export default class Grapher {
     }
 
     /**
-     * Select the given dots. Use to select dots without having to refresh the
-     * entire graph.
+     * Select the given dots.
      *
-     * @param {?jQuery} dots
+     * @param {jQuery} dots
      */
     selectDots(dots) {
         d3.selectAll(dots).classed("selected", true);
@@ -314,7 +320,7 @@ export default class Grapher {
     _drawDots(sheet, currentBeat) {
         let _this = this;
         let options = this._options;
-        let dotRadius = this._scale.toDistance(3/4);
+        let dotRadius = this.getDotRadius();
 
         // group containing all dots
         let dotsGroup = this._svg.select("g.dots");
@@ -424,6 +430,8 @@ export default class Grapher {
                         .text(dot.label);
                 }
 
+                dotLabel.attr("font-size", dotRadius * 2);
+
                 let width = $.fromD3(dotLabel).getDimensions().width
                 let offsetX = -1.25 * width;
                 let offsetY = -1.25 * dotRadius;
@@ -431,10 +439,7 @@ export default class Grapher {
                     offsetX *= -1;
                 }
 
-                dotLabel
-                    .attr("font-size", dotRadius * 2)
-                    .attr("x", offsetX)
-                    .attr("y", offsetY);
+                dotLabel.attr("x", offsetX).attr("y", offsetY);
             } else {
                 dotLabel.remove();
             }

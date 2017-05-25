@@ -487,7 +487,8 @@ export function showPopup(name, options={}) {
 
             if (!_.isUndefined(options.onSubmit)) {
                 let result = attempt(() => options.onSubmit(popup), {
-                    ValidationError: ex => {
+                    class: ValidationError,
+                    callback: ex => {
                         showError(ex.message);
                     },
                 });
@@ -689,7 +690,7 @@ export function resizeHandles(handle, start, end) {
         if (handle % 8 !== 0) {
             ratio *= -1;
         }
-        if (deltaX > deltaY * ratio) {
+        if (deltaX < deltaY * ratio) {
             deltaX = deltaY * ratio;
         } else {
             deltaY = deltaX / ratio;

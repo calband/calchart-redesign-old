@@ -119,7 +119,7 @@ export default class FTLPathContext extends HiddenContext {
         this._list.empty();
         this._svg.selectAll(".ref-point").remove();
         let scale = this._grapher.getScale();
-        let dotRadius = scale.toDistance(3/4);
+        let dotRadius = this._grapher.getDotRadius();
 
         let start = this._sheet.getDotInfo(dot.data("dot")).position;
         let startScaled = scale.toDistanceCoordinates(start);

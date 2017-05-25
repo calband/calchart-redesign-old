@@ -35,7 +35,7 @@ let isGraphInitialized = false;
 let GraphState = {
     grapher: null,
     sheet: null,
-    currBeat: null,
+    currBeat: null, // TODO: move to ContinuityContext (#154)
     selectedDots: $(),
 };
 
@@ -46,6 +46,9 @@ let GraphState = {
 export default class GraphContext extends BaseContext {
     constructor(controller) {
         super(controller);
+
+        this._sidebar = $(".graph-sidebar");
+        this._workspace = $(".graph-workspace");
 
         if (!isGraphInitialized) {
             this.init();
@@ -78,8 +81,8 @@ export default class GraphContext extends BaseContext {
         // init sidebar
 
         let oldIndex;
-        $(".graph-sidebar").sortable({
-            containment: ".graph-sidebar",
+        this._sidebar.sortable({
+            containment: this._sidebar,
             activate: (e, ui) => {
                 oldIndex = ui.item.index();
             },
@@ -91,8 +94,7 @@ export default class GraphContext extends BaseContext {
 
         // init workspace
 
-        let workspace = $(".graph-workspace");
-        GraphState.grapher = new Grapher(this._show, workspace, {
+        GraphState.grapher = new Grapher(this._show, this._workspace, {
             boundDots: true,
             drawYardlineNumbers: true,
             draw4Step: true,
@@ -104,8 +106,8 @@ export default class GraphContext extends BaseContext {
 
         // initialize with field in view
         let scale = GraphState.grapher.getScale();
-        workspace.scrollLeft(scale.minX - 30);
-        workspace.scrollTop(scale.minY - 30);
+        this._workspace.scrollLeft(scale.minX - 30);
+        this._workspace.scrollTop(scale.minY - 30);
     }
 
     load(options) {
@@ -117,7 +119,7 @@ export default class GraphContext extends BaseContext {
         this._currBeat = GraphState.currBeat;
         this._selectedDots = GraphState.selectedDots;
 
-        this._addEvents(".graph-sidebar", {
+        this._addEvents(this._sidebar, {
             contextmenu: e => {
                 if ($(e.target).notIn(".stuntsheet")) {
                     showContextMenu(e, {
@@ -127,7 +129,7 @@ export default class GraphContext extends BaseContext {
             },
         });
 
-        this._addEvents(".graph-sidebar", ".stuntsheet", {
+        this._addEvents(this._sidebar, ".stuntsheet", {
             contextmenu: e => {
                 $(e.currentTarget).click();
 
@@ -145,7 +147,7 @@ export default class GraphContext extends BaseContext {
             },
         });
 
-        $(".graph-workspace").pinch(e => {
+        this._workspace.pinch(e => {
             e.preventDefault();
 
             let delta = e.deltaY / 100;
@@ -165,7 +167,7 @@ export default class GraphContext extends BaseContext {
         GraphState.currBeat = this._currBeat;
         GraphState.selectedDots = this._selectedDots;
 
-        $(".graph-workspace").off(".pinch");
+        this._workspace.off(".pinch");
         $(".toolbar .graph-context-group").addClass("hide");
     }
 
@@ -175,6 +177,7 @@ export default class GraphContext extends BaseContext {
     refreshGrapher() {
         if (this._sheet) {
             this._grapher.draw(this._sheet, this._currBeat);
+            this._grapher.selectDots(this._selectedDots);
         } else {
             this._grapher.drawField();
         }
@@ -184,14 +187,14 @@ export default class GraphContext extends BaseContext {
      * Refresh the sidebar
      */
     refreshSidebar() {
-        let sidebar = $(".graph-sidebar").empty();
+        this._sidebar.empty();
         
         this._show.getSheets().forEach(sheet => {
             let label = HTMLBuilder.span(sheet.getLabel(), "label");
 
             let preview = HTMLBuilder.div("preview");
             let $sheet = HTMLBuilder
-                .div("stuntsheet", [label, preview], sidebar)
+                .div("stuntsheet", [label, preview], this._sidebar)
                 .data("sheet", sheet);
 
             if (sheet === this._sheet) {
@@ -199,9 +202,9 @@ export default class GraphContext extends BaseContext {
             }
         });
 
-        sidebar.find(".stuntsheet").each((i, elem) => {
-            let sheet = $(elem).data("sheet");
-            let preview = $(elem).find(".preview");
+        this._sidebar.find(".stuntsheet").each((i, $sheet) => {
+            let sheet = $($sheet).data("sheet");
+            let preview = $($sheet).find(".preview");
 
             // field preview
             let grapher = new Grapher(this._show, preview, {
@@ -237,35 +240,34 @@ export default class GraphContext extends BaseContext {
      *   into/out of. Defaults to the center of the graph.
      */
     refreshZoom(pageX, pageY) {
-        let workspace = $(".graph-workspace");
-        let offset = workspace.offset();
+        let offset = this._workspace.offset();
 
         // distance from top-left corner of workspace
         let left, top;
         if (_.isUndefined(pageX)) {
-            left = workspace.outerWidth() / 2;
+            left = this._workspace.outerWidth() / 2;
         } else {
             left = pageX - offset.left;
         }
         if (_.isUndefined(pageY)) {
-            top = workspace.outerHeight() / 2;
+            top = this._workspace.outerHeight() / 2;
         } else {
             top = pageY - offset.top;
         }
 
         // steps from top-left corner of field
-        let start = this._grapher.getScale().toStepCoordinates({
-            x: workspace.scrollLeft() + left,
-            y: workspace.scrollTop() + top,
+        let start = this._grapher.getScale().toSteps({
+            x: this._workspace.scrollLeft() + left,
+            y: this._workspace.scrollTop() + top,
         });
 
         this._grapher.clearField();
         this.refresh("grapher");
 
         // scroll workspace to keep same location under cursor
-        let end = this._grapher.getScale().toDistanceCoordinates(start);
-        workspace.scrollLeft(end.x - left);
-        workspace.scrollTop(end.y - top);
+        let end = this._grapher.getScale().toDistance(start);
+        this._workspace.scrollLeft(end.x - left);
+        this._workspace.scrollTop(end.y - top);
     }
 
     /**** METHODS ****/
@@ -337,7 +339,8 @@ export default class GraphContext extends BaseContext {
 
         dots.forEach(dot => {
             let final = attempt(() => sheet.getAnimationState(dot, duration), {
-                AnimationStateError: ex => {
+                class: AnimationStateError,
+                callback: ex => {
                     errors.lackMoves.push(dot.label);
                 },
             });
@@ -504,13 +507,34 @@ export default class GraphContext extends BaseContext {
     }
 
     /**
-     * @return {Dot[]} The selected dots, as Dot objects.
+     * @return {Sheet}
+     */
+    getActiveSheet() {
+        return this._sheet;
+    }
+
+    /**
+     * @return {Grapher}
+     */
+    getGrapher() {
+        return this._grapher;
+    }
+
+    /**
+     * @return {Dot[]}
      */
     getSelectedDots() {
         return _.map(
             this._selectedDots,
             elem => $(elem).data("dot")
         );
+    }
+
+    /**
+     * @return {jQuery}
+     */
+    getSelection() {
+        return this._selectedDots;
     }
 
     /**
@@ -599,11 +623,11 @@ export default class GraphContext extends BaseContext {
      * @param {jQuery} dots
      */
     toggleDots(dots) {
+        let deselect = dots.filter(this._selectedDots);
+
         this.selectDots(dots, {
             append: true,
         });
-
-        let deselect = dots.filter(this._selectedDots);
         this.deselectDots(deselect);
     }
 

@@ -42,7 +42,7 @@ export default class GateReferenceContext extends HiddenContext {
         this._continuity = options.continuity;
 
         let scale = this._grapher.getScale();
-        let dotRadius = scale.toDistance(3/4);
+        let dotRadius = this._grapher.getDotRadius();
 
         this._helper = this._svg.append("circle")
             .classed("gate-reference-helper", true)

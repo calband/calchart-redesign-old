@@ -52,10 +52,16 @@ if (IS_MAC) {
  * If no errors object is given, ignores any errors thrown by the func.
  *
  * @param {function} func - The function to attempt to run.
- * @param {?object} [errors=null] - An optional object that maps error class
- *   to a callback function, passing in the exception. If null, ignores any
- *   errors thrown (different from passing an empty object, which re-throws
- *   any errors thrown).
+ * @param {?(object[]|object)} [errors=null] - An optional array of objects that
+ *   list, in order, the errors to catch. If null, ignores any errors thrown
+ *   (which is different from passing an empty array, which re-throws any errors
+ *   thrown). Can also pass in a single object instead of an array with one
+ *   element. Each object is of the form:
+ *   {
+ *       class: Error,
+ *       callback: function,
+ *   }
+ *
  * @return {?*} The result of running the function, or null if an error was
  *   caught.
  */
@@ -65,13 +71,18 @@ export function attempt(func, errors=null) {
     } catch (ex) {
         if (!_.isNull(errors)) {
             let found = false;
-            _.each(errors, (callback, ErrorClass) => {
-                if (ex instanceof ErrorClass) {
-                    callback(ex);
+            if (_.isPlainObject(errors)) {
+                errors = [errors];
+            }
+
+            _.each(errors, error => {
+                if (ex instanceof error.class) {
+                    error.callback(ex);
                     found = true;
                     return false;
                 }
             });
+
             if (!found) {
                 throw ex;
             }

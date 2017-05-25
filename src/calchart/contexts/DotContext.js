@@ -52,7 +52,7 @@ export default class DotContext extends GraphContext {
     load(options) {
         super.load(options);
 
-        this._addEvents(".workspace", {
+        this._addEvents(this._workspace, {
             contextmenu: e => {
                 showContextMenu(e, {
                     "Edit continuity...": "loadContext(continuity)",
@@ -87,10 +87,10 @@ export default class DotContext extends GraphContext {
             .scrollTop(0);
 
         this.loadTool("selection");
-        this._addEvents(".workspace", {
+        this._addEvents(this._workspace, {
             mousedown: e => {
                 e.preventDefault();
-                this._activeTool.mousedown(e);
+                this._activeTool.handle(e);
 
                 $(document).on({
                     "mousemove.edit-tool": e => {
@@ -154,22 +154,19 @@ export default class DotContext extends GraphContext {
 
         super.deselectDots(dots);
         if (options.refresh) {
-            this.refresh("grapher", "panel");
+            this.refresh("panel");
         }
     }
 
     /**
-     * @return {Grapher}
-     */
-    getGrapher() {
-        return this._grapher;
-    }
-
-    /**
-     * @return {int}
+     * @return {?int} The snap grid as steps, or null if no snap.
      */
     getGrid() {
-        return this._grid;
+        if (this._grid === 0) {
+            return null;
+        } else {
+            return this._grid;
+        }
     }
 
     /**
@@ -190,20 +187,19 @@ export default class DotContext extends GraphContext {
      *
      * @param {jQuery} dots
      * @param {Object} [options]
-     *   - {boolean} [append=true] - Set to false to deselect
-     *     dots before selecting
+     *   - {boolean} [append=false] - If false, deselect all dots
+     *     before selecting.
      *   - {boolean} [refresh=true] - Set to false to manually
      *     refresh the context (optimization).
      */
     selectDots(dots, options={}) {
         options = _.defaults({}, options, {
-            append: true,
             refresh: true,
         });
 
         super.selectDots(dots, options);
         if (options.refresh) {
-            this.refresh("grapher", "panel");
+            this.refresh("panel");
         }
     }
 
@@ -230,7 +226,7 @@ export default class DotContext extends GraphContext {
 
         super.toggleDots(dots);
         if (options.refresh) {
-            this.refresh("grapher", "panel");
+            this.refresh("panel");
         }
     }
 
@@ -396,19 +392,19 @@ class ContextActions {
      */
     static moveDots(deltaX, deltaY, dots, sheet=this._sheet) {
         if (_.isUndefined(dots)) {
-            dots = this._controller.getSelectedDots();
+            dots = this.getSelectedDots();
         }
 
         let scale = this._grapher.getScale();
         let _deltaX = scale.toDistance(deltaX);
         let _deltaY = scale.toDistance(deltaY);
         let boundPosition = position => {
-            position = scale.toDistanceCoordinates(position);
+            position = scale.toDistance(position);
 
             let x = _.clamp(position.x + _deltaX, 0, this._grapher.svgWidth);
             let y = _.clamp(position.y + _deltaY, 0, this._grapher.svgHeight);
 
-            return scale.toStepCoordinates({ x, y });
+            return scale.toSteps({ x, y });
         };
 
         // update positions

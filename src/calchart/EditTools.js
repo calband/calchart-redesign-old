@@ -66,9 +66,9 @@ export default class EditTools {
         }
 
         if (tool instanceof BaseEdit) {
-            $(".workspace").addClass("edit-tools-active");
+            $(".graph-workspace").addClass("edit-tools-active");
         } else {
-            $(".workspace").removeClass("edit-tools-active");
+            $(".graph-workspace").removeClass("edit-tools-active");
         }
 
         $(".toolbar .edit-tools li").removeClass("active");
@@ -91,8 +91,8 @@ export default class EditTools {
  *
  * Method handlers:
  * - User clicks tool in toolbar: load()
- * - User clicks down in workspace: mousedown(). Start listening
- *   for mousemove and mouseup events
+ * - User clicks down in workspace: handle(), which calls mousedown().
+ *   Starts listening for mousemove and mouseup events
  * - User moves mouse (dragging): mousemove()
  * - User clicks up: mouseup()
  * - If isDone() returns true, stop listening for mousemove and
@@ -104,9 +104,12 @@ class BaseTool {
      * @param {DotContext} context
      */
     constructor(context) {
-        this.context = context;
-        this.controller = context.getController();
-        this.grapher = context.getGrapher();
+        this._context = context;
+        this._controller = context.getController();
+        this._grapher = context.getGrapher();
+
+        // initialize any refreshZoom fields
+        this.refreshZoom();
     }
 
     /**
@@ -115,9 +118,11 @@ class BaseTool {
     load() {}
 
     /**
-     * Runs any actions whenever the context is refreshed.
+     * Runs any actions whenever the grapher zoom changes.
      */
-    refreshZoom() {}
+    refreshZoom() {
+        this._scale = this._grapher.getScale();
+    }
 
     /**
      * Runs any actions when the tool is unloaded from the toolbar.
@@ -130,6 +135,15 @@ class BaseTool {
      */
     isDone() {
         return true;
+    }
+
+    /**
+     * The function to run before mousedown is triggered.
+     *
+     * @param {Event} e
+     */
+    handle(e) {
+        this.mousedown(e);
     }
 
     /**
@@ -157,18 +171,6 @@ class BaseTool {
     mouseup(e) {}
 
     /**
-     * @return {number} the snap grid
-     */
-    _getSnap() {
-        let grid = this.context.getGrid();
-        if (grid === 0) {
-            return null;
-        } else {
-            return this.grapher.getScale().toDistance(grid);
-        }
-    }
-
-    /**
      * Convert the given (x,y) coordinates on the page to be relative to
      * the workspace. Can also pass in an Event object, which will have
      * its pageX and pageY values taken.
@@ -189,7 +191,7 @@ class BaseTool {
             pageY = e.pageY;
         }
 
-        return $(".workspace").makeRelative(pageX, pageY);
+        return $(".graph-workspace").makeRelative(pageX, pageY);
     }
 
     /**
@@ -199,16 +201,12 @@ class BaseTool {
     _makeRelativeSnap() {
         let [x, y] = this._makeRelative.apply(this, arguments);
 
-        let grid = this.context.getGrid();
-        if (grid !== 0) {
-            let scale = this.grapher.getScale();
-            let steps = scale.toStepCoordinates({x, y});
-            let distance = scale.toDistanceCoordinates({
-                x: round(steps.x, grid),
-                y: round(steps.y, grid),
-            });
-            x = distance.x;
-            y = distance.y;
+        let grid = this._context.getGrid();
+        if (grid) {
+            let roundX = round(this._scale.toStepsX(x), grid);
+            let roundY = round(this._scale.toStepsY(y), grid);
+            x = this._scale.toDistanceX(roundX);
+            y = this._scale.toDistanceY(roundY);
         }
 
         return [x, y];
@@ -231,31 +229,32 @@ class SelectionTool extends BaseSelection {
 
         if ($(e.target).is(".dot-marker")) {
             if (this._metaKey) {
-                this._dragType = "none";
-                let dot = $(e.target).parent();
-                this.context.toggleDots(dot);
+                this.mousedownToggle(e);
             } else {
-                this._dragType = "dot";
                 this.mousedownDot(e);
             }
         } else {
-            this._dragType = "select";
             this.mousedownSelect(e);
         }
 
         this._dragStart = e;
     }
 
-    mousedownDot(e) {
-        let dot = $(e.target).parent();
+    mousedownToggle(e) {
+        this._dragType = "none";
 
-        if (!this.grapher.isSelected(dot)) {
-            this.context.selectDots(dot, {
-                append: false,
-            });
+        let dot = $(e.target).parent();
+        this._context.toggleDots(dot);
+    }
+
+    mousedownDot(e) {
+        this._dragType = "dot";
+
+        let dot = $(e.target).parent();
+        if (!this._grapher.isSelected(dot)) {
+            this._context.selectDots(dot);
         }
 
-        this._scale = this.grapher.getScale();
         this._scrollOffset = {
             top: 0,
             left: 0,
@@ -267,14 +266,16 @@ class SelectionTool extends BaseSelection {
     }
 
     mousedownSelect(e) {
+        this._dragType = "select";
+
         if (this._metaKey) {
-            let selectedDots = this.controller.getSelectedDots().map(dot => dot.id);
+            let selectedDots = this._context.getSelectedDots().map(dot => dot.id);
             this._selected = new Set(selectedDots);
         } else {
-            this.context.deselectDots();
+            this._context.deselectDots();
         }
 
-        this._box = HTMLBuilder.div("selection-box", null, ".workspace");
+        this._box = HTMLBuilder.div("selection-box", null, ".graph-workspace");
         this._scrollOffset = {
             top: 0,
             left: 0,
@@ -293,33 +294,30 @@ class SelectionTool extends BaseSelection {
     }
 
     mousemoveDot(e) {
-        let scale = this.grapher.getScale();
-
         // change from beginning of move to now
         let deltaX = this._scrollOffset.left + e.pageX - this._dragStart.pageX;
         let deltaY = this._scrollOffset.top + e.pageY - this._dragStart.pageY;
 
         // snap overall movement to grid; dots can themselves be off
         // the grid, but they move in a consistent interval
-        let snap = this._getSnap();
-        if (!_.isNull(snap)) {
-            deltaX = round(deltaX, snap);
-            deltaY = round(deltaY, snap);
+        if (this._snap) {
+            deltaX = round(deltaX, this._snap);
+            deltaY = round(deltaY, this._snap);
         }
 
-        let sheet = this.controller.getActiveSheet();
-        this.controller.getSelection()
+        let sheet = this._context.getActiveSheet();
+        this._context.getSelection()
             .each((i, dot) => {
                 let dotPosition = sheet.getPosition($(dot).data("dot"));
-                let position = scale.toDistanceCoordinates(dotPosition);
-                this.grapher.moveDotTo(dot, position.x + deltaX, position.y + deltaY);
+                let position = this._scale.toDistance(dotPosition);
+                this._grapher.moveDotTo(dot, position.x + deltaX, position.y + deltaY);
             })
             .scrollIntoView({
-                parent: ".workspace",
+                parent: ".graph-workspace",
                 tolerance: 10,
-                callback: (deltaX, deltaY) => {
-                    this._scrollOffset.left += deltaX;
-                    this._scrollOffset.top += deltaY;
+                callback: (dx, dy) => {
+                    this._scrollOffset.left += dx;
+                    this._scrollOffset.top += dy;
                 },
             });
 
@@ -347,47 +345,47 @@ class SelectionTool extends BaseSelection {
                 height: height,
             })
             .scrollIntoView({
-                parent: ".workspace",
+                parent: ".graph-workspace",
                 callback: (dx, dy) => {
                     this._scrollOffset.left += dx;
                     this._scrollOffset.top += dy;
                 },
             });
 
+        // dont refresh until the end
         let options = {
+            append: true,
             refresh: false,
         };
 
-        if (!this._metaKey) {
-            this.context.deselectDots(undefined, options);
-        }
+        this._context.deselectDots(undefined, options);
 
         // select dots within the selection box
-        this.grapher.getDots().each((i, dot) => {
-            dot = $(dot);
-            let id = dot.data("dot").id;
-            let position = dot.data("position");
+        this._grapher.getDots().each((i, dot) => {
+            let id = $(dot).data("dot").id;
+            let position = $(dot).data("position");
             let inRange = (
                 _.inRange(position.x, minX, maxX) &&
                 _.inRange(position.y, minY, maxY)
             );
 
-            if (this._metaKey) {
-                if (inRange) {
-                    if (this._selected.has(id)) {
-                        this.context.deselectDots(dot, options);
-                    } else {
-                        this.context.selectDots(dot, options);
-                    }
-                } else if (this._selected.has(id)) {
-                    this.context.selectDots(dot, options);
+            // TODO: fix (#152)
+            if (inRange) {
+                if (this._metaKey && this._selected.has(id)) {
+                    this._context.deselectDots(dot, options);
                 } else {
-                    this.context.deselectDots(dot, options);
+                    this._context.selectDots(dot, options);
                 }
-            } else if (inRange) {
-                this.context.selectDots(dot, options);
+            } else if (this._metaKey) {
+                if (this._selected.has(id)) {
+                    this._context.selectDots(dot, options);
+                } else {
+                    this._context.deselectDots(dot, options);
+                }
             }
         });
+
+        this._context.refresh("panel");
     }
 
     mouseup(e) {
@@ -399,18 +397,13 @@ class SelectionTool extends BaseSelection {
                 this.mouseupSelect(e);
                 break;
         }
-
-        // update panel
-        this.context.refresh();
     }
 
     mouseupDot(e) {
-        let scale = this.grapher.getScale();
-        let deltaX = scale.toSteps(this._moveOffset.x);
-        let deltaY = scale.toSteps(this._moveOffset.y);
-
-        if (deltaX !== 0 || deltaY !== 0) {
-            this.controller.doAction("moveDots", [deltaX, deltaY]);
+        if (this._moveOffset.x !== 0 || this._moveOffset.y !== 0) {
+            let deltaX = this._scale.toSteps(this._moveOffset.x);
+            let deltaY = this._scale.toSteps(this._moveOffset.y);
+            this._controller.doAction("moveDots", [deltaX, deltaY]);
         }
     }
 
@@ -424,10 +417,9 @@ class SelectionTool extends BaseSelection {
  */
 class LassoTool extends BaseSelection {
     mousedown(e) {
-        this.context.deselectDots();
 
         let [startX, startY] = this._makeRelative(e);
-        let path = this.grapher.getSVG()
+        let path = this._grapher.getSVG()
             .append("path")
             .classed("edit-tool-path lasso-path", true)
             .attr("d", `M ${startX} ${startY}`);
@@ -442,14 +434,13 @@ class LassoTool extends BaseSelection {
         this._path
             .attr("d", pathDef)
             .scrollIntoView({
-                parent: ".workspace",
+                parent: ".graph-workspace",
             });
-    }
 
-    mouseup(e) {
-        this.grapher.getDots().each((i, dot) => {
-            dot = $(dot);
-            let marker = dot.find(".dot-marker");
+        this._context.deselectDots();
+
+        this._grapher.getDots().each((i, dot) => {
+            let marker = $(dot).find(".dot-marker");
             let offset = marker.offset();
             let dimensions = marker.getDimensions();
             let topElem = document.elementFromPoint(
@@ -457,13 +448,17 @@ class LassoTool extends BaseSelection {
                 offset.top + dimensions.height / 2
             );
             if ($(topElem).is(this._path)) {
-                this.context.selectDots(dot, {
+                this._context.selectDots(dot, {
+                    append: true,
                     refresh: false,
                 });
             }
         });
 
-        this.controller.refresh("context");
+        this._context.refresh("panel");
+    }
+
+    mouseup(e) {
         this._path.remove();
     }
 }
@@ -473,26 +468,27 @@ class LassoTool extends BaseSelection {
  */
 class SwapTool extends BaseTool {
     load() {
-        let selection = this.controller.getSelection();
-        selection = selection.not(selection.last());
-        this.context.deselectDots(selection);
+        // if multiple dots are selected, just deselect everything
+        if (this._context.getSelection().length > 1) {
+            this._context.deselectDots();
+        }
     }
 
     mousedown(e) {
         if ($(e.target).is(".dot-marker")) {
-            let selection = this.controller.getSelection();
+            let selection = this._context.getSelection();
             let dot = $(e.target).parent();
 
             if (selection.length === 0) {
-                this.context.selectDots(dot);
+                this._context.selectDots(dot);
             } else {
                 let dot1 = selection.data("dot");
                 let dot2 = dot.data("dot");
-                this.controller.doAction("swapDots", [dot1, dot2]);
-                this.context.deselectDots();
+                this._controller.doAction("swapDots", [dot1, dot2]);
+                this._context.deselectDots();
             }
         } else {
-            this.context.deselectDots();
+            this._context.deselectDots();
         }
     }
 }
@@ -501,25 +497,41 @@ class SwapTool extends BaseTool {
  * A superclass for all tools that edit dots.
  */
 class BaseEdit extends BaseTool {
+    refreshZoom() {
+        super.refreshZoom();
+
+        let grid = this._context.getGrid();
+        if (grid) {
+            this._snap = this._scale.toDistance(grid);
+        } else {
+            this._snap = null;
+        }
+    }
+
+    handle(e) {
+        // By default, always run mousemove after mousedown.
+        super.handle(e);
+        this.mousemove(e);
+    }
+
     mouseup(e) {
         this._saveDotPositions();
-        this.context.loadTool(EditTools.lastSelectionTool);
+        this._context.loadTool(EditTools.lastSelectionTool);
     }
 
     /**
      * Save the currently selected dots' positions.
      */
     _saveDotPositions() {
-        let scale = this.grapher.getScale();
-        let data = _.map(this.controller.getSelection(), dot => {
-            let position = scale.toStepCoordinates($(dot).data("position"));
+        let data = _.map(this._context.getSelection(), dot => {
+            let position = this._scale.toSteps($(dot).data("position"));
             return {
                 dot: $(dot).data("dot"),
                 x: roundSmall(position.x),
                 y: roundSmall(position.y),
             };
         })
-        this.controller.doAction("moveDotsTo", [data]);
+        this._controller.doAction("moveDotsTo", [data]);
     }
 }
 
@@ -528,7 +540,7 @@ class BaseEdit extends BaseTool {
  */
 class StretchTool extends BaseEdit {
     load() {
-        this._box = HTMLBuilder.div("stretch-box", null, ".workspace");
+        this._box = HTMLBuilder.div("stretch-box", null, ".graph-workspace");
         addHandles(this._box);
 
         let bounds = this._getDotBounds();
@@ -537,7 +549,7 @@ class StretchTool extends BaseEdit {
 
         // dot ID to ratio of position to top/left-most dot
         this._positions = {};
-        this.controller.getSelection().each((i, $dot) => {
+        this._context.getSelection().each((i, $dot) => {
             let dot = $($dot).data("dot");
             let position = $($dot).data("position");
 
@@ -547,12 +559,14 @@ class StretchTool extends BaseEdit {
             };
         });
 
-        this.refresh();
+        this.refreshZoom();
     }
 
     refreshZoom() {
+        super.refreshZoom();
+
         let bounds = this._getDotBounds();
-        this._margin = this._getDotRadius() + 5;
+        this._margin = this._grapher.getDotRadius() + 5;
 
         this._box.css({
             top: bounds.top - this._margin,
@@ -567,7 +581,7 @@ class StretchTool extends BaseEdit {
     }
 
     mousedown(e) {
-        // TODO: rotate
+        // TODO: rotate (#129)
 
         if (!$(e.target).is(".handle")) {
             this._handle = null;
@@ -576,7 +590,7 @@ class StretchTool extends BaseEdit {
 
         this._handle = $(e.target).data("handle-id");
         let offset = this._box.offset();
-        let [x, y] = $(".workspace").makeRelative(offset.left, offset.top);
+        let [x, y] = this._makeRelative(offset.left, offset.top);
         this._start = {
             top: y,
             left: x,
@@ -598,12 +612,12 @@ class StretchTool extends BaseEdit {
         let width = data.width - 2 * this._margin;
         let height = data.height - 2 * this._margin;
 
-        this.controller.getSelection().each((i, $dot) => {
-            let dot = $($dot).data("dot");
-            let ratio = this._positions[dot.id];
+        this._context.getSelection().each((i, dot) => {
+            let id = $(dot).data("dot").id;
+            let ratio = this._positions[id];
             let x = ratio.left * width + left;
             let y = ratio.top * height + top;
-            this.grapher.moveDotTo($dot, x, y);
+            this._grapher.moveDotTo(dot, x, y);
         });
     }
 
@@ -617,27 +631,21 @@ class StretchTool extends BaseEdit {
      *   the x-coordinate of the left-most dot.
      */
     _getDotBounds() {
-        let bounds = this.controller.getSelection().getBounds();
+        let bounds = this._context.getSelection().getBounds();
 
-        let scrollLeft = $(".workspace").scrollLeft();
-        let scrollTop = $(".workspace").scrollTop();
-        let offset = $(".workspace").offset();
+        let workspace = $(".graph-workspace");
+        let scrollLeft = workspace.scrollLeft();
+        let scrollTop = workspace.scrollTop();
+        let offset = workspace.offset();
 
         // make bounds relative to center of dots instead of edge of dot
-        let dotRadius = this._getDotRadius();
+        let dotRadius = this._grapher.getDotRadius();
         bounds.left += scrollLeft + dotRadius - offset.left;
         bounds.top += scrollTop + dotRadius - offset.top;
         bounds.right += scrollLeft - dotRadius - offset.left;
         bounds.bottom += scrollTop - dotRadius - offset.top;
 
         return bounds;
-    }
-
-    /**
-     * @return {number} The radius of a dot.
-     */
-    _getDotRadius() {
-        return this.controller.getSelection().first().getDimensions().width / 2;
     }
 }
 
@@ -652,33 +660,27 @@ class LineTool extends BaseEdit {
         this._startY = startY;
 
         // the helper line
-        let line = this.grapher.getSVG()
+        let line = this._grapher.getSVG()
             .append("line")
             .classed("edit-tool-path", true)
             .attr("x1", this._startX)
             .attr("y1", this._startY);
         this._line = $.fromD3(line);
-
-        this.mousemove(e);
     }
 
     mousemove(e) {
         let [x, y] = this._makeRelativeSnap(e);
 
-        this._line
-            .attr("x2", x)
-            .attr("y2", y);
+        this._line.attr("x2", x).attr("y2", y);
 
         let deltaX = x - this._startX;
         let deltaY = y - this._startY;
 
-        let selection = this.controller.getSelection();
-        let total = selection.length - 1;
-        selection.each((i, dot) => {
-            // selection originally in reverse order
-            let x = this._startX + (total - i) * deltaX;
-            let y = this._startY + (total - i) * deltaY;
-            this.grapher.moveDotTo(dot, x, y);
+        // TODO: Fix order (#132)
+        this._context.getSelection().get().reverse().forEach((dot, i) => {
+            let x = this._startX + i * deltaX;
+            let y = this._startY + i * deltaY;
+            this._grapher.moveDotTo(dot, x, y);
         });
     }
 
@@ -726,14 +728,10 @@ class ArcTool extends BaseEdit {
 
         // helper path
 
-        let path = this.grapher.getSVG()
+        let path = this._grapher.getSVG()
             .append("path")
             .classed("edit-tool-path", true);
         this._path = $.fromD3(path);
-
-        this._snap = this._getSnap();
-
-        this.mousemove(e);
     }
 
     mousemove(e) {
@@ -748,7 +746,7 @@ class ArcTool extends BaseEdit {
         // radius
         let [x, y] = this._makeRelative(e);
         this._radius = calcDistance(this._startX, this._startY, x, y);
-        if (!_.isNull(this._snap)) {
+        if (this._snap) {
             this._radius = round(this._radius, this._snap);
         }
 
@@ -761,8 +759,8 @@ class ArcTool extends BaseEdit {
 
         this._startAngle = angle;
 
-        this.controller.getSelection().each((i, dot) => {
-            this.grapher.moveDotTo(dot, x, y);
+        this._context.getSelection().each((i, dot) => {
+            this._grapher.moveDotTo(dot, x, y);
         });
 
         this._lastAngle = angle;
@@ -779,15 +777,15 @@ class ArcTool extends BaseEdit {
         let arcPath = `A ${this._radius} ${this._radius} 0 ${arc.largeArcFlag} ${arc.sweepFlag} ${x} ${y}`;
         this._path.attr("d", `${this._radiusPath} ${arcPath} Z`);
 
-        let selection = this.controller.getSelection();
+        let selection = this._context.getSelection();
         let total = selection.length - 1;
         let delta = arc.length / total;
-        selection.each((i, dot) => {
-            // selection originally in reverse order
-            let angle = delta * (total - i) + this._startAngle;
+        // TODO: Fix order (#132)
+        selection.get().reverse().forEach((dot, i) => {
+            let angle = delta * i + this._startAngle;
             let x = this._startX + calcRotatedXPos(angle) * this._radius;
             let y = this._startY + calcRotatedYPos(angle) * this._radius;
-            this.grapher.moveDotTo(dot, x, y);
+            this._grapher.moveDotTo(dot, x, y);
         });
     }
 
@@ -872,32 +870,32 @@ class ArcTool extends BaseEdit {
  * will fill in.
  */
 class BlockTool extends BaseEdit {
+    refreshZoom() {
+        super.refreshZoom();
+
+        // always make sure there's a grid; default to 2
+        if (_.isNull(this._snap)) {
+            this._snap = this._scale.toDistance(2);
+        }
+    }
+
     mousedown(e) {
         let [startX, startY] = this._makeRelativeSnap(e);
         this._startX = startX;
         this._startY = startY;
 
-        // always make sure there's a grid; default to 2
-        this._snap = this._getSnap();
-        if (_.isNull(this._snap)) {
-            let scale = this.grapher.getScale();
-            this._snap = scale.toDistance(2);
-        }
-
         // helper path
-        let line = this.grapher.getSVG()
+        let line = this._grapher.getSVG()
             .append("line")
             .classed("edit-tool-path", true)
             .attr("x1", this._startX)
             .attr("y1", this._startY);
         this._line = $.fromD3(line);
-
-        this.mousemove(e);
     }
 
     mousemove(e) {
         let [endX, endY] = this._makeRelativeSnap(e);
-        let selection = this.controller.getSelection();
+        let selection = this._context.getSelection();
 
         let deltaX = endX - this._startX;
         let deltaY = endY - this._startY;
@@ -921,10 +919,11 @@ class BlockTool extends BaseEdit {
         this._line.attr("x2", endX).attr("y2", endY);
 
         // move dots
+        // TODO: Fix order (#132)
         selection.get().reverse().forEach((dot, i) => {
             let dotX = this._startX + (i % numCols) * this._snap;
             let dotY = this._startY + Math.floor(i / numCols) * this._snap;
-            this.grapher.moveDotTo(dot, dotX, dotY);
+            this._grapher.moveDotTo(dot, dotX, dotY);
         });
     }
 
@@ -946,7 +945,7 @@ class CircleTool extends BaseEdit {
 
         // helper paths
 
-        let svg = this.grapher.getSVG();
+        let svg = this._grapher.getSVG();
 
         let line = svg.append("line")
             .classed("edit-tool-path", true)
@@ -959,17 +958,13 @@ class CircleTool extends BaseEdit {
             .attr("cx", this._startX)
             .attr("cy", this._startY);
         this._circle = $.fromD3(circle);
-
-        this._snap = this._getSnap();
-
-        this.mousemove(e);
     }
 
     mousemove(e) {
         // radius
         let [x, y] = this._makeRelative(e);
         let radius = calcDistance(this._startX, this._startY, x, y);
-        if (!_.isNull(this._snap)) {
+        if (this._snap) {
             radius = round(radius, this._snap);
         }
 
@@ -981,12 +976,12 @@ class CircleTool extends BaseEdit {
         this._line.attr("x2", this._startX + rx).attr("y2", this._startY + ry);
         this._circle.attr("r", radius);
 
-        let selection = this.controller.getSelection();
+        let selection = this._context.getSelection();
         let delta = 360 / selection.length;
         selection.each((i, dot) => {
             let rx = calcRotatedXPos(delta * i) * radius;
             let ry = calcRotatedYPos(delta * i) * radius;
-            this.grapher.moveDotTo(dot, this._startX + rx, this._startY + ry);
+            this._grapher.moveDotTo(dot, this._startX + rx, this._startY + ry);
         });
     }
 
