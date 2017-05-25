@@ -123,6 +123,9 @@ export default class DotContext extends GraphContext {
         this._grapher.showBackground(this._backgroundVisible);
     }
 
+    /**
+     * Refresh the dot selection panel
+     */
     refreshPanel() {
         // highlight dots in panel
         let dotLabels = this._panel.find(".dot-labels");

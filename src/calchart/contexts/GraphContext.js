@@ -88,7 +88,7 @@ export default class GraphContext extends BaseContext {
             },
             update: (e, ui) => {
                 let index = ui.item.index();
-                _this.doAction("moveSheet", [oldIndex, index]);
+                this.doAction("moveSheet", [oldIndex, index]);
             },
         });
 
@@ -96,9 +96,9 @@ export default class GraphContext extends BaseContext {
 
         GraphState.grapher = new Grapher(this._show, this._workspace, {
             boundDots: true,
+            dotFormat: "dot-type",
             drawYardlineNumbers: true,
             draw4Step: true,
-            drawDotType: true,
             expandField: true,
             showLabels: true,
             zoom: 1,
@@ -163,7 +163,7 @@ export default class GraphContext extends BaseContext {
 
         // save state in GraphContext
         GraphState.grapher = this._grapher;
-        GraphState.activeSheet = this._sheet;
+        GraphState.sheet = this._sheet;
         GraphState.currBeat = this._currBeat;
         GraphState.selectedDots = this._selectedDots;
 
@@ -261,7 +261,7 @@ export default class GraphContext extends BaseContext {
             y: this._workspace.scrollTop() + top,
         });
 
-        this._grapher.clearField();
+        this._grapher.redrawZoom();
         this.refresh("grapher");
 
         // scroll workspace to keep same location under cursor
@@ -605,16 +605,6 @@ export default class GraphContext extends BaseContext {
 
         this._selectedDots = this._selectedDots.add(dots);
         this._grapher.selectDots(this._selectedDots);
-    }
-
-    /**
-     * Set the current beat to the given beat.
-     *
-     * @param {int} beat
-     */
-    setBeat(beat) {
-        this._currBeat = beat;
-        this.refresh("grapher");
     }
 
     /**

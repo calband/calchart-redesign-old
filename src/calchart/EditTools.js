@@ -122,6 +122,13 @@ class BaseTool {
      */
     refreshZoom() {
         this._scale = this._grapher.getScale();
+
+        let grid = this._context.getGrid();
+        if (grid) {
+            this._snap = this._scale.toDistance(grid);
+        } else {
+            this._snap = null;
+        }
     }
 
     /**
@@ -497,17 +504,6 @@ class SwapTool extends BaseTool {
  * A superclass for all tools that edit dots.
  */
 class BaseEdit extends BaseTool {
-    refreshZoom() {
-        super.refreshZoom();
-
-        let grid = this._context.getGrid();
-        if (grid) {
-            this._snap = this._scale.toDistance(grid);
-        } else {
-            this._snap = null;
-        }
-    }
-
     handle(e) {
         // By default, always run mousemove after mousedown.
         super.handle(e);

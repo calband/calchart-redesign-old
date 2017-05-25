@@ -28,6 +28,10 @@ export default class Grapher {
         this._drawTarget = drawTarget;
         this._options = options;
 
+        // true to trigger drawing zoom-dependent aspects of the grapher; to
+        // avoid redundant calculations in _drawDots
+        this._redrawZoom = true;
+
         // the GrapherScale containing data about scale
         this._scale = null;
 
@@ -71,8 +75,8 @@ export default class Grapher {
         let fieldType = sheet.getFieldType();
         let field = this._svg.select("g.field");
 
-        // re-draw field if no field is drawn or if the drawn field is of the wrong type
-        if (field.empty() || !field.classed(`field-${fieldType}`)) {
+        // re-draw field if needed
+        if (field.empty() || !field.classed(`field-${fieldType}`) || this._redrawZoom) {
             field.remove();
             this.drawField(fieldType);
             field = this._svg.select("g.field");
@@ -243,6 +247,13 @@ export default class Grapher {
     }
 
     /**
+     * Trigger redrawing zoom-dependent aspects next time draw() is called.
+     */
+    redrawZoom() {
+        this._redrawZoom = true;
+    }
+
+    /**
      * Select the given dots.
      *
      * @param {jQuery} dots
@@ -256,12 +267,9 @@ export default class Grapher {
      * available options are:
      *  - {boolean} [backgroundVisible=false] - If true, show the background image for a sheet
      *  - {boolean} [boundDots=false] - If true, prevent dots from going out of the SVG.
-     *  - {boolean} [circleSelected=false] - If true, circles the selected dot, or the last
-     *    selected dot, if multiple.
+     *  - {string} [dotFormat="orientation"] - The format to draw the dots. The available formats
+     *    are: orientation, dot-type.
      *  - {boolean} [draw4Step=false] - If true, draws 4 step lines.
-     *  - {boolean} [drawDotType=false] - If true, draw dots according to their dot type, overriding
-     *    drawOrientation.
-     *  - {boolean} [drawOrientation=true] - If true, colors dots differently based on orientation.
      *  - {boolean} [drawYardlineNumbers=false] - If true, draws yardline numbers.
      *  - {boolean} [drawYardlines=true] - If true, draw yardlines and hashes.
      *  - {boolean} [expandField=false] - If true, expand the boundaries of the field beyond the
@@ -330,123 +338,116 @@ export default class Grapher {
 
         // separate labels from dots to keep in a separate layer
         let labelsGroup = this._svg.select("g.dot-labels");
-        if (options.showLabels && labelsGroup.empty()) {
+        if (!options.showLabels) {
+            labelsGroup.remove();
+        } else if (labelsGroup.empty()) {
             labelsGroup = this._svg.append("g").classed("dot-labels", true);
         }
 
-        // order dots in reverse order so that lower dot values are drawn on top
-        // of higher dot values
-        let dots = this._show.getDots();
-        let sortedDots = _.clone(dots).sort(function(dot1, dot2) {
-            return -1 * dot1.compareTo(dot2);
-        });
+        let drawDot = dot => {
+            let dotGroup = dotsGroup.append("g");
 
-        // each dot consists of a group containing all svg elements making up a dot
-        let dotGroups = dotsGroup.selectAll("g.dot").data(sortedDots);
-        if (dotGroups.empty()) {
-            dotGroups = dotGroups.enter().append("g");
-        }
-        
-        dotGroups.each(function(dot) {
+            if (options.dotFormat === "dot-type") {
+                dotGroup.append("line").classed("fslash", true);
+                dotGroup.append("line").classed("bslash", true);
+            }
+            dotGroup.append("circle").classed("dot-marker", true);
+
+            let dotLabel;
+            if (options.showLabels) {
+                dotLabel = labelsGroup.append("text")
+                    .classed(`dot-label dot-label-${dot.id}`, true)
+                    .text(dot.label);
+            }
+
+            return [dotGroup, dotLabel];
+        };
+
+        let getState = dot => {
             let state;
             try {
                 state = sheet.getAnimationState(dot, currentBeat);
             } catch (e) {
-                // ran out of movements
                 state = null;
             }
 
+            if (state) {
+                return state;
+            }
+
             // ran out of movements or no movements for dot
-            if (_.isNull(state)) {
-                let position;
-                if (currentBeat === 0) {
-                    position = sheet.getPosition(dot);
-                } else {
-                    position = sheet.getFinalPosition(dot);
-                }
-                // face sheet orientation
-                state = new AnimationState(position, sheet.getOrientationDegrees());
-            }
+            let position = currentBeat === 0 ?
+                sheet.getPosition(dot) :
+                sheet.getFinalPosition(dot);
 
-            // save dot in jQuery data also
-            $(this).data("dot", dot);
+            // face sheet orientation
+            let orientation = sheet.getOrientationDegrees();
+            return new AnimationState(position, orientation);
+        };
 
-            let dotClass = "";
-            if (options.drawDotType) {
-                dotClass = sheet.getDotType(dot);
-            } else if (options.drawOrientation !== false) {
-                dotClass = getNearestOrientation(state.angle);
-            }
-
-            dotClass = `dot ${dotClass} dot-${dot.id}`;
-            let dotGroup = d3.select(this).attr("class", dotClass);
-
-            let dotMarker = dotGroup.selectAll(".dot-marker");
-            if (dotMarker.empty()) {
-                // draw slashes first, to keep behind dot-marker
-                if (options.drawDotType) {
-                    dotGroup
-                        .append("line")
-                        .classed("fslash", true);
-                    dotGroup
-                        .append("line")
-                        .classed("bslash", true);
-                }
-
-                dotMarker = dotGroup
-                    .append("circle")
-                    .classed("dot-marker", true);
-            }
-
-            // resize in case of zoom
-            dotMarker.attr("r", dotRadius);
-            let start = -1.1 * dotRadius;
-            let end = 1.1 * dotRadius;
-            dotMarker.select(".fslash")
-                .attr("x1", start)
-                .attr("y1", end)
-                .attr("x2", end)
-                .attr("y2", start);
-            dotMarker.select(".bslash")
-                .attr("x1", start)
-                .attr("y1", start)
-                .attr("x2", end)
-                .attr("y2", end);
-
-            if (options.circleSelected) {
-                let circle = dotGroup.selectAll("circle.selected-circle");
-                if (circle.empty()) {
-                    circle = dotGroup.append("circle")
-                        .classed("selected-circle", true)
-                        .attr("r", dotRadius * 2);
-                }
-            }
-
+        // order dots in reverse order so that lower dot values are drawn on top
+        // of higher dot values
+        let dots = this._show.getDots();
+        _.clone(dots).reverse().forEach(dot => {
+            let dotGroup = dotsGroup.select(`.dot-${dot.id}`);
             let dotLabel = labelsGroup.select(`.dot-label-${dot.id}`);
-            if (options.showLabels) {
-                if (dotLabel.empty()) {
-                    dotLabel = labelsGroup.append("text")
-                        .classed(`dot-label-${dot.id}`, true)
-                        .text(dot.label);
-                }
 
-                dotLabel.attr("font-size", dotRadius * 2);
-
-                let width = $.fromD3(dotLabel).getDimensions().width
-                let offsetX = -1.25 * width;
-                let offsetY = -1.25 * dotRadius;
-                if (options.labelLeft === false) {
-                    offsetX *= -1;
-                }
-
-                dotLabel.attr("x", offsetX).attr("y", offsetY);
-            } else {
-                dotLabel.remove();
+            if (dotGroup.empty()) {
+                let temp = drawDot(dot);
+                dotGroup = temp[0];
+                dotLabel = temp[1];
             }
 
-            let x = _this._scale.xScale(state.x);
-            let y = _this._scale.yScale(state.y);
-            _this.moveDotTo(this, x, y);
+            // save dot in jQuery data
+            let $dot = $.fromD3(dotGroup).data("dot", dot);
+
+            let state = getState(dot);
+            let x = this._scale.toDistanceX(state.x);
+            let y = this._scale.toDistanceY(state.y);
+            this.moveDotTo($dot, x, y);
+
+            // overwrite dot class each time
+            let dotClass;
+            switch (options.dotFormat) {
+                case "orientation":
+                    dotClass = getNearestOrientation(state.angle);
+                    break;
+                case "dot-type":
+                    dotClass = sheet.getDotType(dot);
+                    break;
+            }
+            dotGroup.attr("class", `dot ${dotClass} dot-${dot.id}`);
+
+            if (this._redrawZoom) {
+                dotGroup.select(".dot-marker")
+                    .attr("r", dotRadius);
+
+                let start = -1.1 * dotRadius;
+                let end = 1.1 * dotRadius;
+
+                dotGroup.select(".fslash")
+                    .attr("x1", start)
+                    .attr("y1", end)
+                    .attr("x2", end)
+                    .attr("y2", start);
+
+                dotGroup.select(".bslash")
+                    .attr("x1", start)
+                    .attr("y1", start)
+                    .attr("x2", end)
+                    .attr("y2", end);
+
+                if (options.showLabels) {
+                    dotLabel.attr("font-size", dotRadius * 2);
+                    let width = $.fromD3(dotLabel).getDimensions().width
+                    let offsetX = 1.25 * width;
+                    let offsetY = -1.25 * dotRadius;
+                    if (_.defaultTo(options.labelLeft, true)) {
+                        offsetX *= -1;
+                    }
+                    dotLabel.attr("x", offsetX).attr("y", offsetY);
+                }
+            }
         });
 
         if (options.showCollisions) {
@@ -454,6 +455,8 @@ export default class Grapher {
                 this.getDot(dot).addClass("collision");
             });
         }
+
+        this._redrawZoom = false;
     }
 
     /**

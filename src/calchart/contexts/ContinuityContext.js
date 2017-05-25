@@ -43,6 +43,10 @@ export default class ContinuityContext extends GraphContext {
         };
     }
 
+    static get refreshTargets() {
+        return super.refreshTargets.concat(["panel"]);
+    }
+
     /**
      * @param {Object} options - Options to customize loading the Context:
      *    - {string} [dotType=null] - The dot type to initially load.
@@ -53,7 +57,7 @@ export default class ContinuityContext extends GraphContext {
         this._panel.show();
         this._dotType = _.defaultTo(options.dotType, null);
 
-        this._addEvents(".workspace", {
+        this._addEvents(this._workspace, {
             contextmenu: function(e) {
                 showContextMenu(e, {
                     "Edit dots...": "loadContext(dot)",
@@ -79,22 +83,72 @@ export default class ContinuityContext extends GraphContext {
         super.unload();
 
         this._panel.hide();
-        this._controller.setBeat(0);
-        this._controller.deselectDots();
+        this._currBeat = 0;
+        this.deselectDots();
 
         this._grapher.setOptions({
             showCollisions: false,
         });
     }
 
-    refresh() {
-        // no Sheets in the show
+    refresh(...targets) {
+        // if no Sheets in the show, load dot context
         if (_.isNull(this._sheet)) {
             this._controller.loadContext("dot");
         } else {
-            this._refreshSheet();
+            super.refresh(...targets);
         }
     }
+
+    refreshGrapher() {
+        super.refreshGrapher();
+
+        let numBeats = this._sheet.getDuration();
+        let position = $(".toolbar .seek").width() / numBeats * this._currBeat;
+        $(".toolbar .seek .marker").css("transform", `translateX(${position}px)`);
+    }
+
+    /**
+     * Refresh the continuities panel
+     */
+    refreshPanel() {
+        // update tabs list in panel
+        let tabs = this._panel.find(".dot-types").empty();
+        let path = tabs.data("path");
+        this._sheet.getDotTypes().forEach(dotType => {
+            let tab = HTMLBuilder.make("li.tab", tabs)
+                .addClass(dotType)
+                .data("dotType", dotType);
+
+            if (DotType.isAll(dotType)) {
+                tab.text("All");
+            } else {
+                let icon = HTMLBuilder.img(path.replace("DOT_TYPE", dotType));
+                tab.append(icon);
+            }
+        });
+
+        // activate dot type tab
+        let tab = tabs.find(`.${this._dotType}`);
+        if (!tab.exists()) {
+            tab = tabs.find("li.tab:first");
+            this._dotType = tab.data("dotType");
+        }
+
+        tab.addClass("active");
+
+        let continuities = this._panel.find(".continuities").empty();
+        this._sheet.getContinuities(this._dotType).forEach(continuity => {
+            let $continuity = this._getPanelContinuity(continuity);
+            continuities.append($continuity);
+        });
+
+        // select dots of the active dot type
+        let dots = $(`.dot.${this._dotType}`);
+        this.selectDots(dots);
+    }
+
+    /**** METHODS ****/
 
     /**
      * Delete the given continuity.
@@ -151,6 +205,8 @@ export default class ContinuityContext extends GraphContext {
         this._controller.doAction("reorderContinuity", [continuity, delta]);
     }
 
+    /**** HELPERS ****/
+
     /**
      * Retrieve the given continuity
      *
@@ -167,7 +223,7 @@ export default class ContinuityContext extends GraphContext {
     }
 
     /**
-     * @return {jQuery} The panel to edit continuities
+     * @return {jQuery} The panel to edit continuities, to easily subclass.
      */
     _getPanel() {
         return $(".panel.edit-continuity");
@@ -180,7 +236,7 @@ export default class ContinuityContext extends GraphContext {
      * @return {jQuery}
      */
     _getPanelContinuity(continuity) {
-        let contents = continuity.getPanel(this._controller);
+        let contents = continuity.getPanel(this);
         let info = HTMLBuilder.div("info", contents);
 
         let iconEdit = HTMLBuilder.icon("pencil", "edit");
@@ -193,57 +249,9 @@ export default class ContinuityContext extends GraphContext {
     }
 
     /**
-     * Update the page according to the state of the Sheet.
-     */
-    _refreshSheet() {
-        // update tabs list in panel
-        let tabs = this._panel.find(".dot-types").empty();
-        let path = tabs.data("path");
-        this._sheet.getDotTypes().forEach(dotType => {
-            let tab = HTMLBuilder.make("li.tab", tabs)
-                .addClass(dotType)
-                .data("dotType", dotType);
-
-            if (DotType.isAll(dotType)) {
-                tab.text("All");
-            } else {
-                let icon = HTMLBuilder.img(path.replace("DOT_TYPE", dotType));
-                tab.append(icon);
-            }
-        });
-
-        // activate dot type tab
-        let tab = tabs.find(`.${this._dotType}`);
-        if (!tab.exists()) {
-            tab = tabs.find("li.tab:first");
-            this._dotType = tab.data("dotType");
-        }
-
-        tab.addClass("active");
-
-        let continuities = this._panel.find(".continuities").empty();
-        this._sheet.getContinuities(this._dotType).forEach(continuity => {
-            let $continuity = this._getPanelContinuity(continuity);
-            continuities.append($continuity);
-        });
-
-        // select dots of the active dot type
-        let dots = $(`.dot.${this._dotType}`);
-        this._controller.selectDots(dots);
-
-        // update seek bar
-        let beat = this._controller.getCurrentBeat();
-        let numBeats = this._sheet.getDuration();
-        let position = $(".toolbar .seek").width() / numBeats * beat;
-        $(".toolbar .seek .marker").css("transform", `translateX(${position}px)`);
-    }
-
-    /**
      * Initialize the continuity panel and toolbar
      */
     _setupPanel() {
-        let _this = this;
-
         // setup continuity panel
         setupPanel(this._panel);
 
@@ -284,16 +292,15 @@ export default class ContinuityContext extends GraphContext {
                 dropdown.css("top", max);
             }
 
-            $(window).click(function(e) {
+            $(window).one("click", function(e) {
                 $(dropdown).remove();
-                $(this).off(e);
             });
         });
 
         // changing tabs
-        this._panel.on("click", ".tab", function() {
-            _this._dotType = $(this).data("dotType");
-            _this.refresh();
+        this._panel.on("click", ".tab", e => {
+            this._dotType = $(e.currentTarget).data("dotType");
+            this.refresh("panel");
         });
 
         // add continuity dropdown
@@ -303,20 +310,22 @@ export default class ContinuityContext extends GraphContext {
                 placeholder_text_single: "Add continuity...",
                 disable_search_threshold: false,
             })
-            .change(function() {
-                let type = $(this).val();
-                _this._controller.doAction("addContinuity", [type]);
-                $(this).choose("");
+            .change(e => {
+                let type = $(e.currentTarget).val();
+                this._controller.doAction("addContinuity", [type]);
+                $(e.currentTarget).choose("");
             });
 
         // edit continuity popup
-        this._panel.on("click", ".continuity .edit", function() {
-            _this.editContinuity($(this).parents(".continuity"));
+        this._panel.on("click", ".continuity .edit", e => {
+            let continuity = $(e.currentTarget).parents(".continuity");
+            this.editContinuity(continuity);
         });
 
         // remove continuity link
-        this._panel.on("click", ".continuity .delete", function() {
-            _this.deleteContinuity($(this).parents(".continuity"));
+        this._panel.on("click", ".continuity .delete", e => {
+            let continuity = $(e.currentTarget).parents(".continuity");
+            this.deleteContinuity(continuity);
         });
 
         // context menus
@@ -336,57 +345,40 @@ export default class ContinuityContext extends GraphContext {
      * Set up the seek interface in the toolbar.
      */
     _setupSeek() {
-        let _this = this;
-
         let seek = $(".toolbar .seek");
-        let isDrag = false;
         let marker = seek.find(".marker");
-        let markerWidth = marker.width();
+        let markerRadius = marker.width() / 2;
         let seekLeft = seek.offset().left;
         let seekWidth = seek.width();
-        let offset = 0;
 
-        function moveMarker(pageX) {
+        let updateSeek = e => {
             let prev = marker.offset().left;
-            let numBeats = _this._sheet.getDuration();
+            let numBeats = this._sheet.getDuration();
             let interval = seekWidth / numBeats;
 
             // snap to beat
-            let x = _.clamp(pageX - seekLeft - offset, 0, seekWidth);
-            let beat = round(x, interval) / interval;
+            let x = _.clamp(e.pageX - seekLeft - markerRadius, 0, seekWidth);
 
             // don't redraw screen if the beat didn't change
             if (x !== prev) {
-                _this._controller.setBeat(beat);
+                this._currBeat = round(x, interval) / interval;
+                this.refresh("grapher");
             }
-        }
+        };
 
         this._addEvents(seek, {
             mousedown: function(e) {
                 // prevent text highlight
                 e.preventDefault();
 
-                isDrag = true;
-
-                if ($(e.target).is(marker)) {
-                    offset = e.pageX - marker.offset().left;
-                } else {
-                    // clicking on the seek bar moves the marker there initially
-                    offset = markerWidth / 2;
-                    moveMarker(e.pageX);
-                }
-            },
-        });
-
-        this._addEvents(document, {
-            mousemove: function(e) {
-                if (!isDrag) {
-                    return;
-                }
-                moveMarker(e.pageX);
-            },
-            mouseup: function(e) {
-                isDrag = false;
+                $(document)
+                    .on({
+                        "mousemove.seek": updateSeek,
+                        "mouseup.seek": e => {
+                            $(document).off(".seek");
+                        },
+                    })
+                    .trigger("mousemove");
             },
         });
     }
