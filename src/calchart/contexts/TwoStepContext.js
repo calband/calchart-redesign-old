@@ -39,7 +39,7 @@ export default class TwoStepContext extends HiddenContextMixin(ContinuityContext
     unload() {
         super.unload();
 
-        this._controller.checkContinuities({
+        this.checkContinuities({
             dots: this._continuity.dotType,
         });
     }

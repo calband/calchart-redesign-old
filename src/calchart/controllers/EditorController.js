@@ -144,6 +144,10 @@ export default class EditorController extends ApplicationController {
         window.open(`/download/${slug}.json`);
     }
 
+    getContext() {
+        return this._context;
+    }
+
     getShortcut(shortcut) {
         let action = super.getShortcut(shortcut);
         return _.defaultTo(action, this._context.constructor.shortcuts[shortcut]);
@@ -367,7 +371,6 @@ class EditorActions {
         let changed = update(this._show, underscoreKeys(data));
 
         this._show.getSheets().forEach(sheet => sheet.updateMovements());
-        this.checkContinuities();
         this._context.refresh();
 
         return {

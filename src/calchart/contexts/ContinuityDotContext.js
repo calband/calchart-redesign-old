@@ -76,7 +76,7 @@ export default class ContinuityDotContext extends HiddenGraphContext {
         let dots = this._continuity.order.map(dot => dot.id);
         this._grapher.getDots(dots).css("opacity", "");
 
-        this._controller.checkContinuities({
+        this.checkContinuities({
             dots: this._continuity.dotType,
         });
     }

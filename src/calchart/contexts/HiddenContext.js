@@ -13,7 +13,7 @@ import { NotImplementedError } from "utils/errors";
  * }
  */
 export function HiddenContextMixin(superclass) {
-    class _HiddenContext extends superclass {
+    class HiddenContext extends superclass {
         loadSheet(sheet) {
             if (sheet !== this._sheet) {
                 this.exit();
@@ -29,7 +29,7 @@ export function HiddenContextMixin(superclass) {
             throw new NotImplementedError(this);
         }
     }
-    return _HiddenContext;
+    return HiddenContext;
 }
 
 let HiddenGraphContext = HiddenContextMixin(GraphContext);

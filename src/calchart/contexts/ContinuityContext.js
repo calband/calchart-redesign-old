@@ -236,7 +236,7 @@ export default class ContinuityContext extends GraphContext {
      * @return {jQuery}
      */
     _getPanelContinuity(continuity) {
-        let contents = continuity.getPanel(this);
+        let contents = continuity.getPanel(this._controller);
         let info = HTMLBuilder.div("info", contents);
 
         let iconEdit = HTMLBuilder.icon("pencil", "edit");

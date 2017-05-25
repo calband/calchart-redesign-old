@@ -126,10 +126,10 @@ export default class BaseContinuity {
     /**
      * Get the HTML elements to add to the ContinuityContext panel.
      *
-     * @param {ContinuityContext} context
+     * @param {EditorController} controller
      * @return {jQuery[]}
      */
-    getPanel(context) {
+    getPanel(controller) {
         return [];
     }
 
@@ -220,10 +220,10 @@ export default class BaseContinuity {
      * Update the movements for dots that use this continuity. Used in the
      * ContinuityContext.
      *
-     * @param {ContinuityContext} context
+     * @param {EditorController} controller
      */
-    _updateMovements(context) {
+    _updateMovements(controller) {
         this._sheet.updateMovements(this._dotType);
-        context.refresh("grapher");
+        controller.getContext().refresh("grapher");
     }
 }

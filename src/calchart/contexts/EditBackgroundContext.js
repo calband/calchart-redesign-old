@@ -4,10 +4,6 @@ import HTMLBuilder from "utils/HTMLBuilder";
 import { getDimensions } from "utils/MathUtils";
 import { addHandles, resizeHandles } from "utils/UIUtils";
 
-// tracks how many times load has been called, to distinguish
-// sessions of editing backgrounds
-let session = 0;
-
 /**
  * The Context that allows a user to move and resize the background image
  */
@@ -16,6 +12,10 @@ export default class EditBackgroundContext extends HiddenGraphContext {
         super(controller);
 
         this._image = null;
+
+        // tracks how many times load has been called, to distinguish
+        // sessions of editing backgrounds
+        this._session = 0;
 
         // contains the context that was active before editing background image
         this._previousContext = undefined;
@@ -44,7 +44,7 @@ export default class EditBackgroundContext extends HiddenGraphContext {
 
         this._image = this._grapher.getGraph().find("image.background-image");
 
-        session++;
+        this._session++;
         this._previousContext = options.previousContext;
         this._grapher.setOptions({
             backgroundVisible: true,
@@ -106,13 +106,14 @@ export default class EditBackgroundContext extends HiddenGraphContext {
      * Handle the mousedown event on the image, to move the image.
      *
      * @param {Event} e
-     * @return {Function}
+     * @return {Function} The handler for the mousemove event.
      */
     mousedownMove(e) {
+        // offset of cursor within the picture
         let [deltaX, deltaY] = this._handles.makeRelative(e.pageX, e.pageY);
 
         return e => {
-            let [endX, endY] = $(".graph-workspace").makeRelative(e.pageX, e.pageY);
+            let [endX, endY] = this._workspace.makeRelative(e.pageX, e.pageY);
             let x = endX - deltaX;
             let y = endY - deltaY;
 
@@ -128,7 +129,7 @@ export default class EditBackgroundContext extends HiddenGraphContext {
      * Handle the mousedown event on a handle, to resize the image.
      *
      * @param {Event} e
-     * @return {Function}
+     * @return {Function} The handler for the mousemove event.
      */
     mousedownResize(e) {
         let handle = $(e.target).data("handle-id");
@@ -157,7 +158,7 @@ export default class EditBackgroundContext extends HiddenGraphContext {
      */
     revert() {
         this._controller.revertWhile(action => {
-            return action.session === session;
+            return action.session === this._session;
         });
         this.exit();
     }
@@ -171,12 +172,14 @@ export default class EditBackgroundContext extends HiddenGraphContext {
     _getImageData() {
         let dimensions = this._image.getDimensions();
         let scale = this._grapher.getScale();
-        let x = scale.toStepsX(parseInt(this._image.attr("x")));
-        let y = scale.toStepsY(parseInt(this._image.attr("y")));
+        let position = scale.toSteps({
+            x: parseInt(this._image.attr("x")),
+            y: parseInt(this._image.attr("y")),
+        });
 
         return {
-            x: x,
-            y: y,
+            x: position.x,
+            y: position.y,
             width: scale.toSteps(dimensions.width),
             height: scale.toSteps(dimensions.height),
         };
@@ -200,7 +203,7 @@ class ContextActions {
         this.refresh("grapher");
 
         return {
-            session: session,
+            session: this._session,
             data: [oldData, newData],
             undo: function() {
                 this._sheet.saveBackground(oldData);

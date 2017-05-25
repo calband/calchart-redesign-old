@@ -103,7 +103,7 @@ export default class FTLPathContext extends HiddenGraphContext {
 
         this._grapher.getDots(this._continuity.order).css("opacity", "");
 
-        this._controller.checkContinuities({
+        this.checkContinuities({
             dots: this._continuity.dotType,
         });
     }
