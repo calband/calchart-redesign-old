@@ -7,9 +7,6 @@ import GateReferenceContext from "calchart/contexts/GateReferenceContext";
 import MusicContext from "calchart/contexts/MusicContext";
 import TwoStepContext from "calchart/contexts/TwoStepContext";
 
-// cache contexts after they've been created
-let contexts = {};
-
 let ALL_CONTEXTS = [
     ContinuityContext,
     ContinuityDotContext,
@@ -28,6 +25,20 @@ let ALL_CONTEXTS = [
  */
 export default class Context {
     /**
+     * Initializes all the contexts when the editor is loaded.
+     *
+     * @param {EditorController} controller
+     */
+    static init(controller) {
+        this.contexts = {};
+
+        ALL_CONTEXTS.forEach(_Context => {
+            let context = new _Context(controller);
+            this.contexts[context.info.name] = context;
+        });
+    }
+
+    /**
      * Load a Context into the editor application.
      *
      * @param {string} name - The name of the context to load.
@@ -36,18 +47,14 @@ export default class Context {
      * @return {Context}
      */
     static load(name, controller, options={}) {
-        if (_.isUndefined(contexts[name])) {
-            let _Context = _.find(ALL_CONTEXTS, c => c.info.name === name);
-            if (_.isUndefined(_Context)) {
-                throw new Error(`No context named: ${name}`);
-            }
+        let context = this.contexts[name];
 
-            contexts[name] = new _Context(controller);
+        if (context) {
+            context.load(options);
+            return context;
+        } else {
+            throw new Error(`No context named: ${name}`);
         }
-
-        let context = contexts[name];
-        context.load(options);
-        return context;
     }
 
     /**

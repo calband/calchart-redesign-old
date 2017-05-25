@@ -1,6 +1,5 @@
 import ApplicationController from "calchart/ApplicationController";
 import Context from "calchart/Context";
-import GraphContext from "calchart/contexts/GraphContext";
 
 import { ActionError, ValidationError } from "utils/errors";
 import HTMLBuilder from "utils/HTMLBuilder";
@@ -55,7 +54,7 @@ export default class EditorController extends ApplicationController {
     init() {
         super.init();
 
-        GraphContext.init(this);
+        Context.init(this);
 
         setupMenu(".menu");
         setupToolbar(".toolbar");

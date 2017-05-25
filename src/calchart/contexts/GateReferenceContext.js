@@ -16,7 +16,7 @@ export default class GateReferenceContext extends HiddenContext {
         this._continuity = null;
 
         // helpers
-        this._svg = this._grapher.getSVG();
+        this._svg = null;
         this._helper = null;
         this._reference = null;
     }
@@ -38,6 +38,7 @@ export default class GateReferenceContext extends HiddenContext {
     load(options) {
         super.load(options);
 
+        this._svg = this._grapher.getSVG();
         this._continuity = options.continuity;
 
         let scale = this._grapher.getScale();

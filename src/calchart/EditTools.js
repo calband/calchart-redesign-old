@@ -117,7 +117,7 @@ class BaseTool {
     /**
      * Runs any actions whenever the context is refreshed.
      */
-    refresh() {}
+    refreshZoom() {}
 
     /**
      * Runs any actions when the tool is unloaded from the toolbar.
@@ -550,7 +550,7 @@ class StretchTool extends BaseEdit {
         this.refresh();
     }
 
-    refresh() {
+    refreshZoom() {
         let bounds = this._getDotBounds();
         this._margin = this._getDotRadius() + 5;
 

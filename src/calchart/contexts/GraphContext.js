@@ -31,24 +31,50 @@ import {
     showPopup,
 } from "utils/UIUtils";
 
+let isGraphInitialized = false;
+let GraphState = {
+    grapher: null,
+    sheet: null,
+    currBeat: null,
+    selectedDots: $(),
+};
+
 /**
  * A superclass for all contexts that edit Sheets, dots, and continuities.
  * Most contexts are GraphContexts, except MusicContext.
  */
 export default class GraphContext extends BaseContext {
+    constructor(controller) {
+        super(controller);
+
+        if (!isGraphInitialized) {
+            this.init();
+            isGraphInitialized = true;
+        }
+
+        // load state from GraphState
+        this._grapher = GraphState.grapher;
+        this._sheet = GraphState.sheet;
+        this._currBeat = GraphState.currBeat;
+        this._selectedDots = GraphState.selectedDots;
+    }
+
+    static get shortcuts() {
+        return GraphShortcuts;
+    }
+
+    static get actions() {
+        return GraphActions;
+    }
+
+    static get refreshTargets() {
+        return ["sidebar", "grapher"];
+    }
+
     /**
-     * Initialize the editor when first loading the page.
-     *
-     * @param {EditorController} controller
+     * Actions to only run once, when the editor is initialized.
      */
-    static init(controller) {
-        this.grapher = null;
-        this.sheet = null;
-        this.currBeat = null; // TODO: move to continuitycontext (Issue #154)
-        this.selectedDots = $();
-
-        let show = controller.getShow();
-
+    init() {
         // init sidebar
 
         let oldIndex;
@@ -66,7 +92,7 @@ export default class GraphContext extends BaseContext {
         // init workspace
 
         let workspace = $(".graph-workspace");
-        this.grapher = new Grapher(show, workspace, {
+        GraphState.grapher = new Grapher(this._show, workspace, {
             boundDots: true,
             drawYardlineNumbers: true,
             draw4Step: true,
@@ -77,31 +103,19 @@ export default class GraphContext extends BaseContext {
         });
 
         // initialize with field in view
-        let scale = this.grapher.getScale();
+        let scale = GraphState.grapher.getScale();
         workspace.scrollLeft(scale.minX - 30);
         workspace.scrollTop(scale.minY - 30);
-    }
-
-    static get shortcuts() {
-        return GraphShortcuts;
-    }
-
-    static get actions() {
-        return GraphActions;
-    }
-
-    static get refreshTargets() {
-        return ["sidebar", "grapher"];
     }
 
     load(options) {
         super.load(options);
 
         // load state from GraphContext
-        this._grapher = this.constructor.grapher;
-        this._sheet = this.constructor.sheet;
-        this._currBeat = this.constructor.currBeat;
-        this._selectedDots = this.constructor.selectedDots;
+        this._grapher = GraphState.grapher;
+        this._sheet = GraphState.sheet;
+        this._currBeat = GraphState.currBeat;
+        this._selectedDots = GraphState.selectedDots;
 
         this._addEvents(".graph-sidebar", {
             contextmenu: e => {
@@ -146,10 +160,10 @@ export default class GraphContext extends BaseContext {
         super.unload();
 
         // save state in GraphContext
-        this.constructor.grapher = this._grapher;
-        this.constructor.activeSheet = this._sheet;
-        this.constructor.currBeat = this._currBeat;
-        this.constructor.selectedDots = this._selectedDots;
+        GraphState.grapher = this._grapher;
+        GraphState.activeSheet = this._sheet;
+        GraphState.currBeat = this._currBeat;
+        GraphState.selectedDots = this._selectedDots;
 
         $(".graph-workspace").off(".pinch");
         $(".toolbar .graph-context-group").addClass("hide");

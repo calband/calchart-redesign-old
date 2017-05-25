@@ -23,7 +23,7 @@ export default class FTLPathContext extends HiddenContext {
         // selection, add-point, remove-point
         this._activeTool = null;
 
-        this._svg = this._grapher.getSVG();
+        this._svg = null;
         this._path = null;
         this._helper = null;
     }
@@ -45,6 +45,7 @@ export default class FTLPathContext extends HiddenContext {
     load(options) {
         super.load(options);
 
+        this._svg = this._grapher.getSVG();
         this._continuity = options.continuity;
 
         this.loadTool("selection");

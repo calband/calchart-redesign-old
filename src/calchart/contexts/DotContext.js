@@ -46,13 +46,41 @@ export default class DotContext extends GraphContext {
     }
 
     static get refreshTargets() {
-        return super.refreshTargets.concat(["panel", "tool"]);
+        return super.refreshTargets.concat(["panel"]);
     }
 
     load(options) {
         super.load(options);
 
-        this._setupContextMenus();
+        this._addEvents(".workspace", {
+            contextmenu: e => {
+                showContextMenu(e, {
+                    "Edit continuity...": "loadContext(continuity)",
+                });
+            },
+        });
+
+        this._addEvents(".dot-marker", {
+            contextmenu: e => {
+                let dot = $(e.currentTarget).parent().data("dot");
+                let dotType = this._sheet.getDotType(dot);
+
+                showContextMenu(e, {
+                    "Edit continuity...": `loadContext(continuity, dotType=${dotType})`,
+                    "Change dot type": {
+                        "Plain": "changeDotType(plain)",
+                        "Solid": "changeDotType(solid)",
+                        "Plain Forwardslash": "changeDotType(plain-forwardslash)",
+                        "Solid Forwardslash": "changeDotType(solid-forwardslash)",
+                        "Plain Backslash": "changeDotType(plain-backslash)",
+                        "Solid Backslash": "changeDotType(solid-backslash)",
+                        "Plain Cross": "changeDotType(plain-x)",
+                        "Solid Cross": "changeDotType(solid-x)",
+                    },
+                });
+                return false;
+            },
+        });
 
         this._panel.show()
             .find(".dot-labels")
@@ -74,7 +102,7 @@ export default class DotContext extends GraphContext {
                             $(document).off(".edit-tool");
                         }
                     },
-                })
+                });
             },
         });
 
@@ -92,7 +120,6 @@ export default class DotContext extends GraphContext {
 
     refreshGrapher() {
         super.refreshGrapher();
-
         this._grapher.showBackground(this._backgroundVisible);
     }
 
@@ -101,12 +128,13 @@ export default class DotContext extends GraphContext {
         let dotLabels = this._panel.find(".dot-labels");
         dotLabels.find(".active").removeClass("active");
         this.getSelectedDots().forEach(dot => {
-            dotLabels.find(`.dot-${dot.label}`).addClass("active");
+            dotLabels.find(`.dot-${dot.id}`).addClass("active");
         });
     }
 
-    refreshTool() {
-        this._activeTool.refresh();
+    refreshZoom(pageX, pageY) {
+        super.refreshZoom(pageX, pageY);
+        this._activeTool.refreshZoom();
     }
 
     /**** METHODS ****/
@@ -124,9 +152,9 @@ export default class DotContext extends GraphContext {
             refresh: true,
         });
 
-        this._controller.deselectDots(dots);
+        super.deselectDots(dots);
         if (options.refresh) {
-            this.refresh();
+            this.refresh("grapher", "panel");
         }
     }
 
@@ -173,9 +201,9 @@ export default class DotContext extends GraphContext {
             refresh: true,
         });
 
-        this._controller.selectDots(dots, options);
+        super.selectDots(dots, options);
         if (options.refresh) {
-            this.refresh();
+            this.refresh("grapher", "panel");
         }
     }
 
@@ -184,7 +212,7 @@ export default class DotContext extends GraphContext {
      */
     toggleBackground() {
         this._backgroundVisible = !this._backgroundVisible;
-        this.refresh();
+        this.refresh("grapher");
     }
 
     /**
@@ -200,91 +228,47 @@ export default class DotContext extends GraphContext {
             refresh: true,
         });
 
-        this._controller.toggleDots(dots);
+        super.toggleDots(dots);
         if (options.refresh) {
-            this.refresh();
+            this.refresh("grapher", "panel");
         }
     }
 
-    /**
-     * Set up the events for showing context menus.
-     */
-    _setupContextMenus() {
-        let _this = this;
-
-        this._addEvents(".workspace", {
-            contextmenu: function(e) {
-                showContextMenu(e, {
-                    "Edit continuity...": "loadContext(continuity)",
-                });
-            },
-        });
-
-        this._addEvents(".dot-marker", {
-            contextmenu: function(e) {
-                let dot = $(this).parent().data("dot");
-                let dotType = _this._sheet.getDotType(dot);
-
-                showContextMenu(e, {
-                    "Edit continuity...": `loadContext(continuity, dotType=${dotType})`,
-                    "Change dot type": {
-                        "Plain": "changeDotType(plain)",
-                        "Solid": "changeDotType(solid)",
-                        "Plain Forwardslash": "changeDotType(plain-forwardslash)",
-                        "Solid Forwardslash": "changeDotType(solid-forwardslash)",
-                        "Plain Backslash": "changeDotType(plain-backslash)",
-                        "Solid Backslash": "changeDotType(solid-backslash)",
-                        "Plain Cross": "changeDotType(plain-x)",
-                        "Solid Cross": "changeDotType(solid-x)",
-                    },
-                });
-                return false;
-            },
-        });
-    }
-
     _setupPanel() {
-        let _this = this;
-        let controller = this._controller;
-        let grapher = this._grapher;
-
         // track last dot selected
         let lastSelected = undefined;
 
         // add dot labels
         let dotLabels = this._panel.find(".dot-labels");
-        this._controller.getShow().getDots().forEach(function(dot) {
-            HTMLBuilder
-                .li(dot.label)
-                .addClass(`dot-${dot.label}`)
-                .click(function(e) {
-                    let $dot = grapher.getDot(dot);
+        this._show.getDots().forEach(dot => {
+            HTMLBuilder.li(dot.label)
+                .addClass(`dot-${dot.id}`)
+                .click(e => {
+                    let $dot = this._grapher.getDot(dot);
                     if (e.ctrlKey || e.metaKey) {
-                        _this.toggleDots($dot);
+                        this.toggleDots($dot);
 
-                        if ($(this).hasClass("active")) {
+                        if ($(e.currentTarget).hasClass("active")) {
                             lastSelected = dot;
                         } else {
                             lastSelected = undefined;
                         }
-                    } else if (e.shiftKey && !_.isUndefined(lastSelected)) {
+                    } else if (e.shiftKey && lastSelected) {
                         let range = $();
                         let delta = Math.sign(dot.id - lastSelected.id);
                         let curr = lastSelected.id;
                         while (curr !== dot.id) {
                             curr += delta;
-                            range = range.add(grapher.getDot(curr));
+                            range = range.add(this._grapher.getDot(curr));
                         }
-                        _this.selectDots(range);
+                        this.selectDots(range);
                         lastSelected = dot;
                     } else {
-                        _this.selectDots($dot, {
+                        this.selectDots($dot, {
                             append: false,
                         });
                         lastSelected = dot;
                     }
-
-                    _this._controller.refresh("context");
                 })
                 .appendTo(dotLabels);
         });
@@ -292,27 +276,24 @@ export default class DotContext extends GraphContext {
         setupPanel(this._panel);
 
         // click on dot type
-        this._panel.find(".dot-types li").click(function(e) {
-            let dotType = $(this).data("type");
-            let dots = _this._sheet.getDotsOfType(dotType);
-            let $dots = grapher.getDots(dots);
-            _this.selectDots($dots, {
+        this._panel.find(".dot-types li").click(e => {
+            let dotType = $(e.currentTarget).data("type");
+            let dots = this._sheet.getDotsOfType(dotType);
+            let $dots = this._grapher.getDots(dots);
+            this.selectDots($dots, {
                 append: e.shiftKey || e.ctrlKey || e.metaKey,
             });
-            _this._controller.refresh("context");
         });
     }
 
-    _setupSnap() {        
-        let _this = this;
-
+    _setupSnap() {
         $(".toolbar .snap-to select")
-            .change(function() {
-                _this._grid = parseNumber($(this).val());
+            .change(e => {
+                this._grid = parseNumber($(e.currentTarget).val());
             })
             .choose(2);
 
-        $(".toolbar .resnap button").click(() => {
+        $(".toolbar .resnap button").click(e => {
             if (this._grid !== 0) {
                 this._controller.doAction("resnapDots");
             }
@@ -327,12 +308,12 @@ export default class DotContext extends GraphContext {
      */
     _updateMovements(dots, sheet) {
         sheet.updateMovements(dots);
-        this._controller.checkContinuities(sheet, dots);
+        this.checkContinuities(sheet, dots);
 
         let prevSheet = sheet.getPrevSheet();
         if (prevSheet) {
             prevSheet.updateMovements(dots);
-            this._controller.checkContinuities(prevSheet, dots);
+            this.checkContinuities(prevSheet, dots);
         }
     }
 }
@@ -371,12 +352,11 @@ class ContextActions {
      * @param {DotType} dotType - The dot type to change to.
      * @param {Dot[]} [dots] - The dots to change dot types for. Defaults to
      *   the currently selected dots.
-     * @param {Sheet} [sheet] - The sheet to change dot types for. Defaults
-     *   to the current sheet.
+     * @param {Sheet} [sheet=this._sheet]
      */
     static changeDotType(dotType, dots, sheet=this._sheet) {
         if (_.isUndefined(dots)) {
-            dots = this._controller.getSelectedDots();
+            dots = this.getSelectedDots();
         }
 
         let oldTypes = {};
@@ -390,15 +370,15 @@ class ContextActions {
         });
 
         sheet.changeDotTypes(dots, dotType);
-        this._controller.loadSheet(sheet);
+        this.loadSheet(sheet);
 
         return {
             data: [dotType, dots, sheet],
             undo: function() {
-                _.each(oldTypes, function(dots, dotType) {
+                _.each(oldTypes, (dots, dotType) => {
                     sheet.changeDotTypes(dots, dotType);
                 });
-                this._controller.loadSheet(sheet);
+                this.loadSheet(sheet);
             },
         };
     }
@@ -410,17 +390,14 @@ class ContextActions {
      *   x-direction, in steps.
      * @param {float} deltaY - The distance to move the dots in the
      *   y-direction, in steps.
-     * @param {Sheet} [sheet] - The sheet to move dots for. Defaults
-     *   to the currently loaded stunt sheet.
      * @param {Dot[]} [dots] - The dots to move. Defaults to the
      *   currently selected dots.
+     * @param {Sheet} [sheet=this._sheet]
      */
-    static moveDots(deltaX, deltaY, sheet=this._sheet, dots) {
+    static moveDots(deltaX, deltaY, dots, sheet=this._sheet) {
         if (_.isUndefined(dots)) {
             dots = this._controller.getSelectedDots();
         }
-
-        let prevPositions = {};
 
         let scale = this._grapher.getScale();
         let _deltaX = scale.toDistance(deltaX);
@@ -435,30 +412,30 @@ class ContextActions {
         };
 
         // update positions
+        let prevPositions = {};
         dots.forEach(dot => {
             // copy position
             let prevPosition = sheet.getPosition(dot);
-            prevPositions[dot.label] = _.clone(prevPosition);
+            prevPositions[dot.label] = prevPosition;
 
             // bound dots within graph
             let position = boundPosition(prevPosition);
-            sheet.updatePosition(dot, position.x, position.y);
+            sheet.setPosition(dot, position.x, position.y);
         });
 
         this._updateMovements(dots, sheet);
 
-        // refresh
-        this._controller.loadSheet(sheet);
+        this.loadSheet(sheet);
 
         return {
-            data: [deltaX, deltaY, sheet, dots],
+            data: [deltaX, deltaY, dots, sheet],
             undo: function() {
-                dots.forEach(function(dot) {
+                dots.forEach(dot => {
                     let position = prevPositions[dot.label];
-                    sheet.updatePosition(dot, position.x, position.y);
+                    sheet.setPosition(dot, position.x, position.y);
                 });
                 this._updateMovements(dots, sheet);
-                this._controller.loadSheet(sheet);
+                this.loadSheet(sheet);
             },
         };
     }
@@ -473,14 +450,13 @@ class ContextActions {
      *        x: number,
      *        y: number,
      *   }
-     * @param {Sheet} [sheet] - The sheet to move dots for. Defaults
-     *   to the currently loaded stunt sheet.
+     * @param {Sheet} [sheet=this._sheet]
      */
     static moveDotsTo(data, sheet=this._sheet) {
         let dots = [];
         let oldData = data.map(info => {
-            let oldPosition = _.clone(sheet.getPosition(info.dot));
-            sheet.updatePosition(info.dot, info.x, info.y);
+            let oldPosition = sheet.getPosition(info.dot);
+            sheet.setPosition(info.dot, info.x, info.y);
             dots.push(info.dot);
             return {
                 dot: info.dot,
@@ -490,17 +466,17 @@ class ContextActions {
         });
 
         this._updateMovements(dots, sheet);
-        this._controller.loadSheet(sheet);
+        this.loadSheet(sheet);
 
         return {
             label: "move dots",
             data: [data, sheet],
             undo: function() {
                 oldData.forEach(info => {
-                    sheet.updatePosition(info.dot, info.x, info.y);
+                    sheet.setPosition(info.dot, info.x, info.y);
                 });
                 this._updateMovements(dots, sheet);
-                this._controller.loadSheet(sheet);
+                this.loadSheet(sheet);
             },
         };
     }
@@ -510,13 +486,11 @@ class ContextActions {
      *
      * @param {Object[]} [data] - Data to pass to moveDotsTo. Used when
      *   redo-ing to optimize performance.
-     * @param {Sheet} [sheet] - The sheet to move dots for. Defaults
-     *   to the currently loaded stunt sheet.
+     * @param {Sheet} [sheet=this._sheet]
      */
     static resnapDots(data, sheet=this._sheet) {
         if (_.isUndefined(data)) {
-            let dots = this._controller.getShow().getDots();
-            data = mapSome(dots, dot => {
+            data = mapSome(this._show.getDots(), dot => {
                 let position = this._sheet.getPosition(dot);
                 let rounded = {
                     dot: dot,
@@ -529,7 +503,7 @@ class ContextActions {
             });
         }
 
-        let result = this.constructor.actions.moveDotsTo.call(this, data, sheet);
+        let result = ContextActions.moveDotsTo.call(this, data, sheet);
         return {
             data: [data, sheet],
             undo: result.undo,
@@ -541,21 +515,14 @@ class ContextActions {
      *
      * @param {Dot} dot1
      * @param {Dot} dot2
-     * @param {Sheet} [sheet] - The sheet to swap dots in. Defaults
-     *   to the currently loaded stunt sheet.
+     * @param {Sheet} [sheet=this._sheet]
      */
     static swapDots(dot1, dot2, sheet=this._sheet) {
-        let info1 = sheet.getDotInfo(dot1);
-        let info2 = sheet.getDotInfo(dot2);
-
         let swap = () => {
-            let temp = info1.position;
-            info1.position = info2.position;
-            info2.position = temp;
-
+            sheet.swapDots(dot1, dot2);
             this._updateMovements([dot1, dot2], sheet);
-            this._controller.loadSheet(sheet);
-        }
+            this.loadSheet(sheet);
+        };
         swap();
 
         return {

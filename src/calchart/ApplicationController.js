@@ -29,7 +29,7 @@ export default class ApplicationController {
      * @return {ApplicationController} The initialized controller.
      */
     static init(show) {
-        if (!window.controller) {
+        if (_.isNull(window.controller)) {
             window.controller = new this(show);
             window.controller.init();
         }

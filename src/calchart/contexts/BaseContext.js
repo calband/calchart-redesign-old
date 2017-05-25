@@ -4,10 +4,10 @@
  * given state.
  *
  * Method handlers:
- * - When the user loads the context for the first time, the constructor
- *   is called.
- * - Every time the user loads the context (including the first time),
- *   load() is called.
+ * - When the editor is initialized, the constructor is called.
+ * - Every time the user loads the context, load() is called, then refresh().
+ * - Every time the user loads another context, unload() is called before
+ *   loading the next context.
  */
 export default class BaseContext {
     /**
@@ -70,20 +70,6 @@ export default class BaseContext {
     }
 
     /**
-     * Runs any necessary actions to unload the context. Defaults to removing all events
-     * set by _addEvents.
-     */
-    unload() {
-        for (let element of this._eventListeners) {
-            $(element).off(".app-context");
-        }
-
-        let toolbar = _.defaultTo(this.info.toolbar, this.info.name);
-        $(`.toolbar .${toolbar}`).removeClass("active");
-        $(`.toolbar .${toolbar}-group`).addClass("hide");
-    }
-
-    /**
      * Refresh the UI according to the state of the context.
      *
      * @param {...String} [targets] - The elements to refresh. When refresh() is called with
@@ -99,6 +85,20 @@ export default class BaseContext {
             target = _.capitalize(target);
             this[`refresh${target}`]();
         });
+    }
+
+    /**
+     * Runs any necessary actions to unload the context. Defaults to removing all events
+     * set by _addEvents.
+     */
+    unload() {
+        for (let element of this._eventListeners) {
+            $(element).off(".app-context");
+        }
+
+        let toolbar = _.defaultTo(this.info.toolbar, this.info.name);
+        $(`.toolbar .${toolbar}`).removeClass("active");
+        $(`.toolbar .${toolbar}-group`).addClass("hide");
     }
 
     /**** METHODS ****/

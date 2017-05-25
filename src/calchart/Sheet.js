@@ -587,12 +587,38 @@ export default class Sheet {
     }
 
     /**
+     * Set the position of the given Dot.
+     *
+     * @param {Dot} dot
+     * @param {int} x - The x-coordinate of the new position, in steps.
+     * @param {int} y - The y-coordinate of the new position, in steps.
+     */
+    setPosition(dot, x, y) {
+        this.getDotInfo(dot).position = new Coordinate(x, y);
+    }
+
+    /**
      * Set the song of this Sheet.
      *
      * @param {?Song} song - The song to set. Null if unset a song from the Sheet.
      */
     setSong(song) {
         this._song = song;
+    }
+
+    /**
+     * Swap the positions of the two given dots.
+     *
+     * @param {Dot} dot1
+     * @param {Dot} dot2
+     */
+    swapDots(dot1, dot2) {
+        let info1 = this.getDotInfo(dot1);
+        let info2 = this.getDotInfo(dot2);
+
+        let temp = info1.position;
+        info1.position = info2.position;
+        info2.position = temp;
     }
 
     /**
@@ -664,18 +690,5 @@ export default class Sheet {
                 }
             }
         });
-    }
-
-    /**
-     * Update the position of the given Dot.
-     *
-     * @param {Dot} dot
-     * @param {int} x - The x-coordinate of the new position, in steps.
-     * @param {int} y - The y-coordinate of the new position, in steps.
-     */
-    updatePosition(dot, x, y) {
-        let coordinate = this.getDotInfo(dot).position;
-        coordinate.x = x;
-        coordinate.y = y;
     }
 }
