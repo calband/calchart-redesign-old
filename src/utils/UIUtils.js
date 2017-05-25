@@ -652,7 +652,7 @@ export function addHandles(container) {
 }
 
 /**
- * Get the data needed to resize an element using a handle.
+ * Get the data needed to resize an element in a GraphContext using a handle.
  *
  * @param {int} handle - The ID of the handle being used.
  * @param {object} start - An object containing the starting data of the
@@ -681,7 +681,7 @@ export function resizeHandles(handle, start, end) {
         startHeight *= -1;
     }
 
-    let [endX, endY] = $(".workspace").makeRelative(end.pageX, end.pageY);
+    let [endX, endY] = $(".graph-workspace").makeRelative(end.pageX, end.pageY);
     let deltaX = endX - startX;
     let deltaY = endY - startY;
 

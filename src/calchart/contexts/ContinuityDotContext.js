@@ -1,4 +1,4 @@
-import HiddenContext from "calchart/contexts/HiddenContext";
+import HiddenGraphContext from "calchart/contexts/HiddenContext";
 
 import HTMLBuilder from "utils/HTMLBuilder";
 import { setupPanel } from "utils/UIUtils";
@@ -7,7 +7,7 @@ import { setupPanel } from "utils/UIUtils";
  * The Context that allows a user to define a dot order in
  * a continuity that requires dots to be in order.
  */
-export default class ContinuityDotContext extends HiddenContext {
+export default class ContinuityDotContext extends HiddenGraphContext {
     constructor(controller) {
         super(controller);
 

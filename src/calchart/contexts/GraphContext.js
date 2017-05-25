@@ -208,7 +208,6 @@ export default class GraphContext extends BaseContext {
 
             // field preview
             let grapher = new Grapher(this._show, preview, {
-                drawOrientation: false,
                 drawYardlines: false,
                 fieldPadding: 5,
             });
@@ -491,10 +490,6 @@ export default class GraphContext extends BaseContext {
 
                 this._controller.doAction("saveSheetProperties", [data]);
             },
-            onHide: popup => {
-                // refresh to show background
-                this.refresh("grapher");
-            },
         });
     }
 
@@ -657,13 +652,13 @@ class GraphActions {
     static addSheet(numBeats) {
         let sheet = this._show.addSheet(numBeats);
         this.loadSheet(sheet);
-        this.refresh("toolbar");
+        this.refresh("sidebar", "toolbar");
 
         return {
             undo: function() {
                 this._show.removeSheet(sheet);
                 this.loadSheet(prevSheet);
-                this.refresh("toolbar");
+                this.refresh("sidebar", "toolbar");
             },
         };
     }
@@ -728,7 +723,7 @@ class GraphActions {
         toUpdate.forEach(sheet => {
             this.checkContinuities(sheet);
         });
-        this.refresh();
+        this.refresh("sidebar");
 
         return {
             undo: function() {
@@ -736,7 +731,7 @@ class GraphActions {
                 toUpdate.forEach(sheet => {
                     this.checkContinuities(sheet);
                 });
-                this.refresh();
+                this.refresh("sidebar");
             },
         };
     }
@@ -751,14 +746,14 @@ class GraphActions {
         let changed = update(sheet, underscoreKeys(data));
         sheet.updateMovements();
         this.checkContinuities(sheet);
-        this.refresh();
+        this.refresh("grapher");
 
         return {
             data: [data, sheet],
             undo: function() {
                 update(sheet, changed);
                 sheet.updateMovements();
-                this.refresh();
+                this.refresh("grapher");
             },
         };
     }

@@ -1,4 +1,4 @@
-import HiddenContext from "calchart/contexts/HiddenContext";
+import HiddenGraphContext from "calchart/contexts/HiddenContext";
 import Coordinate from "calchart/Coordinate";
 
 import HTMLBuilder from "utils/HTMLBuilder";
@@ -9,7 +9,7 @@ import { setupPanel } from "utils/UIUtils";
  * The Context that allows a user to define the path in
  * a follow the leader continuity.
  */
-export default class FTLPathContext extends HiddenContext {
+export default class FTLPathContext extends HiddenGraphContext {
     constructor(controller) {
         super(controller);
 

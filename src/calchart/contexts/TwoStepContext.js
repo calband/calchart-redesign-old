@@ -1,11 +1,12 @@
 import ContinuityContext from "calchart/contexts/ContinuityContext";
+import { HiddenContextMixin } from "calchart/contexts/HiddenContext";
 import Continuity from "calchart/Continuity";
 
 /**
  * The context that lets the user select the continuities to run
  * in a two-step continuity.
  */
-export default class TwoStepContext extends ContinuityContext {
+export default class TwoStepContext extends HiddenContextMixin(ContinuityContext) {
     constructor(controller) {
         super(controller);
 
@@ -41,18 +42,6 @@ export default class TwoStepContext extends ContinuityContext {
         this._controller.checkContinuities({
             dots: this._continuity.dotType,
         });
-    }
-
-    /**
-     * Copied from HiddenContext, since TwoStepContext needs to
-     * inherit from ContinuityContext.
-     */
-    loadSheet(sheet) {
-        if (sheet !== this._sheet) {
-            this.exit();
-        } else {
-            super.loadSheet(sheet);
-        }
     }
 
     /**

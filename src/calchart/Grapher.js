@@ -21,12 +21,27 @@ export default class Grapher {
     /**
      * @param {Show} show - The show that will be graphed
      * @param {jQuery} drawTarget - The HTML element the Grapher will draw to.
-     * @param {Object} [options] - Options to set. @see Grapher#setOption.
+     * @param {Object} [options] - Options to set. See Grapher.setOption for a
+     *   a list of all the available options.
      */
     constructor(show, drawTarget, options={}) {
         this._show = show;
         this._drawTarget = drawTarget;
-        this._options = options;
+
+        this._options = _.defaults({}, options, {
+            backgroundVisible: false,
+            boundDots: false,
+            dotFormat: "none",
+            draw4Step: false,
+            drawYardlineNumbers: false,
+            drawYardlines: true,
+            expandField: false,
+            fieldPadding: 30,
+            labelLeft: true,
+            showCollisions: false,
+            showLabels: false,
+            zoom: null,
+        });
 
         // true to trigger drawing zoom-dependent aspects of the grapher; to
         // avoid redundant calculations in _drawDots
@@ -119,7 +134,7 @@ export default class Grapher {
             fieldType = this._show.getFieldType();
         }
 
-        let zoom = _.defaultTo(this._options.zoom, null);
+        let zoom = this._options.zoom;
         let svgWidth, svgHeight;
         if (_.isNull(zoom)) {
             svgWidth = this._drawTarget.width();
@@ -267,8 +282,8 @@ export default class Grapher {
      * available options are:
      *  - {boolean} [backgroundVisible=false] - If true, show the background image for a sheet
      *  - {boolean} [boundDots=false] - If true, prevent dots from going out of the SVG.
-     *  - {string} [dotFormat="orientation"] - The format to draw the dots. The available formats
-     *    are: orientation, dot-type.
+     *  - {string} [dotFormat="none"] - The format to draw the dots. The available formats
+     *    are: none, orientation, dot-type.
      *  - {boolean} [draw4Step=false] - If true, draws 4 step lines.
      *  - {boolean} [drawYardlineNumbers=false] - If true, draws yardline numbers.
      *  - {boolean} [drawYardlines=true] - If true, draw yardlines and hashes.
@@ -298,11 +313,7 @@ export default class Grapher {
      * @param {boolean} [visible] - If true, show the background image; otherwise, hide the
      *   background image. If undefined, use the backgroundVisible option.
      */
-    showBackground(visible) {
-        if (_.isUndefined(visible)) {
-            visible = _.defaultTo(this._options.backgroundVisible);
-        }
-
+    showBackground(visible=this._options.backgroundVisible) {
         this.setOption("backgroundVisible", visible);
         this._svg.select("image.background-image").style("display", visible ? "block" : "none");
     }
@@ -407,7 +418,7 @@ export default class Grapher {
             this.moveDotTo($dot, x, y);
 
             // overwrite dot class each time
-            let dotClass;
+            let dotClass = "";
             switch (options.dotFormat) {
                 case "orientation":
                     dotClass = getNearestOrientation(state.angle);
@@ -442,7 +453,7 @@ export default class Grapher {
                     let width = $.fromD3(dotLabel).getDimensions().width
                     let offsetX = 1.25 * width;
                     let offsetY = -1.25 * dotRadius;
-                    if (_.defaultTo(options.labelLeft, true)) {
+                    if (options.labelLeft) {
                         offsetX *= -1;
                     }
                     dotLabel.attr("x", offsetX).attr("y", offsetY);

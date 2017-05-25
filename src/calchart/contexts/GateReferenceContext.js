@@ -1,4 +1,4 @@
-import HiddenContext from "calchart/contexts/HiddenContext";
+import HiddenGraphContext from "calchart/contexts/HiddenContext";
 import Coordinate from "calchart/Coordinate";
 
 import HTMLBuilder from "utils/HTMLBuilder";
@@ -8,7 +8,7 @@ import { round } from "utils/MathUtils";
  * The Context that allows a user to define the reference point
  * in a GateTurnContinuity
  */
-export default class GateReferenceContext extends HiddenContext {
+export default class GateReferenceContext extends HiddenGraphContext {
     constructor(controller) {
         super(controller);
 
