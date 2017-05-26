@@ -120,9 +120,10 @@ export default class ContinuityContext extends GraphContext {
         let tabs = this.panel.find(".dot-types").empty();
         let path = tabs.data("path");
         this.activeSheet.getDotTypes().forEach(dotType => {
-            let tab = HTMLBuilder.make("li.tab", tabs)
+            let tab = HTMLBuilder.make("li.tab")
                 .addClass(dotType)
-                .data("dotType", dotType);
+                .data("dotType", dotType)
+                .appendTo(tabs);
 
             if (DotType.isAll(dotType)) {
                 tab.text("All");
@@ -308,7 +309,7 @@ export default class ContinuityContext extends GraphContext {
             e.preventDefault();
 
             let select = this;
-            let dropdown = HTMLBuilder.make("ul.panel-dropdown", "body");
+            let dropdown = HTMLBuilder.make("ul.panel-dropdown").appendTo("body");
 
             $(this).children().each(function() {
                 let val = $(this).attr("value");

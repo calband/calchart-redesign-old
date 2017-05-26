@@ -296,7 +296,7 @@ class SelectionTool extends BaseSelection {
             this.context.deselectDots();
         }
 
-        this._box = HTMLBuilder.div("selection-box", null, this.context.workspace);
+        this._box = HTMLBuilder.div("selection-box").appendTo(this.context.workspace);
         this._scrollOffset = {
             top: 0,
             left: 0,
@@ -548,7 +548,7 @@ class BaseEdit extends BaseTool {
  */
 class StretchTool extends BaseEdit {
     load() {
-        this._box = HTMLBuilder.div("stretch-box", null, this.context.workspace);
+        this._box = HTMLBuilder.div("stretch-box").appendTo(this.context.workspace);
         addHandles(this._box);
 
         let bounds = this._getDotBounds();

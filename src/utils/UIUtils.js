@@ -295,7 +295,7 @@ export function setupToolbar(toolbar) {
 export function setupTooltip(selector, label) {
     let tooltipTimeout = null;
     let tooltip = HTMLBuilder.span("", "tooltip").html(label);
-    let arrow = HTMLBuilder.make("span.tooltip-arrow", tooltip);
+    let arrow = HTMLBuilder.make("span.tooltip-arrow").appendTo(tooltip);
 
     $(selector)
         .mouseenter(function() {
@@ -347,7 +347,7 @@ export function showContextMenu(e, items) {
     // close any existing menus
     closeMenus();
     parents.lockScroll();
-    let menu = HTMLBuilder.make("ul.context-menu", "body");
+    let menu = HTMLBuilder.make("ul.context-menu").appendTo("body");
 
     // recursively setup menu items
     function makeMenu(parent, items) {
@@ -574,7 +574,7 @@ export function showMessage(message, options={}) {
 
     let container = $("ul.messages");
     if (!container.exists()) {
-        container = HTMLBuilder.make("ul.messages", "body");
+        container = HTMLBuilder.make("ul.messages").appendTo("body");
     }
 
     let li = HTMLBuilder.li(message, "message").appendTo(container);

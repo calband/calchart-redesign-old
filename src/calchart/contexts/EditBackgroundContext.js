@@ -50,7 +50,7 @@ export default class EditBackgroundContext extends HiddenGraphContext {
             backgroundVisible: true,
         });
 
-        this._handles = HTMLBuilder.div("background-image-handles", null, this.workspace);
+        this._handles = HTMLBuilder.div("background-image-handles").appendTo(this.workspace);
         addHandles(this._handles);
 
         this._addEvents(this._handles, {

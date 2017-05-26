@@ -26,12 +26,17 @@
         {% make_menu toolbar %}
     </div>
     <div class="content graph-content">
-        <div class="sidebar graph-sidebar"></div>
-        <div class="workspace graph-workspace"></div>
+        <div class="sidebar"></div>
+        <div class="workspace"></div>
     </div>
     <div class="content music-content">
-        <div class="sidebar music-sidebar"></div>
-        <div class="workspace music-workspace"></div>
+        <div class="top-panel">
+            <div class="song-list"></div>
+            <div class="sheet-list"></div>
+        </div>
+        <div class="workspace">
+            TODO: BEATS EDITOR
+        </div>
     </div>
     {% for template, name in panels %}
         {% include template with name=name only %}

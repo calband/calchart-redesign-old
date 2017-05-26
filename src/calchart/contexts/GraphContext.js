@@ -64,15 +64,17 @@ export default class GraphContext extends BaseContext {
     }
 
     get sidebar() {
-        return $(".graph-sidebar");
+        return $(".graph-content .sidebar");
     }
 
     get workspace() {
-        return $(".graph-workspace");
+        return $(".graph-content .workspace");
     }
 
     load(options) {
         super.load(options);
+
+        $(".graph-content").show();
 
         // initialize grapher if not initialized
         if (_.isNull(this.grapher)) {
@@ -147,6 +149,8 @@ export default class GraphContext extends BaseContext {
 
         this.workspace.off(".pinch");
         $(".toolbar .graph-context-group").addClass("hide");
+
+        $(".graph-content").hide();
     }
 
     /**
@@ -172,8 +176,9 @@ export default class GraphContext extends BaseContext {
 
             let preview = HTMLBuilder.div("preview");
             let $sheet = HTMLBuilder
-                .div("stuntsheet", [label, preview], this.sidebar)
-                .data("sheet", sheet);
+                .div("stuntsheet", [label, preview])
+                .data("sheet", sheet)
+                .appendTo(this.sidebar);
 
             if (sheet === this.activeSheet) {
                 $sheet.addClass("active");
