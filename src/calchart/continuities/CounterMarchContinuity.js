@@ -29,8 +29,7 @@ export default class CounterMarchContinuity extends FollowLeaderContinuity {
     }
 
     static deserialize(sheet, dotType, data) {
-        let show = sheet.getShow();
-        let order = data.order.map(dotId => show.getDot(dotId));
+        let order = data.order.map(dotId => sheet.show.getDot(dotId));
         return new CounterMarchContinuity(sheet, dotType, data.duration, order, data);
     }
 

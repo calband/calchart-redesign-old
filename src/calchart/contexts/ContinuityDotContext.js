@@ -129,7 +129,7 @@ export default class ContinuityDotContext extends HiddenGraphContext {
     }
 }
 
-class ContextActions {
+class ContextActions extends HiddenGraphContext.actions {
     /**
      * Change the dot order to reflect the given order.
      *

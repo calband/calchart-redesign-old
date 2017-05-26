@@ -84,6 +84,23 @@ export default class BaseContinuity {
         return this._sheet;
     }
 
+    /**** METHODS ****/
+
+    /**
+     * Clone the given property, being careful to not clone any foreign keys.
+     *
+     * @param {string} key - The property to clone, such as "_sheet"
+     * @param {*} val - The value of the property (equivalent to this[key]).
+     * @return {undefined|*} The value to use for this property in the cloned
+     *   continuity. If undefined, will be cloned as normal.
+     */
+    clone(key, val) {
+        switch (key) {
+            case "_sheet":
+                return null; // set manually later
+        }
+    }
+
     /**
      * Get the number of beats per step for this continuity, resolving any defaults.
      *
@@ -206,6 +223,15 @@ export default class BaseContinuity {
     }
 
     /**
+     * Sets the sheet this continuity is a part of. Used when cloning a Sheet.
+     *
+     * @param {Sheet} sheet
+     */
+    setSheet(sheet) {
+        this._sheet = sheet;
+    }
+
+    /**
      * Validate the data when saving the Edit Continuity popup.
      *
      * @param {Object} data
@@ -220,6 +246,8 @@ export default class BaseContinuity {
             }
         }
     }
+
+    /**** HELPERS ****/
 
     /**
      * Update the movements for dots that use this continuity. Used in the

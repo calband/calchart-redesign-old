@@ -113,7 +113,7 @@ export default class GateReferenceContext extends HiddenGraphContext {
     }
 }
 
-class ContextActions {
+class ContextActions extends HiddenGraphContext.actions {
     /**
      * Set the reference point to the given point
      *

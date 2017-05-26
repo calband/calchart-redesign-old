@@ -245,7 +245,7 @@ export default class FTLPathContext extends HiddenGraphContext {
     }
 }
 
-class ContextActions {
+class ContextActions extends HiddenGraphContext.actions {
     /**
      * Add a point to the end of the path.
      *

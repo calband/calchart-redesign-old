@@ -47,6 +47,17 @@ export default class ApplicationController {
     }
 
     /**
+     * Class variable holding all keyboard shortcuts for the controller, mapping
+     * keyboard shortcut to the name of the ApplicationController function. Separate
+     * keys with "+", e.g. "ctrl+s" or "ctrl+shift+s". Meta keys need to be in this
+     * order: ctrl (alias for cmd on Mac), alt, shift. Non-character keys can be mapped
+     * as: top, left, down, right, enter, tab, backspace, delete.
+     */
+    static get shortcuts() {
+        return {};
+    }
+
+    /**
      * Retrieve and cache getAllShortcutCommands.
      */
     get shortcutCommands() {
@@ -56,15 +67,8 @@ export default class ApplicationController {
         return this._shortcutCommands;
     }
 
-    /**
-     * Class variable holding all keyboard shortcuts for the controller, mapping
-     * keyboard shortcut to the name of the ApplicationController function. Separate
-     * keys with "+", e.g. "ctrl+s" or "ctrl+shift+s". Meta keys need to be in this
-     * order: ctrl (alias for cmd on Mac), alt, shift. Non-character keys can be mapped
-     * as: top, left, down, right, enter, tab, backspace, delete.
-     */
-    static get shortcuts() {
-        return {};
+    get show() {
+        return this._show;
     }
 
     /**
@@ -157,13 +161,6 @@ export default class ApplicationController {
      */
     getShortcut(shortcut) {
         return this.constructor.shortcuts[shortcut] || null;
-    }
-
-    /**
-     * @return {Show} The show stored in the controller.
-     */
-    getShow() {
-        return this._show;
     }
 
     /**

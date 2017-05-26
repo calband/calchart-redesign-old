@@ -1,6 +1,7 @@
 import AnimationState from "calchart/AnimationState";
 import Coordinate from "calchart/Coordinate";
 import Continuity from "calchart/Continuity";
+import TwoStepContinuity from "calchart/continuities/TwoStepContinuity";
 import Dot from "calchart/Dot";
 import DotType from "calchart/DotType";
 import MovementCommand from "calchart/MovementCommand";
@@ -189,6 +190,12 @@ export default class Sheet {
         return _.defaultTo(this._song, this._show);
     }
 
+    get show() {
+        return this._show;
+    }
+
+    /**** METHODS ****/
+
     /**
      * Add the given continuity to the given dot type.
      *
@@ -226,21 +233,43 @@ export default class Sheet {
      * @return {Sheet}
      */
     clone() {
-        // dont clone foreign keys
-        let show = this._show;
-        let song = this._song;
-        this._show = null;
-        this._song = null;
+        let allContinuities = [];
 
-        let sheet = _.cloneDeep(this);
-        this._show = show;
-        this._song = song;
+        let clone = _.cloneDeepWith(this, (val, key) => {
+            switch (key) {
+                // make sure to not clone foreign keys
+                case "_show":
+                case "_song":
+                    return val;
+                case "_continuities":
+                    let dotContinuities = {};
+                    _.each(val, (continuities, dotType) => {
+                        dotContinuities[dotType] = continuities.map(continuity => {
+                            let clone = _.cloneDeepWith(continuity,
+                                (val, key) => continuity.clone(key, val)
+                            );
 
-        sheet._show = show;
-        sheet._index = undefined;
-        sheet._song = song;
+                            allContinuities.push(clone);
+                            if (clone instanceof TwoStepContinuity) {
+                                let nested = clone.getContinuities();
+                                allContinuities = allContinuities.concat(nested);
+                            }
 
-        return sheet;
+                            return clone
+                        });
+                    })
+                    return dotContinuities;
+            }
+        });
+
+        // manually set the sheet of all continuities
+        allContinuities.forEach(continuity => {
+            continuity.setSheet(clone);
+        });
+
+        console.log(clone);
+
+        return clone;
     }
 
     /**
@@ -461,13 +490,6 @@ export default class Sheet {
      */
     getPrevSheet() {
         return this._show.getSheet(this._index - 1) || null;
-    }
-
-    /**
-     * @return {Show}
-     */
-    getShow() {
-        return this._show;
     }
 
     /**

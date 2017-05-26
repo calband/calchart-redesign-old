@@ -64,7 +64,7 @@ export default class BaseContext {
     }
 
     get show() {
-        return this._controller.getShow();
+        return this.controller.show;
     }
 
     /**

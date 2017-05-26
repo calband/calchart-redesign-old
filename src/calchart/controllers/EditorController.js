@@ -33,7 +33,7 @@ export default class EditorController extends ApplicationController {
         this._redoHistory = [];
 
         // track last saved state of show
-        this._savedShow = JSON.stringify(this._show.serialize());
+        this._savedShow = JSON.stringify(this.show.serialize());
     }
 
     /**
@@ -62,7 +62,7 @@ export default class EditorController extends ApplicationController {
         // prompt user if leaving while unsaved, unless in development
         if (!window.isLocal) {
             $(window).on("beforeunload", () => {
-                let data = JSON.stringify(this._show.serialize());
+                let data = JSON.stringify(this.show.serialize());
                 if (data !== this._savedShow) {
                     return true;
                 }
@@ -71,7 +71,7 @@ export default class EditorController extends ApplicationController {
 
         this.loadContext("dot");
 
-        let sheet = this._show.getSheet(0);
+        let sheet = this.show.getSheet(0);
         if (sheet) {
             this._context.loadSheet(sheet);
         }
@@ -115,10 +115,10 @@ export default class EditorController extends ApplicationController {
     editShowProperties() {
         showPopup("edit-show", {
             init: popup => {
-                popup.find(".fieldType select").choose(this._show.getFieldType());
-                popup.find(".beatsPerStep input").val(this._show.getBeatsPerStep());
-                popup.find(".stepType select").choose(this._show.getStepType());
-                popup.find(".orientation select").choose(this._show.getOrientation());
+                popup.find(".fieldType select").choose(this.show.getFieldType());
+                popup.find(".beatsPerStep input").val(this.show.getBeatsPerStep());
+                popup.find(".stepType select").choose(this.show.getStepType());
+                popup.find(".orientation select").choose(this.show.getOrientation());
             },
             onSubmit: popup => {
                 let data = getData(popup);
@@ -140,7 +140,7 @@ export default class EditorController extends ApplicationController {
      * Automatically download the JSON file for the show.
      */
     export() {
-        let slug = this._show.getSlug();
+        let slug = this.show.getSlug();
         window.open(`/download/${slug}.json`);
     }
 
@@ -151,10 +151,6 @@ export default class EditorController extends ApplicationController {
     getShortcut(shortcut) {
         let action = super.getShortcut(shortcut);
         return _.defaultTo(action, this._context.constructor.shortcuts[shortcut]);
-    }
-
-    getShow() {
-        return this._show;
     }
 
     /**
@@ -241,7 +237,7 @@ export default class EditorController extends ApplicationController {
      * Save the Show to the server.
      */
     saveShow() {
-        let data = JSON.stringify(this._show.serialize());
+        let data = JSON.stringify(this.show.serialize());
         let params = {
             viewer: data,
         };
@@ -371,15 +367,15 @@ class EditorActions {
      * @param {Object} data - The data from the edit-show popup.
      */
     static saveShowProperties(data) {
-        let changed = update(this._show, underscoreKeys(data));
+        let changed = update(this.show, underscoreKeys(data));
 
-        this._show.getSheets().forEach(sheet => sheet.updateMovements());
+        this.show.getSheets().forEach(sheet => sheet.updateMovements());
         this._context.refresh();
 
         return {
             undo: function() {
-                update(this._show, changed);
-                this._show.getSheets().forEach(function(sheet) {
+                update(this.show, changed);
+                this.show.getSheets().forEach(function(sheet) {
                     sheet.updateMovements();
                 });
                 this._context.refresh();

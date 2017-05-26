@@ -32,8 +32,7 @@ export default class FollowLeaderContinuity extends OrderedDotsContinuity {
     }
 
     static deserialize(sheet, dotType, data) {
-        let show = sheet.getShow();
-        let order = data.order.map(dotId => show.getDot(dotId));
+        let order = data.order.map(dotId => sheet.show.getDot(dotId));
         let path = data.path.map(coordData => Coordinate.deserialize(coordData));
 
         return new FollowLeaderContinuity(sheet, dotType, order, path, data);
@@ -165,7 +164,6 @@ export default class FollowLeaderContinuity extends OrderedDotsContinuity {
      */
     _getPath(index) {
         let path = this._path;
-        let show = this._sheet.getShow();
 
         // add preceding dot positions as reference points
         for (let i = 0; i <= index; i++) {

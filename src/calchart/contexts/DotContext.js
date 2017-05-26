@@ -29,7 +29,7 @@ export default class DotContext extends GraphContext {
     }
 
     static get shortcuts() {
-        return ContextShortcuts;
+        return _.extend({}, super.shortcuts, ContextShortcuts);
     }
 
     static get actions() {
@@ -347,7 +347,7 @@ let ContextShortcuts = {
     "ctrl+a": "selectAll",
 };
 
-class ContextActions {
+class ContextActions extends GraphContext.actions {
     /**
      * Change the currently selected dots' dot type to the given dot type.
      *

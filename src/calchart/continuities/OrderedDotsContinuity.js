@@ -19,6 +19,14 @@ export default class OrderedDotsContinuity extends BaseContinuity {
 
     /**** METHODS ****/
 
+    clone(key, val) {
+        switch (key) {
+            case "_order":
+                return val;
+        }
+        return super.clone(key, val);
+    }
+
     /**
      * @return {Dot[]}
      */

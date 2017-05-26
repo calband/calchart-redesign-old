@@ -86,7 +86,7 @@ export default class TwoStepContext extends HiddenContextMixin(ContinuityContext
     }
 }
 
-class ContextActions {
+class ContextActions extends ContinuityContext.actions {
     /**
      * Add a continuity of the given type to the two-step continuity.
      *

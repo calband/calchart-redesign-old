@@ -185,7 +185,7 @@ export default class EditBackgroundContext extends HiddenGraphContext {
     }
 }
 
-class ContextActions {
+class ContextActions extends HiddenGraphContext.actions {
     /**
      * Save the background image's position and size after modifying it.
      *

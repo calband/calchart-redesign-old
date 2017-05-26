@@ -126,7 +126,7 @@ export default class GraphContext extends BaseContext {
             },
             update: (e, ui) => {
                 let index = ui.item.index();
-                this.doAction("moveSheet", [oldIndex, index]);
+                this.controller.doAction("moveSheet", [oldIndex, index]);
             },
         });
 

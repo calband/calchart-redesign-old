@@ -30,7 +30,7 @@ export default class ContinuityContext extends GraphContext {
     }
 
     static get shortcuts() {
-        return ContextShortcuts;
+        return _.extend({}, super.shortcuts, ContextShortcuts);
     }
 
     static get actions() {
@@ -434,7 +434,7 @@ let ContextShortcuts = {
     "ctrl+enter": "checkContinuities(fullCheck=true)",
 };
 
-class ContextActions {
+class ContextActions extends GraphContext.actions {
     /**
      * Add a continuity of the given type to the given sheet for the
      * given dot type.

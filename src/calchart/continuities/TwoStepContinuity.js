@@ -36,8 +36,7 @@ export default class TwoStepContinuity extends OrderedDotsContinuity {
     }
 
     static deserialize(sheet, dotType, data) {
-        let show = sheet.getShow();
-        let order = data.order.map(dotId => show.getDot(dotId));
+        let order = data.order.map(dotId => sheet.show.getDot(dotId));
         let continuities = data.continuities.map(
             continuity => Continuity.deserialize(sheet, dotType, continuity)
         );
@@ -61,8 +60,16 @@ export default class TwoStepContinuity extends OrderedDotsContinuity {
         };
     }
 
-    get continuities() {
-        return this._continuities;
+    /**** METHODS ****/
+
+    clone(key, val) {
+        switch (key) {
+            case "_continuities":
+                return val.map(continuity =>
+                    _.cloneDeepWith(continuity, (val, key) => continuity.clone(key, val))
+                );
+        }
+        return super.clone(key, val);
     }
 
     /**
@@ -73,6 +80,13 @@ export default class TwoStepContinuity extends OrderedDotsContinuity {
     addContinuity(continuity) {
         this._continuities.push(continuity);
         this._sheet.updateMovements(this._dotType);
+    }
+
+    /**
+     * @return {Continuity[]}
+     */
+    getContinuities() {
+        return this._continuities;
     }
 
     getMovements(dot, data) {
