@@ -141,11 +141,8 @@ export default class ContinuityContext extends GraphContext {
 
         tab.addClass("active");
 
-        let continuities = this.panel.find(".continuities").empty();
-        this.activeSheet.getContinuities(this._dotType).forEach(continuity => {
-            let $continuity = this._getPanelContinuity(continuity);
-            continuities.append($continuity);
-        });
+        let continuities = this.activeSheet.getContinuities(this._dotType);
+        this._populatePanel(continuities);
 
         // select dots of the active dot type
         let dots = $(`.dot.${this._dotType}`);
@@ -272,22 +269,28 @@ export default class ContinuityContext extends GraphContext {
     }
 
     /**
-     * Get the panel HTML element for the given continuity.
+     * Populate the panel with the given continuities.
      *
-     * @param {Continuity} continuity
-     * @return {jQuery}
+     * @param {Continuity[]} continuities
      */
-    _getPanelContinuity(continuity) {
-        let contents = continuity.getPanel(this.controller);
-        let info = HTMLBuilder.div("info", contents);
+    _populatePanel(continuities) {
+        let $continuities = this.panel.find(".continuities").empty();
 
+        // action icons
         let iconEdit = HTMLBuilder.icon("pencil", "edit");
         let iconDelete = HTMLBuilder.icon("times", "delete");
         let actions = HTMLBuilder.div("actions", [iconEdit, iconDelete]);
 
-        let classes = `continuity ${continuity.info.type}`;
-        return HTMLBuilder.div(classes, [info, actions.clone()])
-            .data("continuity", continuity);
+        continuities.forEach(continuity => {
+            let contents = continuity.getPanel(this.controller);
+            let info = HTMLBuilder.div("info", contents);
+
+            let classes = `continuity ${continuity.info.type}`;
+
+            HTMLBuilder.div(classes, [info, actions.clone()])
+                .data("continuity", continuity)
+                .appendTo($continuities);
+        });
     }
 
     /**
@@ -412,15 +415,14 @@ export default class ContinuityContext extends GraphContext {
             mousedown: function(e) {
                 // prevent text highlight
                 e.preventDefault();
+                updateSeek(e);
 
-                $(document)
-                    .on({
-                        "mousemove.seek": updateSeek,
-                        "mouseup.seek": e => {
-                            $(document).off(".seek");
-                        },
-                    })
-                    .trigger("mousemove");
+                $(document).on({
+                    "mousemove.seek": updateSeek,
+                    "mouseup.seek": e => {
+                        $(document).off(".seek");
+                    },
+                });
             },
         });
     }

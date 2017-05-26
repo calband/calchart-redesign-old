@@ -120,23 +120,15 @@ export default class TwoStepContinuity extends OrderedDotsContinuity {
     }
 
     /**
-     * Move the given continuity by the given amount in the two-step drill.
+     * Move the continuity at the given index in the step-two drill
+     * to the specified index.
      *
-     * @param {Continuity} continuity
-     * @param {int} delta
-     * @return {boolean} true if successful
+     * @param {int} from
+     * @param {int} to
      */
-    moveContinuity(continuity, delta) {
-        let index = this._continuities.indexOf(continuity);
-        let newIndex = index + delta;
-        
-        if (newIndex < 0 || newIndex >= continuities.length) {
-            return false;
-        }
-
-        moveElem(this._continuities, index, newIndex);
+    moveContinuity(from, to) {
+        moveElem(this._continuities, from, to);
         this._sheet.updateMovements(this._dotType);
-        return true;
     }
 
     getPanel(controller) {

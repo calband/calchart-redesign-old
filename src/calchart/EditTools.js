@@ -66,9 +66,9 @@ export default class EditTools {
         }
 
         if (tool instanceof BaseEdit) {
-            $(".graph-workspace").addClass("edit-tools-active");
+            context.workspace.addClass("edit-tools-active");
         } else {
-            $(".graph-workspace").removeClass("edit-tools-active");
+            context.workspace.removeClass("edit-tools-active");
         }
 
         $(".toolbar .edit-tools li").removeClass("active");
@@ -296,7 +296,7 @@ class SelectionTool extends BaseSelection {
             this.context.deselectDots();
         }
 
-        this._box = HTMLBuilder.div("selection-box", null, ".graph-workspace");
+        this._box = HTMLBuilder.div("selection-box", null, this.context.workspace);
         this._scrollOffset = {
             top: 0,
             left: 0,
@@ -333,7 +333,7 @@ class SelectionTool extends BaseSelection {
                 this.grapher.moveDotTo(dot, position.x + deltaX, position.y + deltaY);
             })
             .scrollIntoView({
-                parent: ".graph-workspace",
+                parent: this.context.workspace,
                 tolerance: 10,
                 callback: (dx, dy) => {
                     this._scrollOffset.left += dx;
@@ -365,7 +365,7 @@ class SelectionTool extends BaseSelection {
                 height: height,
             })
             .scrollIntoView({
-                parent: ".graph-workspace",
+                parent: this.context.workspace,
                 callback: (dx, dy) => {
                     this._scrollOffset.left += dx;
                     this._scrollOffset.top += dy;
@@ -453,7 +453,7 @@ class LassoTool extends BaseSelection {
         this._path
             .attr("d", pathDef)
             .scrollIntoView({
-                parent: ".graph-workspace",
+                parent: this.context.workspace,
             });
 
         this.context.deselectDots();
@@ -548,7 +548,7 @@ class BaseEdit extends BaseTool {
  */
 class StretchTool extends BaseEdit {
     load() {
-        this._box = HTMLBuilder.div("stretch-box", null, ".graph-workspace");
+        this._box = HTMLBuilder.div("stretch-box", null, this.context.workspace);
         addHandles(this._box);
 
         let bounds = this._getDotBounds();
@@ -573,15 +573,17 @@ class StretchTool extends BaseEdit {
     refreshZoom() {
         super.refreshZoom();
 
-        let bounds = this._getDotBounds();
-        this._margin = this.grapher.getDotRadius() + 5;
+        if (this._box) {
+            let bounds = this._getDotBounds();
+            this._margin = this.grapher.getDotRadius() + 5;
 
-        this._box.css({
-            top: bounds.top - this._margin,
-            left: bounds.left - this._margin,
-            height: (bounds.bottom - bounds.top) + 2 * this._margin,
-            width: (bounds.right - bounds.left) + 2 * this._margin,
-        });
+            this._box.css({
+                top: bounds.top - this._margin,
+                left: bounds.left - this._margin,
+                height: (bounds.bottom - bounds.top) + 2 * this._margin,
+                width: (bounds.right - bounds.left) + 2 * this._margin,
+            });
+        }
     }
 
     unload() {
