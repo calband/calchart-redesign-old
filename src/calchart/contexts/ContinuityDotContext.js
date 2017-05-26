@@ -11,11 +11,9 @@ export default class ContinuityDotContext extends HiddenGraphContext {
     constructor(controller) {
         super(controller);
 
-        this._panel = $(".panel.edit-continuity-dots");
-        this._list = this._panel.find(".dot-order");
         this._setupPanel();
 
-        // FollowLeaderContinuity
+        // OrderedDotsContinuity
         this._continuity = null;
     }
 
@@ -29,85 +27,103 @@ export default class ContinuityDotContext extends HiddenGraphContext {
         };
     }
 
+    static get refreshTargets() {
+        return super.refreshTargets.concat(["panel"]);
+    }
+
+    get panel() {
+        return $(".panel.edit-continuity-dots");
+    }
+
     /**
      * @param {Object} options - Options to customize loading the Context:
-     *    - {FollowLeaderContinuity} continuity - The FTL continuity being edited
+     *    - {OrderedDotsContinuity} continuity - The continuity being edited
      */
     load(options) {
         super.load(options);
 
         this._continuity = options.continuity;
 
-        this._list.empty();
-        this._continuity.order.forEach(dot => {
-            let graphDot = this._grapher.getDot(dot);
+        let list = this.panel.find(".dot-order").empty();
+        this._continuity.getOrder().forEach(dot => {
+            let $dot = this.grapher.getDot(dot);
             
             HTMLBuilder.li(dot.label, `dot dot-${dot.id}`)
                 .data("dot", dot)
-                .appendTo(this._list)
+                .appendTo(list)
                 .mouseenter(e => {
-                    this._controller.selectDots(graphDot);
+                    this.selectDots($dot);
                 })
                 .mouseleave(e => {
-                    this._controller.deselectDots(graphDot);
+                    this.deselectDots($dot);
                 });
         });
 
-        this._list.sortable({
-            containment: this._panel,
+        list.sortable({
+            containment: this.panel,
             update: () => {
-                let order = this._list.children().map(function() {
+                let order = list.children().map(function() {
                     return $(this).data("dot");
                 }).get();
                 controller.doAction("changeDotOrder", [order]);
             },
         });
 
-        this._panel
-            .show()
-            .keepOnscreen();
+        this.panel.show().keepOnscreen();
     }
 
     unload() {
         super.unload();
 
-        this._panel.hide();
+        this.panel.hide();
 
-        let dots = this._continuity.order.map(dot => dot.id);
-        this._grapher.getDots(dots).css("opacity", "");
+        this._getGraphDots().css("opacity", "");
 
         this.checkContinuities({
             dots: this._continuity.dotType,
         });
     }
 
-    refresh() {
-        super.refresh();
+    refreshGrapher() {
+        super.refreshGrapher();
 
-        let order = this._continuity.order.map(dot => dot.id);
-        this._grapher.getDots(order).css("opacity", 1);
+        this._getGraphDots().css("opacity", 1);
+    }
+
+    refreshPanel() {
+        let order = this._continuity.getOrder().map(dot => dot.id);
+        let list = this.panel.find(".dot-order");
 
         // re-order dots on every refresh
         order.forEach(id => {
-            let li = this._list.find(`li.dot-${id}`);
-            this._list.append(li);
+            let li = list.find(`li.dot-${id}`);
+            list.append(li);
         });
     }
 
     exit() {
-        this._controller.loadContext("continuity", {
+        this.controller.loadContext("continuity", {
             dotType: this._continuity.dotType,
         });
     }
 
-    _setupPanel() {
-        setupPanel(this._panel);
+    /**** HELPERS ****/
 
-        this._panel.find("button.flip").click(() => {
-            this._controller.doAction("reverseDotOrder");
+    /**
+     * @param {jQuery}
+     */
+    _getGraphDots() {
+        return this.grapher.getDots(this._continuity.getOrder());
+    }
+
+    _setupPanel() {
+        setupPanel(this.panel);
+
+        this.panel.find("button.flip").click(e => {
+            this.controller.doAction("reverseDotOrder");
         });
 
-        this._panel.find("button.submit").click(() => {
+        this.panel.find("button.submit").click(e => {
             this.exit();
         });
     }
@@ -117,21 +133,21 @@ class ContextActions {
     /**
      * Change the dot order to reflect the given order.
      *
-     * @param {int[]} order
-     * @param {FollowLeaderContinuity} [continuity=this._continuity]
+     * @param {Dot[]} order
+     * @param {OrderedDotsContinuity} [continuity=this._continuity]
      */
     static changeDotOrder(order, continuity=this._continuity) {
-        let oldOrder = continuity.order;
+        let oldOrder = continuity.getOrder();
         continuity.setOrder(order);
         continuity.sheet.updateMovements(continuity.dotType);
-        this._controller.refresh();
+        this.refresh("panel");
 
         return {
             data: [order, continuity],
             undo: function() {
                 continuity.setOrder(oldOrder);
                 continuity.sheet.updateMovements(continuity.dotType);
-                this._controller.refresh();
+                this.refresh("panel");
             },
         };
     }
@@ -139,19 +155,19 @@ class ContextActions {
     /**
      * Reverse the dot order.
      *
-     * @param {FollowLeaderContinuity} [continuity=this._continuity]
+     * @param {OrderedDotsContinuity} [continuity=this._continuity]
      */
     static reverseDotOrder(continuity=this._continuity) {
-        continuity.order.reverse();
+        continuity.reverseOrder();
         continuity.sheet.updateMovements(continuity.dotType);
-        this._controller.refresh();
+        this.refresh("panel");
 
         return {
             data: [continuity],
             undo: function() {
-                continuity.order.reverse();
+                continuity.reverseOrder();
                 continuity.sheet.updateMovements(continuity.dotType);
-                this._controller.refresh();
+                this.refresh("panel");
             },
         };
     }

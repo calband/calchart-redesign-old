@@ -1,4 +1,4 @@
-import BaseContinuity from "calchart/continuities/BaseContinuity";
+import OrderedDotsContinuity from "calchart/continuities/OrderedDotsContinuity";
 import Continuity from "calchart/Continuity";
 import MovementCommandMove from "calchart/movements/MovementCommandMove";
 import MovementCommandStop from "calchart/movements/MovementCommandStop";
@@ -11,12 +11,11 @@ import { setupTooltip } from "utils/UIUtils";
  * A two step continuity, where each dot in a line does a given set of
  * continuities 2 beats after the previous dot.
  */
-export default class TwoStepContinuity extends BaseContinuity {
+export default class TwoStepContinuity extends OrderedDotsContinuity {
     /**
      * @param {Sheet} sheet
      * @param {DotType} dotType
-     * @param {Dot[]} order - The order of dots in the line. order[0] is the first
-     *   dot in the path.
+     * @param {Dot[]} order
      * @param {Continuity[]} continuities - The continuities each dot should execute
      *   after waiting the appropriate amount of time.
      * @param {object} [options] - Options for the continuity, including:
@@ -26,13 +25,12 @@ export default class TwoStepContinuity extends BaseContinuity {
      *   - {boolean} [isMarktime=true] - true if mark time during step two, false for close
      */
     constructor(sheet, dotType, order, continuities, options) {
-        super(sheet, dotType, options);
+        super(sheet, dotType, order, options);
 
         options = _.defaults({}, options, {
             isMarktime: true,
         });
 
-        this._order = order;
         this._continuities = continuities;
         this._isMarktime = options.isMarktime;
     }
@@ -63,8 +61,9 @@ export default class TwoStepContinuity extends BaseContinuity {
         };
     }
 
-    get continuities() { return this._continuities; }
-    get order() { return this._order; }
+    get continuities() {
+        return this._continuities;
+    }
 
     /**
      * Add the given continuity to the two-step drill.
@@ -167,12 +166,5 @@ export default class TwoStepContinuity extends BaseContinuity {
     removeContinuity(continuity) {
         _.pull(this._continuities, continuity);
         this._sheet.updateMovements(this._dotType);
-    }
-
-    /**
-     * @param {Dot[]} order - The new order of dots
-     */
-    setOrder(order) {
-        this._order = order;
     }
 }

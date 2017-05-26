@@ -346,6 +346,9 @@ let EditorShortcuts = {
     "ctrl+shift+z": "redo",
     "ctrl+s": "saveShow",
     "ctrl+z": "undo",
+    "d": "loadContext(dot)",
+    "c": "loadContext(continuity)",
+    "m": "loadContext(music)",
 };
 
 /**

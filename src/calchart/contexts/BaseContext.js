@@ -15,7 +15,6 @@ export default class BaseContext {
      */
     constructor(controller) {
         this._controller = controller;
-        this._show = controller.getShow();
         this._eventListeners = new Set();
     }
 
@@ -49,13 +48,23 @@ export default class BaseContext {
         throw new NotImplementedError(this);
     }
 
-    get info() { return this.constructor.info; }
-
     /**
      * @return {string[]} Targets to use when no arguments are passed to refresh().
      */
     static get refreshTargets() {
         return [];
+    }
+
+    get controller() {
+        return this._controller;
+    }
+
+    get info() {
+        return this.constructor.info;
+    }
+
+    get show() {
+        return this._controller.getShow();
     }
 
     /**
@@ -99,15 +108,6 @@ export default class BaseContext {
         let toolbar = _.defaultTo(this.info.toolbar, this.info.name);
         $(`.toolbar .${toolbar}`).removeClass("active");
         $(`.toolbar .${toolbar}-group`).addClass("hide");
-    }
-
-    /**** METHODS ****/
-
-    /**
-     * @return {EditorController}
-     */
-    getController() {
-        return this._controller;
     }
 
     /**** HELPERS ****/

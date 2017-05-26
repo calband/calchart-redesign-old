@@ -178,15 +178,16 @@ export default class Grapher {
      * @return {jQuery} The dots in the grapher.
      */
     getDots(dots) {
-        let dotGroups = this._svg.selectAll("g.dot");
-        if (!_.isUndefined(dots)) {
-            let ids = dots;
-            if (dots.length > 0 && !_.isInteger(dots[0])) {
-                ids = dots.map(dot => dot.id);
+        let dotGroups = $.fromD3(this._svg.selectAll("g.dot"));
+        if (dots) {
+            if (dots[0] instanceof Dot) {
+                dots = dots.map(dot => dot.id);
             }
-            dotGroups = dotGroups.filter(dot => ids.includes(dot.id));
+            dotGroups = dotGroups.filter(
+                (i, dot) => _.includes(dots, $(dot).data("dot").id)
+            );
         }
-        return $.fromD3(dotGroups);
+        return dotGroups;
     }
 
     /**

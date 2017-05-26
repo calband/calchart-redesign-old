@@ -74,6 +74,10 @@ class Parent {
         this._a = a;
     }
 
+    static get name() {
+        return "Parent";
+    }
+
     foo(x) {
         return this._a + x;
     }
@@ -82,6 +86,10 @@ class Child extends Parent {
     constructor(a, b) {
         super(a);
         this._b = b;
+    }
+
+    static get name() {
+        return "Child";
     }
 
     static create(a, b) {
@@ -99,6 +107,9 @@ class Child extends Parent {
 
 c1 = new Child(1, 2);
 c2 = Child.create(1, 2); // same as c1
+console.log(Parent.name); // Parent
+console.log(Child.name); // Child
+console.log(c1.constructor.name); // Child
 console.log(c1.b); // 2
 console.log(c2.foo(3)) // 6
 ```
@@ -107,6 +118,8 @@ console.log(c2.foo(3)) // 6
 
 ```python
 class Parent:
+    name = 'Parent' # except unchangeable
+
     def __init__(self, a):
         self._a = a
 
@@ -114,6 +127,8 @@ class Parent:
         return self._a + x
 
 class Child(Parent):
+    name = 'Child' # except unchangeable
+
     def __init__(self, a, b):
         super().__init__(a)
         self._b = b
@@ -131,8 +146,11 @@ class Child(Parent):
 
 c1 = Child(1, 2)
 c2 = Child.create(1, 2)
+print(Parent.name) # Parent
+print(Child.name) # Child
+print(c1.name) # Child
 print(c1.b) # 2
-print(c1.foo(3)) # 6
+print(c2.foo(3)) # 6
 ```
 
 ### Modules

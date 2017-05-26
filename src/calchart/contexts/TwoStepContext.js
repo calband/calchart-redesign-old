@@ -24,6 +24,10 @@ export default class TwoStepContext extends HiddenContextMixin(ContinuityContext
         };
     }
 
+    get panel() {
+        return $(".panel.two-step");
+    }
+
     /**
      * @param {Object} options - Options to customize loading the Context:
      *    - {TwoStepContinuity} continuity - The two-step continuity being edited
@@ -53,9 +57,7 @@ export default class TwoStepContext extends HiddenContextMixin(ContinuityContext
         });
     }
 
-    _getPanel() {
-        return $(".panel.two-step");
-    }
+    /**** HELPERS ****/
 
     _refreshSheet() {
         let continuities = this._panel.find(".continuities").empty();
@@ -78,7 +80,7 @@ export default class TwoStepContext extends HiddenContextMixin(ContinuityContext
     _setupPanel() {
         super._setupPanel();
 
-        this._panel.find("button.submit").click(() => {
+        this.panel.find("button.submit").click(() => {
             this.exit();
         });
     }

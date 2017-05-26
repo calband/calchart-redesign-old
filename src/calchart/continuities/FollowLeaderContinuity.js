@@ -1,5 +1,5 @@
-import BaseContinuity from "calchart/continuities/BaseContinuity";
 import DiagonalContinuity from "calchart/continuities/DiagonalContinuity";
+import OrderedDotsContinuity from "calchart/continuities/OrderedDotsContinuity";
 import Coordinate from "calchart/Coordinate";
 import Dot from "calchart/Dot";
 import MovementCommandMove from "calchart/movements/MovementCommandMove";
@@ -14,12 +14,11 @@ import { setupTooltip, showPopup } from "utils/UIUtils";
  * the path for the first dot is marked. Dots will move to each point using a
  * DMHS continuity.
  */
-export default class FollowLeaderContinuity extends BaseContinuity {
+export default class FollowLeaderContinuity extends OrderedDotsContinuity {
     /**
      * @param {Sheet} sheet
      * @param {DotType} dotType
-     * @param {Dot[]} order - The order of dots in the line. order[0] is the
-     *   first dot in the path.
+     * @param {Dot[]} order
      * @param {Coordinate[]} path - The coordinates for the path of the first dot.
      *   path[0] is the first coordinate to go to.
      * @param {object} [options] - Options for the continuity, including:
@@ -27,9 +26,8 @@ export default class FollowLeaderContinuity extends BaseContinuity {
      *   - {int} beatsPerStep
      */
     constructor(sheet, dotType, order, path, options) {
-        super(sheet, dotType, options);
+        super(sheet, dotType, order, options);
 
-        this._order = order;
         this._path = path;
     }
 
@@ -58,8 +56,9 @@ export default class FollowLeaderContinuity extends BaseContinuity {
         };
     }
 
-    get order() { return this._order; }
-    get path() { return this._path; }
+    get path() {
+        return this._path;
+    }
 
     getMovements(dot, data) {
         let index = this._order.indexOf(dot);
@@ -148,13 +147,6 @@ export default class FollowLeaderContinuity extends BaseContinuity {
         let [stepType, orientation, beatsPerStep, customText] = super.getPopup();
 
         return [stepType, beatsPerStep, customText];
-    }
-
-    /**
-     * @param {Dot[]} order - The new order of dots
-     */
-    setOrder(order) {
-        this._order = order;
     }
 
     /**

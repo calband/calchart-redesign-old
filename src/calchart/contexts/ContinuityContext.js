@@ -20,10 +20,11 @@ export default class ContinuityContext extends GraphContext {
     constructor(controller) {
         super(controller);
 
-        this._panel = this._getPanel();
-
         // the currently active dot type
         this._dotType = null;
+
+        // track the current beat
+        this._currBeat = 0;
 
         this._setupPanel();
     }
@@ -47,6 +48,10 @@ export default class ContinuityContext extends GraphContext {
         return super.refreshTargets.concat(["panel"]);
     }
 
+    get panel() {
+        return $(".panel.edit-continuity");
+    }
+
     /**
      * @param {Object} options - Options to customize loading the Context:
      *    - {string} [dotType=null] - The dot type to initially load.
@@ -54,10 +59,10 @@ export default class ContinuityContext extends GraphContext {
     load(options) {
         super.load(options);
 
-        this._panel.show();
+        this.panel.show();
         this._dotType = _.defaultTo(options.dotType, null);
 
-        this._addEvents(this._workspace, {
+        this._addEvents(this.workspace, {
             contextmenu: function(e) {
                 showContextMenu(e, {
                     "Edit dots...": "loadContext(dot)",
@@ -72,7 +77,7 @@ export default class ContinuityContext extends GraphContext {
             },
         });
 
-        this._grapher.setOptions({
+        this.grapher.setOptions({
             showCollisions: true,
         });
 
@@ -82,19 +87,18 @@ export default class ContinuityContext extends GraphContext {
     unload() {
         super.unload();
 
-        this._panel.hide();
-        this._currBeat = 0;
+        this.panel.hide();
         this.deselectDots();
 
-        this._grapher.setOptions({
+        this.grapher.setOptions({
             showCollisions: false,
         });
     }
 
     refresh(...targets) {
         // if no Sheets in the show, load dot context
-        if (_.isNull(this._sheet)) {
-            this._controller.loadContext("dot");
+        if (_.isNull(this.activeSheet)) {
+            this.controller.loadContext("dot");
         } else {
             super.refresh(...targets);
         }
@@ -103,7 +107,7 @@ export default class ContinuityContext extends GraphContext {
     refreshGrapher() {
         super.refreshGrapher();
 
-        let numBeats = this._sheet.getDuration();
+        let numBeats = this.activeSheet.getDuration();
         let position = $(".toolbar .seek").width() / numBeats * this._currBeat;
         $(".toolbar .seek .marker").css("transform", `translateX(${position}px)`);
     }
@@ -113,9 +117,9 @@ export default class ContinuityContext extends GraphContext {
      */
     refreshPanel() {
         // update tabs list in panel
-        let tabs = this._panel.find(".dot-types").empty();
+        let tabs = this.panel.find(".dot-types").empty();
         let path = tabs.data("path");
-        this._sheet.getDotTypes().forEach(dotType => {
+        this.activeSheet.getDotTypes().forEach(dotType => {
             let tab = HTMLBuilder.make("li.tab", tabs)
                 .addClass(dotType)
                 .data("dotType", dotType);
@@ -137,8 +141,8 @@ export default class ContinuityContext extends GraphContext {
 
         tab.addClass("active");
 
-        let continuities = this._panel.find(".continuities").empty();
-        this._sheet.getContinuities(this._dotType).forEach(continuity => {
+        let continuities = this.panel.find(".continuities").empty();
+        this.activeSheet.getContinuities(this._dotType).forEach(continuity => {
             let $continuity = this._getPanelContinuity(continuity);
             continuities.append($continuity);
         });
@@ -158,7 +162,7 @@ export default class ContinuityContext extends GraphContext {
      */
     deleteContinuity(continuity) {
         continuity = this._getContinuity(continuity);
-        this._controller.doAction("removeContinuity", [continuity]);
+        this.controller.doAction("removeContinuity", [continuity]);
     }
 
     /**
@@ -187,9 +191,34 @@ export default class ContinuityContext extends GraphContext {
             onSubmit: popup => {
                 let data = getData(popup);
                 continuity.validatePopup(data);
-                this._controller.doAction("saveContinuity", [continuity, data]);
+                this.controller.doAction("saveContinuity", [continuity, data]);
             },
         });
+    }
+
+    /**
+     * Go to the zero-th beat of the sheet.
+     */
+    firstBeat() {
+        this._currBeat = 0;
+        this.refresh("grapher");
+    }
+
+    getCurrentBeat() {
+        return this._currBeat;
+    }
+
+    /**
+     * Go to the last beat of the sheet.
+     */
+    lastBeat() {
+        this._currBeat = this.activeSheet.getDuration();
+        this.refresh("grapher");
+    }
+
+    loadSheet(sheet) {
+        this._currBeat = 0;
+        super.loadSheet(sheet);
     }
 
     /**
@@ -202,7 +231,27 @@ export default class ContinuityContext extends GraphContext {
      */
     moveContinuity(continuity, delta) {
         continuity = this._getContinuity(continuity);
-        this._controller.doAction("reorderContinuity", [continuity, delta]);
+        this.controller.doAction("reorderContinuity", [continuity, delta]);
+    }
+
+    /**
+     * Increment the current beat.
+     */
+    nextBeat() {
+        if (this._currBeat < this.activeSheet.getDuration()) {
+            this._currBeat++;
+            this.refresh("grapher");
+        }
+    }
+
+    /**
+     * Decrement the current beat.
+     */
+    prevBeat() {
+        if (this._currBeat > 0) {
+            this._currBeat--;
+            this.refresh("grapher");
+        }
     }
 
     /**** HELPERS ****/
@@ -217,16 +266,9 @@ export default class ContinuityContext extends GraphContext {
      */
     _getContinuity(continuity) {
         if (_.isNumber(continuity)) {
-            continuity = this._panel.find(".continuity").get(continuity);
+            continuity = this.panel.find(".continuity").get(continuity);
         }
         return $(continuity).data("continuity");
-    }
-
-    /**
-     * @return {jQuery} The panel to edit continuities, to easily subclass.
-     */
-    _getPanel() {
-        return $(".panel.edit-continuity");
     }
 
     /**
@@ -236,7 +278,7 @@ export default class ContinuityContext extends GraphContext {
      * @return {jQuery}
      */
     _getPanelContinuity(continuity) {
-        let contents = continuity.getPanel(this._controller);
+        let contents = continuity.getPanel(this.controller);
         let info = HTMLBuilder.div("info", contents);
 
         let iconEdit = HTMLBuilder.icon("pencil", "edit");
@@ -253,10 +295,10 @@ export default class ContinuityContext extends GraphContext {
      */
     _setupPanel() {
         // setup continuity panel
-        setupPanel(this._panel);
+        setupPanel(this.panel);
 
         // using custom panel-dropdowns because chosen doesn't render outside of scroll overflow
-        this._panel.on("mousedown", "select", function(e) {
+        this.panel.on("mousedown", "select", function(e) {
             e.preventDefault();
 
             let select = this;
@@ -298,13 +340,13 @@ export default class ContinuityContext extends GraphContext {
         });
 
         // changing tabs
-        this._panel.on("click", ".tab", e => {
+        this.panel.on("click", ".tab", e => {
             this._dotType = $(e.currentTarget).data("dotType");
             this.refresh("panel");
         });
 
         // add continuity dropdown
-        this._panel
+        this.panel
             .find(".add-continuity select")
             .dropdown({
                 placeholder_text_single: "Add continuity...",
@@ -312,24 +354,24 @@ export default class ContinuityContext extends GraphContext {
             })
             .change(e => {
                 let type = $(e.currentTarget).val();
-                this._controller.doAction("addContinuity", [type]);
+                this.controller.doAction("addContinuity", [type]);
                 $(e.currentTarget).choose("");
             });
 
         // edit continuity popup
-        this._panel.on("click", ".continuity .edit", e => {
+        this.panel.on("click", ".continuity .edit", e => {
             let continuity = $(e.currentTarget).parents(".continuity");
             this.editContinuity(continuity);
         });
 
         // remove continuity link
-        this._panel.on("click", ".continuity .delete", e => {
+        this.panel.on("click", ".continuity .delete", e => {
             let continuity = $(e.currentTarget).parents(".continuity");
             this.deleteContinuity(continuity);
         });
 
         // context menus
-        this._panel.on("contextmenu", ".continuity", function(e) {
+        this.panel.on("contextmenu", ".continuity", function(e) {
             let index = $(this).index();
 
             showContextMenu(e, {
@@ -353,7 +395,7 @@ export default class ContinuityContext extends GraphContext {
 
         let updateSeek = e => {
             let prev = marker.offset().left;
-            let numBeats = this._sheet.getDuration();
+            let numBeats = this.activeSheet.getDuration();
             let interval = seekWidth / numBeats;
 
             // snap to beat
@@ -398,10 +440,10 @@ class ContextActions {
      * given dot type.
      *
      * @param {string} type - The type of Continuity to create (@see Continuity).
-     * @param {Sheet} [sheet=this._sheet] - The sheet to add continuity to.
+     * @param {Sheet} [sheet=this.activeSheet] - The sheet to add continuity to.
      * @param {string} [dotType=this._dotType] - The dot type to add continuity for.
      */
-    static addContinuity(type, sheet=this._sheet, dotType=this._dotType) {
+    static addContinuity(type, sheet=this.activeSheet, dotType=this._dotType) {
         let continuity = Continuity.create(type, sheet, dotType);
         sheet.addContinuity(dotType, continuity);
         this.refresh("grapher", "panel");
@@ -419,10 +461,10 @@ class ContextActions {
      * Remove the given continuity from the given sheet for the given dot type.
      *
      * @param {Continuity} continuity - The Continuity to remove
-     * @param {Sheet} [sheet=this._sheet] - The sheet to remove continuity from.
+     * @param {Sheet} [sheet=this.activeSheet] - The sheet to remove continuity from.
      * @param {string} [dotType=this._dotType] - The dot type to remove continuity for.
      */
-    static removeContinuity(continuity, sheet=this._sheet, dotType=this._dotType) {
+    static removeContinuity(continuity, sheet=this.activeSheet, dotType=this._dotType) {
         sheet.removeContinuity(dotType, continuity);
         this.refresh("grapher", "panel");
 
@@ -441,10 +483,10 @@ class ContextActions {
      * @param {Continuity} continuity - The continuity to reorder.
      * @param {int} delta - The amount to move the continuity by; e.g. delta=1
      *   would put the continuity 1 index later, if possible.
-     * @param {Sheet} [sheet=this._sheet] - The sheet to reorder continuity in.
+     * @param {Sheet} [sheet=this.activeSheet] - The sheet to reorder continuity in.
      * @param {string} [dotType=this._dotType] - The dot type to reorder continuity for.
      */
-    static reorderContinuity(continuity, delta, sheet=this._sheet, dotType=this._dotType) {
+    static reorderContinuity(continuity, delta, sheet=this.activeSheet, dotType=this._dotType) {
         let continuities = sheet.getContinuities(dotType);
         let index = continuities.indexOf(continuity);
         let newIndex = index + delta;
@@ -474,10 +516,10 @@ class ContextActions {
      *
      * @param {Continuity} continuity - The Continuity to save.
      * @param {object} data - The data to save.
-     * @param {Sheet} [sheet=this._sheet] - The sheet to save continuity for.
+     * @param {Sheet} [sheet=this.activeSheet] - The sheet to save continuity for.
      * @param {string} [dotType=this._dotType] - The dot type to save continuity for.
      */
-    static saveContinuity(continuity, data, sheet=this._sheet, dotType=this._dotType) {
+    static saveContinuity(continuity, data, sheet=this.activeSheet, dotType=this._dotType) {
         let changed = continuity.savePopup(data);
 
         sheet.updateMovements(dotType);

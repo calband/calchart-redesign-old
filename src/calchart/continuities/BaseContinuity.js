@@ -67,6 +67,10 @@ export default class BaseContinuity {
         });
     }
 
+    get dotType() {
+        return this._dotType;
+    }
+
     /**
      * @return {object} meta info for this continuity, including the following keys:
      *   - {string} type - The short, unique ID of the continuity; e.g. "fm"
@@ -76,8 +80,9 @@ export default class BaseContinuity {
         throw new NotImplementedError(this);
     }
 
-    get dotType() { return this._dotType; }
-    get sheet() { return this._sheet; }
+    get sheet() {
+        return this._sheet;
+    }
 
     /**
      * Get the number of beats per step for this continuity, resolving any defaults.

@@ -31,11 +31,9 @@ import {
     showPopup,
 } from "utils/UIUtils";
 
-let isGraphInitialized = false;
 let GraphState = {
     grapher: null,
-    sheet: null,
-    currBeat: null, // TODO: move to ContinuityContext (#154)
+    activeSheet: null,
     selectedDots: $(),
 };
 
@@ -44,24 +42,6 @@ let GraphState = {
  * Most contexts are GraphContexts, except MusicContext.
  */
 export default class GraphContext extends BaseContext {
-    constructor(controller) {
-        super(controller);
-
-        this._sidebar = $(".graph-sidebar");
-        this._workspace = $(".graph-workspace");
-
-        if (!isGraphInitialized) {
-            this.init();
-            isGraphInitialized = true;
-        }
-
-        // load state from GraphState
-        this._grapher = GraphState.grapher;
-        this._sheet = GraphState.sheet;
-        this._currBeat = GraphState.currBeat;
-        this._selectedDots = GraphState.selectedDots;
-    }
-
     static get shortcuts() {
         return GraphShortcuts;
     }
@@ -74,52 +54,43 @@ export default class GraphContext extends BaseContext {
         return ["sidebar", "grapher"];
     }
 
-    /**
-     * Actions to only run once, when the editor is initialized.
-     */
-    init() {
-        // init sidebar
+    get grapher() {
+        return GraphState.grapher;
+    }
 
-        let oldIndex;
-        this._sidebar.sortable({
-            containment: this._sidebar,
-            activate: (e, ui) => {
-                oldIndex = ui.item.index();
-            },
-            update: (e, ui) => {
-                let index = ui.item.index();
-                this.doAction("moveSheet", [oldIndex, index]);
-            },
-        });
+    get activeSheet() {
+        return GraphState.activeSheet;
+    }
 
-        // init workspace
+    get sidebar() {
+        return $(".graph-sidebar");
+    }
 
-        GraphState.grapher = new Grapher(this._show, this._workspace, {
-            boundDots: true,
-            dotFormat: "dot-type",
-            drawYardlineNumbers: true,
-            draw4Step: true,
-            expandField: true,
-            showLabels: true,
-            zoom: 1,
-        });
-
-        // initialize with field in view
-        let scale = GraphState.grapher.getScale();
-        this._workspace.scrollLeft(scale.minX - 30);
-        this._workspace.scrollTop(scale.minY - 30);
+    get workspace() {
+        return $(".graph-workspace");
     }
 
     load(options) {
         super.load(options);
 
-        // load state from GraphContext
-        this._grapher = GraphState.grapher;
-        this._sheet = GraphState.sheet;
-        this._currBeat = GraphState.currBeat;
-        this._selectedDots = GraphState.selectedDots;
+        // initialize grapher if not initialized
+        if (_.isNull(this.grapher)) {
+            GraphState.grapher = new Grapher(this.show, this.workspace, {
+                boundDots: true,
+                dotFormat: "dot-type",
+                drawYardlineNumbers: true,
+                draw4Step: true,
+                expandField: true,
+                showLabels: true,
+                zoom: 1,
+            });
+            // initialize with field in view
+            let scale = this.grapher.getScale();
+            this.workspace.scrollLeft(scale.minX - 30);
+            this.workspace.scrollTop(scale.minY - 30);
+        }
 
-        this._addEvents(this._sidebar, {
+        this._addEvents(this.sidebar, {
             contextmenu: e => {
                 if ($(e.target).notIn(".stuntsheet")) {
                     showContextMenu(e, {
@@ -129,7 +100,7 @@ export default class GraphContext extends BaseContext {
             },
         });
 
-        this._addEvents(this._sidebar, ".stuntsheet", {
+        this._addEvents(this.sidebar, ".stuntsheet", {
             contextmenu: e => {
                 $(e.currentTarget).click();
 
@@ -141,17 +112,29 @@ export default class GraphContext extends BaseContext {
             },
             click: e => {
                 let sheet = $(e.currentTarget).data("sheet");
-                if (sheet !== this._sheet) {
+                if (sheet !== this.activeSheet) {
                     this.loadSheet(sheet);
                 }
             },
         });
 
-        this._workspace.pinch(e => {
+        let oldIndex;
+        this.sidebar.sortable({
+            containment: this.sidebar,
+            activate: (e, ui) => {
+                oldIndex = ui.item.index();
+            },
+            update: (e, ui) => {
+                let index = ui.item.index();
+                this.doAction("moveSheet", [oldIndex, index]);
+            },
+        });
+
+        this.workspace.pinch(e => {
             e.preventDefault();
 
             let delta = e.deltaY / 100;
-            this._grapher.zoom(delta);
+            this.grapher.zoom(delta);
             this.refreshZoom(e.pageX, e.pageY);
         });
 
@@ -161,13 +144,7 @@ export default class GraphContext extends BaseContext {
     unload() {
         super.unload();
 
-        // save state in GraphContext
-        GraphState.grapher = this._grapher;
-        GraphState.sheet = this._sheet;
-        GraphState.currBeat = this._currBeat;
-        GraphState.selectedDots = this._selectedDots;
-
-        this._workspace.off(".pinch");
+        this.workspace.off(".pinch");
         $(".toolbar .graph-context-group").addClass("hide");
     }
 
@@ -175,11 +152,11 @@ export default class GraphContext extends BaseContext {
      * Refresh the grapher
      */
     refreshGrapher() {
-        if (this._sheet) {
-            this._grapher.draw(this._sheet, this._currBeat);
-            this._grapher.selectDots(this._selectedDots);
+        if (this.activeSheet) {
+            this.grapher.draw(this.activeSheet, this.getCurrentBeat());
+            this.grapher.selectDots(GraphState.selectedDots);
         } else {
-            this._grapher.drawField();
+            this.grapher.drawField();
         }
     }
 
@@ -187,27 +164,27 @@ export default class GraphContext extends BaseContext {
      * Refresh the sidebar
      */
     refreshSidebar() {
-        this._sidebar.empty();
+        this.sidebar.empty();
         
-        this._show.getSheets().forEach(sheet => {
+        this.show.getSheets().forEach(sheet => {
             let label = HTMLBuilder.span(sheet.getLabel(), "label");
 
             let preview = HTMLBuilder.div("preview");
             let $sheet = HTMLBuilder
-                .div("stuntsheet", [label, preview], this._sidebar)
+                .div("stuntsheet", [label, preview], this.sidebar)
                 .data("sheet", sheet);
 
-            if (sheet === this._sheet) {
+            if (sheet === this.activeSheet) {
                 $sheet.addClass("active");
             }
         });
 
-        this._sidebar.find(".stuntsheet").each((i, $sheet) => {
+        this.sidebar.find(".stuntsheet").each((i, $sheet) => {
             let sheet = $($sheet).data("sheet");
             let preview = $($sheet).find(".preview");
 
             // field preview
-            let grapher = new Grapher(this._show, preview, {
+            let grapher = new Grapher(this.show, preview, {
                 drawYardlines: false,
                 fieldPadding: 5,
             });
@@ -220,7 +197,7 @@ export default class GraphContext extends BaseContext {
      */
     refreshToolbar() {
         // mark entire toolbar as inactive if there are no sheets
-        if (this._show.getSheets().length === 0) {
+        if (this.show.getSheets().length === 0) {
             $(".toolbar li").addClass("inactive");
             // except new sheet
             $(".toolbar .add-stuntsheet").removeClass("inactive");
@@ -239,34 +216,34 @@ export default class GraphContext extends BaseContext {
      *   into/out of. Defaults to the center of the graph.
      */
     refreshZoom(pageX, pageY) {
-        let offset = this._workspace.offset();
+        let offset = this.workspace.offset();
 
         // distance from top-left corner of workspace
         let left, top;
         if (_.isUndefined(pageX)) {
-            left = this._workspace.outerWidth() / 2;
+            left = this.workspace.outerWidth() / 2;
         } else {
             left = pageX - offset.left;
         }
         if (_.isUndefined(pageY)) {
-            top = this._workspace.outerHeight() / 2;
+            top = this.workspace.outerHeight() / 2;
         } else {
             top = pageY - offset.top;
         }
 
         // steps from top-left corner of field
-        let start = this._grapher.getScale().toSteps({
-            x: this._workspace.scrollLeft() + left,
-            y: this._workspace.scrollTop() + top,
+        let start = this.grapher.getScale().toSteps({
+            x: this.workspace.scrollLeft() + left,
+            y: this.workspace.scrollTop() + top,
         });
 
-        this._grapher.redrawZoom();
+        this.grapher.redrawZoom();
         this.refresh("grapher");
 
         // scroll workspace to keep same location under cursor
-        let end = this._grapher.getScale().toDistance(start);
-        this._workspace.scrollLeft(end.x - left);
-        this._workspace.scrollTop(end.y - top);
+        let end = this.grapher.getScale().toDistance(start);
+        this.workspace.scrollLeft(end.x - left);
+        this.workspace.scrollTop(end.y - top);
     }
 
     /**** METHODS ****/
@@ -286,7 +263,7 @@ export default class GraphContext extends BaseContext {
                     throw new ValidationError("Need to have a positive number of beats.");
                 }
 
-                this._controller.doAction("addSheet", [data.numBeats]);
+                this.controller.doAction("addSheet", [data.numBeats]);
             },
         });
     }
@@ -311,7 +288,7 @@ export default class GraphContext extends BaseContext {
         let args = parseArgs(arguments, ["sheet", "dots", "fullCheck"]);
         let SUCCESS_MESSAGE = "Continuities valid!";
 
-        let sheet = _.defaultTo(args.sheet, this._sheet);
+        let sheet = _.defaultTo(args.sheet, this.activeSheet);
         if (sheet.isLastSheet()) {
             if (args.fullCheck) {
                 showMessage(SUCCESS_MESSAGE);
@@ -324,7 +301,7 @@ export default class GraphContext extends BaseContext {
 
         let dots = args.dots;
         if (_.isUndefined(dots)) {
-            dots = this._show.getDots();
+            dots = this.show.getDots();
         } else if (_.isString(dots)) {
             dots = sheet.getDotsOfType(dots);
         } else if (dots instanceof Dot) {
@@ -392,9 +369,9 @@ export default class GraphContext extends BaseContext {
      *
      * @param {jQuery} [dots] - Dots to deselect (defaults to all dots).
      */
-    deselectDots(dots=this._selectedDots) {
-        this._selectedDots = this._selectedDots.not(dots);
-        this._grapher.deselectDots(dots);
+    deselectDots(dots=GraphState.selectedDots) {
+        GraphState.selectedDots = GraphState.selectedDots.not(dots);
+        this.grapher.deselectDots(dots);
     }
 
     /**
@@ -403,7 +380,7 @@ export default class GraphContext extends BaseContext {
     editSheetProperties() {
         // update the background field in the popup
         let updateBackgroundInfo = popup => {
-            let background = this._sheet.getBackground();
+            let background = this.activeSheet.getBackground();
             let fileText;
             if (_.isUndefined(background)) {
                 fileText = "none selected";
@@ -417,21 +394,21 @@ export default class GraphContext extends BaseContext {
 
         showPopup("edit-stuntsheet", {
             init: popup => {
-                let label = _.defaultTo(this._sheet.label, "");
+                let label = _.defaultTo(this.activeSheet.label, "");
                 popup.find(".label input").val(label);
-                popup.find(".numBeats input").val(this._sheet.getDuration());
-                popup.find(".fieldType select").choose(this._sheet.fieldType);
-                popup.find(".stepType select").choose(this._sheet.stepType);
-                popup.find(".orientation select").choose(this._sheet.orientation);
+                popup.find(".numBeats input").val(this.activeSheet.getDuration());
+                popup.find(".fieldType select").choose(this.activeSheet.fieldType);
+                popup.find(".stepType select").choose(this.activeSheet.stepType);
+                popup.find(".orientation select").choose(this.activeSheet.orientation);
 
                 popup.find(".beatsPerStep select")
-                    .choose(this._sheet.beatsPerStep === "default" ? "default" : "custom")
+                    .choose(this.activeSheet.beatsPerStep === "default" ? "default" : "custom")
                     .change(function() {
                         let disabled = $(this).val() !== "custom";
                         $(this).siblings("input").prop("disabled", disabled);
                     })
                     .change();
-                popup.find(".beatsPerStep > input").val(this._sheet.getBeatsPerStep());
+                popup.find(".beatsPerStep > input").val(this.activeSheet.getBeatsPerStep());
 
                 updateBackgroundInfo(popup);
 
@@ -440,27 +417,27 @@ export default class GraphContext extends BaseContext {
                     .on("click.edit-background", ".icons .edit-link", e => {
                         promptFile(file => {
                             let params = {
-                                sheet: this._sheet.getIndex(),
+                                sheet: this.activeSheet.getIndex(),
                                 image: file,
                             };
 
                             doAction("upload_sheet_image", params, {
                                 dataType: "json",
                                 success: data => {
-                                    this._sheet.setBackground(data.url);
+                                    this.activeSheet.setBackground(data.url);
                                     updateBackgroundInfo(popup);
                                 },
                             });
                         });
                     })
                     .on("click.edit-background", ".icons .move-link", e => {
-                        this._controller.loadContext("background", {
+                        this.controller.loadContext("background", {
                             previousContext: this.info.name,
                         });
                         hidePopup();
                     })
                     .on("click.edit-background", ".icons .clear-link", e => {
-                        this._sheet.removeBackground();
+                        this.activeSheet.removeBackground();
                         updateBackgroundInfo(popup);
                     });
             },
@@ -488,31 +465,17 @@ export default class GraphContext extends BaseContext {
                     }
                 }
 
-                this._controller.doAction("saveSheetProperties", [data]);
+                this.controller.doAction("saveSheetProperties", [data]);
             },
         });
     }
 
     /**
-     * Go to the zero-th beat of the sheet.
+     * @return {int} The beat in the current sheet to draw when refreshing the grapher.
      */
-    firstBeat() {
-        this._currBeat = 0;
-        this.refresh("grapher");
-    }
-
-    /**
-     * @return {Sheet}
-     */
-    getActiveSheet() {
-        return this._sheet;
-    }
-
-    /**
-     * @return {Grapher}
-     */
-    getGrapher() {
-        return this._grapher;
+    getCurrentBeat() {
+        // most contexts draw the first beat of a sheet
+        return 0;
     }
 
     /**
@@ -520,7 +483,7 @@ export default class GraphContext extends BaseContext {
      */
     getSelectedDots() {
         return _.map(
-            this._selectedDots,
+            GraphState.selectedDots,
             elem => $(elem).data("dot")
         );
     }
@@ -529,15 +492,7 @@ export default class GraphContext extends BaseContext {
      * @return {jQuery}
      */
     getSelection() {
-        return this._selectedDots;
-    }
-
-    /**
-     * Go to the last beat of the sheet.
-     */
-    lastBeat() {
-        this._currBeat = this._sheet.getDuration();
-        this.refresh("grapher");
+        return GraphState.selectedDots;
     }
 
     /**
@@ -546,44 +501,15 @@ export default class GraphContext extends BaseContext {
      * @param {Sheet} sheet
      */
     loadSheet(sheet) {
-        this._sheet = sheet;
-        this._currBeat = 0;
-
+        GraphState.activeSheet = sheet;
         this.refresh();
-    }
-
-    /**
-     * Increment the current beat.
-     */
-    nextBeat() {
-        this._currBeat++;
-        let duration = this._sheet.getDuration();
-
-        if (this._currBeat > duration) {
-            this._currBeat = duration;
-        } else {
-            this.refresh("grapher");
-        }
-    }
-
-    /**
-     * Decrement the current beat.
-     */
-    prevBeat() {
-        this._currBeat--;
-
-        if (this._currBeat < 0) {
-            this._currBeat = 0;
-        } else {
-            this.refresh("grapher");
-        }
     }
 
     /**
      * Select all dots in the graph.
      */
     selectAll() {
-        this.selectDots(this._grapher.getDots());
+        this.selectDots(this.grapher.getDots());
     }
 
     /**
@@ -598,8 +524,8 @@ export default class GraphContext extends BaseContext {
             this.deselectDots();
         }
 
-        this._selectedDots = this._selectedDots.add(dots);
-        this._grapher.selectDots(this._selectedDots);
+        GraphState.selectedDots = GraphState.selectedDots.add(dots);
+        this.grapher.selectDots(GraphState.selectedDots);
     }
 
     /**
@@ -608,7 +534,7 @@ export default class GraphContext extends BaseContext {
      * @param {jQuery} dots
      */
     toggleDots(dots) {
-        let deselect = dots.filter(this._selectedDots);
+        let deselect = dots.filter(GraphState.selectedDots);
 
         this.selectDots(dots, {
             append: true,
@@ -622,7 +548,7 @@ export default class GraphContext extends BaseContext {
      * @param {number} delta
      */
     zoom(delta) {
-        this._grapher.zoom(delta);
+        this.grapher.zoom(delta);
         this.refreshZoom();
     }
 
@@ -632,7 +558,7 @@ export default class GraphContext extends BaseContext {
      * @param {number} ratio
      */
     zoomTo(ratio) {
-        this._grapher.setOption("zoom", ratio);
+        this.grapher.setOption("zoom", ratio);
         this.refreshZoom();
     }
 }
@@ -650,13 +576,13 @@ class GraphActions {
      * @param {int} numBeats - The number of beats for the stuntsheet.
      */
     static addSheet(numBeats) {
-        let sheet = this._show.addSheet(numBeats);
+        let sheet = this.show.addSheet(numBeats);
         this.loadSheet(sheet);
         this.refresh("sidebar", "toolbar");
 
         return {
             undo: function() {
-                this._show.removeSheet(sheet);
+                this.show.removeSheet(sheet);
                 this.loadSheet(prevSheet);
                 this.refresh("sidebar", "toolbar");
             },
@@ -666,19 +592,19 @@ class GraphActions {
     /**
      * Delete the currently active Sheet.
      *
-     * @param {Sheet} [sheet=this._sheet]
+     * @param {Sheet} [sheet=this.activeSheet]
      */
-    static deleteSheet(sheet=this._sheet) {
+    static deleteSheet(sheet=this.activeSheet) {
         let prevSheet = sheet.getPrevSheet();
         let nextSheet = sheet.getNextSheet();
 
-        this._show.removeSheet(sheet);
+        this.show.removeSheet(sheet);
         this.loadSheet(_.defaultTo(prevSheet, nextSheet));
 
         return {
             data: [sheet],
             undo: function() {
-                this._show.insertSheet(sheet, sheet.getIndex());
+                this.show.insertSheet(sheet, sheet.getIndex());
                 this.loadSheet(sheet);
             },
         };
@@ -687,21 +613,21 @@ class GraphActions {
     /**
      * Duplicate the currently active Sheet.
      *
-     * @param {Sheet} [sheet=this._sheet]
+     * @param {Sheet} [sheet=this.activeSheet]
      * @param {Sheet} [clone] - The cloned Sheet to readd, for redo.
      */
-    static duplicateSheet(sheet=this._sheet, clone) {
+    static duplicateSheet(sheet=this.activeSheet, clone) {
         if (_.isUndefined(clone)) {
             clone = sheet.clone();
         }
 
-        this._show.insertSheet(clone, sheet.getIndex() + 1);
+        this.show.insertSheet(clone, sheet.getIndex() + 1);
         this.loadSheet(clone);
 
         return {
             data: [sheet, clone],
             undo: function() {
-                this._show.removeSheet(clone);
+                this.show.removeSheet(clone);
                 this.loadSheet(sheet);
             },
         };
@@ -715,9 +641,9 @@ class GraphActions {
      * @param {int} to - The index to move to.
      */
     static moveSheet(from, to) {
-        this._show.moveSheet(from, to);
+        this.show.moveSheet(from, to);
 
-        let sheets = this._show.getSheets();
+        let sheets = this.show.getSheets();
         let toUpdate = mapSome([from - 1, to - 1, to], i => sheets[i]);
 
         toUpdate.forEach(sheet => {
@@ -727,7 +653,7 @@ class GraphActions {
 
         return {
             undo: function() {
-                this._show.moveSheet(to, from);
+                this.show.moveSheet(to, from);
                 toUpdate.forEach(sheet => {
                     this.checkContinuities(sheet);
                 });
@@ -740,9 +666,9 @@ class GraphActions {
      * Save the given Sheet's properties.
      *
      * @param {Object} data - The data from the edit-stuntsheet popup.
-     * @param {Sheet} [sheet=this._sheet]
+     * @param {Sheet} [sheet=this.activeSheet]
      */
-    static saveSheetProperties(data, sheet=this._sheet) {
+    static saveSheetProperties(data, sheet=this.activeSheet) {
         let changed = update(sheet, underscoreKeys(data));
         sheet.updateMovements();
         this.checkContinuities(sheet);
