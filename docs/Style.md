@@ -153,6 +153,53 @@ print(c1.b) # 2
 print(c2.foo(3)) # 6
 ```
 
+- Privacy
+
+In Javascript, everything is an object, meaning that there are no public/private fields. However, similar to Python, there are some developer-enforced rules to simulate a true OOP paradigm. There might be some exceptions scattered throughout the project, but try to be consistent with the rest of the codebase.
+
+1. Never access a field prefixed with an underscore except from `this`. Underscore-prefixed fields represent private fields that only a class and its subclasses can see.
+
+```
+class A {
+    constructor() {
+        this._a = 1;
+    }
+    foo() {
+        // good
+        return this._a;
+    }
+}
+
+class B extends A {
+    foo() {
+        // good
+        return this._a + 1;
+    }
+}
+
+// bad
+new B()._a;
+```
+
+2. Use read-only getters (`get foo() {}`) if the field is not expected to change after creating the object. Use explicit getters (`getFoo() {}`) if calculations are involved or if the field is something that can be modified with some action by the user. For example, `ApplicationController` has a read-only getter for `show`, since a show will not change after being opened by the application. On the other hand, `EditorController` has an explicit `getContext` because the context in the editor is expected to change in the normal usage of the editor.
+
+3. If a class exposes a read-only getter, subclasses should use the read-only getter unless they need to modify the field.
+
+```
+class A {
+    constructor() { this._a = 1; }
+    get a() { return this._a; }
+}
+class B extends A {
+    foo() {
+        return this.a + 1;
+    }
+    setA(a) {
+        this._a = a;
+    }
+}
+```
+
 ### Modules
 
 - ES6
