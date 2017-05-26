@@ -55,8 +55,16 @@ export default class FollowLeaderContinuity extends OrderedDotsContinuity {
         };
     }
 
-    get path() {
-        return this._path;
+    /**** METHODS ****/
+
+    /**
+     * Add the given point to the path at the given index.
+     *
+     * @param {int} index
+     * @param {Coordinate} coordinate
+     */
+    addPoint(index, coordinate) {
+        this._path.splice(index, 0, coordinate);
     }
 
     getMovements(dot, data) {
@@ -66,7 +74,7 @@ export default class FollowLeaderContinuity extends OrderedDotsContinuity {
             index = this._order.length - 1;
         }
 
-        let path = this._getPath(index);
+        let path = this._getPathIterator(index);
 
         path.next();
         let prev = path.get();
@@ -142,6 +150,13 @@ export default class FollowLeaderContinuity extends OrderedDotsContinuity {
         return [label, editLabel, editDots, editPath];
     }
 
+    /**
+     * @return {Coordinate[]}
+     */
+    getPath() {
+        return this._path;
+    }
+
     getPopup() {
         let [stepType, orientation, beatsPerStep, customText] = super.getPopup();
 
@@ -149,11 +164,33 @@ export default class FollowLeaderContinuity extends OrderedDotsContinuity {
     }
 
     /**
-     * @param {int[]} path - The new path of dots
+     * Remove the point at the given index from the path.
+     *
+     * @param {int} index
+     * @return {Coordinate} The point that was removed.
+     */
+    removePoint(index) {
+        return this._path.splice(index, 1)[0];
+    }
+
+    /**
+     * @param {Coordinate[]} path
      */
     setPath(path) {
         this._path = path;
     }
+
+    /**
+     * Set the point at the given index in the path to the given coordinate.
+     *
+     * @param {int} index
+     * @param {Coordinate} coordinate
+     */
+    setPoint(index, coordinate) {
+        this._path[index] = coordinate;
+    }
+
+    /**** HELPERS ****/
 
     /**
      * Get the path for the dot at the given index to follow. The first
@@ -162,7 +199,7 @@ export default class FollowLeaderContinuity extends OrderedDotsContinuity {
      * @param {int} index - The index of the current dot in the order.
      * @return {Iterator<Coordinate>}
      */
-    _getPath(index) {
+    _getPathIterator(index) {
         let path = this._path;
 
         // add preceding dot positions as reference points

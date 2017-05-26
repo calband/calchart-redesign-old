@@ -103,7 +103,7 @@ export default class CounterMarchContinuity extends FollowLeaderContinuity {
         }
     }
 
-    _getPath(index) {
+    _getPathIterator(index) {
         let path = this._order.map(dot => this._sheet.getDotInfo(dot).position);
 
         // move preceding dots to end of path

@@ -1,4 +1,5 @@
 import BaseContext from "calchart/contexts/BaseContext";
+import Coordinate from "calchart/Coordinate";
 import Dot from "calchart/Dot";
 import Grapher from "calchart/Grapher";
 import Sheet from "calchart/Sheet";
@@ -560,6 +561,21 @@ export default class GraphContext extends BaseContext {
     zoomTo(ratio) {
         this.grapher.setOption("zoom", ratio);
         this.refreshZoom();
+    }
+
+    /**** HELPERS ****/
+
+    /**
+     * Convert a MouseEvent into a coordinate for the current mouse position,
+     * rounded to the nearest step.
+     *
+     * @param {Event} e
+     * @return {Coordinate}
+     */
+    _eventToSnapSteps(e) {
+        let [x, y] = this.workspace.makeRelative(e.pageX, e.pageY);
+        let steps = this.grapher.getScale().toSteps({x, y});
+        return new Coordinate(round(steps.x, 1), round(steps.y, 1));
     }
 }
 

@@ -41,6 +41,7 @@ export default class GateReferenceContext extends HiddenGraphContext {
 
         let dotRadius = this.grapher.getDotRadius();
         let svg = this.grapher.getSVG();
+        let scale = this.grapher.getScale();
 
         // the dot that follows the cursor
         this._helper = svg.append("circle")
@@ -55,7 +56,7 @@ export default class GateReferenceContext extends HiddenGraphContext {
         this._addEvents(this.workspace, {
             mousemove: e => {
                 let steps = this._eventToSnapSteps(e);
-                let coord = this.scale.toDistance(steps);
+                let coord = scale.toDistance(steps);
                 this._helper.attr("cx", coord.x).attr("cy", coord.y);
             },
             click: e => {
@@ -98,19 +99,6 @@ export default class GateReferenceContext extends HiddenGraphContext {
             dotType: this._continuity.dotType,
         });
     }
-
-    /**
-     * Convert a MouseEvent into a coordinate for the current mouse position,
-     * rounded to the nearest step.
-     *
-     * @param {Event} e
-     * @return {Coordinate}
-     */
-    _eventToSnapSteps(e) {
-        let [x, y] = this.workspace.makeRelative(e.pageX, e.pageY);
-        let steps = this.grapher.getScale().toSteps({x, y});
-        return new Coordinate(round(steps.x, 1), round(steps.y, 1));
-    }
 }
 
 class ContextActions extends HiddenGraphContext.actions {
@@ -118,9 +106,9 @@ class ContextActions extends HiddenGraphContext.actions {
      * Set the reference point to the given point
      *
      * @param {Coordinate} point
-     * @param {GateTurnContinuity} [continuity=this.continuity]
+     * @param {GateTurnContinuity} [continuity=this._continuity]
      */
-    static setReference(point, continuity=this.continuity) {
+    static setReference(point, continuity=this._continuity) {
         let old = continuity.getReference();
         continuity.setReference(point);
         continuity.sheet.updateMovements(continuity.dotType);
