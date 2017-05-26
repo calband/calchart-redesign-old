@@ -42,7 +42,7 @@ export default class BaseContext {
     /**
      * @return {object} meta info for this context, including the following keys:
      *   - {string} name - The name of the context, the string used for Context.load.
-     *   - {string} [toolbar=name] - The class of the toolbar item for the context.
+     *   - {string} [html=name] - The class of the menu/toolbar HTML items for the context.
      */
     static get info() {
         throw new NotImplementedError(this);
@@ -73,9 +73,13 @@ export default class BaseContext {
      * @param {object} options - Options to customize loading the Context.
      */
     load(options) {
-        let toolbar = _.defaultTo(this.info.toolbar, this.info.name);
-        $(`.toolbar .${toolbar}`).addClass("active");
-        $(`.toolbar .${toolbar}-group`).removeClass("hide");
+        let name = _.defaultTo(this.info.html, this.info.name);
+        // context icon
+        $(`.toolbar .${name}`).addClass("active");
+        // MenuContextItem
+        $(`.menu-item.${name}-group`).removeClass("disabled");
+        // ToolbarContextGroup
+        $(`.toolbar .${name}-group`).removeClass("hide");
     }
 
     /**
@@ -105,9 +109,10 @@ export default class BaseContext {
             $(element).off(".app-context");
         }
 
-        let toolbar = _.defaultTo(this.info.toolbar, this.info.name);
-        $(`.toolbar .${toolbar}`).removeClass("active");
-        $(`.toolbar .${toolbar}-group`).addClass("hide");
+        let name = _.defaultTo(this.info.html, this.info.name);
+        $(`.toolbar .${name}`).removeClass("active");
+        $(`.menu-item.${name}-group`).addClass("disabled");
+        $(`.toolbar .${name}-group`).addClass("hide");
     }
 
     /**** HELPERS ****/

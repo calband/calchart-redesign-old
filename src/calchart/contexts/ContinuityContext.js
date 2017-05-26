@@ -40,7 +40,7 @@ export default class ContinuityContext extends GraphContext {
     static get info() {
         return {
             name: "continuity",
-            toolbar: "edit-continuity",
+            html: "edit-continuity",
         };
     }
 

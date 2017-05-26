@@ -39,7 +39,7 @@ export default class DotContext extends GraphContext {
     static get info() {
         return {
             name: "dot",
-            toolbar: "edit-dots",
+            html: "edit-dots",
         };
     }
 
@@ -107,8 +107,6 @@ export default class DotContext extends GraphContext {
                 });
             },
         });
-
-        $(".menu-item.toggle-background").removeClass("disabled");
     }
 
     unload() {
@@ -117,8 +115,6 @@ export default class DotContext extends GraphContext {
         this.deselectDots();
         this.panel.hide();
         this.grapher.showBackground(false);
-
-        $(".menu-item.toggle-background").addClass("disabled");
     }
 
     refreshGrapher() {

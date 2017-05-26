@@ -141,6 +141,7 @@ export default class GraphContext extends BaseContext {
             this.refreshZoom(e.pageX, e.pageY);
         });
 
+        $(".menu-item.graph-context-group").removeClass("disabled");
         $(".toolbar .graph-context-group").removeClass("hide");
     }
 
@@ -148,6 +149,7 @@ export default class GraphContext extends BaseContext {
         super.unload();
 
         this.workspace.off(".pinch");
+        $(".menu-item.graph-context-group").addClass("disabled");
         $(".toolbar .graph-context-group").addClass("hide");
 
         $(".graph-content").hide();

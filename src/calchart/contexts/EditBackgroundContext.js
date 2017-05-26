@@ -31,7 +31,7 @@ export default class EditBackgroundContext extends HiddenGraphContext {
     static get info() {
         return {
             name: "background",
-            toolbar: "edit-background",
+            html: "edit-background",
         };
     }
 

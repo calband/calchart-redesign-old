@@ -22,7 +22,7 @@ export default class MusicContext extends BaseContext {
     static get info() {
         return {
             name: "music",
-            toolbar: "edit-music",
+            html: "edit-music",
         };
     }
 

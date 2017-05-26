@@ -21,7 +21,7 @@ export default class TwoStepContext extends HiddenContextMixin(ContinuityContext
     static get info() {
         return {
             name: "two-step",
-            toolbar: super.info.toolbar,
+            html: super.info.html,
         };
     }
 
