@@ -3,7 +3,6 @@ import FollowLeaderContinuity from "calchart/continuities/FollowLeaderContinuity
 import { ValidationError } from "utils/errors";
 import HTMLBuilder from "utils/HTMLBuilder";
 import Iterator from "utils/Iterator";
-import { moveElem } from "utils/JSUtils";
 import { setupTooltip } from "utils/UIUtils";
 
 /**
@@ -44,12 +43,11 @@ export default class CounterMarchContinuity extends FollowLeaderContinuity {
         return {
             type: "cm",
             name: "Counter March",
+            label: "CM",
         };
     }
 
     getPanel(controller) {
-        let label = HTMLBuilder.span("CM");
-
         let editLabel = HTMLBuilder.label("Edit:");
 
         let editDots = HTMLBuilder.icon("ellipsis-h").click(() => {
@@ -59,7 +57,7 @@ export default class CounterMarchContinuity extends FollowLeaderContinuity {
         });
         setupTooltip(editDots, "Dots");
 
-        return [label, editLabel, editDots];
+        return [editLabel, editDots];
     }
 
     getPopup() {
@@ -104,7 +102,7 @@ export default class CounterMarchContinuity extends FollowLeaderContinuity {
     }
 
     _getPathIterator(index) {
-        let path = this._order.map(dot => this._sheet.getDotInfo(dot).position);
+        let path = this._order.map(dot => this.sheet.getDotInfo(dot).position);
 
         // move preceding dots to end of path
         let shifted = path.splice(0, index);

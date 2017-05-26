@@ -66,7 +66,7 @@ export default class Sheet {
         if (_.isNull(options.song)) {
             this._song = null;
         } else {
-            this._song = this._show.getSong(options.song);
+            this._song = this.show.getSong(options.song);
         }
 
         // @type {Object[]} see Sheet.getDotInfo
@@ -187,7 +187,7 @@ export default class Sheet {
      * @return {(Song|Show)}
      */
     get parent() {
-        return _.defaultTo(this._song, this._show);
+        return _.defaultTo(this._song, this.show);
     }
 
     get show() {
@@ -267,8 +267,6 @@ export default class Sheet {
             continuity.setSheet(clone);
         });
 
-        console.log(clone);
-
         return clone;
     }
 
@@ -338,7 +336,7 @@ export default class Sheet {
     getCollisions(beatNum) {
         return mapSome(this._dots, (info, id) => {
             if (info.collisions.has(beatNum)) {
-                return this._show.getDot(id);
+                return this.show.getDot(id);
             }
         });
     }
@@ -375,11 +373,11 @@ export default class Sheet {
      */
     getDotsOfType(dotType) {
         if (DotType.isAll(dotType)) {
-            return this._show.getDots();
+            return this.show.getDots();
         } else {
             return mapSome(this._dots, (info, i) => {
                 if (info.type === dotType) {
-                    return this._show.getDot(i);
+                    return this.show.getDot(i);
                 }
             });
         }
@@ -456,7 +454,7 @@ export default class Sheet {
      *   is the last sheet.
      */
     getNextSheet() {
-        return this._show.getSheet(this._index + 1) || null;
+        return this.show.getSheet(this._index + 1) || null;
     }
 
     /**
@@ -489,7 +487,7 @@ export default class Sheet {
      *   this is the first sheet.
      */
     getPrevSheet() {
-        return this._show.getSheet(this._index - 1) || null;
+        return this.show.getSheet(this._index - 1) || null;
     }
 
     /**
@@ -517,7 +515,7 @@ export default class Sheet {
      * @return {boolean} true if this Sheet is the last sheet in the Show.
      */
     isLastSheet() {
-        return this._index === this._show.getSheets().length - 1;
+        return this._index === this.show.getSheets().length - 1;
     }
 
     /**
@@ -653,7 +651,7 @@ export default class Sheet {
         if (_.isString(dots)) {
             dots = this.getDotsOfType(dots);
         } else if (_.isUndefined(dots)) {
-            dots = this._show.getDots();
+            dots = this.show.getDots();
         } else if (dots instanceof Dot) {
             dots = [dots];
         }
@@ -668,24 +666,14 @@ export default class Sheet {
             // continuities for all dot types
             continuities = allBefore.concat(continuities).concat(allAfter);
 
-            let data = {
-                position: info.position,
-                remaining: this._numBeats,
-            };
-
-            info.movements = _.flatMap(continuities, continuity => {
-                let moves = continuity.getMovements(dot, _.clone(data));
-                moves.forEach(movement => {
-                    data.position = movement.getEndPosition();
-                    data.remaining -= movement.getDuration();
-                });
-                return moves;
-            });
+            info.movements = Continuity.buildMovements(
+                continuities, dot, info.position, this._numBeats
+            );
         });
 
         // update collisions
         runAsync(() => {
-            let allDots = this._show.getDots();
+            let allDots = this.show.getDots();
             this._dots.forEach(info => info.collisions.clear());
 
             for (let beat = 0; beat < this._numBeats; beat++) {

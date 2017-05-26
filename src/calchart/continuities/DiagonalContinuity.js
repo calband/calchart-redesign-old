@@ -1,6 +1,5 @@
 import FountainGridContinuity from "calchart/continuities/FountainGridContinuity";
 import MovementCommandMove from "calchart/movements/MovementCommandMove";
-import MovementCommandStop from "calchart/movements/MovementCommandStop";
 
 import { STEP_SIZES } from "utils/CalchartUtils";
 import { calcAngle } from "utils/MathUtils";
@@ -57,7 +56,7 @@ export default class DiagonalContinuity extends FountainGridContinuity {
             stepSize: STEP_SIZES.DIAGONAL,
         };
         let moveInfo = {
-            angle: absX > absY ? this._getXAngle(deltaX) : this._getYAngle(deltaY),
+            angle: absX > absY ? this.getXAngle(deltaX) : this.getYAngle(deltaY),
             steps: Math.abs(absX - absY),
             stepSize: STEP_SIZES.STANDARD,
         };
@@ -95,19 +94,23 @@ export default class DiagonalContinuity extends FountainGridContinuity {
     }
 
     get info() {
+        let name = this._diagFirst ? "DMHS" : "HSDM";
         return {
             type: "diagonal",
-            name: this._diagFirst ? "DMHS" : "HSDM",
+            name: name,
+            label: name,
         };
     }
 
+    /**** METHODS ****/
+
     getMovements(dot, data) {
         let start = data.position;
-        let nextSheet = this._sheet.getNextSheet();
-        if (_.isNull(nextSheet)) {
+        let end = this._getNextPosition(dot);
+        if (_.isNull(end)) {
             return [];
         }
-        let end = nextSheet.getPosition(dot);
+
         let options = {
             beatsPerStep: this.getBeatsPerStep(),
             diagFirst: this._diagFirst,
@@ -115,7 +118,7 @@ export default class DiagonalContinuity extends FountainGridContinuity {
 
         let movements = this.constructor.getDiagonalMoves(start.x, start.y, end.x, end.y, options);
 
-        let remaining = this._sheet.getDuration();
+        let remaining = this.sheet.getDuration();
         movements.forEach(movement => {
             remaining -= movement.getDuration();
         });

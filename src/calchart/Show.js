@@ -131,6 +131,14 @@ export default class Show {
         return data;
     }
 
+    get name() {
+        return this._name;
+    }
+
+    get slug() {
+        return this._slug;
+    }
+
     /**
      * @return {int} The default number of beats per step for the entire show.
      */
@@ -143,13 +151,6 @@ export default class Show {
      */
     getFieldType() {
         return this._fieldType;
-    }
-
-    /**
-     * @return {string}
-     */
-    getName() {
-        return this._name;
     }
 
     /**
@@ -173,13 +174,6 @@ export default class Show {
     }
 
     /**
-     * @return {string}
-     */
-    getSlug() {
-        return this._slug;
-    }
-
-    /**
      * @return {string} The default step type for the entire show. (see
      *   CalchartUtils.STEP_TYPES)
      */
@@ -188,13 +182,6 @@ export default class Show {
     }
 
     /**** DOTS ****/
-
-    /**
-     * @return {Dot[]} Every Dot in the show.
-     */
-    getDots() {
-        return this._dots;
-    }
 
     /**
      * Get dot by its ID.
@@ -206,13 +193,29 @@ export default class Show {
         return this._dots[id];
     }
 
+    /**
+     * @return {Dot[]} Every Dot in the show.
+     */
+    getDots() {
+        return this._dots;
+    }
+
     /**** SHEETS ****/
 
     /**
-     * @return {Sheet[]} All stuntsheets in the Show.
+     * Add a stuntsheet to the show with the given number of beats.
+     *
+     * @param {int} numBeats - The number of beats for the stuntsheet.
+     * @return {Sheet}
      */
-    getSheets() {
-        return this._sheets;
+    addSheet(numBeats) {
+        let index = this._sheets.length;
+        let sheet = Sheet.create(this, index, numBeats, this._dots.length);
+
+        this._sheets.push(sheet);
+        this.updateMovements(index - 1);
+
+        return sheet;
     }
 
     /**
@@ -226,19 +229,10 @@ export default class Show {
     }
 
     /**
-     * Add a stuntsheet to the show with the given number of beats.
-     *
-     * @param {int} numBeats - The number of beats for the stuntsheet.
-     * @return {Sheet}
+     * @return {Sheet[]} All stuntsheets in the Show.
      */
-    addSheet(numBeats) {
-        let index = this._sheets.length;
-        let sheet = Sheet.create(this, index, numBeats, this._dots.length);
-
-        this._sheets.push(sheet);
-        this._updateMovements(index - 1);
-
-        return sheet;
+    getSheets() {
+        return this._sheets;
     }
 
     /**
@@ -254,7 +248,7 @@ export default class Show {
             this._sheets[i].setIndex(i);
         });
 
-        this._updateMovements(index - 1, index);
+        this.updateMovements(index - 1, index);
     }
 
     /**
@@ -270,7 +264,7 @@ export default class Show {
             sheet.setIndex(i);
         });
 
-        this._updateMovements(from - 1, to - 1, to);
+        this.updateMovements(from - 1, to - 1, to);
     }
 
     /**
@@ -286,18 +280,23 @@ export default class Show {
             this._sheets[i].setIndex(i);
         });
 
-        this._updateMovements(i - 1);
+        this.updateMovements(i - 1);
     }
 
     /**
      * Update the movements of the sheets at the given indices.
      *
-     * @param {...int} indices
+     * @param {...int} [indices] - Defaults to all sheets in the show.
      */
-    _updateMovements(...indices) {
+    updateMovements(...indices) {
+        if (indices.length === 0) {
+            indices = _.range(0, this._sheets.length);
+        }
+
         indices.forEach(i => {
-            if (i >= 0) {
-                this._sheets[i].updateMovements();
+            let sheet = this._sheets[i];
+            if (sheet) {
+                sheet.updateMovements();
             }
         });
     }
@@ -305,12 +304,13 @@ export default class Show {
     /**** SONGS ****/
 
     /**
-     * Get all songs in the show.
+     * Add a song to the Show.
      *
-     * @return {Song[]}
+     * @param {string} name - Name of the song.
      */
-    getSongs() {
-        return this._songs;
+    addSong(name) {
+        let song = new Song(this, name, []);
+        this._songs.push(song);
     }
 
     /**
@@ -325,13 +325,12 @@ export default class Show {
     }
 
     /**
-     * Add a song to the Show.
+     * Get all songs in the show.
      *
-     * @param {string} name - Name of the song.
+     * @return {Song[]}
      */
-    addSong(name) {
-        let song = new Song(this, name, []);
-        this._songs.push(song);
+    getSongs() {
+        return this._songs;
     }
 
     /**

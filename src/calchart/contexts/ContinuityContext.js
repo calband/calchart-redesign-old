@@ -282,7 +282,10 @@ export default class ContinuityContext extends GraphContext {
         let actions = HTMLBuilder.div("actions", [iconEdit, iconDelete]);
 
         continuities.forEach(continuity => {
+            let label = HTMLBuilder.span(continuity.info.label);
             let contents = continuity.getPanel(this.controller);
+            contents = [label].concat(contents);
+
             let info = HTMLBuilder.div("info", contents);
 
             let classes = `continuity ${continuity.info.type}`;

@@ -1,3 +1,4 @@
+import BaseContinuity from "calchart/continuities/BaseContinuity";
 import CounterMarchContinuity from "calchart/continuities/CounterMarchContinuity";
 import DiagonalContinuity from "calchart/continuities/DiagonalContinuity";
 import EvenContinuity from "calchart/continuities/EvenContinuity";
@@ -91,5 +92,12 @@ export default class Continuity {
                 return GrapevineContinuity.deserialize(sheet, dotType, data);
         }
         throw new Error("No continuity of the type: " + data.type);
+    }
+
+    /**
+     * Build the movements from the given continuities for the given dot.
+     */
+    static buildMovements() {
+        return BaseContinuity.buildMovements.apply(this, arguments);
     }
 }

@@ -36,7 +36,7 @@ export default class TwoStepContinuity extends OrderedDotsContinuity {
     }
 
     static deserialize(sheet, dotType, data) {
-        let order = data.order.map(dotId => sheet.show.getDot(dotId));
+        let order = this.deserializeOrder(sheet, data);
         let continuities = data.continuities.map(
             continuity => Continuity.deserialize(sheet, dotType, continuity)
         );
@@ -44,10 +44,8 @@ export default class TwoStepContinuity extends OrderedDotsContinuity {
     }
 
     serialize() {
-        let order = this._order.map(dot => dot.id);
         let continuities = this._continuities.map(continuity => continuity.serialize());
         return super.serialize({
-            order: order,
             continuities: continuities,
             isMarktime: this._isMarktime,
         });
@@ -57,6 +55,7 @@ export default class TwoStepContinuity extends OrderedDotsContinuity {
         return {
             type: "two",
             name: "Two Step",
+            label: "2-Step",
         };
     }
 
@@ -73,13 +72,13 @@ export default class TwoStepContinuity extends OrderedDotsContinuity {
     }
 
     /**
-     * Add the given continuity to the two-step drill.
+     * Add the given continuity to the step-two drill.
      *
      * @param {Continuity} continuity
      */
     addContinuity(continuity) {
         this._continuities.push(continuity);
-        this._sheet.updateMovements(this._dotType);
+        this.sheet.updateMovements(this.dotType);
     }
 
     /**
@@ -94,7 +93,8 @@ export default class TwoStepContinuity extends OrderedDotsContinuity {
         let options = {
             beatsPerStep: this.getBeatsPerStep(),
         };
-        let wait = this._order.indexOf(dot) * 2;
+        let wait = this.getOrderIndex(dot) * 2;
+
         let stop = new MovementCommandStop(
             data.position.x,
             data.position.y,
@@ -104,17 +104,9 @@ export default class TwoStepContinuity extends OrderedDotsContinuity {
             options
         );
 
-        data.remaining -= stop.getDuration();
-
-        // copied from Sheet.updateMovements
-        let movements = _.flatMap(this._continuities, continuity => {
-            let moves = continuity.getMovements(dot, _.clone(data));
-            moves.forEach(movement => {
-                data.position = movement.getEndPosition();
-                data.remaining -= movement.getDuration();
-            });
-            return moves;
-        });
+        let movements = this.constructor.buildMovements(
+            this._continuities, dot, data.position, data.remaining - wait
+        );
 
         return [stop].concat(movements);
     }
@@ -128,12 +120,10 @@ export default class TwoStepContinuity extends OrderedDotsContinuity {
      */
     moveContinuity(from, to) {
         moveElem(this._continuities, from, to);
-        this._sheet.updateMovements(this._dotType);
+        this.sheet.updateMovements(this.dotType);
     }
 
     getPanel(controller) {
-        let label = HTMLBuilder.span("2-Step");
-
         let editLabel = HTMLBuilder.label("Edit:");
 
         let editDots = HTMLBuilder.icon("ellipsis-h").click(() => {
@@ -150,7 +140,7 @@ export default class TwoStepContinuity extends OrderedDotsContinuity {
         });
         setupTooltip(editContinuities, "Continuities");
 
-        return [label, editLabel, editDots, editContinuities];
+        return [editLabel, editDots, editContinuities];
     }
 
     getPopup() {
@@ -165,12 +155,12 @@ export default class TwoStepContinuity extends OrderedDotsContinuity {
     }
 
     /**
-     * Remove the given continuity from the two-step drill.
+     * Remove the given continuity from the step-two drill.
      *
      * @param {Continuity} continuity
      */
     removeContinuity(continuity) {
         _.pull(this._continuities, continuity);
-        this._sheet.updateMovements(this._dotType);
+        this.sheet.updateMovements(this.dotType);
     }
 }

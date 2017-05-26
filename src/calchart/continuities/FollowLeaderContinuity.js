@@ -1,8 +1,6 @@
 import DiagonalContinuity from "calchart/continuities/DiagonalContinuity";
 import OrderedDotsContinuity from "calchart/continuities/OrderedDotsContinuity";
 import Coordinate from "calchart/Coordinate";
-import Dot from "calchart/Dot";
-import MovementCommandMove from "calchart/movements/MovementCommandMove";
 
 import HTMLBuilder from "utils/HTMLBuilder";
 import Iterator from "utils/Iterator";
@@ -32,18 +30,16 @@ export default class FollowLeaderContinuity extends OrderedDotsContinuity {
     }
 
     static deserialize(sheet, dotType, data) {
-        let order = data.order.map(dotId => sheet.show.getDot(dotId));
+        let order = this.deserializeOrder(sheet, data);
         let path = data.path.map(coordData => Coordinate.deserialize(coordData));
 
         return new FollowLeaderContinuity(sheet, dotType, order, path, data);
     }
 
     serialize() {
-        let order = this._order.map(dot => dot.id);
         let path = this._path.map(coord => coord.serialize());
 
         return super.serialize({
-            order: order,
             path: path,
         });
     }
@@ -52,6 +48,7 @@ export default class FollowLeaderContinuity extends OrderedDotsContinuity {
         return {
             type: "ftl",
             name: "Follow the Leader",
+            label: "FTL",
         };
     }
 
@@ -68,17 +65,12 @@ export default class FollowLeaderContinuity extends OrderedDotsContinuity {
     }
 
     getMovements(dot, data) {
-        let index = this._order.indexOf(dot);
-        if (index === -1) {
-            this._order.push(dot);
-            index = this._order.length - 1;
-        }
-
+        let index = this.getOrderIndex(dot);
         let path = this._getPathIterator(index);
 
         path.next();
         let prev = path.get();
-        let lastMove = undefined;
+        let lastMove = null;
         let movements = [];
         let beats = 0;
         let maxDuration = this._getMaxDuration(data);
@@ -101,6 +93,7 @@ export default class FollowLeaderContinuity extends OrderedDotsContinuity {
                 if (beats >= maxDuration) {
                     // truncate movement duration
                     move.setDuration(duration + maxDuration - beats);
+
                     // drop all further movements
                     movesToNext = _.take(movesToNext, i + 1);
                 }
@@ -109,7 +102,7 @@ export default class FollowLeaderContinuity extends OrderedDotsContinuity {
             movements = movements.concat(movesToNext);
 
             // combine moves if in same direction
-            if (!_.isUndefined(lastMove) && movesToNext.length > 0) {
+            if (lastMove && movesToNext.length > 0) {
                 let currMove = movesToNext[0];
                 let dir1 = lastMove.getDirection();
                 let dir2 = currMove.getDirection();
@@ -129,8 +122,6 @@ export default class FollowLeaderContinuity extends OrderedDotsContinuity {
     }
 
     getPanel(controller) {
-        let label = HTMLBuilder.span("FTL");
-
         let editLabel = HTMLBuilder.label("Edit:");
 
         let editDots = HTMLBuilder.icon("ellipsis-h").click(() => {
@@ -147,7 +138,7 @@ export default class FollowLeaderContinuity extends OrderedDotsContinuity {
         });
         setupTooltip(editPath, "Path");
 
-        return [label, editLabel, editDots, editPath];
+        return [editLabel, editDots, editPath];
     }
 
     /**
@@ -205,7 +196,7 @@ export default class FollowLeaderContinuity extends OrderedDotsContinuity {
         // add preceding dot positions as reference points
         for (let i = 0; i <= index; i++) {
             let dot = this._order[i];
-            let position = this._sheet.getDotInfo(dot).position;
+            let position = this.sheet.getDotInfo(dot).position;
             path = [position].concat(path);
         }
 

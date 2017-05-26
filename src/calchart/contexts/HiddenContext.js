@@ -11,11 +11,15 @@ import { NotImplementedError } from "utils/errors";
  * class MyHiddenContext extends HiddenContextMixin(BaseContext) {
  *     ...
  * }
+ *
+ * @param {class} superclass - The superclass that the HiddenContextMixin
+ *   should inherit from. The superclass needs to subclass GraphContext.
+ * @return {class} The generated HiddenContext that can be extended.
  */
 export function HiddenContextMixin(superclass) {
     class HiddenContext extends superclass {
         loadSheet(sheet) {
-            if (sheet !== this._sheet) {
+            if (sheet !== this.activeSheet) {
                 this.exit();
             } else {
                 super.loadSheet(sheet);

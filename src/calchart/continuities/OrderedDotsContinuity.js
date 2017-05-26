@@ -17,6 +17,22 @@ export default class OrderedDotsContinuity extends BaseContinuity {
         this._order = order;
     }
 
+    /**
+     * Deserialize the order in the given data.
+     *
+     * @param {Sheet} sheet
+     * @param {object} data
+     * @return {Dot[]}
+     */
+    static deserializeOrder(sheet, data) {
+        return data.order.map(id => sheet.show.getDot(id));
+    }
+
+    serialize(data={}) {
+        data.order = this._order.map(dot => dot.id);
+        return super.serialize(data);
+    }
+
     /**** METHODS ****/
 
     clone(key, val) {
@@ -32,6 +48,24 @@ export default class OrderedDotsContinuity extends BaseContinuity {
      */
     getOrder() {
         return this._order;
+    }
+
+    /**
+     * Get the index of the given dot in the order. If the dot is
+     * not in the order, add it to the end of the order, in the
+     * case that the dot was added to the dot type after the continuity
+     * was created.
+     *
+     * @param {Dot} dot
+     * @return {int} index
+     */
+    getOrderIndex(dot) {
+        let index = this._order.indexOf(dot);
+        if (index === -1) {
+            this._order.push(dot);
+            index = this._order.length - 1;
+        }
+        return index;
     }
 
     /**

@@ -25,8 +25,13 @@ export default class Dot {
         return new Dot(data.id, data.label);
     }
 
-    get id() { return this._id; }
-    get label() { return this._label; }
+    get id() {
+        return this._id;
+    }
+
+    get label() {
+        return this._label;
+    }
 
     /**
      * Return the JSONified version of the Dot.

@@ -65,7 +65,7 @@ export default class EditBackgroundContext extends HiddenGraphContext {
                 $(document).on({
                     "mousemove.edit-background": mousemove,
                     "mouseup.edit-background": e => {
-                        this._controller.doAction("saveBackground", [oldData]);
+                        this.controller.doAction("saveBackground", [oldData]);
                         $(document).off(".edit-background");
                     }
                 });

@@ -140,8 +140,7 @@ export default class EditorController extends ApplicationController {
      * Automatically download the JSON file for the show.
      */
     export() {
-        let slug = this.show.getSlug();
-        window.open(`/download/${slug}.json`);
+        window.open(`/download/${this.show.slug}.json`);
     }
 
     getContext() {
