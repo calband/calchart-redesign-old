@@ -87,6 +87,16 @@ export default class Song {
         return data;
     }
 
+    // getter methods to access raw properties instead of resolving defaults
+    get beatsPerStep() { return this._beatsPerStep; }
+    get fieldType() { return this._fieldType; }
+    get orientation() { return this._orientation; }
+    get stepType() { return this._stepType; }
+
+    get show() {
+        return this._show;
+    }
+
     /**** METHODS ****/
 
     /**
@@ -99,10 +109,19 @@ export default class Song {
     }
 
     /**
+     * Get the number of beats per step for this song, resolving any defaults.
+     *
+     * @return {int}
+     */
+    getBeatsPerStep() {
+        return this._beatsPerStep === "default" ? this.show.getBeatsPerStep() : this._beatsPerStep;
+    }
+
+    /**
      * @return {string} The field type for the song, resolving any defaults.
      */
     getFieldType() {
-        return this._fieldType === "default" ? this._show.getFieldType() : this._fieldType;
+        return this._fieldType === "default" ? this.show.getFieldType() : this._fieldType;
     }
 
     /**
@@ -118,7 +137,7 @@ export default class Song {
     getOrientationDegrees() {
         switch (this._orientation) {
             case "default":
-                return this._show.getOrientationDegrees();
+                return this.show.getOrientationDegrees();
             case "east":
                 return 0;
             case "west":
@@ -131,7 +150,7 @@ export default class Song {
      * @return {string} The song's step type, resolving any defaults. (@see CalchartUtils.STEP_TYPES)
      */
     getStepType() {
-        return this._stepType === "default" ? this._show.getStepType() : this._stepType;
+        return this._stepType === "default" ? this.show.getStepType() : this._stepType;
     }
 
     /**
@@ -149,5 +168,14 @@ export default class Song {
      */
     removeSheet(sheet) {
         this._sheets.remove(sheet);
+    }
+
+    /**
+     * Update movements for all sheets in the song.
+     */
+    updateMovements() {
+        this._sheets.forEach(sheet => {
+            sheet.updateMovements();
+        });
     }
 }

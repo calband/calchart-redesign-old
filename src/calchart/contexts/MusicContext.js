@@ -2,8 +2,10 @@ import BaseContext from "calchart/contexts/BaseContext";
 import Grapher from "calchart/Grapher";
 import Song from "calchart/Song";
 
+import { ValidationError } from "utils/errors";
 import HTMLBuilder from "utils/HTMLBuilder";
-import { getData, showPopup } from "utils/UIUtils";
+import { underscoreKeys, update } from "utils/JSUtils";
+import { getData, showContextMenu, showPopup } from "utils/UIUtils";
 
 /**
  * The Context that allows a user to edit the songs, audio, and music
@@ -58,13 +60,21 @@ export default class MusicContext extends BaseContext {
                 }
             },
             contextmenu: e => {
-                // TODO
+                let index = $(e.currentTarget).index();
+
+                showContextMenu(e, {
+                    "Edit...": `showEditSong(${index})`,
+                    "Move down": `moveSong(${index}, 1)`,
+                    "Move up": `moveSong(${index}, -1)`,
+                    "Delete": `removeSong(${index})`,
+                });
             },
         });
 
         this._addEvents(this.songPanel, ".actions .edit", {
             click: e => {
-                // TODO
+                let index = $(e.currentTarget).parents(".song").index();
+                this.showEditSong(index);
             },
         });
 
@@ -170,6 +180,50 @@ export default class MusicContext extends BaseContext {
             },
         });
     }
+
+    /**
+     * Show the popup that edits a song in the show.
+     *
+     * @param {int} index - The index of the song to edit.
+     */
+    showEditSong(index) {
+        let song = this.show.getSong(index);
+
+        showPopup("edit-song", {
+            init: popup => {
+                popup.find(".songName input").val(song.getName());
+                popup.find(".fieldType select").choose(song.fieldType);
+                popup.find(".stepType select").choose(song.stepType);
+                popup.find(".orientation select").choose(song.orientation);
+
+                popup.find(".beatsPerStep select")
+                    .choose(song.beatsPerStep === "default" ? "default" : "custom")
+                    .change(function() {
+                        let disabled = $(this).val() !== "custom";
+                        $(this).siblings("input").prop("disabled", disabled);
+                    })
+                    .change();
+
+                popup.find(".beatsPerStep > input").val(song.getBeatsPerStep());
+            },
+            onSubmit: popup => {
+                let data = getData(popup);
+
+                data.name = data.songName;
+
+                if (data.beatsPerStep === "custom") {
+                    data.beatsPerStep = parseInt(data.customBeatsPerStep);
+                    if (_.isNaN(data.beatsPerStep)) {
+                        throw new ValidationError("Please provide the number of beats per step.");
+                    } else if (data.beatsPerStep <= 0) {
+                        throw new ValidationError("Beats per step needs to be a positive integer.");
+                    }
+                }
+
+                this.controller.doAction("saveSong", [song, data]);
+            },
+        });
+    }
 }
 
 let ContextShortcuts = {
@@ -195,10 +249,54 @@ class ContextActions {
     }
 
     /**
+     * Move the song at the given index by the given amount.
+     *
+     * @param {int} index - The index of the song to move
+     * @param {int} delta - The amount to change the index
+     */
+    static moveSong(index, delta) {
+        let song = this.show.getSong(index);
+        let newIndex = index + delta;
+        if (newIndex < 0 || newIndex >= this.show.getSongs().length) {
+            return false;
+        }
+
+        this.show.moveSong(index, newIndex);
+        this.refresh("panels");
+
+        return {
+            undo: function() {
+                this.show.moveSong(newIndex, index);
+                this.refresh("panels");
+            },
+        };
+    }
+
+    /**
      * TODO
      */
     static removeSong() {
         // TODO
+    }
+
+    /**
+     * Save the given data for the given song.
+     *
+     * @param {Song} song
+     * @param {object} data
+     */
+    static saveSong(song, data) {
+        let changed = update(song, underscoreKeys(data));
+        song.updateMovements();
+        this.refresh("panels");
+
+        return {
+            undo: function() {
+                update(song, changed);
+                song.updateMovements();
+                this.refresh("panels");
+            },
+        };
     }
 
     /**

@@ -72,7 +72,7 @@ export default class ContinuityContext extends GraphContext {
                         "Next beat": "nextBeat",
                         "Last beat": "lastBeat",
                     },
-                    "Check Continuities...": "checkContinuities(message=true)",
+                    "Check Continuities...": "checkContinuities(fullCheck=true)",
                 });
             },
         });
@@ -503,9 +503,7 @@ class ContextActions extends GraphContext.actions {
         }
 
         sheet.moveContinuity(dotType, index, newIndex);
-        this.checkContinuities({
-            dots: dotType,
-        });
+        this.checkContinuities(sheet, dotType);
         this.refresh("grapher", "panel");
 
         return {
@@ -529,9 +527,7 @@ class ContextActions extends GraphContext.actions {
         let changed = continuity.savePopup(data);
 
         sheet.updateMovements(dotType);
-        this.checkContinuities({
-            dots: dotType,
-        });
+        this.checkContinuities(sheet, dotType);
         this.refresh("grapher", "panel");
 
         return {

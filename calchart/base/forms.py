@@ -120,6 +120,18 @@ class AddSongPopup(PopupForm):
 
     songName = forms.CharField(label='Name')
 
+class EditSongPopup(PopupForm):
+    """
+    The popup to edit a song
+    """
+    name = 'edit-song'
+
+    songName = forms.CharField(label='Name')
+    fieldType = forms.ChoiceField(choices=DEF_FIELD_TYPES)
+    beatsPerStep = BeatsPerStepField(label='Beats per step')
+    stepType = forms.ChoiceField(choices=DEF_STEP_TYPES)
+    orientation = forms.ChoiceField(choices=DEF_ORIENTATIONS)
+
 class AddStuntsheetPopup(PopupForm):
     """
     The popup to add a stuntsheet
@@ -153,6 +165,7 @@ editor_popups = [
     SetUpShowPopup,
     EditShowPopup,
     AddSongPopup,
+    EditSongPopup,
     AddStuntsheetPopup,
     EditStuntsheetPopup,
     EditContinuityPopup,

@@ -316,14 +316,13 @@ export default class Show {
     }
 
     /**
-     * Get the song with the given name. Returns undefined if
-     * the song could not be found.
+     * Get the song at the given index.
      *
-     * @param {string} name
+     * @param {int} index
      * @return {Song}
      */
-    getSong(name) {
-        return _.find(this._songs, song => song.getName() === name);
+    getSong(index) {
+        return this._songs[index];
     }
 
     /**
@@ -333,6 +332,16 @@ export default class Show {
      */
     getSongs() {
         return this._songs;
+    }
+
+    /**
+     * Move the song at the given index to the specified index.
+     *
+     * @param {int} from - The index of the song to move.
+     * @param {int} to - The index to move to.
+     */
+    moveSong(from, to) {
+        moveElem(this._songs, from, to);
     }
 
     /**
