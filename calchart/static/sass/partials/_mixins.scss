@@ -96,6 +96,15 @@
     }
 }
 
+// Set the max width for a span element, with any overflow ending in ellipses
+@mixin max-text-width($width) {
+    display: inline-block;
+    white-space: nowrap;
+    max-width: $width;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 // Remove the small space between children caused by whitespace
 @mixin remove-children-space {
     font-size: 0;
