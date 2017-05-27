@@ -306,23 +306,25 @@ export default class Show {
     /**
      * Add a song to the Show.
      *
-     * @param {string} name - Name of the song.
-     * @return {Song}
+     * @param {Song} song
      */
-    addSong(name) {
-        let song = Song.create(this, name);
+    addSong(song) {
         this._songs.push(song);
-        return song;
     }
 
     /**
-     * Get the song at the given index.
+     * Get the song with the given name or at the given index.
      *
-     * @param {int} index
+     * @param {(int|string)} param - Either the index of the song
+     *   or the name of the song.
      * @return {Song}
      */
-    getSong(index) {
-        return this._songs[index];
+    getSong(param) {
+        if (_.isNumber(param)) {
+            return this._songs[param];
+        } else {
+            return _.find(this._songs, song => song.getName() === param);
+        }
     }
 
     /**
@@ -350,8 +352,7 @@ export default class Show {
      * @param {Song} song
      */
     removeSong(song) {
-        let sheets = song.getSheets();
-        sheets.forEach(sheet => {
+        song.getSheets().forEach(sheet => {
             sheet.setSong(null);
             sheet.updateMovements();
         });

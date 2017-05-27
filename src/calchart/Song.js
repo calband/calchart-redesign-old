@@ -100,12 +100,20 @@ export default class Song {
     /**** METHODS ****/
 
     /**
-     * Add the given Sheet to the song.
+     * Add the given Sheet to the song, removing it from any other
+     * songs it may be a part of.
      *
      * @param {Sheet} sheet
      */
     addSheet(sheet) {
         this._sheets.add(sheet);
+
+        // tell song's previous song of its removal
+        let song = sheet.getSong();
+        if (song) {
+            song.removeSheet(sheet);
+        }
+        sheet.setSong(this);
     }
 
     /**
@@ -147,6 +155,13 @@ export default class Song {
     }
 
     /**
+     * @return {Set<Sheet>}
+     */
+    getSheets() {
+        return this._sheets;
+    }
+
+    /**
      * @return {string} The song's step type, resolving any defaults. (@see CalchartUtils.STEP_TYPES)
      */
     getStepType() {
@@ -167,7 +182,8 @@ export default class Song {
      * @param {Sheet} sheet
      */
     removeSheet(sheet) {
-        this._sheets.remove(sheet);
+        this._sheets.delete(sheet);
+        sheet.setSong(null);
     }
 
     /**

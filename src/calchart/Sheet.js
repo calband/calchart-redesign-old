@@ -63,11 +63,8 @@ export default class Sheet {
         this._orientation = options.orientation;
         this._stepType = options.stepType;
 
-        if (_.isNull(options.song)) {
-            this._song = null;
-        } else {
-            this._song = this.show.getSong(options.song);
-        }
+        // {?string} the name of the song
+        this._song = options.song;
 
         // @type {Object[]} see Sheet.getDotInfo
         this._dots = [];
@@ -149,7 +146,7 @@ export default class Sheet {
 
         data.options = {
             label: this._label,
-            song: _.isNull(this._song) ? null : this._song.getName(),
+            song: this._song,
             background: this._background,
             fieldType: this._fieldType,
             beatsPerStep: this._beatsPerStep,
@@ -187,7 +184,7 @@ export default class Sheet {
      * @return {(Song|Show)}
      */
     get parent() {
-        return _.defaultTo(this._song, this.show);
+        return _.defaultTo(this.getSong(), this.show);
     }
 
     get show() {
@@ -491,10 +488,14 @@ export default class Sheet {
     }
 
     /**
-     * @return {Song}
+     * @return {?Song}
      */
     getSong() {
-        return this._song;
+        if (this._song) {
+            return this.show.getSong(this._song);
+        } else {
+            return null;
+        }
     }
 
     /**

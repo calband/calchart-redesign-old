@@ -80,13 +80,19 @@ export default class MusicContext extends BaseContext {
 
         this._addEvents(this.songPanel, ".actions .delete", {
             click: e => {
-                // TODO
+                let index = $(e.currentTarget).parents(".song").index();
+                this.controller.doAction("removeSong", [index]);
             },
         });
 
         this._addEvents(this.sheetPanel, ".stuntsheet", {
             click: e => {
-                // TODO: add/remove to active song
+                let sheet = $(e.currentTarget).data("sheet");
+                if ($(e.currentTarget).hasClass("active")) {
+                    this.controller.doAction("removeSheetFromSong", [sheet]);
+                } else {
+                    this.controller.doAction("addSheetToSong", [sheet]);
+                }
             },
         });
 
@@ -232,12 +238,33 @@ let ContextShortcuts = {
 
 class ContextActions {
     /**
+     * Add the given sheet to the given song.
+     *
+     * @param {Sheet} sheet
+     * @param {Song} [song=this._activeSong]
+     */
+    static addSheetToSong(sheet, song=this._activeSong) {
+        song.addSheet(sheet);
+        sheet.updateMovements();
+        this.refresh("panels");
+
+        return {
+            undo: function() {
+                song.removeSheet(sheet);
+                sheet.updateMovements();
+                this.refresh("panels");
+            },
+        };
+    }
+
+    /**
      * Add a song to the show with the given name.
      *
      * @param {string} name
      */
     static addSong(name) {
-        let song = this.show.addSong(name);
+        let song = Song.create(this.show, name);
+        this.show.addSong(song);
         this.loadSong(song);
 
         return {
@@ -271,12 +298,46 @@ class ContextActions {
             },
         };
     }
+    /**
+     * Remove the given sheet from the given song.
+     *
+     * @param {Sheet} sheet
+     * @param {Song} [song=this._activeSong]
+     */
+    static removeSheetFromSong(sheet, song=this._activeSong) {
+        song.removeSheet(sheet);
+        sheet.updateMovements();
+        this.refresh("panels");
+
+        return {
+            undo: function() {
+                song.addSheet(sheet);
+                sheet.updateMovements();
+                this.refresh("panels");
+            },
+        };
+    }
 
     /**
-     * TODO
+     * Remove the song at the given index from the show.
+     *
+     * @param {int} index
      */
-    static removeSong() {
-        // TODO
+    static removeSong(index) {
+        let song = this.show.getSong(index);
+        this.show.removeSong(song);
+        if (song === this._activeSong) {
+            this.loadSong(this.show.getSong(0));
+        }
+        this.refresh("panels");
+
+        return {
+            undo: function() {
+                this.show.addSong(song);
+                this.loadSong(song);
+                this.refresh("panels");
+            },
+        };
     }
 
     /**
@@ -297,12 +358,5 @@ class ContextActions {
                 this.refresh("panels");
             },
         };
-    }
-
-    /**
-     * TODO
-     */
-    static setSongSheets() {
-        // TODO
     }
 }
