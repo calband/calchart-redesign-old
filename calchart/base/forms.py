@@ -118,7 +118,7 @@ class AddSongPopup(PopupForm):
     """
     name = 'add-song'
 
-    title = forms.CharField(label='Name of song')
+    songName = forms.CharField(label='Name')
 
 class AddStuntsheetPopup(PopupForm):
     """

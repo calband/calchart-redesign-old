@@ -185,13 +185,7 @@ export default class GraphContext extends BaseContext {
             if (sheet === this.activeSheet) {
                 $sheet.addClass("active");
             }
-        });
 
-        this.sidebar.find(".stuntsheet").each((i, $sheet) => {
-            let sheet = $($sheet).data("sheet");
-            let preview = $($sheet).find(".preview");
-
-            // field preview
             let grapher = new Grapher(this.show, preview, {
                 drawYardlines: false,
                 fieldPadding: 5,
@@ -601,13 +595,11 @@ class GraphActions {
     static addSheet(numBeats) {
         let sheet = this.show.addSheet(numBeats);
         this.loadSheet(sheet);
-        this.refresh("sidebar", "toolbar");
 
         return {
             undo: function() {
                 this.show.removeSheet(sheet);
                 this.loadSheet(prevSheet);
-                this.refresh("sidebar", "toolbar");
             },
         };
     }

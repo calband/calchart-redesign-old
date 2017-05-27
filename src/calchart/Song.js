@@ -43,6 +43,17 @@ export default class Song {
     }
 
     /**
+     * Create a song with the given name.
+     *
+     * @param {Show} show
+     * @param {string} name
+     * @return {Song}
+     */
+    static create(show, name) {
+        return new Song(show, name, []);
+    }
+
+    /**
      * Create a Song from the given serialized data
      *
      * @param {Show} show
@@ -75,6 +86,8 @@ export default class Song {
 
         return data;
     }
+
+    /**** METHODS ****/
 
     /**
      * Add the given Sheet to the song.
@@ -115,17 +128,18 @@ export default class Song {
     }
 
     /**
-     * @return {Sheet[]}
-     */
-    getSheets() {
-        return this._sheets;
-    }
-
-    /**
      * @return {string} The song's step type, resolving any defaults. (@see CalchartUtils.STEP_TYPES)
      */
     getStepType() {
         return this._stepType === "default" ? this._show.getStepType() : this._stepType;
+    }
+
+    /**
+     * @param {Sheet} sheet
+     * @return {boolean} true if the given sheet is in this song
+     */
+    hasSheet(sheet) {
+        return this._sheets.has(sheet);
     }
 
     /**

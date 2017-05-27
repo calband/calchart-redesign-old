@@ -307,10 +307,12 @@ export default class Show {
      * Add a song to the Show.
      *
      * @param {string} name - Name of the song.
+     * @return {Song}
      */
     addSong(name) {
-        let song = new Song(this, name, []);
+        let song = Song.create(this, name);
         this._songs.push(song);
+        return song;
     }
 
     /**

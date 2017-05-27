@@ -294,7 +294,7 @@ class ChoiceToolbarItem(CustomToolbarItem):
 
 editor_menu = Menu(
     SubMenu('File', [
-        MenuItem('New stuntsheet', 'addStuntsheet', icon='file-o'),
+        MenuContextItem('graph-context', 'New stuntsheet', 'addStuntsheet', icon='file-o'),
         MenuItem('Rename show', 'promptRename'),
         MenuItem('Save', 'saveShow', icon='floppy-o'),
         MenuItem('Generate PDF', 'generatePoopsheet', icon='file-pdf-o'),
@@ -376,5 +376,9 @@ editor_toolbar = Toolbar(
     ToolbarContextGroup(
         'gate-reference',
         ToolbarItem('Save', 'check', 'exit'),
+    ),
+    ToolbarContextGroup(
+        'edit-music',
+        ToolbarItem('Add Song', 'file-o', 'showAddSong'),
     ),
 )

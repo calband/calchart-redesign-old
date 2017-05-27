@@ -195,6 +195,9 @@ header {
                 background: $white;
                 color: $semilight-gray;
             }
+            span.hint {
+                color: $semilight-gray;
+            }
         }
         &:hover, &.active {
             background: $light-gray;
