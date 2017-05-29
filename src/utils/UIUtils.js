@@ -44,33 +44,16 @@ export function doAction(action, params={}, options={}) {
         processData: false,
         error: function(xhr) {
             console.error(xhr);
-            showError("An error occurred.");
+            if (xhr.responseJSON) {
+                showError(xhr.responseJSON.message);
+            } else {
+                showError("An error occurred.");
+            }
         },
     };
     _.extend(ajaxOptions, options);
 
     $.ajax("", ajaxOptions);
-}
-
-/**
- * Get data from any form elements that are children of the given element
- *
- * @param {jQuery} parent - The parent element to start looking for form elements.
- * @return {Object} Key/value pairs mapping name to value.
- */
-export function getData(parent) {
-    let data = {};
-    $(parent).find("input, select, textarea").each(function() {
-        let name = $(this).attr("name");
-        if (name) {
-            let value = $(this).val();
-            if ($(this).attr("type") === "checkbox") {
-                value = $(this).prop("checked");
-            }
-            data[name] = value;
-        }
-    });
-    return data;
 }
 
 /**
@@ -457,100 +440,6 @@ export function setupPanel(panel, options={}) {
             $(panel).keepOnscreen();
         }
     });
-}
-
-/**** POPUPS ****/
-
-/**
- * Show the popup with the given name.
- *
- * @param {string} name - The name of the popup to show.
- * @param {object} [options] - An object containing optional parameters, such as:
- *   - {function(jQuery)} init - Function to run before the popup is shown.
- *   - {function(jQuery)} onSubmit - Function to run when the Save button is pressed.
- *     If any ValidationErrors are thrown, shows a UI error message and exits without
- *     closing the popup.
- *   - {function(jQuery)} onHide - Function to run after the popup is hidden.
- *   - {boolean} [submitHide=true] - Set to false to not hide the popup when submitting.
- */
-export function showPopup(name, options={}) {
-    let popup = $(`.popup-box.${name}`).addClass("active");
-
-    if (options.init !== undefined) {
-        options.init(popup);
-    }
-
-    // event listener to submit form
-    popup
-        .on("submit.popup", "form", function(e) {
-            e.preventDefault();
-
-            if (!_.isUndefined(options.onSubmit)) {
-                let result = attempt(() => options.onSubmit(popup), {
-                    class: ValidationError,
-                    callback: ex => {
-                        showError(ex.message);
-                    },
-                });
-
-                if (_.isNull(result)) {
-                    return;
-                }
-            }
-
-            if (_.defaultTo(options.submitHide, true)) {
-                hidePopup();
-            }
-        });
-
-    // event listeners to close popup
-    $(".popup")
-        .on("click.popup", function(e) {
-            if (!$(e.target).closest(".popup-box").exists()) {
-                hidePopup();
-            }
-        })
-        .on("click.popup", ".popup-box button.cancel", function() {
-            hidePopup();
-        });
-
-    // ESC closes popup
-    $(window)
-        .on("keydown.popup", function(e) {
-            if (e.which === 27) {
-                hidePopup();
-            }
-        });
-
-    $(".popup").show();
-    popup.data("onHide", options.onHide);
-
-    // auto focus on first input
-    popup.find("input, select, textarea").first().focus();
-}
-
-/**
- * Hide the currently active popup.
- */
-export function hidePopup() {
-    let popup = $(".popup-box.active");
-
-    popup.removeClass("active")
-        .parent()
-        .hide();
-
-    // clear inputs
-    popup.find("input, select, textarea").val("");
-
-    // remove event listeners
-    popup.off(".popup");
-    $(".popup").off(".popup");
-    $(window).off(".popup");
-
-    let onHide = popup.data("onHide");
-    if (!_.isUndefined(onHide)) {
-        onHide(popup);
-    }
 }
 
 /**** MESSAGES ****/

@@ -29,66 +29,9 @@ class CreateUserForm(UserCreationForm):
 
         return user
 
-### POPUPS ###
-
-class BasePopupForm(object):
-    """
-    A popup form. A mixin to include with another Form class.
-    """
-    # the name of this popup -- needs to be unique to each popup
-    name = None
-    # classes to add to the popup div
-    classes = []
-    # template to load for the popup
-    template_name = 'partials/popup.html'
-    # title to show in the popup box, defaults to name
-    title = None
-    # description (as HTML) to show above the form in the popup box
-    description = None
-    # names for hidden fields
-    hidden_fields = []
-    # label for save button
-    save_label = 'Save'
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        assert self.name is not None, 'Popup form needs a name'
-
-        for field in self.hidden_fields:
-            self.fields[field] = forms.CharField(widget=forms.HiddenInput)
-
-        # manually set labels for each field, since we're using camelcase
-        for field_name, field in self.fields.items():
-            if field.label is None:
-                field.label = camel_case_to_spaces(field_name).capitalize()
-
-        if self.title is None:
-            # automatically generate from the name
-            self.title = self.name.replace('-', ' ').title()
-
-class PopupForm(BasePopupForm, forms.Form):
-    """
-    A form to use for any popups on the site. Can be included on a page using
-    the CalchartMixin.
-    """
-    pass
-
-### HOME POPUPS ###
-
-class CreateShowPopup(PopupForm):
-    """
-    The popup to create a show on the home page.
-    """
-    name = 'create-show'
-
-    show_name = forms.CharField(label='Name')
-    is_band = forms.BooleanField(label='For Cal Band')
-    audio = forms.FileField(label='Audio file (opt.)', required=False)
-
 ### EDITOR POPUPS ###
 
-class SetUpShowPopup(PopupForm):
+class SetUpShowPopup(object):
     """
     The popup to set up a show when first opening in the editor view.
     """
@@ -100,7 +43,7 @@ class SetUpShowPopup(PopupForm):
     dotFormat = forms.ChoiceField(choices=DOT_FORMATS, initial='combo')
     fieldType = forms.ChoiceField(choices=FIELD_TYPES, initial='college')
 
-class EditShowPopup(PopupForm):
+class EditShowPopup(object):
     """
     The popup to edit a show.
     """
@@ -112,7 +55,7 @@ class EditShowPopup(PopupForm):
     stepType = forms.ChoiceField(choices=STEP_TYPES)
     orientation = forms.ChoiceField(choices=ORIENTATIONS)
 
-class AddSongPopup(PopupForm):
+class AddSongPopup(object):
     """
     The popup to add a song
     """
@@ -120,7 +63,7 @@ class AddSongPopup(PopupForm):
 
     songName = forms.CharField(label='Name')
 
-class EditSongPopup(PopupForm):
+class EditSongPopup(object):
     """
     The popup to edit a song
     """
@@ -132,7 +75,7 @@ class EditSongPopup(PopupForm):
     stepType = forms.ChoiceField(choices=DEF_STEP_TYPES)
     orientation = forms.ChoiceField(choices=DEF_ORIENTATIONS)
 
-class AddStuntsheetPopup(PopupForm):
+class AddStuntsheetPopup(object):
     """
     The popup to add a stuntsheet
     """
@@ -140,7 +83,7 @@ class AddStuntsheetPopup(PopupForm):
 
     numBeats = forms.IntegerField(label='Number of beats')
 
-class EditStuntsheetPopup(PopupForm):
+class EditStuntsheetPopup(object):
     """
     The popup to edit a stuntsheet
     """
@@ -154,7 +97,7 @@ class EditStuntsheetPopup(PopupForm):
     stepType = forms.ChoiceField(choices=DEF_STEP_TYPES)
     orientation = forms.ChoiceField(choices=DEF_ORIENTATIONS)
 
-class EditContinuityPopup(PopupForm):
+class EditContinuityPopup(object):
     """
     The popup to edit a continuity
     """

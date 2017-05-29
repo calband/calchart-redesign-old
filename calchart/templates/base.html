@@ -18,13 +18,5 @@
         {% block body %}{% endblock %}
         <!-- CSRF token for AJAX requests -->
         {% csrf_token %}
-        <!-- Popups -->
-        {% if popup_forms %}
-            <div class="popup">
-                {% for popup in popup_forms %}
-                    {% include popup.template_name with form=popup %}
-                {% endfor %}
-            </div>
-        {% endif %}
     </body>
 </html>

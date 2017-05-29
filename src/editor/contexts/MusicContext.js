@@ -129,8 +129,7 @@ export default class MusicContext extends BaseContext {
 
         // no songs in panel
         if (this.songPanel.children().length === 0) {
-            HTMLBuilder.make("p.no-songs")
-                .text("No songs currently in show.")
+            HTMLBuilder.make("p.no-songs", "No songs currently in show.")
                 .appendTo(this.songPanel);
         }
 

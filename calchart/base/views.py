@@ -90,9 +90,6 @@ class HomeView(CalchartMixin, TemplateView):
     by the STUNT committee in a Google Drive-like format.
     """
     template_name = 'home.html'
-    popup_forms = [
-        CreateShowPopup,
-    ]
 
     def get(self, request, *args, **kwargs):
         """
@@ -183,9 +180,9 @@ class HomeView(CalchartMixin, TemplateView):
             'audio_file': self.request.FILES.get('audio'),
         }
         show = Show.objects.create(**kwargs)
-        url = reverse('editor', kwargs={'slug': show.slug})
+
         return {
-            'url': url,
+            'url': reverse('editor', kwargs={'slug': show.slug}),
         }
 
 class EditorView(CalchartMixin, TemplateView):
@@ -193,7 +190,6 @@ class EditorView(CalchartMixin, TemplateView):
     The editor view that can edit shows
     """
     template_name = 'editor.html'
-    popup_forms = editor_popups
 
     def dispatch(self, request, *args, **kwargs):
         self.show = get_object_or_404(Show, slug=kwargs['slug'])

@@ -55,8 +55,7 @@ export default class ViewerController extends ApplicationController {
         // select dot
         let dots = $(".select-dot");
         this._show.getDots().forEach(dot => {
-            HTMLBuilder.make("option")
-                .text(dot.label)
+            HTMLBuilder.make("option", dot.label)
                 .attr("value", dot.id)
                 .data("dot", dot)
                 .appendTo(dots);

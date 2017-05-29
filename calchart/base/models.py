@@ -62,7 +62,7 @@ class Show(models.Model):
     # the audio file to animate the show
     audio_file = models.FileField(upload_to='audio')
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     @property

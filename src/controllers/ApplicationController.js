@@ -2,6 +2,10 @@ import { ActionError } from "utils/errors";
 import { attempt } from "utils/JSUtils";
 import { setupTooltip } from "utils/UIUtils";
 
+if (_ === undefined) {
+    console.error("lodash is not loaded!");
+}
+
 // The singleton instance of the ApplicationController
 window.controller = null;
 

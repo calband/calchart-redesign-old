@@ -111,9 +111,6 @@ select {
 
 button {
     @include display-button;
-    &.red-button {
-        @include display-button($red);
-    }
 }
 
 header {
@@ -332,24 +329,20 @@ ul.messages {
     height: 100%;
     background: rgba($white, 0.4);
     text-align: center;
-    display: none;
     overflow-y: auto;
     padding: 50px 0;
     .popup-box {
-        display: none;
+        display: inline-block;
         width: 500px;
         border-radius: 5px;
         background: white;
         box-shadow: 0 0 10px $dark-gray;
         padding: 20px 30px;
-        &.active {
-            display: inline-block;
-        }
-        p {
-            margin: 10px 0;
-        }
         .buttons {
             margin-top: 20px;
+            .cancel {
+                @include display-button($red);
+            }
         }
     }
 }
