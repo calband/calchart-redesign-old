@@ -1,6 +1,7 @@
-import GraphContext from "calchart/contexts/GraphContext";
 import DotType from "calchart/DotType";
-import EditTools from "calchart/EditTools";
+
+import GraphContext from "editor/contexts/GraphContext";
+import EditTools from "editor/EditTools";
 
 import HTMLBuilder from "utils/HTMLBuilder";
 import { mapSome, parseNumber } from "utils/JSUtils";

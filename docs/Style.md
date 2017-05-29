@@ -371,12 +371,13 @@ import Dot from "./Dot";
 import Dot from "calchart/Dot";
 ```
 
-Imports should be organized in three sections, with a newline between each section: external libraries, calchart modules, and utils modules. Within each section, order imports alphabetically by path.
+Imports should be organized in newline-separated sections, one for each module, ordered alphabetically. Within each section, order imports alphabetically by **path**.
 
 ```js
 import AnimationState from "calchart/AnimationState";
-import EditorController from "calchart/controllers/EditorController";
 import Coordinate from "calchart/Coordinate";
+
+import EditorController from "controllers/EditorController";
 
 import HTMLBuilder from "utils/HTMLBuilder";
 import { empty } from "utils/JSUtils";

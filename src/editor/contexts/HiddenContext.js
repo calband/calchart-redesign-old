@@ -1,4 +1,4 @@
-import GraphContext from "calchart/contexts/GraphContext";
+import GraphContext from "editor/contexts/GraphContext";
 
 import { NotImplementedError } from "utils/errors";
 

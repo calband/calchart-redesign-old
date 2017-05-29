@@ -1,4 +1,4 @@
-import HiddenGraphContext from "calchart/contexts/HiddenContext";
+import HiddenGraphContext from "editor/contexts/HiddenContext";
 
 import HTMLBuilder from "utils/HTMLBuilder";
 import { getDimensions } from "utils/MathUtils";

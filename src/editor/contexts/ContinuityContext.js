@@ -1,6 +1,7 @@
-import GraphContext from "calchart/contexts/GraphContext";
 import Continuity from "calchart/Continuity";
 import DotType from "calchart/DotType";
+
+import GraphContext from "editor/contexts/GraphContext";
 
 import { ActionError } from "utils/errors";
 import HTMLBuilder from "utils/HTMLBuilder";

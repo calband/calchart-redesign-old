@@ -1,5 +1,6 @@
-import ApplicationController from "calchart/ApplicationController";
 import Grapher from "calchart/Grapher";
+
+import ApplicationController from "controllers/ApplicationController";
 
 import HTMLBuilder from "utils/HTMLBuilder";
 import { round, roundSmall } from "utils/MathUtils";

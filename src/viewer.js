@@ -1,5 +1,6 @@
-import ViewerController from "calchart/controllers/ViewerController";
 import Show from "calchart/Show";
+
+import ViewerController from "controllers/ViewerController";
 
 import "utils/jquery";
 

@@ -1,6 +1,7 @@
-import ContinuityContext from "calchart/contexts/ContinuityContext";
-import { HiddenContextMixin } from "calchart/contexts/HiddenContext";
 import Continuity from "calchart/Continuity";
+
+import ContinuityContext from "editor/contexts/ContinuityContext";
+import { HiddenContextMixin } from "editor/contexts/HiddenContext";
 
 /**
  * The context that lets the user select the continuities to run

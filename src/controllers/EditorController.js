@@ -1,5 +1,6 @@
-import ApplicationController from "calchart/ApplicationController";
-import Context from "calchart/Context";
+import Context from "editor/Context";
+
+import ApplicationController from "controllers/ApplicationController";
 
 import { ActionError, ValidationError } from "utils/errors";
 import HTMLBuilder from "utils/HTMLBuilder";

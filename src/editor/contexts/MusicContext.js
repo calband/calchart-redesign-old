@@ -1,6 +1,7 @@
-import BaseContext from "calchart/contexts/BaseContext";
 import Grapher from "calchart/Grapher";
 import Song from "calchart/Song";
+
+import BaseContext from "editor/contexts/BaseContext";
 
 import { ValidationError } from "utils/errors";
 import HTMLBuilder from "utils/HTMLBuilder";

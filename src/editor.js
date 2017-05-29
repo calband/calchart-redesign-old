@@ -1,5 +1,6 @@
-import EditorController from "calchart/controllers/EditorController";
 import Show from "calchart/Show";
+
+import EditorController from "controllers/EditorController";
 
 import { ValidationError } from "utils/errors";
 import "utils/jquery";

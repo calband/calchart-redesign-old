@@ -1,11 +1,11 @@
-import ContinuityContext from "calchart/contexts/ContinuityContext";
-import ContinuityDotContext from "calchart/contexts/ContinuityDotContext";
-import DotContext from "calchart/contexts/DotContext";
-import EditBackgroundContext from "calchart/contexts/EditBackgroundContext";
-import FTLPathContext from "calchart/contexts/FTLPathContext";
-import GateReferenceContext from "calchart/contexts/GateReferenceContext";
-import MusicContext from "calchart/contexts/MusicContext";
-import TwoStepContext from "calchart/contexts/TwoStepContext";
+import ContinuityContext from "editor/contexts/ContinuityContext";
+import ContinuityDotContext from "editor/contexts/ContinuityDotContext";
+import DotContext from "editor/contexts/DotContext";
+import EditBackgroundContext from "editor/contexts/EditBackgroundContext";
+import FTLPathContext from "editor/contexts/FTLPathContext";
+import GateReferenceContext from "editor/contexts/GateReferenceContext";
+import MusicContext from "editor/contexts/MusicContext";
+import TwoStepContext from "editor/contexts/TwoStepContext";
 
 let ALL_CONTEXTS = [
     ContinuityContext,

@@ -1,8 +1,9 @@
-import BaseContext from "calchart/contexts/BaseContext";
 import Coordinate from "calchart/Coordinate";
 import Dot from "calchart/Dot";
 import Grapher from "calchart/Grapher";
 import Sheet from "calchart/Sheet";
+
+import BaseContext from "editor/contexts/BaseContext";
 
 import { ActionError, AnimationStateError, ValidationError } from "utils/errors";
 import HTMLBuilder from "utils/HTMLBuilder";
