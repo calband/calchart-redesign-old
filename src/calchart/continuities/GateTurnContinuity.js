@@ -3,7 +3,7 @@ import Coordinate from "calchart/Coordinate";
 import MovementCommandArc from "calchart/movements/MovementCommandArc";
 
 import HTMLBuilder from "utils/HTMLBuilder";
-import { parseNumber, validatePositive } from "utils/JSUtils";
+import { validatePositive } from "utils/JSUtils";
 import { setupTooltip } from "utils/UIUtils";
 
 /**
@@ -47,10 +47,11 @@ export default class GateTurnContinuity extends BaseContinuity {
         return {
             type: "gate",
             name: "Gate Turn",
+            label: "Gate",
         };
     }
 
-    get reference() { return this._reference; }
+    /**** METHODS ****/
 
     getMovements(dot, data) {
         let sign = this._isCW ? 1 : -1;
@@ -67,8 +68,6 @@ export default class GateTurnContinuity extends BaseContinuity {
 
     getPanel(controller) {
         let _this = this;
-
-        let label = HTMLBuilder.span("GATE");
 
         let degrees = HTMLBuilder.input({
             type: "number",
@@ -98,7 +97,7 @@ export default class GateTurnContinuity extends BaseContinuity {
         });
         setupTooltip(editReference, "Reference Point");
 
-        return [label, degrees, direction, editReference];
+        return [degrees, direction, editReference];
     }
 
     getPopup() {
@@ -118,6 +117,13 @@ export default class GateTurnContinuity extends BaseContinuity {
         }), "isCW");
 
         return [degrees, direction, stepType, beatsPerStep, customText];
+    }
+
+    /**
+     * @return {Coordinate}
+     */
+    getReference() {
+        return this._reference;
     }
 
     /**

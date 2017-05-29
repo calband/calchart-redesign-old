@@ -1,4 +1,4 @@
-import HiddenContext from "calchart/contexts/HiddenContext";
+import HiddenGraphContext from "calchart/contexts/HiddenContext";
 import Coordinate from "calchart/Coordinate";
 
 import HTMLBuilder from "utils/HTMLBuilder";
@@ -9,12 +9,10 @@ import { setupPanel } from "utils/UIUtils";
  * The Context that allows a user to define the path in
  * a follow the leader continuity.
  */
-export default class FTLPathContext extends HiddenContext {
+export default class FTLPathContext extends HiddenGraphContext {
     constructor(controller) {
         super(controller);
 
-        this._panel = $(".panel.ftl-path");
-        this._list = this._panel.find(".ftl-path-points");
         this._setupPanel();
 
         // FollowLeaderContinuity
@@ -23,13 +21,31 @@ export default class FTLPathContext extends HiddenContext {
         // selection, add-point, remove-point
         this._activeTool = null;
 
-        this._svg = this._grapher.getSVG();
+        // {jQuery} helpers
         this._path = null;
         this._helper = null;
     }
 
     static get actions() {
         return ContextActions;
+    }
+
+    static get info() {
+        return {
+            name: "ftl-path",
+        };
+    }
+
+    static get refreshTargets() {
+        return super.refreshTargets.concat(["panel"]);
+    }
+
+    get panel() {
+        return $(".panel.ftl-path");
+    }
+
+    get svg() {
+        return this.grapher.getSVG();
     }
 
     /**
@@ -43,25 +59,24 @@ export default class FTLPathContext extends HiddenContext {
 
         this.loadTool("selection");
 
-        this._panel.show();
-        $(".toolbar .ftl-path-group").removeClass("hide");
+        this.panel.show();
 
-        let scale = this._grapher.getScale();
-        this._addEvents(".workspace", {
+        let scale = this.grapher.getScale();
+        this._addEvents(this.workspace, {
             mousedown: e => {
                 if (this._activeTool === "selection" && $(e.target).is(".ref-point")) {
                     let point = $(e.target);
-                    $(".workspace").on({
+                    this.workspace.on({
                         "mousemove.ftl-path-move-point": e => {
                             let steps = this._eventToSnapSteps(e);
-                            let coord = scale.toDistanceCoordinates(steps);
+                            let coord = scale.toDistance(steps);
                             point.attr("cx", coord.x).attr("cy", coord.y);
                         },
                         "mouseup.ftl-path-move-point": e => {
                             let coordinate = this._eventToSnapSteps(e);
                             let index = point.data("index");
-                            this._controller.doAction("movePoint", [index, coordinate]);
-                            $(".workspace").off(".ftl-path-move-point");
+                            this.controller.doAction("movePoint", [index, coordinate]);
+                            this.workspace.off(".ftl-path-move-point");
                         },
                     });
                 }
@@ -70,119 +85,130 @@ export default class FTLPathContext extends HiddenContext {
                 let coord = this._eventToSnapSteps(e);
                 switch (this._activeTool) {
                     case "add-point":
-                        this._controller.doAction("addPoint", [coord.x, coord.y]);
+                        this.controller.doAction("addPoint", [coord.x, coord.y]);
                         break;
                     case "remove-point":
                         let point = $(e.target);
                         if (point.is(".ref-point")) {
-                            this._controller.doAction("removePoint", [point.data("index")]);
+                            this.controller.doAction("removePoint", [point.data("index")]);
                         }
                         break;
                 }
             },
-        })
+        });
     }
 
     unload() {
         super.unload();
 
         // remove helpers
-        this._svg.selectAll(".ref-point").remove();
+        this.svg.selectAll(".ref-point").remove();
         this._path.remove();
-        if (!_.isNull(this._helper)) {
+        if (this._helper) {
             this._helper.remove();
         }
 
-        this._panel.hide();
-        $(".toolbar .ftl-path-group").addClass("hide");
+        this.panel.hide();
 
-        this._grapher.getDots(this._continuity.order).css("opacity", "");
+        this._getGraphDots().css("opacity", "");
 
-        this._controller.checkContinuities({
+        this.checkContinuities({
             dots: this._continuity.dotType,
         });
     }
 
-    refresh() {
-        super.refresh();
+    refreshGrapher() {
+        super.refreshGrapher();
 
         // highlight first dot in path
-        let dot = this._grapher.getDot(this._continuity.order[0]);
-        this._controller.selectDots(dot);
-        this._grapher.getDots(this._continuity.order).css("opacity", 1);
+        let dot = this._continuity.getOrder()[0];
+        let $dot = this.grapher.getDot(dot);
+        this.selectDots($dot);
+        this._getGraphDots().css("opacity", 1);
 
-        this._list.empty();
-        this._svg.selectAll(".ref-point").remove();
-        let scale = this._grapher.getScale();
-        let dotRadius = scale.toDistance(3/4);
+        let scale = this.grapher.getScale();
+        let start = this.activeSheet.getDotInfo(dot).position;
+        start = scale.toDistance(start);
 
-        let start = this._sheet.getDotInfo(dot.data("dot")).position;
-        let startScaled = scale.toDistanceCoordinates(start);
-        let pathDef = `M ${startScaled.x} ${startScaled.y}`;
-        let prevPoint = startScaled;
+        let pathDef = `M ${start.x} ${start.y}`;
+        let prevPoint = start;
+        let dotRadius = this.grapher.getDotRadius();
 
-        // populate panel and add reference points to SVG
-        this._continuity.path.forEach((coordinate, i) => {
-            let point = this._svg.append("circle")
-                .classed("ref-point", true)
+        // add reference points to SVG and build path
+        this.svg.selectAll(".ref-point").remove();
+        this._continuity.getPath().forEach((coordinate, i) => {
+            let point = this.svg.append("circle")
+                .attr("class", `ref-point point-${i}`)
                 .attr("r", dotRadius);
 
             // reference points know their order
             $.fromD3(point).data("index", i);
 
-            let scaled = scale.toDistanceCoordinates(coordinate);
+            let scaled = scale.toDistance(coordinate);
             point.attr("cx", scaled.x).attr("cy", scaled.y);
-            if (prevPoint.x !== scaled.x && prevPoint.y !== scaled.y) {
-                let deltaX = scaled.x - prevPoint.x;
-                let deltaY = scaled.y - prevPoint.y;
-                let delta = Math.min(Math.abs(deltaX), Math.abs(deltaY));
-                deltaX = Math.sign(deltaX) * delta;
-                deltaY = Math.sign(deltaY) * delta;
-                pathDef += ` L ${prevPoint.x + deltaX} ${prevPoint.y + deltaY}`;
-            }
+
+            // diagonal path
+            let deltaX = scaled.x - prevPoint.x;
+            let deltaY = scaled.y - prevPoint.y;
+            let delta = Math.min(Math.abs(deltaX), Math.abs(deltaY));
+            deltaX = Math.sign(deltaX) * delta;
+            deltaY = Math.sign(deltaY) * delta;
+            pathDef += ` L ${prevPoint.x + deltaX} ${prevPoint.y + deltaY}`;
+
+            // rest of path to next point
             pathDef += ` L ${scaled.x} ${scaled.y}`;
             prevPoint = scaled;
+        });
 
+        // initialize path
+        this._path = this.svg.select("path.ftl-path-helper");
+        if (this._path.empty()) {
+            let path = this.svg.append("path").classed("ftl-path-helper", true);
+            this._path = $.fromD3(path);
+        }
+        this._path.attr("d", pathDef);
+    }
+
+    refreshPanel() {
+        let list = this.panel.find(".ftl-path-points").empty();
+
+        // populate panel
+        this._continuity.getPath().forEach((coordinate, i) => {
+            let point = this.svg.select(`point-${i}`);
             let label = `(${coordinate.x}, ${coordinate.y})`;
-            let li = HTMLBuilder.li(label, "point")
+
+            HTMLBuilder.li(label, "point")
                 .data("coordinate", coordinate)
-                .appendTo(this._list)
+                .appendTo(list)
                 .mouseenter(e => {
                     point.classed("highlight", true);
                 })
                 .mouseleave(e => {
                     point.classed("highlight", false);
-                });;
+                });
         });
 
-        this._list.sortable({
-            containment: this._panel,
+        list.sortable({
+            containment: this.panel,
             update: () => {
-                let path = this._list.children().map(function() {
-                    return $(this).data("coordinate");
-                }).get();
-                controller.doAction("setPath", [path]);
+                let path = _.map(list.children(), point => $(point).data("coordinate"));
+                this.controller.doAction("setPath", [path]);
             },
         });
 
-        this._path = this._svg.select("path.ftl-path-helper");
-        if (this._path.empty()) {
-            let path = this._svg.append("path").classed("ftl-path-helper", true);
-            this._path = $.fromD3(path);
-        }
-        this._path.attr("d", pathDef);
-
-        this._panel.keepOnscreen();
+        this.panel.keepOnscreen();
     }
 
     /**
      * Load continuity context if the user is done with this context.
      */
     exit() {
-        this._controller.loadContext("continuity", {
+        this.controller.loadContext("continuity", {
             dotType: this._continuity.dotType,
         });
     }
+
+    /**** METHODS ****/
 
     /**
      * Load the given editing tool.
@@ -192,24 +218,23 @@ export default class FTLPathContext extends HiddenContext {
     loadTool(name) {
         this._activeTool = name;
 
-        $(".workspace").off(".ftl-path-add-point");
-        let helper = this._svg.select(".ftl-path-add-point");
+        this.workspace.off(".ftl-path-add-point");
         if (name === "add-point") {
             // add helper dot
-            let scale = this._grapher.getScale();
-            let dotRadius = scale.toDistance(3/4);
-            $(".workspace").on("mousemove.ftl-path-add-point", e => {
+            let scale = this.grapher.getScale();
+            let dotRadius = this.grapher.getDotRadius();
+            this.workspace.on("mousemove.ftl-path-add-point", e => {
                 let steps = this._eventToSnapSteps(e);
-                let coord = scale.toDistanceCoordinates(steps);
+                let coord = scale.toDistance(steps);
 
                 if (_.isNull(this._helper)) {
-                    this._helper = this._svg.append("circle")
+                    this._helper = this.svg.append("circle")
                         .classed("ftl-path-add-point", true)
                         .attr("r", dotRadius);
                 }
                 this._helper.attr("cx", coord.x).attr("cy", coord.y);
             });
-        } else if (!_.isNull(this._helper)) {
+        } else if (this._helper) {
             this._helper.remove();
             this._helper = null;
         }
@@ -218,29 +243,25 @@ export default class FTLPathContext extends HiddenContext {
         $(`.toolbar .ftl-path-group .${name}`).addClass("active");
     }
 
-    _setupPanel() {
-        setupPanel(this._panel);
+    /**** HELPERS ****/
 
-        this._panel.find("button.submit").click(() => {
+    /**
+     * @param {jQuery}
+     */
+    _getGraphDots() {
+        return this.grapher.getDots(this._continuity.getOrder());
+    }
+
+    _setupPanel() {
+        setupPanel(this.panel);
+
+        this.panel.find("button.submit").click(() => {
             this.exit();
         });
     }
-
-    /**
-     * Convert a MouseEvent into a coordinate for the current mouse position,
-     * rounded to the nearest step.
-     *
-     * @param {Event} e
-     * @return {Coordinate}
-     */
-    _eventToSnapSteps(e) {
-        let [x, y] = $(".workspace").makeRelative(e.pageX, e.pageY);
-        let steps = this._grapher.getScale().toStepCoordinates({x, y});
-        return new Coordinate(round(steps.x, 1), round(steps.y, 1));
-    }
 }
 
-class ContextActions {
+class ContextActions extends HiddenGraphContext.actions {
     /**
      * Add a point to the end of the path.
      *
@@ -249,16 +270,18 @@ class ContextActions {
      * @param {FollowLeaderContinuity} [continuity=this._continuity]
      */
     static addPoint(x, y, continuity=this._continuity) {
-        continuity.path.push(new Coordinate(x, y));
+        let index = continuity.getPath().length;
+        let coordinate = new Coordinate(x, y);
+        continuity.addPoint(index, coordinate);
         continuity.sheet.updateMovements(continuity.dotType);
-        this._controller.refresh();
+        this.refresh("grapher", "panel");
 
         return {
             data: [x, y, continuity],
             undo: function() {
-                continuity.path.pop();
+                continuity.removePoint(index);
                 continuity.sheet.updateMovements(continuity.dotType);
-                this._controller.refresh();
+                this.refresh("grapher", "panel");
             },
         };
     }
@@ -271,17 +294,17 @@ class ContextActions {
      * @param {FollowLeaderContinuity} [continuity=this._continuity]
      */
     static movePoint(index, coordinate, continuity=this._continuity) {
-        let oldCoord = continuity.path[index];
-        continuity.path[index] = coordinate;
+        let oldCoord = continuity.getPath()[index];
+        continuity.setPoint(index, coordinate);
         continuity.sheet.updateMovements(continuity.dotType);
-        this._controller.refresh();
+        this.refresh("grapher", "panel");
 
         return {
             data: [index, coordinate, continuity],
             undo: function() {
-                continuity.path[index] = oldCoord;
+                continuity.setPoint(index, oldCoord);
                 continuity.sheet.updateMovements(continuity.dotType);
-                this._controller.refresh();
+                this.refresh("grapher", "panel");
             },
         };
     }
@@ -293,16 +316,16 @@ class ContextActions {
      * @param {FollowLeaderContinuity} [continuity=this._continuity]
      */
     static removePoint(index, continuity=this._continuity) {
-        let coordinate = continuity.path.splice(index, 1)[0];
+        let coordinate = continuity.removePoint(index);
         continuity.sheet.updateMovements(continuity.dotType);
-        this._controller.refresh();
+        this.refresh("grapher", "panel");
 
         return {
             data: [index, continuity],
             undo: function() {
-                continuity.path.splice(index, 0, coordinate);
+                continuity.addPoint(index, coordinate);
                 continuity.sheet.updateMovements(continuity.dotType);
-                this._controller.refresh();
+                this.refresh("grapher", "panel");
             },
         };
     }
@@ -314,17 +337,17 @@ class ContextActions {
      * @param {FollowLeaderContinuity} [continuity=this._continuity]
      */
     static setPath(path, continuity=this._continuity) {
-        let oldPath = continuity.path;
+        let oldPath = continuity.getPath();
         continuity.setPath(path);
         continuity.sheet.updateMovements(continuity.dotType);
-        this._controller.refresh();
+        this.refresh("grapher", "panel");
 
         return {
             data: [path, continuity],
             undo: function() {
                 continuity.setPath(oldPath);
                 continuity.sheet.updateMovements(continuity.dotType);
-                this._controller.refresh();
+                this.refresh("grapher", "panel");
             },
         };
     }

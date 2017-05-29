@@ -44,6 +44,54 @@ if (IS_MAC) {
 }
 
 /**
+ * Attempt to run the given function. If any errors are thrown, check
+ * if the error class is an instance of an error class in the given
+ * errors object. If so, run that callback function. Otherwise, re-throw
+ * the error.
+ *
+ * If no errors object is given, ignores any errors thrown by the func.
+ *
+ * @param {function} func - The function to attempt to run.
+ * @param {?(object[]|object)} [errors=null] - An optional array of objects that
+ *   list, in order, the errors to catch. If null, ignores any errors thrown
+ *   (which is different from passing an empty array, which re-throws any errors
+ *   thrown). Can also pass in a single object instead of an array with one
+ *   element. Each object is of the form:
+ *   {
+ *       class: Error,
+ *       callback: function,
+ *   }
+ *
+ * @return {?*} The result of running the function, or null if an error was
+ *   caught.
+ */
+export function attempt(func, errors=null) {
+    try {
+        return func();
+    } catch (ex) {
+        if (!_.isNull(errors)) {
+            let found = false;
+            if (_.isPlainObject(errors)) {
+                errors = [errors];
+            }
+
+            _.each(errors, error => {
+                if (ex instanceof error.class) {
+                    error.callback(ex);
+                    found = true;
+                    return false;
+                }
+            });
+
+            if (!found) {
+                throw ex;
+            }
+        }
+        return null;
+    }
+}
+
+/**
  * Convert the given shortcut key binding to a human readable hint.
  *
  * @param {string} shortcut - The shortcut key binding, e.g. "ctrl+s".

@@ -12,7 +12,7 @@ export default class Iterator {
     constructor(source, options={}) {
         this._source = _.clone(source);
 
-        options = _.defaults(options, {
+        options = _.defaults({}, options, {
             cycle: false,
         });
         this._cycle = options.cycle;

@@ -1,11 +1,12 @@
 import ContinuityContext from "calchart/contexts/ContinuityContext";
+import { HiddenContextMixin } from "calchart/contexts/HiddenContext";
 import Continuity from "calchart/Continuity";
 
 /**
  * The context that lets the user select the continuities to run
  * in a two-step continuity.
  */
-export default class TwoStepContext extends ContinuityContext {
+export default class TwoStepContext extends HiddenContextMixin(ContinuityContext) {
     constructor(controller) {
         super(controller);
 
@@ -17,6 +18,17 @@ export default class TwoStepContext extends ContinuityContext {
         return ContextActions;
     }
 
+    static get info() {
+        return {
+            name: "two-step",
+            html: super.info.html,
+        };
+    }
+
+    get panel() {
+        return $(".panel.two-step");
+    }
+
     /**
      * @param {Object} options - Options to customize loading the Context:
      *    - {TwoStepContinuity} continuity - The two-step continuity being edited
@@ -24,72 +36,50 @@ export default class TwoStepContext extends ContinuityContext {
     load(options) {
         super.load(options);
 
-        this._panel.show();
-
         this._continuity = options.continuity;
+
+        this.panel.show();
     }
 
     unload() {
         super.unload();
 
-        this._controller.checkContinuities({
+        this.checkContinuities({
             dots: this._continuity.dotType,
         });
-    }
-
-    /**
-     * Copied from HiddenContext, since TwoStepContext needs to
-     * inherit from ContinuityContext.
-     */
-    loadSheet(sheet) {
-        if (sheet !== this._sheet) {
-            this.exit();
-        } else {
-            super.loadSheet(sheet);
-        }
     }
 
     /**
      * Load continuity context if the user is done with this context.
      */
     exit() {
-        this._controller.loadContext("continuity", {
+        this.controller.loadContext("continuity", {
             dotType: this._continuity.dotType,
         });
     }
 
-    _getPanel() {
-        return $(".panel.two-step");
-    }
-
-    _refreshSheet() {
-        let continuities = this._panel.find(".continuities").empty();
-        this._continuity.continuities.forEach(continuity => {
-            let $continuity = this._getPanelContinuity(continuity);
-            continuities.append($continuity);
-        });
+    refreshPanel() {
+        this._populatePanel(this._continuity.getContinuities());
 
         // select dots in continuity
         let dots = $(`.dot.${this._continuity.dotType}`);
-        this._controller.selectDots(dots);
-
-        // update seek bar
-        let beat = this._controller.getCurrentBeat();
-        let numBeats = this._sheet.getDuration();
-        let position = $(".toolbar .seek").width() / numBeats * beat;
-        $(".toolbar .seek .marker").css("transform", `translateX(${position}px)`);
+        this.selectDots(dots);
     }
+
+    /**** HELPERS ****/
 
     _setupPanel() {
         super._setupPanel();
 
-        this._panel.find("button.submit").click(() => {
+        this.panel.off("click", ".tab");
+
+        this.panel.find("button.submit").click(() => {
             this.exit();
         });
     }
 }
 
-class ContextActions {
+class ContextActions extends ContinuityContext.actions {
     /**
      * Add a continuity of the given type to the two-step continuity.
      *
@@ -99,13 +89,13 @@ class ContextActions {
     static addContinuity(type, twoStep=this._continuity) {
         let continuity = Continuity.create(type, twoStep.sheet, twoStep.dotType);
         twoStep.addContinuity(continuity);
-        this._controller.refresh("context");
+        this.refresh("grapher", "panel");
 
         return {
             data: [type, twoStep],
             undo: function() {
                 twoStep.removeContinuity(continuity);
-                this._controller.refresh("context");
+                this.refresh("grapher", "panel");
             },
         };
     }
@@ -118,13 +108,13 @@ class ContextActions {
      */
     static removeContinuity(continuity, twoStep=this._continuity) {
         twoStep.removeContinuity(continuity);
-        this._controller.refresh("context");
+        this.refresh("grapher", "panel");
 
         return {
             data: [continuity, twoStep],
             undo: function() {
                 twoStep.addContinuity(continuity);
-                this._controller.refresh("context");
+                this.refresh("grapher", "panel");
             },
         };
     }
@@ -138,17 +128,22 @@ class ContextActions {
      * @param {TwoStepContinuity} [twoStep=this._continuity]
      */
     static reorderContinuity(continuity, delta, twoStep=this._continuity) {
-        let success = twoStep.moveContinuity(continuity, delta);
-        if (!success) {
+        let continuities = twoStep.getContinuities();
+        let from = continuities.indexOf(continuity);
+        let to = from + delta;
+
+        if (to < 0 || to >= continuities.length) {
             return false;
         }
-        this._controller.refresh("context");
+
+        twoStep.moveContinuity(from, to);
+        this.refresh("grapher", "panel");
 
         return {
             data: [continuity, delta, twoStep],
             undo: function() {
-                twoStep.moveContinuity(continuity, -delta);
-                this._controller.refresh("context");
+                twoStep.moveContinuity(to, from);
+                this.refresh("grapher", "panel");
             },
         };
     }

@@ -44,18 +44,20 @@ export default class StopContinuity extends BaseContinuity {
             return {
                 type: "mt",
                 name: "Mark Time",
+                label: "MT",
             };
         } else {
             return {
                 type: "close",
                 name: "Close",
+                label: "Close",
             };
         }
     }
 
     getMovements(dot, data) {
         let duration = this._duration;
-        if (_.isNull(this._duration)) {
+        if (_.isNull(duration)) {
             duration = data.remaining;
         }
 
@@ -76,16 +78,12 @@ export default class StopContinuity extends BaseContinuity {
     }
 
     getPanel(controller) {
-        let _this = this;
-
-        let label = HTMLBuilder.span(this.info.type === "close" ? "Close" : "MT");
-
         let numBeats = HTMLBuilder.input({
             type: "number",
             initial: this._duration,
-            change: function() {
-                _this._duration = validatePositive(this);
-                _this._updateMovements(controller);
+            change: e => {
+                this._duration = validatePositive(e.currentTarget);
+                this._updateMovements(controller);
             },
         });
 
@@ -95,22 +93,22 @@ export default class StopContinuity extends BaseContinuity {
                 custom: "Custom",
             },
             initial: _.isNull(this._duration) ? "remaining" : "custom",
-            change: function() {
-                switch ($(this).val()) {
+            change: e => {
+                switch ($(e.currentTarget).val()) {
                     case "custom":
                         numBeats.prop("disabled", false).change();
                         break;
                     case "remaining":
                         numBeats.prop("disabled", true);
-                        _this._duration = null;
-                        _this._updateMovements(controller);
+                        this._duration = null;
+                        this._updateMovements(controller);
                 }
             },
         });
 
         numBeats.prop("disabled", _.isNull(this._duration));
 
-        return [label, duration, numBeats];
+        return [duration, numBeats];
     }
 
     getPopup() {

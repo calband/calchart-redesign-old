@@ -89,7 +89,7 @@ $.fn.dropdown = function(options) {
     if (!this.is(":visible")) {
         defaults.width = this.css("width");
     }
-    options = $.extend(defaults, options);
+    options = _.defaults({}, options, defaults);
 
     // destroy Chosen if exists
     if (this.data("chosen") !== undefined) {
@@ -210,13 +210,14 @@ $.fn.notIn = function(element) {
 /**
  * Capture the pinch gesture on trackpads, which is the same as scrolling
  * with the ctrl key pressed (http://stackoverflow.com/a/28685082/4966649).
+ * Can be unbound by calling $(element).off(".pinch").
  *
  * @param {function(Event)} callback - The callback to run when a pinch is
  *   detected. The event will have deltaY defined, which represents the velocity
  *   of the pinch. A positive deltaY means the pinch is getting wider apart.
  */
 $.fn.pinch = function(callback) {
-    return this.on("wheel", function(e) {
+    return this.on("wheel.pinch", function(e) {
         if (e.ctrlKey) {
             e.deltaY = -e.originalEvent.deltaY;
             callback(e);
@@ -252,7 +253,7 @@ $.fn.removeClassRegex = function(pattern) {
  *     takes in the change in x/y positions.
  */
 $.fn.scrollIntoView = function(options={}) {
-    options = _.defaults(options, {
+    options = _.defaults({}, options, {
         tolerance: 0,
         parent: this.parent(),
     });
@@ -365,7 +366,7 @@ $.fn.scrollTop = function(val) {
  *     of the screen, if the bottom edge of the element goes offscreen.
  */
 $.fn.smartPosition = function(top, left, options={}) {
-    options = _.defaults(options, {
+    options = _.defaults({}, options, {
         offTop: 0,
         offLeft: 0,
         offRight: left,

@@ -11,7 +11,7 @@ export default class FieldGrapher {
      * @param {number} svgWidth - The width of the svg.
      * @param {number} svgHeight - The height of the svg.
      * @param {Object} options - The options to customize drawing the field.
-     *   @see Grapher#setOption.
+     *   See Grapher.setOption for a list of all available options.
      */
     constructor(svg, svgWidth, svgHeight, options) {
         this._svg = svg;
@@ -19,9 +19,8 @@ export default class FieldGrapher {
         this._svgWidth = svgWidth;
         this._svgHeight = svgHeight;
 
-        let padding = _.defaultTo(options.fieldPadding, 30);
-        let paddingWidth = padding;
-        let paddingHeight = padding;
+        let paddingWidth = options.fieldPadding;
+        let paddingHeight = options.fieldPadding;
 
         // expand field to a field and a half in each direction
         if (this._options.expandField) {

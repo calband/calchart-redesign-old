@@ -1,8 +1,6 @@
-import BaseContinuity from "calchart/continuities/BaseContinuity";
 import DiagonalContinuity from "calchart/continuities/DiagonalContinuity";
+import OrderedDotsContinuity from "calchart/continuities/OrderedDotsContinuity";
 import Coordinate from "calchart/Coordinate";
-import Dot from "calchart/Dot";
-import MovementCommandMove from "calchart/movements/MovementCommandMove";
 
 import HTMLBuilder from "utils/HTMLBuilder";
 import Iterator from "utils/Iterator";
@@ -14,12 +12,11 @@ import { setupTooltip, showPopup } from "utils/UIUtils";
  * the path for the first dot is marked. Dots will move to each point using a
  * DMHS continuity.
  */
-export default class FollowLeaderContinuity extends BaseContinuity {
+export default class FollowLeaderContinuity extends OrderedDotsContinuity {
     /**
      * @param {Sheet} sheet
      * @param {DotType} dotType
-     * @param {Dot[]} order - The order of dots in the line. order[0] is the
-     *   first dot in the path.
+     * @param {Dot[]} order
      * @param {Coordinate[]} path - The coordinates for the path of the first dot.
      *   path[0] is the first coordinate to go to.
      * @param {object} [options] - Options for the continuity, including:
@@ -27,26 +24,22 @@ export default class FollowLeaderContinuity extends BaseContinuity {
      *   - {int} beatsPerStep
      */
     constructor(sheet, dotType, order, path, options) {
-        super(sheet, dotType, options);
+        super(sheet, dotType, order, options);
 
-        this._order = order;
         this._path = path;
     }
 
     static deserialize(sheet, dotType, data) {
-        let show = sheet.getShow();
-        let order = data.order.map(dotId => show.getDot(dotId));
+        let order = this.deserializeOrder(sheet, data);
         let path = data.path.map(coordData => Coordinate.deserialize(coordData));
 
         return new FollowLeaderContinuity(sheet, dotType, order, path, data);
     }
 
     serialize() {
-        let order = this._order.map(dot => dot.id);
         let path = this._path.map(coord => coord.serialize());
 
         return super.serialize({
-            order: order,
             path: path,
         });
     }
@@ -55,24 +48,29 @@ export default class FollowLeaderContinuity extends BaseContinuity {
         return {
             type: "ftl",
             name: "Follow the Leader",
+            label: "FTL",
         };
     }
 
-    get order() { return this._order; }
-    get path() { return this._path; }
+    /**** METHODS ****/
+
+    /**
+     * Add the given point to the path at the given index.
+     *
+     * @param {int} index
+     * @param {Coordinate} coordinate
+     */
+    addPoint(index, coordinate) {
+        this._path.splice(index, 0, coordinate);
+    }
 
     getMovements(dot, data) {
-        let index = this._order.indexOf(dot);
-        if (index === -1) {
-            this._order.push(dot);
-            index = this._order.length - 1;
-        }
-
-        let path = this._getPath(index);
+        let index = this.getOrderIndex(dot);
+        let path = this._getPathIterator(index);
 
         path.next();
         let prev = path.get();
-        let lastMove = undefined;
+        let lastMove = null;
         let movements = [];
         let beats = 0;
         let maxDuration = this._getMaxDuration(data);
@@ -95,6 +93,7 @@ export default class FollowLeaderContinuity extends BaseContinuity {
                 if (beats >= maxDuration) {
                     // truncate movement duration
                     move.setDuration(duration + maxDuration - beats);
+
                     // drop all further movements
                     movesToNext = _.take(movesToNext, i + 1);
                 }
@@ -103,7 +102,7 @@ export default class FollowLeaderContinuity extends BaseContinuity {
             movements = movements.concat(movesToNext);
 
             // combine moves if in same direction
-            if (!_.isUndefined(lastMove) && movesToNext.length > 0) {
+            if (lastMove && movesToNext.length > 0) {
                 let currMove = movesToNext[0];
                 let dir1 = lastMove.getDirection();
                 let dir2 = currMove.getDirection();
@@ -123,8 +122,6 @@ export default class FollowLeaderContinuity extends BaseContinuity {
     }
 
     getPanel(controller) {
-        let label = HTMLBuilder.span("FTL");
-
         let editLabel = HTMLBuilder.label("Edit:");
 
         let editDots = HTMLBuilder.icon("ellipsis-h").click(() => {
@@ -141,7 +138,14 @@ export default class FollowLeaderContinuity extends BaseContinuity {
         });
         setupTooltip(editPath, "Path");
 
-        return [label, editLabel, editDots, editPath];
+        return [editLabel, editDots, editPath];
+    }
+
+    /**
+     * @return {Coordinate[]}
+     */
+    getPath() {
+        return this._path;
     }
 
     getPopup() {
@@ -151,18 +155,33 @@ export default class FollowLeaderContinuity extends BaseContinuity {
     }
 
     /**
-     * @param {Dot[]} order - The new order of dots
+     * Remove the point at the given index from the path.
+     *
+     * @param {int} index
+     * @return {Coordinate} The point that was removed.
      */
-    setOrder(order) {
-        this._order = order;
+    removePoint(index) {
+        return this._path.splice(index, 1)[0];
     }
 
     /**
-     * @param {int[]} path - The new path of dots
+     * @param {Coordinate[]} path
      */
     setPath(path) {
         this._path = path;
     }
+
+    /**
+     * Set the point at the given index in the path to the given coordinate.
+     *
+     * @param {int} index
+     * @param {Coordinate} coordinate
+     */
+    setPoint(index, coordinate) {
+        this._path[index] = coordinate;
+    }
+
+    /**** HELPERS ****/
 
     /**
      * Get the path for the dot at the given index to follow. The first
@@ -171,14 +190,13 @@ export default class FollowLeaderContinuity extends BaseContinuity {
      * @param {int} index - The index of the current dot in the order.
      * @return {Iterator<Coordinate>}
      */
-    _getPath(index) {
+    _getPathIterator(index) {
         let path = this._path;
-        let show = this._sheet.getShow();
 
         // add preceding dot positions as reference points
         for (let i = 0; i <= index; i++) {
             let dot = this._order[i];
-            let position = this._sheet.getDotInfo(dot).position;
+            let position = this.sheet.getDotInfo(dot).position;
             path = [position].concat(path);
         }
 

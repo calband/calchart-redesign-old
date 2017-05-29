@@ -61,10 +61,10 @@ export default class Show {
 
         this._dots = dots.map(data => Dot.deserialize(data));
         this._sheets = sheets.map(data => Sheet.deserialize(this, data));
-        this._songs = songs.map(data => Song.deserialize(data));
+        this._songs = songs.map(data => Song.deserialize(this, data));
         this._fieldType = fieldType;
 
-        options = _.defaults(options, {
+        options = _.defaults({}, options, {
             beatsPerStep: 1,
             stepType: "HS",
             orientation: "east",
@@ -131,6 +131,14 @@ export default class Show {
         return data;
     }
 
+    get name() {
+        return this._name;
+    }
+
+    get slug() {
+        return this._slug;
+    }
+
     /**
      * @return {int} The default number of beats per step for the entire show.
      */
@@ -143,13 +151,6 @@ export default class Show {
      */
     getFieldType() {
         return this._fieldType;
-    }
-
-    /**
-     * @return {string}
-     */
-    getName() {
-        return this._name;
     }
 
     /**
@@ -167,16 +168,9 @@ export default class Show {
             case "east":
                 return 0;
             case "west":
-                return 90;
+                return 180;
         }
         throw new Error(`Invalid orientation: ${this._orientation}`);
-    }
-
-    /**
-     * @return {string}
-     */
-    getSlug() {
-        return this._slug;
     }
 
     /**
@@ -190,13 +184,6 @@ export default class Show {
     /**** DOTS ****/
 
     /**
-     * @return {Dot[]} Every Dot in the show.
-     */
-    getDots() {
-        return this._dots;
-    }
-
-    /**
      * Get dot by its ID.
      *
      * @param {int} id - The ID of the dot to get.
@@ -206,14 +193,14 @@ export default class Show {
         return this._dots[id];
     }
 
-    /**** SHEETS ****/
-
     /**
-     * @return {Sheet[]} All stuntsheets in the Show.
+     * @return {Dot[]} Every Dot in the show.
      */
-    getSheets() {
-        return this._sheets;
+    getDots() {
+        return this._dots;
     }
+
+    /**** SHEETS ****/
 
     /**
      * Add a stuntsheet to the show with the given number of beats.
@@ -226,13 +213,30 @@ export default class Show {
         let sheet = Sheet.create(this, index, numBeats, this._dots.length);
 
         this._sheets.push(sheet);
-        this._updateMovements(index - 1);
+        this.updateMovements(index - 1);
 
         return sheet;
     }
 
     /**
-     * Insert the given stuntsheet at the given index.
+     * Get the Sheet at the given index
+     *
+     * @param {number} i
+     * @return {Sheet}
+     */
+    getSheet(i) {
+        return this._sheets[i];
+    }
+
+    /**
+     * @return {Sheet[]} All stuntsheets in the Show.
+     */
+    getSheets() {
+        return this._sheets;
+    }
+
+    /**
+     * Insert the given sheet at the given index.
      *
      * @param {Sheet} sheet
      * @param {int} index
@@ -240,11 +244,11 @@ export default class Show {
     insertSheet(sheet, index) {
         this._sheets.splice(index, 0, sheet);
 
-        _.range(index + 1, this._sheets.length).forEach(i => {
+        _.range(index, this._sheets.length).forEach(i => {
             this._sheets[i].setIndex(i);
         });
 
-        this._updateMovements(index - 1, index);
+        this.updateMovements(index - 1, index);
     }
 
     /**
@@ -260,7 +264,7 @@ export default class Show {
             sheet.setIndex(i);
         });
 
-        this._updateMovements(from - 1, to - 1, to);
+        this.updateMovements(from - 1, to - 1, to);
     }
 
     /**
@@ -276,22 +280,83 @@ export default class Show {
             this._sheets[i].setIndex(i);
         });
 
-        this._updateMovements(i - 1);
+        this.updateMovements(i - 1);
     }
 
     /**
      * Update the movements of the sheets at the given indices.
      *
-     * @param {...int} indices
+     * @param {...int} [indices] - Defaults to all sheets in the show.
      */
-    _updateMovements(...indices) {
+    updateMovements(...indices) {
+        if (indices.length === 0) {
+            indices = _.range(0, this._sheets.length);
+        }
+
         indices.forEach(i => {
-            if (i >= 0) {
-                this._sheets[i].updateMovements();
+            let sheet = this._sheets[i];
+            if (sheet) {
+                sheet.updateMovements();
             }
         });
     }
 
     /**** SONGS ****/
-    // TODO
+
+    /**
+     * Add a song to the Show.
+     *
+     * @param {Song} song
+     */
+    addSong(song) {
+        this._songs.push(song);
+    }
+
+    /**
+     * Get the song with the given name or at the given index.
+     *
+     * @param {(int|string)} param - Either the index of the song
+     *   or the name of the song.
+     * @return {Song}
+     */
+    getSong(param) {
+        if (_.isNumber(param)) {
+            return this._songs[param];
+        } else {
+            return _.find(this._songs, song => song.getName() === param);
+        }
+    }
+
+    /**
+     * Get all songs in the show.
+     *
+     * @return {Song[]}
+     */
+    getSongs() {
+        return this._songs;
+    }
+
+    /**
+     * Move the song at the given index to the specified index.
+     *
+     * @param {int} from - The index of the song to move.
+     * @param {int} to - The index to move to.
+     */
+    moveSong(from, to) {
+        moveElem(this._songs, from, to);
+    }
+
+    /**
+     * Remove a song from the Show.
+     *
+     * @param {Song} song
+     */
+    removeSong(song) {
+        song.getSheets().forEach(sheet => {
+            sheet.setSong(null);
+            sheet.updateMovements();
+        });
+
+        _.pull(this._songs, song);
+    }
 }

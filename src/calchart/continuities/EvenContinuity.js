@@ -19,7 +19,7 @@ export default class EvenContinuity extends BaseContinuity {
      *     direction of travel
      */
     constructor(sheet, dotType, options={}) {
-        options = _.defaults(options, {
+        options = _.defaults({}, options, {
             orientation: "",
         });
 
@@ -34,34 +34,31 @@ export default class EvenContinuity extends BaseContinuity {
         return {
             type: "even",
             name: "Even",
+            label: "Even",
         };
     }
 
     getMovements(dot, data) {
-        let nextSheet = this._sheet.getNextSheet();
-        if (_.isNull(nextSheet)) {
+        let start = data.position;
+        let end = this._getNextPosition(dot);
+        if (_.isNull(end)) {
             return [];
         }
-        let end = nextSheet.getPosition(dot);
+
         let options = {
             orientation: this.getOrientationDegrees(),
             beatsPerStep: this.getBeatsPerStep(),
         };
 
         let move = new MovementCommandEven(
-            data.position.x,
-            data.position.y,
+            start.x,
+            start.y,
             end.x,
             end.y,
             data.remaining,
             options
         );
         return [move];
-    }
-
-    getPanel(controller) {
-        let label = HTMLBuilder.span("Even");
-        return [label];
     }
 
     getPopup() {

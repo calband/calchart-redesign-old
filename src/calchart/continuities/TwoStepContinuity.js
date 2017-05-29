@@ -1,4 +1,4 @@
-import BaseContinuity from "calchart/continuities/BaseContinuity";
+import OrderedDotsContinuity from "calchart/continuities/OrderedDotsContinuity";
 import Continuity from "calchart/Continuity";
 import MovementCommandMove from "calchart/movements/MovementCommandMove";
 import MovementCommandStop from "calchart/movements/MovementCommandStop";
@@ -11,12 +11,11 @@ import { setupTooltip } from "utils/UIUtils";
  * A two step continuity, where each dot in a line does a given set of
  * continuities 2 beats after the previous dot.
  */
-export default class TwoStepContinuity extends BaseContinuity {
+export default class TwoStepContinuity extends OrderedDotsContinuity {
     /**
      * @param {Sheet} sheet
      * @param {DotType} dotType
-     * @param {Dot[]} order - The order of dots in the line. order[0] is the first
-     *   dot in the path.
+     * @param {Dot[]} order
      * @param {Continuity[]} continuities - The continuities each dot should execute
      *   after waiting the appropriate amount of time.
      * @param {object} [options] - Options for the continuity, including:
@@ -26,20 +25,18 @@ export default class TwoStepContinuity extends BaseContinuity {
      *   - {boolean} [isMarktime=true] - true if mark time during step two, false for close
      */
     constructor(sheet, dotType, order, continuities, options) {
-        super(sheet, dotType, options);
+        super(sheet, dotType, order, options);
 
-        options = _.defaults(options, {
+        options = _.defaults({}, options, {
             isMarktime: true,
         });
 
-        this._order = order;
         this._continuities = continuities;
         this._isMarktime = options.isMarktime;
     }
 
     static deserialize(sheet, dotType, data) {
-        let show = sheet.getShow();
-        let order = data.order.map(dotId => show.getDot(dotId));
+        let order = this.deserializeOrder(sheet, data);
         let continuities = data.continuities.map(
             continuity => Continuity.deserialize(sheet, dotType, continuity)
         );
@@ -47,10 +44,8 @@ export default class TwoStepContinuity extends BaseContinuity {
     }
 
     serialize() {
-        let order = this._order.map(dot => dot.id);
         let continuities = this._continuities.map(continuity => continuity.serialize());
         return super.serialize({
-            order: order,
             continuities: continuities,
             isMarktime: this._isMarktime,
         });
@@ -60,20 +55,37 @@ export default class TwoStepContinuity extends BaseContinuity {
         return {
             type: "two",
             name: "Two Step",
+            label: "2-Step",
         };
     }
 
-    get continuities() { return this._continuities; }
-    get order() { return this._order; }
+    /**** METHODS ****/
+
+    clone(key, val) {
+        switch (key) {
+            case "_continuities":
+                return val.map(continuity =>
+                    _.cloneDeepWith(continuity, (val, key) => continuity.clone(key, val))
+                );
+        }
+        return super.clone(key, val);
+    }
 
     /**
-     * Add the given continuity to the two-step drill.
+     * Add the given continuity to the step-two drill.
      *
      * @param {Continuity} continuity
      */
     addContinuity(continuity) {
         this._continuities.push(continuity);
-        this._sheet.updateMovements(this._dotType);
+        this.sheet.updateMovements(this.dotType);
+    }
+
+    /**
+     * @return {Continuity[]}
+     */
+    getContinuities() {
+        return this._continuities;
     }
 
     getMovements(dot, data) {
@@ -81,7 +93,8 @@ export default class TwoStepContinuity extends BaseContinuity {
         let options = {
             beatsPerStep: this.getBeatsPerStep(),
         };
-        let wait = this._order.indexOf(dot) * 2;
+        let wait = this.getOrderIndex(dot) * 2;
+
         let stop = new MovementCommandStop(
             data.position.x,
             data.position.y,
@@ -91,44 +104,26 @@ export default class TwoStepContinuity extends BaseContinuity {
             options
         );
 
-        data.remaining -= stop.getDuration();
-
-        // copied from Sheet.updateMovements
-        let movements = _.flatMap(this._continuities, continuity => {
-            let moves = continuity.getMovements(dot, _.clone(data));
-            moves.forEach(movement => {
-                data.position = movement.getEndPosition();
-                data.remaining -= movement.getDuration();
-            });
-            return moves;
-        });
+        let movements = this.constructor.buildMovements(
+            this._continuities, dot, data.position, data.remaining - wait
+        );
 
         return [stop].concat(movements);
     }
 
     /**
-     * Move the given continuity by the given amount in the two-step drill.
+     * Move the continuity at the given index in the step-two drill
+     * to the specified index.
      *
-     * @param {Continuity} continuity
-     * @param {int} delta
-     * @return {boolean} true if successful
+     * @param {int} from
+     * @param {int} to
      */
-    moveContinuity(continuity, delta) {
-        let index = this._continuities.indexOf(continuity);
-        let newIndex = index + delta;
-        
-        if (newIndex < 0 || newIndex >= continuities.length) {
-            return false;
-        }
-
-        moveElem(this._continuities, index, newIndex);
-        this._sheet.updateMovements(this._dotType);
-        return true;
+    moveContinuity(from, to) {
+        moveElem(this._continuities, from, to);
+        this.sheet.updateMovements(this.dotType);
     }
 
     getPanel(controller) {
-        let label = HTMLBuilder.span("2-Step");
-
         let editLabel = HTMLBuilder.label("Edit:");
 
         let editDots = HTMLBuilder.icon("ellipsis-h").click(() => {
@@ -145,7 +140,7 @@ export default class TwoStepContinuity extends BaseContinuity {
         });
         setupTooltip(editContinuities, "Continuities");
 
-        return [label, editLabel, editDots, editContinuities];
+        return [editLabel, editDots, editContinuities];
     }
 
     getPopup() {
@@ -160,19 +155,12 @@ export default class TwoStepContinuity extends BaseContinuity {
     }
 
     /**
-     * Remove the given continuity from the two-step drill.
+     * Remove the given continuity from the step-two drill.
      *
      * @param {Continuity} continuity
      */
     removeContinuity(continuity) {
         _.pull(this._continuities, continuity);
-        this._sheet.updateMovements(this._dotType);
-    }
-
-    /**
-     * @param {Dot[]} order - The new order of dots
-     */
-    setOrder(order) {
-        this._order = order;
+        this.sheet.updateMovements(this.dotType);
     }
 }

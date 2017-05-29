@@ -1,6 +1,7 @@
 import AnimationState from "calchart/AnimationState";
 import Coordinate from "calchart/Coordinate";
 import Continuity from "calchart/Continuity";
+import TwoStepContinuity from "calchart/continuities/TwoStepContinuity";
 import Dot from "calchart/Dot";
 import DotType from "calchart/DotType";
 import MovementCommand from "calchart/MovementCommand";
@@ -28,24 +29,26 @@ export default class Sheet {
      * @param {int} numBeats - The number of beats in the stuntsheet.
      * @param {Object} [options] - Optional information about a stuntsheet, such as:
      *   - {string} label - A label for the Sheet.
+     *   - {?string} song - The name of the song this sheet is a part of.
      *   - {string} [background] - The URL for the background image (or undefined)
      *   - {string} fieldType - The field type, or "default" to use the same field
-     *     type as the Show.
+     *     type as the associated song/show.
      *   - {(int|string)} beatsPerStep - The default number of beats per step for
      *       continuities in the Sheet, or "default" to get the number of beats per
-     *       step from the Show.
+     *       step from the associated song/show.
      *   - {string} orientation - The default orientation for continuities in the
-     *       Sheet, or "default" to get the orientation from the Show.
+     *       Sheet, or "default" to get the orientation from the associated song/show.
      *   - {string} stepType - The default step type for continuities in the Sheet,
-     *       or "default" to get the step type from the Show.
+     *       or "default" to get the step type from the associated song/show.
      */
     constructor(show, index, numBeats, options) {
         this._show = show;
         this._index = index;
         this._numBeats = numBeats;
 
-        options = _.defaults(options, {
+        options = _.defaults({}, options, {
             label: null,
+            song: null,
             background: undefined,
             fieldType: "default",
             beatsPerStep: "default",
@@ -59,6 +62,9 @@ export default class Sheet {
         this._beatsPerStep = options.beatsPerStep;
         this._orientation = options.orientation;
         this._stepType = options.stepType;
+
+        // {?string} the name of the song
+        this._song = options.song;
 
         // @type {Object[]} see Sheet.getDotInfo
         this._dots = [];
@@ -140,6 +146,7 @@ export default class Sheet {
 
         data.options = {
             label: this._label,
+            song: this._song,
             background: this._background,
             fieldType: this._fieldType,
             beatsPerStep: this._beatsPerStep,
@@ -170,6 +177,21 @@ export default class Sheet {
     get label() { return this._label; }
     get orientation() { return this._orientation; }
     get stepType() { return this._stepType; }
+
+    /**
+     * Get the parent of this Sheet for resolving defaults.
+     *
+     * @return {(Song|Show)}
+     */
+    get parent() {
+        return _.defaultTo(this.getSong(), this.show);
+    }
+
+    get show() {
+        return this._show;
+    }
+
+    /**** METHODS ****/
 
     /**
      * Add the given continuity to the given dot type.
@@ -208,17 +230,41 @@ export default class Sheet {
      * @return {Sheet}
      */
     clone() {
-        // dont clone show
-        let show = this._show;
-        this._show = null;
+        let allContinuities = [];
 
-        let sheet = _.cloneDeep(this);
-        this._show = show;
+        let clone = _.cloneDeepWith(this, (val, key) => {
+            switch (key) {
+                // make sure to not clone foreign keys
+                case "_show":
+                case "_song":
+                    return val;
+                case "_continuities":
+                    let dotContinuities = {};
+                    _.each(val, (continuities, dotType) => {
+                        dotContinuities[dotType] = continuities.map(continuity => {
+                            let clone = _.cloneDeepWith(continuity,
+                                (val, key) => continuity.clone(key, val)
+                            );
 
-        sheet._show = show;
-        sheet._index = undefined;
+                            allContinuities.push(clone);
+                            if (clone instanceof TwoStepContinuity) {
+                                let nested = clone.getContinuities();
+                                allContinuities = allContinuities.concat(nested);
+                            }
 
-        return sheet;
+                            return clone
+                        });
+                    })
+                    return dotContinuities;
+            }
+        });
+
+        // manually set the sheet of all continuities
+        allContinuities.forEach(continuity => {
+            continuity.setSheet(clone);
+        });
+
+        return clone;
     }
 
     /**
@@ -275,7 +321,7 @@ export default class Sheet {
      * @return {int}
      */
     getBeatsPerStep() {
-        return this._beatsPerStep === "default" ? this._show.getBeatsPerStep() : this._beatsPerStep;
+        return this._beatsPerStep === "default" ? this.parent.getBeatsPerStep() : this._beatsPerStep;
     }
 
     /**
@@ -287,7 +333,7 @@ export default class Sheet {
     getCollisions(beatNum) {
         return mapSome(this._dots, (info, id) => {
             if (info.collisions.has(beatNum)) {
-                return this._show.getDot(id);
+                return this.show.getDot(id);
             }
         });
     }
@@ -324,11 +370,11 @@ export default class Sheet {
      */
     getDotsOfType(dotType) {
         if (DotType.isAll(dotType)) {
-            return this._show.getDots();
+            return this.show.getDots();
         } else {
             return mapSome(this._dots, (info, i) => {
                 if (info.type === dotType) {
-                    return this._show.getDot(i);
+                    return this.show.getDot(i);
                 }
             });
         }
@@ -365,11 +411,10 @@ export default class Sheet {
     }
 
     /**
-     * @return {string} The field type for the stuntsheet, defaulting to the field
-     *   type of the Show.
+     * @return {string} The field type for the stuntsheet, resolving any defaults.
      */
     getFieldType() {
-        return this._fieldType === "default" ? this._show.getFieldType() : this._fieldType;
+        return this._fieldType === "default" ? this.parent.getFieldType() : this._fieldType;
     }
 
     /**
@@ -406,17 +451,16 @@ export default class Sheet {
      *   is the last sheet.
      */
     getNextSheet() {
-        return this._show.getSheets()[this._index + 1] || null;
+        return this.show.getSheet(this._index + 1) || null;
     }
 
     /**
-     * @return {int} The sheet's orientation, defaulting to the Show's orientation, in
-     *   Calchart degrees.
+     * @return {int} The sheet's orientation in Calchart degrees, resolving any defaults.
      */
     getOrientationDegrees() {
         switch (this._orientation) {
             case "default":
-                return this._show.getOrientationDegrees();
+                return this.parent.getOrientationDegrees();
             case "east":
                 return 0;
             case "west":
@@ -440,22 +484,25 @@ export default class Sheet {
      *   this is the first sheet.
      */
     getPrevSheet() {
-        return this._show.getSheets()[this._index - 1] || null;
+        return this.show.getSheet(this._index - 1) || null;
     }
 
     /**
-     * @return {Show}
+     * @return {?Song}
      */
-    getShow() {
-        return this._show;
+    getSong() {
+        if (this._song) {
+            return this.show.getSong(this._song);
+        } else {
+            return null;
+        }
     }
 
     /**
-     * @return {string} The sheet's step type, defaulting to the show's step type.
-     *   (@see CalchartUtils.STEP_TYPES)
+     * @return {string} The sheet's step type, resolving any defaults. (@see CalchartUtils.STEP_TYPES)
      */
     getStepType() {
-        return this._stepType === "default" ? this._show.getStepType() : this._stepType;
+        return this._stepType === "default" ? this.parent.getStepType() : this._stepType;
     }
 
     /**
@@ -469,7 +516,7 @@ export default class Sheet {
      * @return {boolean} true if this Sheet is the last sheet in the Show.
      */
     isLastSheet() {
-        return this._index === this._show.getSheets().length - 1;
+        return this._index === this.show.getSheets().length - 1;
     }
 
     /**
@@ -561,6 +608,41 @@ export default class Sheet {
     }
 
     /**
+     * Set the position of the given Dot.
+     *
+     * @param {Dot} dot
+     * @param {int} x - The x-coordinate of the new position, in steps.
+     * @param {int} y - The y-coordinate of the new position, in steps.
+     */
+    setPosition(dot, x, y) {
+        this.getDotInfo(dot).position = new Coordinate(x, y);
+    }
+
+    /**
+     * Set the song of this Sheet.
+     *
+     * @param {?Song} song - The song to set. Null if unset a song from the Sheet.
+     */
+    setSong(song) {
+        this._song = song;
+    }
+
+    /**
+     * Swap the positions of the two given dots.
+     *
+     * @param {Dot} dot1
+     * @param {Dot} dot2
+     */
+    swapDots(dot1, dot2) {
+        let info1 = this.getDotInfo(dot1);
+        let info2 = this.getDotInfo(dot2);
+
+        let temp = info1.position;
+        info1.position = info2.position;
+        info2.position = temp;
+    }
+
+    /**
      * Update the movements for the given dots.
      *
      * @param {(string|Dot|Dot[])} [dots] - The dots to update movements for, as
@@ -570,7 +652,7 @@ export default class Sheet {
         if (_.isString(dots)) {
             dots = this.getDotsOfType(dots);
         } else if (_.isUndefined(dots)) {
-            dots = this._show.getDots();
+            dots = this.show.getDots();
         } else if (dots instanceof Dot) {
             dots = [dots];
         }
@@ -585,24 +667,14 @@ export default class Sheet {
             // continuities for all dot types
             continuities = allBefore.concat(continuities).concat(allAfter);
 
-            let data = {
-                position: info.position,
-                remaining: this._numBeats,
-            };
-
-            info.movements = _.flatMap(continuities, continuity => {
-                let moves = continuity.getMovements(dot, _.clone(data));
-                moves.forEach(movement => {
-                    data.position = movement.getEndPosition();
-                    data.remaining -= movement.getDuration();
-                });
-                return moves;
-            });
+            info.movements = Continuity.buildMovements(
+                continuities, dot, info.position, this._numBeats
+            );
         });
 
         // update collisions
         runAsync(() => {
-            let allDots = this._show.getDots();
+            let allDots = this.show.getDots();
             this._dots.forEach(info => info.collisions.clear());
 
             for (let beat = 0; beat < this._numBeats; beat++) {
@@ -629,18 +701,5 @@ export default class Sheet {
                 }
             }
         });
-    }
-
-    /**
-     * Update the position of the given Dot.
-     *
-     * @param {Dot} dot
-     * @param {int} x - The x-coordinate of the new position, in steps.
-     * @param {int} y - The y-coordinate of the new position, in steps.
-     */
-    updatePosition(dot, x, y) {
-        let coordinate = this.getDotInfo(dot).position;
-        coordinate.x = x;
-        coordinate.y = y;
     }
 }

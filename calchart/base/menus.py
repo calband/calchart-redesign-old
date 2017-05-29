@@ -41,7 +41,7 @@ class SubMenu(object):
     """
     A Calchart SubMenu, in the format
 
-    <li>
+    <li class="menu-item">
         <i class="icon-{{ icon }}"></i>
         {{ name }}
         <div class="controller-menu submenu">
@@ -66,8 +66,8 @@ class SubMenu(object):
 
         menu_groups = mark_safe(''.join(self.render_group(group) for group in self.groups))
         return format_html(
-            '<li>{}{}<div class="controller-menu submenu">{}</div></li>',
-            icon, self.name, menu_groups
+            '<li class="{}">{}{}<div class="controller-menu submenu">{}</div></li>',
+            self._get_classes(), icon, self.name, menu_groups
         )
 
     def render_group(self, group):
@@ -76,21 +76,46 @@ class SubMenu(object):
             mark_safe(''.join(menu_item.render() for menu_item in group))
         )
 
+    def _get_classes(self):
+        return 'menu-item'
+
+class SubMenuContext(SubMenu):
+    """
+    A Calchart SubMenuContext, in the format
+
+    <li class="menu-item disabled {{ context }}-group">
+        <i class="icon-{{ icon }}"></i>
+        {{ name }}
+        <div class="controller-menu submenu">
+            # for each group
+            <ul class="menu-group">
+                # for each menu item, either SubMenu or MenuItem
+                {{ item.render }}
+            </ul>
+        </div>
+    </li>
+    """
+    def __init__(self, context, *args, **kwargs):
+        self.context = context
+        super().__init__(*args, **kwargs)
+
+    def _get_classes(self):
+        classes = super()._get_classes()
+        return f'{classes} disabled {self.context}-group'
+
 class MenuItem(object):
     """
     A Calchart MenuItem, in the format
 
-    <li data-action="{{ action }}" class="menu-item {{ classes }} {{ disabled }}">
+    <li data-action="{{ action }}" class="menu-item">
         <i class="icon-{{ icon }}"></i>
         {{ name }}
     </li>
     """
-    def __init__(self, name, action, icon=None, classes=None, disabled=False):
+    def __init__(self, name, action, icon=None):
         self.name = name
         self.action = action
         self.icon = icon
-        self.classes = classes
-        self.disabled = disabled
 
     def render(self):
         if self.icon is None:
@@ -98,12 +123,30 @@ class MenuItem(object):
         else:
             icon = format_html('<i class="icon-{}"></i>', self.icon)
 
-        disabled = 'disabled' if self.disabled else ''
-
         return format_html(
-            '<li data-action="{}" class="menu-item {} {}">{}{}</li>',
-            self.action, self.classes, disabled, icon, self.name
+            '<li data-action="{}" class="{}">{}{}</li>',
+            self.action, self._get_classes(), icon, self.name
         )
+
+    def _get_classes(self):
+        return 'menu-item'
+
+class MenuContextItem(MenuItem):
+    """
+    A Calchart MenuContextItem, in the format
+
+    <li data-action="{{ action }}" class="menu-item disabled {{ context }}-group">
+        <i class="icon-{{ icon }}"></i>
+        {{ name }}
+    </li>
+    """
+    def __init__(self, context, *args, **kwargs):
+        self.context = context
+        super().__init__(*args, **kwargs)
+
+    def _get_classes(self):
+        classes = super()._get_classes()
+        return f'{classes} disabled {self.context}-group'
 
 class Toolbar(object):
     """
@@ -127,14 +170,13 @@ class ToolbarGroup(object):
     """
     A Calchart ToolbarGroup, in the format
 
-    <ul class="toolbar-group {{ kwargs.classes }}">
+    <ul class="toolbar-group">
         # for each item
         {{ ToolbarItem.render }}
     </ul>
     """
-    def __init__(self, *items, **kwargs):
+    def __init__(self, *items):
         self.items = collapse(items)
-        self.classes = kwargs.get('classes', '')
 
     def render(self):
         return format_html(
@@ -143,26 +185,26 @@ class ToolbarGroup(object):
         )
 
     def _get_classes(self):
-        return f'toolbar-group {self.classes}'
+        return 'toolbar-group'
 
 class ToolbarContextGroup(ToolbarGroup):
     """
     A Calchart ToolbarContextGroup, in the format
 
-    <ul class="toolbar-group hide {{ name }}-group">
+    <ul class="toolbar-group hide {{ context }}-group">
         # for each item
         {{ ToolbarItem.render }}
     </ul>
     """
-    def __init__(self, name, *items, **kwargs):
+    def __init__(self, context, *items, **kwargs):
         items = collapse(items)
 
         super().__init__(*items, **kwargs)
-        self.name = name
+        self.context = context
 
     def _get_classes(self):
         classes = super()._get_classes()
-        return f'{classes} hide {self.name}-group'
+        return f'{classes} hide {self.context}-group'
 
 class ToolbarItem(object):
     """
@@ -252,7 +294,7 @@ class ChoiceToolbarItem(CustomToolbarItem):
 
 editor_menu = Menu(
     SubMenu('File', [
-        MenuItem('New stuntsheet', 'addStuntsheet', icon='file-o'),
+        MenuContextItem('graph-context', 'New stuntsheet', 'addStuntsheet', icon='file-o'),
         MenuItem('Rename show', 'promptRename'),
         MenuItem('Save', 'saveShow', icon='floppy-o'),
         MenuItem('Generate PDF', 'generatePoopsheet', icon='file-pdf-o'),
@@ -267,16 +309,16 @@ editor_menu = Menu(
     ]),
     SubMenu('View', [
         SubMenu('View mode', [
-            # MenuItem('Music editor', 'loadContext(music)', icon='music'),
+            MenuItem('Music editor', 'loadContext(music)', icon='music'),
             MenuItem('Dot editor', 'loadContext(dot)', icon='dot-circle-o'),
             MenuItem('Continuity editor', 'loadContext(continuity)', icon='pencil-square-o'),
             # MenuItem('3D View', 'loadContext(3d)'),
         ]),
-        MenuItem('Toggle sheet background', 'toggleBackground', classes='toggle-background', disabled=True),
+        MenuContextItem('edit-dots', 'Toggle sheet background', 'toggleBackground'),
     ], [
-        SubMenu('Zoom', [
-            MenuItem('Zoom in', 'zoomIn', icon='search-plus'),
-            MenuItem('Zoom out', 'zoomOut', icon='search-minus'),
+        SubMenuContext('graph-context', 'Zoom', [
+            MenuItem('Zoom in', 'zoom(0.1)', icon='search-plus'),
+            MenuItem('Zoom out', 'zoom(-0.1)', icon='search-minus'),
         ], [
             MenuItem(label, f'zoomTo({zoom})')
             for zoom, label in ZOOMS
@@ -289,12 +331,13 @@ editor_menu = Menu(
 
 editor_toolbar = Toolbar(
     ToolbarGroup(
-        ToolbarItem('Add Stuntsheet', 'file-o', 'addStuntsheet'),
-    ),
-    ToolbarGroup(
-        # ToolbarItem('Edit Music', 'music', 'loadContext(music)'),
+        ToolbarItem('Edit Music', 'music', 'loadContext(music)'),
         ToolbarItem('Edit Dots', 'dot-circle-o', 'loadContext(dot)'),
         ToolbarItem('Edit Continuity', 'pencil-square-o', 'loadContext(continuity)'),
+    ),
+    ToolbarContextGroup(
+        'graph-context',
+        ToolbarItem('Add Stuntsheet', 'file-o', 'addStuntsheet'),
     ),
     ToolbarContextGroup(
         'edit-dots',
@@ -306,7 +349,6 @@ editor_toolbar = Toolbar(
         ToolbarItem('Arc', 'arc', 'loadTool(arc)'),
         ToolbarItem('Block', 'rectangle', 'loadTool(block)'),
         ToolbarItem('Circle', 'circle-o', 'loadTool(circle)'),
-        classes='edit-tools',
     ),
     ToolbarContextGroup(
         'edit-dots',
@@ -334,5 +376,9 @@ editor_toolbar = Toolbar(
     ToolbarContextGroup(
         'gate-reference',
         ToolbarItem('Save', 'check', 'exit'),
+    ),
+    ToolbarContextGroup(
+        'edit-music',
+        ToolbarItem('Add Song', 'file-o', 'showAddSong'),
     ),
 )

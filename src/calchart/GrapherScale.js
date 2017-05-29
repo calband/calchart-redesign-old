@@ -54,48 +54,79 @@ export default class GrapherScale {
     get yScale() { return this._yScale; }
 
     /**
-     * Get the scaled distance for the given number of steps.
+     * Convert the input into distance. If the input is a number, return
+     * the scaled distance for the given number of steps. If the input
+     * is a Coordinate-like object, convert the coordinate from steps to
+     * distance.
+     *
+     * @param {(number|Coordinate)} steps
+     * @return {(number|Coordinate)}
+     */
+    toDistance(steps) {
+        if (_.isNumber(steps)) {
+            return steps * this._ratio;
+        } else {
+            let x = this.toDistanceX(steps.x);
+            let y = this.toDistanceY(steps.y);
+            return new Coordinate(x, y);
+        }
+    }
+
+    /**
+     * Convert the given x-coordinate from steps to distance.
      *
      * @param {number} steps
      * @return {number}
      */
-    toDistance(steps) {
-        return this._ratio * steps;
+    toDistanceX(steps) {
+        return this.toDistance(steps) + this.minX;
     }
 
     /**
-     * Get the number of steps for the given distance.
+     * Convert the given y-coordinate from steps to distance.
+     *
+     * @param {number} steps
+     * @return {number}
+     */
+    toDistanceY(steps) {
+        return this.toDistance(steps) + this.minY;
+    }
+
+    /**
+     * Convert the input into steps. If the input is a number, return
+     * the number of steps for the given distance. If the input is a
+     * Coordinate-like object, convert the coordinate from distance to steps.
+     *
+     * @param {(number|Coordinate)} distance
+     * @return {(number|Coordinate)}
+     */
+    toSteps(distance) {
+        if (_.isNumber(distance)) {
+            return distance / this._ratio;
+        } else {
+            let x = this.toStepsX(distance.x);
+            let y = this.toStepsY(distance.y);
+            return new Coordinate(x, y);
+        }
+    }
+
+    /**
+     * Convert the given x-coordinate from distance to steps.
      *
      * @param {number} distance
      * @return {number}
      */
-    toSteps(distance) {
-        return distance / this._ratio;
+    toStepsX(distance) {
+        return this.toSteps(distance - this.minX);
     }
 
     /**
-     * Convert the given coordinate from steps to distance.
+     * Convert the given y-coordinate from distance to steps.
      *
-     * @param {(Coordinate|Object)} steps - The coordinate to convert, either
-     *   a Coordinate object or an object that has x and y defined.
-     * @return {Coordinate}
+     * @param {number} distance
+     * @return {number}
      */
-    toDistanceCoordinates(steps) {
-        let x = this.toDistance(steps.x) + this.minX;
-        let y = this.toDistance(steps.y) + this.minY;
-        return new Coordinate(x, y);
-    }
-
-    /**
-     * Convert the given coordinate from distance to steps.
-     *
-     * @param {(Coordinate|Object)} distance - The coordinate to convert, either
-     *   a Coordinate object or an object that has x and y defined.
-     * @return {Coordinate}
-     */
-    toStepCoordinates(distance) {
-        let x = this.toSteps(distance.x - this.minX);
-        let y = this.toSteps(distance.y - this.minY);
-        return new Coordinate(x, y);
+    toStepsY(distance) {
+        return this.toSteps(distance - this.minY);
     }
 }

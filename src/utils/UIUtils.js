@@ -13,7 +13,7 @@
 
 import { ValidationError } from "utils/errors";
 import HTMLBuilder from "utils/HTMLBuilder";
-import { convertShortcut } from "utils/JSUtils";
+import { attempt, convertShortcut } from "utils/JSUtils";
 
 /**** FORMS ****/
 
@@ -295,7 +295,7 @@ export function setupToolbar(toolbar) {
 export function setupTooltip(selector, label) {
     let tooltipTimeout = null;
     let tooltip = HTMLBuilder.span("", "tooltip").html(label);
-    let arrow = HTMLBuilder.make("span.tooltip-arrow", tooltip);
+    let arrow = HTMLBuilder.make("span.tooltip-arrow").appendTo(tooltip);
 
     $(selector)
         .mouseenter(function() {
@@ -347,7 +347,7 @@ export function showContextMenu(e, items) {
     // close any existing menus
     closeMenus();
     parents.lockScroll();
-    let menu = HTMLBuilder.make("ul.context-menu", "body");
+    let menu = HTMLBuilder.make("ul.context-menu").appendTo("body");
 
     // recursively setup menu items
     function makeMenu(parent, items) {
@@ -486,15 +486,15 @@ export function showPopup(name, options={}) {
             e.preventDefault();
 
             if (!_.isUndefined(options.onSubmit)) {
-                try {
-                    options.onSubmit(popup);
-                } catch (e) {
-                    if (e instanceof ValidationError) {
-                        showError(e.message);
-                        return;
-                    } else {
-                        throw e;
-                    }
+                let result = attempt(() => options.onSubmit(popup), {
+                    class: ValidationError,
+                    callback: ex => {
+                        showError(ex.message);
+                    },
+                });
+
+                if (_.isNull(result)) {
+                    return;
                 }
             }
 
@@ -567,14 +567,14 @@ export function hidePopup() {
  *   the message after a given time.
  */
 export function showMessage(message, options={}) {
-    options = _.defaults(options, {
+    options = _.defaults({}, options, {
         isError: false,
     });
     options.autohide = _.defaultTo(options.autohide, !options.isError);
 
     let container = $("ul.messages");
     if (!container.exists()) {
-        container = HTMLBuilder.make("ul.messages", "body");
+        container = HTMLBuilder.make("ul.messages").appendTo("body");
     }
 
     let li = HTMLBuilder.li(message, "message").appendTo(container);
@@ -652,7 +652,7 @@ export function addHandles(container) {
 }
 
 /**
- * Get the data needed to resize an element using a handle.
+ * Get the data needed to resize an element in a GraphContext using a handle.
  *
  * @param {int} handle - The ID of the handle being used.
  * @param {object} start - An object containing the starting data of the
@@ -681,7 +681,7 @@ export function resizeHandles(handle, start, end) {
         startHeight *= -1;
     }
 
-    let [endX, endY] = $(".workspace").makeRelative(end.pageX, end.pageY);
+    let [endX, endY] = $(".graph-workspace").makeRelative(end.pageX, end.pageY);
     let deltaX = endX - startX;
     let deltaY = endY - startY;
 
@@ -690,7 +690,7 @@ export function resizeHandles(handle, start, end) {
         if (handle % 8 !== 0) {
             ratio *= -1;
         }
-        if (deltaX > deltaY * ratio) {
+        if (deltaX < deltaY * ratio) {
             deltaX = deltaY * ratio;
         } else {
             deltaY = deltaX / ratio;

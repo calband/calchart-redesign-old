@@ -1,4 +1,4 @@
-import BaseContext from "calchart/contexts/BaseContext";
+import GraphContext from "calchart/contexts/GraphContext";
 import Continuity from "calchart/Continuity";
 import DotType from "calchart/DotType";
 
@@ -16,24 +16,40 @@ import {
  * The Context that allows a user to edit continuities for dot types
  * and step through marching a Sheet.
  */
-export default class ContinuityContext extends BaseContext {
+export default class ContinuityContext extends GraphContext {
     constructor(controller) {
         super(controller);
 
-        this._panel = this._getPanel();
-
         // the currently active dot type
         this._dotType = null;
+
+        // track the current beat
+        this._currBeat = 0;
 
         this._setupPanel();
     }
 
     static get shortcuts() {
-        return ContextShortcuts;
+        return _.extend({}, super.shortcuts, ContextShortcuts);
     }
 
     static get actions() {
         return ContextActions;
+    }
+
+    static get info() {
+        return {
+            name: "continuity",
+            html: "edit-continuity",
+        };
+    }
+
+    static get refreshTargets() {
+        return super.refreshTargets.concat(["panel"]);
+    }
+
+    get panel() {
+        return $(".panel.edit-continuity");
     }
 
     /**
@@ -43,10 +59,10 @@ export default class ContinuityContext extends BaseContext {
     load(options) {
         super.load(options);
 
-        this._panel.show();
+        this.panel.show();
         this._dotType = _.defaultTo(options.dotType, null);
 
-        this._addEvents(".workspace", {
+        this._addEvents(this.workspace, {
             contextmenu: function(e) {
                 showContextMenu(e, {
                     "Edit dots...": "loadContext(dot)",
@@ -56,17 +72,14 @@ export default class ContinuityContext extends BaseContext {
                         "Next beat": "nextBeat",
                         "Last beat": "lastBeat",
                     },
-                    "Check Continuities...": "checkContinuities(message=true)",
+                    "Check Continuities...": "checkContinuities(fullCheck=true)",
                 });
             },
         });
 
-        this._grapher.setOptions({
+        this.grapher.setOptions({
             showCollisions: true,
         });
-        
-        $(".toolbar .edit-continuity").addClass("active");
-        $(".toolbar .edit-continuity-group").removeClass("hide");
 
         this._setupSeek();
     }
@@ -74,26 +87,70 @@ export default class ContinuityContext extends BaseContext {
     unload() {
         super.unload();
 
-        this._panel.hide();
-        this._controller.setBeat(0);
-        this._controller.deselectDots();
+        this.panel.hide();
+        this.deselectDots();
 
-        this._grapher.setOptions({
+        this.grapher.setOptions({
             showCollisions: false,
         });
-
-        $(".toolbar .edit-continuity").removeClass("active");
-        $(".toolbar .edit-continuity-group").addClass("hide");
     }
 
-    refresh() {
-        // no Sheets in the show
-        if (_.isNull(this._sheet)) {
-            this._controller.loadContext("dot");
+    refresh(...targets) {
+        // if no Sheets in the show, load dot context
+        if (_.isNull(this.activeSheet)) {
+            this.controller.loadContext("dot");
         } else {
-            this._refreshSheet();
+            super.refresh(...targets);
         }
     }
+
+    refreshGrapher() {
+        super.refreshGrapher();
+
+        let numBeats = this.activeSheet.getDuration();
+        let position = $(".toolbar .seek").width() / numBeats * this._currBeat;
+        $(".toolbar .seek .marker").css("transform", `translateX(${position}px)`);
+    }
+
+    /**
+     * Refresh the continuities panel
+     */
+    refreshPanel() {
+        // update tabs list in panel
+        let tabs = this.panel.find(".dot-types").empty();
+        let path = tabs.data("path");
+        this.activeSheet.getDotTypes().forEach(dotType => {
+            let tab = HTMLBuilder.make("li.tab")
+                .addClass(dotType)
+                .data("dotType", dotType)
+                .appendTo(tabs);
+
+            if (DotType.isAll(dotType)) {
+                tab.text("All");
+            } else {
+                let icon = HTMLBuilder.img(path.replace("DOT_TYPE", dotType));
+                tab.append(icon);
+            }
+        });
+
+        // activate dot type tab
+        let tab = tabs.find(`.${this._dotType}`);
+        if (!tab.exists()) {
+            tab = tabs.find("li.tab:first");
+            this._dotType = tab.data("dotType");
+        }
+
+        tab.addClass("active");
+
+        let continuities = this.activeSheet.getContinuities(this._dotType);
+        this._populatePanel(continuities);
+
+        // select dots of the active dot type
+        let dots = $(`.dot.${this._dotType}`);
+        this.selectDots(dots);
+    }
+
+    /**** METHODS ****/
 
     /**
      * Delete the given continuity.
@@ -103,7 +160,7 @@ export default class ContinuityContext extends BaseContext {
      */
     deleteContinuity(continuity) {
         continuity = this._getContinuity(continuity);
-        this._controller.doAction("removeContinuity", [continuity]);
+        this.controller.doAction("removeContinuity", [continuity]);
     }
 
     /**
@@ -132,9 +189,34 @@ export default class ContinuityContext extends BaseContext {
             onSubmit: popup => {
                 let data = getData(popup);
                 continuity.validatePopup(data);
-                this._controller.doAction("saveContinuity", [continuity, data]);
+                this.controller.doAction("saveContinuity", [continuity, data]);
             },
         });
+    }
+
+    /**
+     * Go to the zero-th beat of the sheet.
+     */
+    firstBeat() {
+        this._currBeat = 0;
+        this.refresh("grapher");
+    }
+
+    getCurrentBeat() {
+        return this._currBeat;
+    }
+
+    /**
+     * Go to the last beat of the sheet.
+     */
+    lastBeat() {
+        this._currBeat = this.activeSheet.getDuration();
+        this.refresh("grapher");
+    }
+
+    loadSheet(sheet) {
+        this._currBeat = 0;
+        super.loadSheet(sheet);
     }
 
     /**
@@ -147,8 +229,30 @@ export default class ContinuityContext extends BaseContext {
      */
     moveContinuity(continuity, delta) {
         continuity = this._getContinuity(continuity);
-        this._controller.doAction("reorderContinuity", [continuity, delta]);
+        this.controller.doAction("reorderContinuity", [continuity, delta]);
     }
+
+    /**
+     * Increment the current beat.
+     */
+    nextBeat() {
+        if (this._currBeat < this.activeSheet.getDuration()) {
+            this._currBeat++;
+            this.refresh("grapher");
+        }
+    }
+
+    /**
+     * Decrement the current beat.
+     */
+    prevBeat() {
+        if (this._currBeat > 0) {
+            this._currBeat--;
+            this.refresh("grapher");
+        }
+    }
+
+    /**** HELPERS ****/
 
     /**
      * Retrieve the given continuity
@@ -160,98 +264,52 @@ export default class ContinuityContext extends BaseContext {
      */
     _getContinuity(continuity) {
         if (_.isNumber(continuity)) {
-            continuity = this._panel.find(".continuity").get(continuity);
+            continuity = this.panel.find(".continuity").get(continuity);
         }
         return $(continuity).data("continuity");
     }
 
     /**
-     * @return {jQuery} The panel to edit continuities
-     */
-    _getPanel() {
-        return $(".panel.edit-continuity");
-    }
-
-    /**
-     * Get the panel HTML element for the given continuity.
+     * Populate the panel with the given continuities.
      *
-     * @param {Continuity} continuity
-     * @return {jQuery}
+     * @param {Continuity[]} continuities
      */
-    _getPanelContinuity(continuity) {
-        let contents = continuity.getPanel(this._controller);
-        let info = HTMLBuilder.div("info", contents);
+    _populatePanel(continuities) {
+        let $continuities = this.panel.find(".continuities").empty();
 
+        // action icons
         let iconEdit = HTMLBuilder.icon("pencil", "edit");
         let iconDelete = HTMLBuilder.icon("times", "delete");
         let actions = HTMLBuilder.div("actions", [iconEdit, iconDelete]);
 
-        let classes = `continuity ${continuity.info.type}`;
-        return HTMLBuilder.div(classes, [info, actions.clone()])
-            .data("continuity", continuity);
-    }
+        continuities.forEach(continuity => {
+            let label = HTMLBuilder.span(continuity.info.label);
+            let contents = continuity.getPanel(this.controller);
+            contents = [label].concat(contents);
 
-    /**
-     * Update the page according to the state of the Sheet.
-     */
-    _refreshSheet() {
-        // update tabs list in panel
-        let tabs = this._panel.find(".dot-types").empty();
-        let path = tabs.data("path");
-        this._sheet.getDotTypes().forEach(dotType => {
-            let tab = HTMLBuilder.make("li.tab", tabs)
-                .addClass(dotType)
-                .data("dotType", dotType);
+            let info = HTMLBuilder.div("info", contents);
 
-            if (DotType.isAll(dotType)) {
-                tab.text("All");
-            } else {
-                let icon = HTMLBuilder.img(path.replace("DOT_TYPE", dotType));
-                tab.append(icon);
-            }
+            let classes = `continuity ${continuity.info.type}`;
+
+            HTMLBuilder.div(classes, [info, actions.clone()])
+                .data("continuity", continuity)
+                .appendTo($continuities);
         });
-
-        // activate dot type tab
-        let tab = tabs.find(`.${this._dotType}`);
-        if (!tab.exists()) {
-            tab = tabs.find("li.tab:first");
-            this._dotType = tab.data("dotType");
-        }
-
-        tab.addClass("active");
-
-        let continuities = this._panel.find(".continuities").empty();
-        this._sheet.getContinuities(this._dotType).forEach(continuity => {
-            let $continuity = this._getPanelContinuity(continuity);
-            continuities.append($continuity);
-        });
-
-        // select dots of the active dot type
-        let dots = $(`.dot.${this._dotType}`);
-        this._controller.selectDots(dots);
-
-        // update seek bar
-        let beat = this._controller.getCurrentBeat();
-        let numBeats = this._sheet.getDuration();
-        let position = $(".toolbar .seek").width() / numBeats * beat;
-        $(".toolbar .seek .marker").css("transform", `translateX(${position}px)`);
     }
 
     /**
      * Initialize the continuity panel and toolbar
      */
     _setupPanel() {
-        let _this = this;
-
         // setup continuity panel
-        setupPanel(this._panel);
+        setupPanel(this.panel);
 
         // using custom panel-dropdowns because chosen doesn't render outside of scroll overflow
-        this._panel.on("mousedown", "select", function(e) {
+        this.panel.on("mousedown", "select", function(e) {
             e.preventDefault();
 
             let select = this;
-            let dropdown = HTMLBuilder.make("ul.panel-dropdown", "body");
+            let dropdown = HTMLBuilder.make("ul.panel-dropdown").appendTo("body");
 
             $(this).children().each(function() {
                 let val = $(this).attr("value");
@@ -283,43 +341,44 @@ export default class ContinuityContext extends BaseContext {
                 dropdown.css("top", max);
             }
 
-            $(window).click(function(e) {
+            $(window).one("click", function(e) {
                 $(dropdown).remove();
-                $(this).off(e);
             });
         });
 
         // changing tabs
-        this._panel.on("click", ".tab", function() {
-            _this._dotType = $(this).data("dotType");
-            _this.refresh();
+        this.panel.on("click", ".tab", e => {
+            this._dotType = $(e.currentTarget).data("dotType");
+            this.refresh("panel");
         });
 
         // add continuity dropdown
-        this._panel
+        this.panel
             .find(".add-continuity select")
             .dropdown({
                 placeholder_text_single: "Add continuity...",
                 disable_search_threshold: false,
             })
-            .change(function() {
-                let type = $(this).val();
-                _this._controller.doAction("addContinuity", [type]);
-                $(this).choose("");
+            .change(e => {
+                let type = $(e.currentTarget).val();
+                this.controller.doAction("addContinuity", [type]);
+                $(e.currentTarget).choose("");
             });
 
         // edit continuity popup
-        this._panel.on("click", ".continuity .edit", function() {
-            _this.editContinuity($(this).parents(".continuity"));
+        this.panel.on("click", ".continuity .edit", e => {
+            let continuity = $(e.currentTarget).parents(".continuity");
+            this.editContinuity(continuity);
         });
 
         // remove continuity link
-        this._panel.on("click", ".continuity .delete", function() {
-            _this.deleteContinuity($(this).parents(".continuity"));
+        this.panel.on("click", ".continuity .delete", e => {
+            let continuity = $(e.currentTarget).parents(".continuity");
+            this.deleteContinuity(continuity);
         });
 
         // context menus
-        this._panel.on("contextmenu", ".continuity", function(e) {
+        this.panel.on("contextmenu", ".continuity", function(e) {
             let index = $(this).index();
 
             showContextMenu(e, {
@@ -335,58 +394,39 @@ export default class ContinuityContext extends BaseContext {
      * Set up the seek interface in the toolbar.
      */
     _setupSeek() {
-        let _this = this;
-
         let seek = $(".toolbar .seek");
-        let isDrag = false;
         let marker = seek.find(".marker");
-        let markerWidth = marker.width();
+        let markerRadius = marker.width() / 2;
         let seekLeft = seek.offset().left;
         let seekWidth = seek.width();
-        let offset = 0;
 
-        function moveMarker(pageX) {
+        let updateSeek = e => {
             let prev = marker.offset().left;
-            let numBeats = _this._sheet.getDuration();
+            let numBeats = this.activeSheet.getDuration();
             let interval = seekWidth / numBeats;
 
             // snap to beat
-            let x = _.clamp(pageX - seekLeft - offset, 0, seekWidth);
-            let beat = round(x, interval) / interval;
+            let x = _.clamp(e.pageX - seekLeft - markerRadius, 0, seekWidth);
 
             // don't redraw screen if the beat didn't change
             if (x !== prev) {
-                _this._controller.setBeat(beat);
-                _this._controller.refresh();
+                this._currBeat = round(x, interval) / interval;
+                this.refresh("grapher");
             }
-        }
+        };
 
         this._addEvents(seek, {
             mousedown: function(e) {
                 // prevent text highlight
                 e.preventDefault();
+                updateSeek(e);
 
-                isDrag = true;
-
-                if ($(e.target).is(marker)) {
-                    offset = e.pageX - marker.offset().left;
-                } else {
-                    // clicking on the seek bar moves the marker there initially
-                    offset = markerWidth / 2;
-                    moveMarker(e.pageX);
-                }
-            },
-        });
-
-        this._addEvents(document, {
-            mousemove: function(e) {
-                if (!isDrag) {
-                    return;
-                }
-                moveMarker(e.pageX);
-            },
-            mouseup: function(e) {
-                isDrag = false;
+                $(document).on({
+                    "mousemove.seek": updateSeek,
+                    "mouseup.seek": e => {
+                        $(document).off(".seek");
+                    },
+                });
             },
         });
     }
@@ -400,25 +440,25 @@ let ContextShortcuts = {
     "ctrl+enter": "checkContinuities(fullCheck=true)",
 };
 
-class ContextActions {
+class ContextActions extends GraphContext.actions {
     /**
      * Add a continuity of the given type to the given sheet for the
      * given dot type.
      *
      * @param {string} type - The type of Continuity to create (@see Continuity).
-     * @param {Sheet} [sheet=this._sheet] - The sheet to add continuity to.
+     * @param {Sheet} [sheet=this.activeSheet] - The sheet to add continuity to.
      * @param {string} [dotType=this._dotType] - The dot type to add continuity for.
      */
-    static addContinuity(type, sheet=this._sheet, dotType=this._dotType) {
+    static addContinuity(type, sheet=this.activeSheet, dotType=this._dotType) {
         let continuity = Continuity.create(type, sheet, dotType);
         sheet.addContinuity(dotType, continuity);
-        this._controller.refresh();
+        this.refresh("grapher", "panel");
 
         return {
             data: [type, sheet, dotType],
             undo: function() {
                 sheet.removeContinuity(dotType, continuity);
-                this._controller.refresh();
+                this.refresh("grapher", "panel");
             },
         };
     }
@@ -427,18 +467,18 @@ class ContextActions {
      * Remove the given continuity from the given sheet for the given dot type.
      *
      * @param {Continuity} continuity - The Continuity to remove
-     * @param {Sheet} [sheet=this._sheet] - The sheet to remove continuity from.
+     * @param {Sheet} [sheet=this.activeSheet] - The sheet to remove continuity from.
      * @param {string} [dotType=this._dotType] - The dot type to remove continuity for.
      */
-    static removeContinuity(continuity, sheet=this._sheet, dotType=this._dotType) {
+    static removeContinuity(continuity, sheet=this.activeSheet, dotType=this._dotType) {
         sheet.removeContinuity(dotType, continuity);
-        this._controller.refresh();
+        this.refresh("grapher", "panel");
 
         return {
             data: [continuity, sheet, dotType],
             undo: function() {
                 sheet.addContinuity(dotType, continuity);
-                this._controller.refresh();
+                this.refresh("grapher", "panel");
             },
         };
     }
@@ -449,10 +489,10 @@ class ContextActions {
      * @param {Continuity} continuity - The continuity to reorder.
      * @param {int} delta - The amount to move the continuity by; e.g. delta=1
      *   would put the continuity 1 index later, if possible.
-     * @param {Sheet} [sheet=this._sheet] - The sheet to reorder continuity in.
+     * @param {Sheet} [sheet=this.activeSheet] - The sheet to reorder continuity in.
      * @param {string} [dotType=this._dotType] - The dot type to reorder continuity for.
      */
-    static reorderContinuity(continuity, delta, sheet=this._sheet, dotType=this._dotType) {
+    static reorderContinuity(continuity, delta, sheet=this.activeSheet, dotType=this._dotType) {
         let continuities = sheet.getContinuities(dotType);
         let index = continuities.indexOf(continuity);
         let newIndex = index + delta;
@@ -461,18 +501,16 @@ class ContextActions {
         } else if (newIndex < 0 || newIndex >= continuities.length) {
             return false;
         }
+
         sheet.moveContinuity(dotType, index, newIndex);
-
-        // no need to checkContinuities, since changing order of movements (vectors) doesn't
-        // change the cumulative movement (vector)?
-
-        this._controller.refresh();
+        this.checkContinuities(sheet, dotType);
+        this.refresh("grapher", "panel");
 
         return {
             data: [continuity, delta, sheet, dotType],
             undo: function() {
                 sheet.moveContinuity(dotType, newIndex, index);
-                this._controller.refresh();
+                this.refresh("grapher", "panel");
             },
         };
     }
@@ -482,24 +520,22 @@ class ContextActions {
      *
      * @param {Continuity} continuity - The Continuity to save.
      * @param {object} data - The data to save.
-     * @param {Sheet} [sheet=this._sheet] - The sheet to save continuity for.
+     * @param {Sheet} [sheet=this.activeSheet] - The sheet to save continuity for.
      * @param {string} [dotType=this._dotType] - The dot type to save continuity for.
      */
-    static saveContinuity(continuity, data, sheet=this._sheet, dotType=this._dotType) {
+    static saveContinuity(continuity, data, sheet=this.activeSheet, dotType=this._dotType) {
         let changed = continuity.savePopup(data);
 
         sheet.updateMovements(dotType);
-        this._controller.checkContinuities({
-            dots: dotType,
-        });
-        this._controller.refresh();
+        this.checkContinuities(sheet, dotType);
+        this.refresh("grapher", "panel");
 
         return {
             data: [continuity, data, sheet, dotType],
             undo: function() {
                 continuity.savePopup(changed);
                 sheet.updateMovements(dotType);
-                this._controller.refresh();
+                this.refresh("grapher", "panel");
             },
         };
     }

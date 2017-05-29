@@ -1,4 +1,5 @@
 import { ActionError } from "utils/errors";
+import { attempt } from "utils/JSUtils";
 import { setupTooltip } from "utils/UIUtils";
 
 // The singleton instance of the ApplicationController
@@ -28,7 +29,7 @@ export default class ApplicationController {
      * @return {ApplicationController} The initialized controller.
      */
     static init(show) {
-        if (!window.controller) {
+        if (_.isNull(window.controller)) {
             window.controller = new this(show);
             window.controller.init();
         }
@@ -46,16 +47,6 @@ export default class ApplicationController {
     }
 
     /**
-     * Retrieve and cache getAllShortcutCommands.
-     */
-    get shortcutCommands() {
-        if (_.isUndefined(this._shortcutCommands)) {
-            this._shortcutCommands = this.constructor.getAllShortcutCommands();
-        }
-        return this._shortcutCommands;
-    }
-
-    /**
      * Class variable holding all keyboard shortcuts for the controller, mapping
      * keyboard shortcut to the name of the ApplicationController function. Separate
      * keys with "+", e.g. "ctrl+s" or "ctrl+shift+s". Meta keys need to be in this
@@ -66,7 +57,19 @@ export default class ApplicationController {
         return {};
     }
 
-    get shortcuts() { return this.constructor.shortcuts; }
+    /**
+     * Retrieve and cache getAllShortcutCommands.
+     */
+    get shortcutCommands() {
+        if (_.isUndefined(this._shortcutCommands)) {
+            this._shortcutCommands = this.constructor.getAllShortcutCommands();
+        }
+        return this._shortcutCommands;
+    }
+
+    get show() {
+        return this._show;
+    }
 
     /**
      * Initialize this controller.
@@ -157,14 +160,7 @@ export default class ApplicationController {
      *   should be passed to {@link ApplicationController#doAction}.
      */
     getShortcut(shortcut) {
-        return this.shortcuts[shortcut] || null;
-    }
-
-    /**
-     * @return {Show} The show stored in the controller.
-     */
-    getShow() {
-        return this._show;
+        return this.constructor.shortcuts[shortcut] || null;
     }
 
     /**
@@ -243,18 +239,19 @@ export default class ApplicationController {
                 arg = arg.trim();
 
                 // float or array
-                try {
-                    return JSON.parse(arg);
-                } catch (e) {}
+                let json = attempt(() => JSON.parse(arg));
+                if (!_.isNull(json)) {
+                    return json;
+                }
 
                 // object
                 if (arg.includes("=")) {
                     let [key, val] = arg.split("=");
 
                     // try to parse as JSON, otherwise it's a string
-                    try {
+                    attempt(() => {
                         val = JSON.parse(val);
-                    } catch (e) {}
+                    });
 
                     return {
                         [key]: val,

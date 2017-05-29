@@ -16,7 +16,7 @@ export default class ViewerController extends ApplicationController {
         super(show);
 
         this._grapher = null;
-        this._currSheet = show.getSheets()[0];
+        this._currSheet = show.getSheet(0);
         this._currBeat = 0;
         this._currDot = null;
         this._isPlaying = false;
@@ -237,7 +237,7 @@ export default class ViewerController extends ApplicationController {
      * @return {[Sheet, number]}
      */
     _getSheetAndBeat(beat) {
-        let sheet = this._show.getSheets()[0];
+        let sheet = this._show.getSheet(0);
 
         while (beat > sheet.getDuration()) {
             beat -= sheet.getDuration();

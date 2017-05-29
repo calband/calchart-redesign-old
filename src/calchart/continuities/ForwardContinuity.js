@@ -41,8 +41,11 @@ export default class ForwardContinuity extends BaseContinuity {
         return {
             type: "fm",
             name: "Forward March",
+            label: "Move",
         };
     }
+
+    /**** METHODS ****/
 
     getMovements(dot, data) {
         let options = {
@@ -60,29 +63,25 @@ export default class ForwardContinuity extends BaseContinuity {
     }
 
     getPanel(controller) {
-        let _this = this;
-
-        let label = HTMLBuilder.span("Move");
-
         let steps = HTMLBuilder.input({
             type: "number",
             initial: this._numSteps,
-            change: function() {
-                _this._numSteps = validatePositive(this);
-                _this._updateMovements(controller);
+            change: e => {
+                this._numSteps = validatePositive(e.currentTarget);
+                this._updateMovements(controller);
             },
         });
 
         let direction = HTMLBuilder.select({
             options: DIRECTIONS,
             initial: this._direction,
-            change: function() {
-                _this._direction = parseNumber($(this).val());
-                _this._updateMovements(controller);
+            change: e => {
+                this._direction = parseNumber($(e.currentTarget).val());
+                this._updateMovements(controller);
             },
         });
 
-        return [label, steps, direction];
+        return [steps, direction];
     }
 
     getPopup() {

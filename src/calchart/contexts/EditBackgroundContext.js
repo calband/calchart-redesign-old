@@ -1,4 +1,4 @@
-import HiddenContext from "calchart/contexts/HiddenContext";
+import HiddenGraphContext from "calchart/contexts/HiddenContext";
 
 import HTMLBuilder from "utils/HTMLBuilder";
 import { getDimensions } from "utils/MathUtils";
@@ -7,9 +7,11 @@ import { addHandles, resizeHandles } from "utils/UIUtils";
 /**
  * The Context that allows a user to move and resize the background image
  */
-export default class EditBackgroundContext extends HiddenContext {
+export default class EditBackgroundContext extends HiddenGraphContext {
     constructor(controller) {
         super(controller);
+
+        this._image = null;
 
         // tracks how many times load has been called, to distinguish
         // sessions of editing backgrounds
@@ -26,6 +28,13 @@ export default class EditBackgroundContext extends HiddenContext {
         return ContextActions;
     }
 
+    static get info() {
+        return {
+            name: "background",
+            html: "edit-background",
+        };
+    }
+
     /**
      * @param {Object} options - Options to customize loading the Context:
      *    - {string} [dotType=null] - The dot type to initially load.
@@ -33,74 +42,77 @@ export default class EditBackgroundContext extends HiddenContext {
     load(options) {
         super.load(options);
 
+        this._image = this.grapher.getGraph().find("image.background-image");
+
         this._session++;
         this._previousContext = options.previousContext;
-        this._grapher.setOptions({
+        this.grapher.setOptions({
             backgroundVisible: true,
         });
 
-        this._handles = HTMLBuilder.div("background-image-handles", null, ".workspace");
+        this._handles = HTMLBuilder.div("background-image-handles").appendTo(this.workspace);
         addHandles(this._handles);
 
-        this._addEvents(this._handles, "mousedown", e => {
-            // for saveBackground
-            let oldData = this._getImageData();
+        this._addEvents(this._handles, {
+            mousedown: e => {
+                // for saveBackground
+                let oldData = this._getImageData();
 
-            let mousemove = $(e.target).is(".handle")
-                ? this.mousedownResize(e)
-                : this.mousedownMove(e);
+                let mousemove = $(e.target).is(".handle")
+                    ? this.mousedownResize(e)
+                    : this.mousedownMove(e);
 
-            $(document).on({
-                "mousemove.edit-background": mousemove,
-                "mouseup.edit-background": e => {
-                    this._controller.doAction("saveBackground", [oldData]);
-                    $(document).off(".edit-background");
-                }
-            });
+                $(document).on({
+                    "mousemove.edit-background": mousemove,
+                    "mouseup.edit-background": e => {
+                        this.controller.doAction("saveBackground", [oldData]);
+                        $(document).off(".edit-background");
+                    }
+                });
+            },
         });
-
-        $(".toolbar .edit-background-group").removeClass("hide");
     }
 
     unload() {
         super.unload();
-        this._grapher.setOptions({
+        this.grapher.setOptions({
             backgroundVisible: false,
         });
 
         this._handles.remove();
-
-        $(".toolbar .edit-background-group").addClass("hide");
     }
 
-    refresh() {
-        let image = this._getImage();
-        let dimensions = image.getDimensions();
+    refreshGrapher() {
+        super.refreshGrapher();
+
+        let dimensions = this._image.getDimensions();
 
         this._handles.css({
-            left: image.attr("x"),
-            top: image.attr("y"),
+            left: this._image.attr("x"),
+            top: this._image.attr("y"),
             width: dimensions.width,
             height: dimensions.height,
         });
     }
 
     exit() {
-        this._controller.loadContext(this._previousContext);
+        this.controller.loadContext(this._previousContext);
     }
+
+    /**** METHODS ****/
 
     /**
      * Handle the mousedown event on the image, to move the image.
      *
      * @param {Event} e
-     * @return {Function}
+     * @return {Function} The handler for the mousemove event.
      */
     mousedownMove(e) {
-        let image = this._getImage();
+        // offset of cursor within the picture
         let [deltaX, deltaY] = this._handles.makeRelative(e.pageX, e.pageY);
 
         return e => {
-            let [endX, endY] = $(".workspace").makeRelative(e.pageX, e.pageY);
+            let [endX, endY] = this.workspace.makeRelative(e.pageX, e.pageY);
             let x = endX - deltaX;
             let y = endY - deltaY;
 
@@ -108,7 +120,7 @@ export default class EditBackgroundContext extends HiddenContext {
                 left: x,
                 top: y,
             });
-            image.attr("x", x).attr("y", y);
+            this._image.attr("x", x).attr("y", y);
         };
     }
 
@@ -116,23 +128,22 @@ export default class EditBackgroundContext extends HiddenContext {
      * Handle the mousedown event on a handle, to resize the image.
      *
      * @param {Event} e
-     * @return {Function}
+     * @return {Function} The handler for the mousemove event.
      */
     mousedownResize(e) {
         let handle = $(e.target).data("handle-id");
-        let image = this._getImage();
-        let dimensions = image.getDimensions();
+        let dimensions = this._image.getDimensions();
 
         let start = {
-            top: parseInt(image.attr("y")),
-            left: parseInt(image.attr("x")),
+            top: parseInt(this._image.attr("y")),
+            left: parseInt(this._image.attr("x")),
             width: dimensions.width,
             height: dimensions.height,
         };
 
         return e => {
             let data = resizeHandles(handle, start, e);
-            image
+            this._image
                 .attr("x", data.left)
                 .attr("width", data.width)
                 .attr("y", data.top)
@@ -145,31 +156,26 @@ export default class EditBackgroundContext extends HiddenContext {
      * Revert all changes made to the background image.
      */
     revert() {
-        this._controller.revertWhile(action => {
+        this.controller.revertWhile(action => {
             return action.session === this._session;
         });
         this.exit();
     }
 
-    /**
-     * @return {jQuery} the background image
-     */
-    _getImage() {
-        return this._grapher.getGraph().find("image.background-image");
-    }
+    /**** HELPERS ****/
 
     /**
      * @return {Object} data of the background image to pass to
      *   Sheet.saveBackground
      */
     _getImageData() {
-        let image = this._getImage();
-        let dimensions = image[0].getBBox();
-        let scale = this._grapher.getScale();
-        let position = scale.toStepCoordinates({
-            x: parseInt(image.attr("x")),
-            y: parseInt(image.attr("y")),
+        let dimensions = this._image.getDimensions();
+        let scale = this.grapher.getScale();
+        let position = scale.toSteps({
+            x: parseInt(this._image.attr("x")),
+            y: parseInt(this._image.attr("y")),
         });
+
         return {
             x: position.x,
             y: position.y,
@@ -179,7 +185,7 @@ export default class EditBackgroundContext extends HiddenContext {
     }
 }
 
-class ContextActions {
+class ContextActions extends HiddenGraphContext.actions {
     /**
      * Save the background image's position and size after modifying it.
      *
@@ -192,15 +198,15 @@ class ContextActions {
             newData = this._getImageData();
         }
 
-        this._sheet.saveBackground(newData);
-        this._controller.refresh();
+        this.activeSheet.saveBackground(newData);
+        this.refresh("grapher");
 
         return {
             session: this._session,
             data: [oldData, newData],
             undo: function() {
-                this._sheet.saveBackground(oldData);
-                this._controller.refresh();
+                this.activeSheet.saveBackground(oldData);
+                this.refresh("grapher");
             },
         };
     }

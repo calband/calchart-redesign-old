@@ -195,6 +195,9 @@ header {
                 background: $white;
                 color: $semilight-gray;
             }
+            span.hint {
+                color: $semilight-gray;
+            }
         }
         &:hover, &.active {
             background: $light-gray;
@@ -381,6 +384,7 @@ svg.graph {
             display: none;
             stroke: $uniform-white;
             stroke-width: 2px;
+            pointer-events: none;
         }
         .dot-marker {
             fill: $uniform-white;
@@ -419,11 +423,6 @@ svg.graph {
             .dot-marker {
                 fill: $highlight-purple;
                 stroke: $highlight-purple;
-            }
-            .selected-circle {
-                stroke: $highlight-purple;
-                stroke-width: 2px;
-                fill: none;
             }
         }
         // collision

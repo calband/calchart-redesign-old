@@ -21,9 +21,8 @@ export default class HTMLBuilder {
      *   [TAG]#[ID].[CLASS]
      *   where ID and CLASS are optional and multiple classes may be
      *   specified. Examples: "p.message", "div#sidebar", "span.foo.bar".
-     * @param {jQuery} appendTo - The element to append the element to.
      */
-    static make(elem, appendTo) {
+    static make(elem) {
         let [match, tag, id, classes=""] = elem.match(/^(\w+)(?:#([\w-]+))?((?:\.[\w-]+)+)?$/);
 
         if (_.isNull(match)) {
@@ -33,11 +32,7 @@ export default class HTMLBuilder {
         tag = `<${tag}>`;
         classes = classes.slice(1).replace(/\./g, " ");
 
-        let element = $(tag).attr("id", id).addClass(classes);
-        if (appendTo) {
-            element.appendTo(appendTo);
-        }
-        return element;
+        return $(tag).attr("id", id).addClass(classes);
     }
 
     /**
@@ -45,20 +40,13 @@ export default class HTMLBuilder {
      *
      * @param {string} class -- the class to add to the <div>
      * @param {(jQuery|jQuery[])} append -- the contents to append to the <div>
-     * @param {jQuery} appendTo -- the element to append the <div> to
      */
     static div() {
-        let args = parseArgs(arguments, ["class", "append", "appendTo"]);
+        let args = parseArgs(arguments, ["class", "append"]);
 
-        let div = $("<div>")
+        return $("<div>")
             .addClass(args.class)
             .append(args.append);
-
-        if (args.appendTo) {
-            div.appendTo(args.appendTo);
-        }
-
-        return div;
     }
 
     /**
@@ -84,8 +72,7 @@ export default class HTMLBuilder {
             .attr("for", name)
             .text(`${args.label}:`);
 
-        return $("<div>")
-            .addClass(`field ${name}`)
+        return this.make(`div.field.${name}`)
             .append([label, args.field]);
     }
 

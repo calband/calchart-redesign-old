@@ -25,7 +25,7 @@ export default class BaseContinuity {
         this._sheet = sheet;
         this._dotType = dotType;
 
-        options = _.defaults(options, {
+        options = _.defaults({}, options, {
             stepType: "default",
             beatsPerStep: "default",
             orientation: "default",
@@ -68,16 +68,70 @@ export default class BaseContinuity {
     }
 
     /**
+     * Build the movements from the given continuities for the given dot.
+     *
+     * @param {Continuity[]} continuities
+     * @param {Dot} dot
+     * @param {Coordinate} start - The starting position of the dot.
+     * @param {int} duration - The number of beats to use for the movements. 
+     */
+    static buildMovements(continuities, dot, start, duration) {
+        // getMovements() can modify anything passed in
+        start = _.clone(start);
+
+        return _.flatMap(continuities, continuity => {
+            if (duration <= 0) {
+                return [];
+            }
+
+            let moves = continuity.getMovements(dot, {
+                position: start,
+                remaining: duration,
+            });
+
+            moves.forEach(movement => {
+                start = movement.getEndPosition();
+                duration -= movement.getDuration();
+            });
+
+            return moves;
+        });
+    }
+
+    get dotType() {
+        return this._dotType;
+    }
+
+    /**
      * @return {object} meta info for this continuity, including the following keys:
      *   - {string} type - The short, unique ID of the continuity; e.g. "fm"
      *   - {string} name - The name of the continuity; e.g. "Forward March"
+     *   - {string} label - The label for the continuity to use in the panel; e.g. "FM"
      */
     get info() {
         throw new NotImplementedError(this);
     }
 
-    get dotType() { return this._dotType; }
-    get sheet() { return this._sheet; }
+    get sheet() {
+        return this._sheet;
+    }
+
+    /**** METHODS ****/
+
+    /**
+     * Clone the given property, being careful to not clone any foreign keys.
+     *
+     * @param {string} key - The property to clone, such as "_sheet"
+     * @param {*} val - The value of the property (equivalent to this[key]).
+     * @return {undefined|*} The value to use for this property in the cloned
+     *   continuity. If undefined, will be cloned as normal.
+     */
+    clone(key, val) {
+        switch (key) {
+            case "_sheet":
+                return null; // set manually later
+        }
+    }
 
     /**
      * Get the number of beats per step for this continuity, resolving any defaults.
@@ -86,7 +140,7 @@ export default class BaseContinuity {
      */
     getBeatsPerStep() {
         return this._beatsPerStep === "default" ?
-            this._sheet.getBeatsPerStep() : this._beatsPerStep;
+            this.sheet.getBeatsPerStep() : this._beatsPerStep;
     }
 
     /**
@@ -111,11 +165,11 @@ export default class BaseContinuity {
     getOrientationDegrees() {
         switch (this._orientation) {
             case "default":
-                return this._sheet.getOrientationDegrees();
+                return this.sheet.getOrientationDegrees();
             case "east":
                 return 0;
             case "west":
-                return 90;
+                return 180;
             case "":
                 // for EvenContinuity, moving in direction of travel
                 return undefined;
@@ -186,7 +240,7 @@ export default class BaseContinuity {
      * @return {string} Step type (see CalchartUtils.STEP_TYPES).
      */
     getStepType() {
-        return this._stepType === "default" ? this._sheet.getStepType() : this._stepType;
+        return this._stepType === "default" ? this.sheet.getStepType() : this._stepType;
     }
 
     /**
@@ -198,6 +252,15 @@ export default class BaseContinuity {
      */
     savePopup(data) {
         return update(this, underscoreKeys(data));
+    }
+
+    /**
+     * Sets the sheet this continuity is a part of. Used when cloning a Sheet.
+     *
+     * @param {Sheet} sheet
+     */
+    setSheet(sheet) {
+        this._sheet = sheet;
     }
 
     /**
@@ -216,14 +279,31 @@ export default class BaseContinuity {
         }
     }
 
+    /**** HELPERS ****/
+
+    /**
+     * Get the position of the given dot in the next Sheet.
+     *
+     * @param {Dot} dot
+     * @return {?Coordinate} null if this continuity's sheet is the last sheet.
+     */
+    _getNextPosition(dot) {
+        let nextSheet = this.sheet.getNextSheet();
+        if (nextSheet) {
+            return nextSheet.getPosition(dot);
+        } else {
+            return null;
+        }
+    }
+
     /**
      * Update the movements for dots that use this continuity. Used in the
-     * edit continuity context.
+     * ContinuityContext.
      *
      * @param {EditorController} controller
      */
     _updateMovements(controller) {
-        this._sheet.updateMovements(this._dotType);
-        controller.refresh();
+        this.sheet.updateMovements(this.dotType);
+        controller.getContext().refresh("grapher");
     }
 }
