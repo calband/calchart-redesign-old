@@ -1,11 +1,7 @@
 from django import forms
-from django.conf import settings
 from django.contrib.auth.forms import UserCreationForm
-from django.forms import modelform_factory
-from django.utils.text import camel_case_to_spaces
 
-from base.constants import *
-from base.models import Show, User
+from base.models import User
 
 ### FORMS ###
 
