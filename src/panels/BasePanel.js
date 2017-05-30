@@ -14,20 +14,13 @@ export default class BasePanel {
     }
 
     /**
-     * @return {string} The short, unique name of the panel; e.g. "select-dots"
-     */
-    get name() {
-        throw new NotImplementedError(this);
-    }
-
-    /**
      * Display this panel.
      */
     show() {
         let handle = HTMLBuilder.div("panel-handle");
         let content = HTMLBuilder.div("panel-content", this.getContent());
 
-        this._panel = HTMLBuilder.div(`panel ${this.name}`, [handle, content])
+        this._panel = HTMLBuilder.div(`panel ${this._context.info.name}`, [handle, content])
             .appendTo("body");
 
         // initialize the panel in bottom-right corner of screen

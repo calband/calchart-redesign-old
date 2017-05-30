@@ -3,10 +3,6 @@ import ContinuityPanel from "panels/ContinuityPanel";
 import HTMLBuilder from "utils/HTMLBuilder";
 
 export default class TwoStepPanel extends ContinuityPanel {
-    get name() {
-        return "two-step";
-    }
-
     // nothing in footer to refresh
     refreshFooter() {}
 

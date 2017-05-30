@@ -269,7 +269,7 @@ body.context-background .workspace .graph {
 
 /** DOT CONTEXT **/
 
-.panel.select-dots {
+.panel.dot {
     $dot-type-size: 24px;
     $li-size: $dot-type-size + 10px;
     $li-margin: 5px;
@@ -362,7 +362,7 @@ body.context-background .workspace .graph {
     }
 }
 
-.panel.edit-continuity {
+.panel.continuity {
     width: 300px;
     .add-continuity {
         padding: 10px;
@@ -508,7 +508,7 @@ body.context-continuity-dots .workspace .graph {
     }
 }
 
-.panel.edit-continuity-dots {
+.panel.continuity-dots {
     .panel-content {
         padding: 5px;
     }
@@ -599,7 +599,7 @@ body.context-gate-reference .workspace .graph {
 /** TWO STEP CONTEXT **/
 
 .panel.two-step {
-    @extend .panel.edit-continuity;
+    @extend .panel.continuity;
     .buttons {
         background: $dark-gray;
         padding: 5px;

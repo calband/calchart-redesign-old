@@ -15,10 +15,6 @@ export default class DotPanel extends BasePanel {
         this._lastSelected = null;
     }
 
-    get name() {
-        return "select-dots";
-    }
-
     refresh() {
         // highlight dots in panel
         let dotLabels = this._panel.find(".dot-labels");

@@ -3,10 +3,6 @@ import BasePanel from "panels/BasePanel";
 import HTMLBuilder from "utils/HTMLBuilder";
 
 export default class FollowLeaderPanel extends BasePanel {
-    get name() {
-        return "ftl-path";
-    }
-
     refresh() {
         // populate panel
         let list = this._panel.find(".ftl-path-points").empty();

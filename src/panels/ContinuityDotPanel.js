@@ -2,11 +2,7 @@ import BasePanel from "panels/BasePanel";
 
 import HTMLBuilder from "utils/HTMLBuilder";
 
-export default class ContinuityDotsPanel extends BasePanel {
-    get name() {
-        return "edit-continuity-dots";
-    }
-
+export default class ContinuityDotPanel extends BasePanel {
     refresh() {
         // re-order dots on every refresh
         let list = this._panel.find(".dot-order");

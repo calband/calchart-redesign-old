@@ -14,10 +14,6 @@ export default class ContinuityPanel extends BasePanel {
         super(context);
     }
 
-    get name() {
-        return "edit-continuity";
-    }
-
     show() {
         super.show();
 
