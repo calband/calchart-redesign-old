@@ -4,16 +4,17 @@
   "version": "0.0.1",
   "private": true,
   "dependencies": {
+    "babel-core": "=6.24.1",
+    "babel-loader": "=7.0.0",
+    "babel-plugin-transform-runtime": "=6.23.0",
+    "babel-preset-es2015": "=6.24.1",
+    "babel-runtime": "=6.23.0",
     "grunt": "=0.4.5",
+    "grunt-cli": "=1.2.0",
+    "grunt-contrib-sass": "=1.0.0",
+    "grunt-contrib-watch": "=1.0.0",
     "grunt-webpack": "=2.0.1",
-    "grunt-cli": "latest",
-    "webpack": "=2.5.1",
-    "grunt-contrib-sass": "latest",
-    "grunt-contrib-watch": "latest",
-    "babel-loader": "latest",
-    "babel-core": "latest",
-    "babel-preset-es2015": "latest",
-    "babel-plugin-transform-builtin-extend": "latest",
-    "imports-loader": "latest"
+    "imports-loader": "=0.7.1",
+    "webpack": "=2.5.1"
   }
 }
