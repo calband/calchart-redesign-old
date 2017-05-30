@@ -1,7 +1,5 @@
 import HiddenGraphContext from "editor/contexts/HiddenContext";
-
-import HTMLBuilder from "utils/HTMLBuilder";
-import { setupPanel } from "utils/UIUtils";
+import ContinuityDotPanel from "panels/ContinuityDotPanel";
 
 /**
  * The Context that allows a user to define a dot order in
@@ -10,8 +8,6 @@ import { setupPanel } from "utils/UIUtils";
 export default class ContinuityDotContext extends HiddenGraphContext {
     constructor(controller) {
         super(controller);
-
-        // this._setupPanel();
 
         // OrderedDotsContinuity
         this._continuity = null;
@@ -27,8 +23,12 @@ export default class ContinuityDotContext extends HiddenGraphContext {
         };
     }
 
+    get continuity() {
+        return this._continuity;
+    }
+
     get panel() {
-        return $(".panel.edit-continuity-dots");
+        return ContinuityDotPanel;
     }
 
     /**
@@ -36,42 +36,13 @@ export default class ContinuityDotContext extends HiddenGraphContext {
      *    - {OrderedDotsContinuity} continuity - The continuity being edited
      */
     load(options) {
-        super.load(options);
-
         this._continuity = options.continuity;
 
-        let list = this.panel.find(".dot-order").empty();
-        this._continuity.getOrder().forEach(dot => {
-            let $dot = this.grapher.getDot(dot);
-            
-            HTMLBuilder.li(dot.label, `dot dot-${dot.id}`)
-                .data("dot", dot)
-                .appendTo(list)
-                .mouseenter(e => {
-                    this.selectDots($dot);
-                })
-                .mouseleave(e => {
-                    this.deselectDots($dot);
-                });
-        });
-
-        list.sortable({
-            containment: this.panel,
-            update: () => {
-                let order = list.children().map(function() {
-                    return $(this).data("dot");
-                }).get();
-                controller.doAction("changeDotOrder", [order]);
-            },
-        });
-
-        this.panel.show().keepOnscreen();
+        super.load(options);
     }
 
     unload() {
         super.unload();
-
-        this.panel.hide();
 
         this._getGraphDots().css("opacity", "");
 
@@ -84,17 +55,6 @@ export default class ContinuityDotContext extends HiddenGraphContext {
         super.refreshGrapher();
 
         this._getGraphDots().css("opacity", 1);
-    }
-
-    refreshPanel() {
-        let order = this._continuity.getOrder().map(dot => dot.id);
-        let list = this.panel.find(".dot-order");
-
-        // re-order dots on every refresh
-        order.forEach(id => {
-            let li = list.find(`li.dot-${id}`);
-            list.append(li);
-        });
     }
 
     exit() {
@@ -110,18 +70,6 @@ export default class ContinuityDotContext extends HiddenGraphContext {
      */
     _getGraphDots() {
         return this.grapher.getDots(this._continuity.getOrder());
-    }
-
-    _setupPanel() {
-        setupPanel(this.panel);
-
-        this.panel.find("button.flip").click(e => {
-            this.controller.doAction("reverseDotOrder");
-        });
-
-        this.panel.find("button.submit").click(e => {
-            this.exit();
-        });
     }
 }
 

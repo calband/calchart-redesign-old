@@ -37,7 +37,7 @@ export default class ContinuityPanel extends BasePanel {
 
         this.getContinuities().forEach(continuity => {
             let label = HTMLBuilder.span(continuity.info.label);
-            let contents = continuity.getPanel(this._context.controller);
+            let contents = continuity.getPanel(this._context);
 
             let info = HTMLBuilder.div("info", [label].concat(contents));
 

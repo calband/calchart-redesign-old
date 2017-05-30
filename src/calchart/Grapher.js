@@ -182,8 +182,8 @@ export default class Grapher {
             if (dots[0] instanceof Dot) {
                 dots = dots.map(dot => dot.id);
             }
-            dotGroups = _.filter(dotGroups,
-                dot => _.includes(dots, $(dot).data("dot").id)
+            dotGroups = dotGroups.filter((i, dot) =>
+                _.includes(dots, $(dot).data("dot").id)
             );
         }
         return dotGroups;
