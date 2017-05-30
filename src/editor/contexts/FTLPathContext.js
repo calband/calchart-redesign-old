@@ -1,10 +1,8 @@
 import Coordinate from "calchart/Coordinate";
-
 import HiddenGraphContext from "editor/contexts/HiddenContext";
+import FollowLeaderPanel from "panels/FollowLeaderPanel";
 
-import HTMLBuilder from "utils/HTMLBuilder";
 import { round } from "utils/MathUtils";
-import { setupPanel } from "utils/UIUtils";
 
 /**
  * The Context that allows a user to define the path in
@@ -13,8 +11,6 @@ import { setupPanel } from "utils/UIUtils";
 export default class FTLPathContext extends HiddenGraphContext {
     constructor(controller) {
         super(controller);
-
-        // this._setupPanel();
 
         // FollowLeaderContinuity
         this._continuity = null;
@@ -37,8 +33,12 @@ export default class FTLPathContext extends HiddenGraphContext {
         };
     }
 
+    get continuity() {
+        return this._continuity;
+    }
+
     get panel() {
-        return $(".panel.ftl-path");
+        return FollowLeaderPanel;
     }
 
     get svg() {
@@ -55,8 +55,6 @@ export default class FTLPathContext extends HiddenGraphContext {
         this._continuity = options.continuity;
 
         this.loadTool("selection");
-
-        this.panel.show();
 
         let scale = this.grapher.getScale();
         this._addEvents(this.workspace, {
@@ -104,8 +102,6 @@ export default class FTLPathContext extends HiddenGraphContext {
         if (this._helper) {
             this._helper.remove();
         }
-
-        this.panel.hide();
 
         this._getGraphDots().css("opacity", "");
 
@@ -166,36 +162,6 @@ export default class FTLPathContext extends HiddenGraphContext {
         this._path.attr("d", pathDef);
     }
 
-    refreshPanel() {
-        let list = this.panel.find(".ftl-path-points").empty();
-
-        // populate panel
-        this._continuity.getPath().forEach((coordinate, i) => {
-            let point = this.svg.select(`point-${i}`);
-            let label = `(${coordinate.x}, ${coordinate.y})`;
-
-            HTMLBuilder.li(label, "point")
-                .data("coordinate", coordinate)
-                .appendTo(list)
-                .mouseenter(e => {
-                    point.classed("highlight", true);
-                })
-                .mouseleave(e => {
-                    point.classed("highlight", false);
-                });
-        });
-
-        list.sortable({
-            containment: this.panel,
-            update: () => {
-                let path = _.map(list.children(), point => $(point).data("coordinate"));
-                this.controller.doAction("setPath", [path]);
-            },
-        });
-
-        this.panel.keepOnscreen();
-    }
-
     /**
      * Load continuity context if the user is done with this context.
      */
@@ -247,14 +213,6 @@ export default class FTLPathContext extends HiddenGraphContext {
      */
     _getGraphDots() {
         return this.grapher.getDots(this._continuity.getOrder());
-    }
-
-    _setupPanel() {
-        setupPanel(this.panel);
-
-        this.panel.find("button.submit").click(() => {
-            this.exit();
-        });
     }
 }
 

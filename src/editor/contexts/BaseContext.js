@@ -117,7 +117,7 @@ export default class BaseContext {
      * Refresh the panel.
      */
     refreshPanel() {
-        if (this.panel) {
+        if (this._panel) {
             this._panel.refresh();
         }
     }
@@ -136,7 +136,7 @@ export default class BaseContext {
         $(`.menu-item.${name}-group`).addClass("disabled");
         $(`.toolbar .${name}-group`).addClass("hide");
 
-        if (this.panel) {
+        if (this._panel) {
             this._panel.hide();
         }
     }
