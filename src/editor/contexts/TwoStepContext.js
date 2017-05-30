@@ -1,7 +1,7 @@
 import Continuity from "calchart/Continuity";
-
 import ContinuityContext from "editor/contexts/ContinuityContext";
 import { HiddenContextMixin } from "editor/contexts/HiddenContext";
+import TwoStepPanel from "panels/TwoStepPanel";
 
 import { underscoreKeys, update } from "utils/JSUtils";
 
@@ -28,8 +28,12 @@ export default class TwoStepContext extends HiddenContextMixin(ContinuityContext
         };
     }
 
+    get continuity() {
+        return this._continuity;
+    }
+
     get panel() {
-        return $(".panel.two-step");
+        return TwoStepPanel;
     }
 
     /**
@@ -40,8 +44,6 @@ export default class TwoStepContext extends HiddenContextMixin(ContinuityContext
         super.load(options);
 
         this._continuity = options.continuity;
-
-        this.panel.show();
     }
 
     unload() {
@@ -58,26 +60,6 @@ export default class TwoStepContext extends HiddenContextMixin(ContinuityContext
     exit() {
         this.controller.loadContext("continuity", {
             dotType: this._continuity.dotType,
-        });
-    }
-
-    refreshPanel() {
-        this._populatePanel(this._continuity.getContinuities());
-
-        // select dots in continuity
-        let dots = $(`.dot.${this._continuity.dotType}`);
-        this.selectDots(dots);
-    }
-
-    /**** HELPERS ****/
-
-    _setupPanel() {
-        super._setupPanel();
-
-        this.panel.off("click", ".tab");
-
-        this.panel.find("button.submit").click(() => {
-            this.exit();
         });
     }
 }

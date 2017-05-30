@@ -278,32 +278,35 @@ export function setupTooltip(selector, label) {
     let tooltip = HTMLBuilder.span("", "tooltip").html(label);
     let arrow = HTMLBuilder.make("span.tooltip-arrow").appendTo(tooltip);
 
-    $(selector)
-        .mouseenter(function() {
-            let offset = $(this).offset();
-            let width = $(this).outerWidth();
+    $(selector).mouseenter(function() {
+        let offset = $(this).offset();
+        let width = $(this).outerWidth();
 
-            tooltipTimeout = setTimeout(function() {
-                tooltip.appendTo("body");
+        tooltipTimeout = setTimeout(function() {
+            tooltip.appendTo("body");
 
-                let left = offset.left - tooltip.outerWidth() / 2 + width / 2;
-                if (left < 0) {
-                    left = 0;
-                    arrow.css("left", offset.left + width / 2);
-                } else {
-                    arrow.css("left", "");
-                }
+            let left = offset.left - tooltip.outerWidth() / 2 + width / 2;
+            if (left < 0) {
+                left = 0;
+                arrow.css("left", offset.left + width / 2);
+            } else {
+                arrow.css("left", "");
+            }
 
-                tooltip.css({
-                    top: offset.top - tooltip.outerHeight() - arrow.outerHeight() + 2,
-                    left: left,
-                });
-            }, 750);
-        })
-        .mouseleave(function() {
-            clearTimeout(tooltipTimeout);
-            tooltip.remove();
+            tooltip.css({
+                top: offset.top - tooltip.outerHeight() - arrow.outerHeight() + 2,
+                left: left,
+            });
+        }, 750);
+
+        $(window).mousemove(e => {
+            if ($(e.target).notIn(selector)) {
+                clearTimeout(tooltipTimeout);
+                tooltip.remove();
+                $(window).off(e);
+            }
         });
+    });
 }
 
 /**
