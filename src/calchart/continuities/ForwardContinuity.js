@@ -1,5 +1,6 @@
 import BaseContinuity from "calchart/continuities/BaseContinuity";
 import MovementCommandMove from "calchart/movements/MovementCommandMove";
+import { ForwardContinuityPopup } from "popups/ContinuityPopups";
 
 import { DIRECTIONS } from "utils/CalchartUtils";
 import HTMLBuilder from "utils/HTMLBuilder";
@@ -37,6 +38,10 @@ export default class ForwardContinuity extends BaseContinuity {
         });
     }
 
+    static get popupClass() {
+        return ForwardContinuityPopup;
+    }
+
     get info() {
         return {
             type: "fm",
@@ -46,6 +51,13 @@ export default class ForwardContinuity extends BaseContinuity {
     }
 
     /**** METHODS ****/
+
+    /**
+     * @return {int}
+     */
+    getDirection() {
+        return this._direction;
+    }
 
     getMovements(dot, data) {
         let options = {
@@ -60,6 +72,13 @@ export default class ForwardContinuity extends BaseContinuity {
             options
         );
         return [move];
+    }
+
+    /**
+     * @return {int}
+     */
+    getNumSteps() {
+        return this._numSteps;
     }
 
     getPanel(controller) {
@@ -82,21 +101,5 @@ export default class ForwardContinuity extends BaseContinuity {
         });
 
         return [steps, direction];
-    }
-
-    getPopup() {
-        let [stepType, orientation, beatsPerStep, customText] = super.getPopup();
-
-        let steps = HTMLBuilder.formfield("Number of steps", HTMLBuilder.input({
-            type: "number",
-            initial: this._numSteps,
-        }), "numSteps");
-
-        let direction = HTMLBuilder.formfield("Direction", HTMLBuilder.select({
-            options: DIRECTIONS,
-            initial: this._direction,
-        }));
-
-        return [steps, direction, stepType, beatsPerStep, customText];
     }
 }

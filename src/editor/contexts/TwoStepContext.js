@@ -3,6 +3,8 @@ import Continuity from "calchart/Continuity";
 import ContinuityContext from "editor/contexts/ContinuityContext";
 import { HiddenContextMixin } from "editor/contexts/HiddenContext";
 
+import { underscoreKeys, update } from "utils/JSUtils";
+
 /**
  * The context that lets the user select the continuities to run
  * in a two-step continuity.
@@ -157,13 +159,13 @@ class ContextActions extends ContinuityContext.actions {
      * @param {TwoStepContinuity} [twoStep=this._continuity]
      */
     static saveContinuity(continuity, data, twoStep=this._continuity) {
-        let changed = continuity.savePopup(data);
+        let changed = update(continuity, underscoreKeys(data));
         twoStep.sheet.updateMovements(twoStep.dotType);
 
         return {
             data: [continuity, data, twoStep],
             undo: function() {
-                continuity.savePopup(changed);
+                update(continuity, changed);
                 twoStep.sheet.updateMovements(twoStep.dotType);
             },
         };

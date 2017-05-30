@@ -68,6 +68,13 @@ export default class BaseContinuity {
     }
 
     /**
+     * @return {EditContinuityPopup}
+     */
+    static get popupClass() {
+        throw new NotImplementedError(this);
+    }
+
+    /**
      * Build the movements from the given continuities for the given dot.
      *
      * @param {Continuity[]} continuities
@@ -97,6 +104,11 @@ export default class BaseContinuity {
             return moves;
         });
     }
+
+    // getter methods to access raw properties instead of resolving defaults
+    get beatsPerStep() { return this._beatsPerStep; }
+    get orientation() { return this._orientation; }
+    get stepType() { return this._stepType; }
 
     get dotType() {
         return this._dotType;
@@ -144,6 +156,13 @@ export default class BaseContinuity {
     }
 
     /**
+     * @return {string}
+     */
+    getCustomText() {
+        return this._customText;
+    }
+
+    /**
      * Get the movements for the given dot for the given stuntsheet.
      *
      * @param {Dot} dot - The dot to get movements for.
@@ -188,53 +207,6 @@ export default class BaseContinuity {
     }
 
     /**
-     * Get the fields to add to the Edit Continuity popup. The form fields
-     * need to have their name match the instance variable, e.g. "orientation"
-     * for this._orientation.
-     *
-     * @return {jQuery[]}
-     */
-    getPopup() {
-        let stepType = HTMLBuilder.formfield("Step type", HTMLBuilder.select({
-            options: STEP_TYPES,
-            initial: this._stepType,
-        }));
-
-        let orientation = HTMLBuilder.formfield("Orientation", HTMLBuilder.select({
-            options: ORIENTATIONS,
-            initial: this._orientation,
-        }));
-
-        // beats per step is a select between default/custom, which disables/enables an
-        // input for a custom beats per step
-        let beatsPerStep = HTMLBuilder.formfield("Beats per step", HTMLBuilder.select({
-            options: {
-                default: "Default",
-                custom: "Custom",
-            },
-            change: function() {
-                let disabled = $(this).val() !== "custom";
-                $(this).siblings("input").prop("disabled", disabled);
-            },
-            initial: this._beatsPerStep === "default" ? "default" : "custom",
-        }));
-        HTMLBuilder.input({
-            name: "customBeatsPerStep",
-            type: "number",
-            initial: this.getBeatsPerStep(),
-        }).appendTo(beatsPerStep);
-        beatsPerStep.find("select").change();
-
-        let customText = HTMLBuilder.formfield(
-            "Custom Continuity Text",
-            HTMLBuilder.make("textarea").val(this._customText),
-            "customText"
-        );
-
-        return [stepType, orientation, beatsPerStep, customText];
-    }
-
-    /**
      * Get this continuity's step type, resolving any defaults.
      *
      * @return {string} Step type (see CalchartUtils.STEP_TYPES).
@@ -244,39 +216,12 @@ export default class BaseContinuity {
     }
 
     /**
-     * Update this continuity when saving the Edit Continuity popup.
-     *
-     * @param {Object} data - The popup data.
-     * @return {Object} The values that were changed, mapping name
-     *   of the field to the old value.
-     */
-    savePopup(data) {
-        return update(this, underscoreKeys(data));
-    }
-
-    /**
      * Sets the sheet this continuity is a part of. Used when cloning a Sheet.
      *
      * @param {Sheet} sheet
      */
     setSheet(sheet) {
         this._sheet = sheet;
-    }
-
-    /**
-     * Validate the data when saving the Edit Continuity popup.
-     *
-     * @param {Object} data
-     */
-    validatePopup(data) {
-        if (data.beatsPerStep === "custom") {
-            data.beatsPerStep = parseInt(data.customBeatsPerStep);
-            if (_.isNaN(data.beatsPerStep)) {
-                throw new ValidationError("Please provide the number of beats per step.");
-            } else if (data.beatsPerStep <= 0) {
-                throw new ValidationError("Beats per step needs to be a positive integer.");
-            }
-        }
     }
 
     /**** HELPERS ****/

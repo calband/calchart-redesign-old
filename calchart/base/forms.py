@@ -27,12 +27,3 @@ class CreateUserForm(UserCreationForm):
         user.save()
 
         return user
-
-### EDITOR POPUPS ###
-
-class EditContinuityPopup(object):
-    """
-    The popup to edit a continuity
-    """
-    name = 'edit-continuity'
-    template_name = 'partials/popup_edit_continuity.html'

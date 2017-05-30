@@ -332,7 +332,7 @@ body.context-background .workspace .graph {
 
 /** CONTINUITY CONTEXT **/
 
-.popup-box.edit-continuity {
+.popup.edit-continuity {
     label {
         width: 125px;
     }
@@ -346,8 +346,11 @@ body.context-background .workspace .graph {
             max-width: 100%;
         }
     }
-    &.continuity-cm {
+    &.continuity-cm, &.continuity-mt, &.continuity-close {
         .duration {
+            label {
+                width: initial;
+            }
             select {
                 width: 125px;
             }

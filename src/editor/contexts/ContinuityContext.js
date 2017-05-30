@@ -5,13 +5,9 @@ import GraphContext from "editor/contexts/GraphContext";
 
 import { ActionError } from "utils/errors";
 import HTMLBuilder from "utils/HTMLBuilder";
+import { underscoreKeys, update } from "utils/JSUtils";
 import { round } from "utils/MathUtils";
-import {
-    getData,
-    setupPanel,
-    showContextMenu,
-    showPopup,
-} from "utils/UIUtils";
+import { setupPanel, showContextMenu } from "utils/UIUtils";
 
 /**
  * The Context that allows a user to edit continuities for dot types
@@ -172,27 +168,8 @@ export default class ContinuityContext extends GraphContext {
      */
     editContinuity(continuity) {
         continuity = this._getContinuity(continuity);
-        let contents = continuity.getPopup();
-
-        showPopup("edit-continuity", {
-            init: popup => {
-                popup.addClass(`continuity-${continuity.info.name}`);
-
-                popup.find(".continuity-title").text(continuity.info.name);
-                popup.find("form").prepend(contents);
-                popup.find("select").dropdown();
-            },
-            onHide: popup => {
-                popup.removeClassRegex(/^continuity-.*$/);
-
-                popup.find("form .field").remove();
-            },
-            onSubmit: popup => {
-                let data = getData(popup);
-                continuity.validatePopup(data);
-                this.controller.doAction("saveContinuity", [continuity, data]);
-            },
-        });
+        let PopupClass = continuity.constructor.popupClass;
+        new PopupClass(this.controller, continuity).show();
     }
 
     /**
@@ -525,7 +502,7 @@ class ContextActions extends GraphContext.actions {
      * @param {string} [dotType=this._dotType] - The dot type to save continuity for.
      */
     static saveContinuity(continuity, data, sheet=this.activeSheet, dotType=this._dotType) {
-        let changed = continuity.savePopup(data);
+        let changed = update(continuity, underscoreKeys(data));
 
         sheet.updateMovements(dotType);
         this.checkContinuities(sheet, dotType);
@@ -534,7 +511,7 @@ class ContextActions extends GraphContext.actions {
         return {
             data: [continuity, data, sheet, dotType],
             undo: function() {
-                continuity.savePopup(changed);
+                update(continuity, changed);
                 sheet.updateMovements(dotType);
                 this.refresh("grapher", "panel");
             },

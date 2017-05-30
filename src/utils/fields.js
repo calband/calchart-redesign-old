@@ -92,6 +92,12 @@ class Field {
 }
 
 export class BooleanField extends Field {
+    constructor(name, options={}) {
+        // checkboxes need to be able to be unchecked
+        options.required = false;
+        super(name, options);
+    }
+
     renderField() {
         return HTMLBuilder.input("checkbox")
             .prop("checked", this._initial);
@@ -256,5 +262,11 @@ export class NumberField extends Field {
         }
 
         return value;
+    }
+}
+
+export class TextField extends Field {
+    renderField() {
+        return HTMLBuilder.make("textarea");
     }
 }

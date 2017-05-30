@@ -1,8 +1,7 @@
 import BaseContinuity from "calchart/continuities/BaseContinuity";
 import MovementCommandStop from "calchart/movements/MovementCommandStop";
+import { StopContinuityPopup } from "popups/ContinuityPopups";
 
-import { ORIENTATIONS } from "utils/CalchartUtils";
-import { ValidationError } from "utils/errors";
 import HTMLBuilder from "utils/HTMLBuilder";
 import { validatePositive } from "utils/JSUtils";
 
@@ -39,6 +38,10 @@ export default class StopContinuity extends BaseContinuity {
         });
     }
 
+    static get popupClass() {
+        return StopContinuityPopup;
+    }
+
     get info() {
         if (this._marktime) {
             return {
@@ -53,6 +56,13 @@ export default class StopContinuity extends BaseContinuity {
                 label: "Close",
             };
         }
+    }
+
+    /**
+     * @return {?int}
+     */
+    getDuration() {
+        return this._duration;
     }
 
     getMovements(dot, data) {
@@ -109,48 +119,5 @@ export default class StopContinuity extends BaseContinuity {
         numBeats.prop("disabled", _.isNull(this._duration));
 
         return [duration, numBeats];
-    }
-
-    getPopup() {
-        let [stepType, orientation, beatsPerStep, customText] = super.getPopup();
-
-        let numBeats = HTMLBuilder.formfield("Number of beats", HTMLBuilder.input({
-            type: "number",
-            initial: this._duration,
-        }), "numBeats");
-
-        let duration = HTMLBuilder.formfield("Duration", HTMLBuilder.select({
-            options: {
-                remaining: "To End",
-                custom: "Custom",
-            },
-            initial: _.isNull(this._duration) ? "remaining" : "custom",
-            change: function() {
-                numBeats.find("input").prop("disabled", $(this).val() !== "custom");
-            },
-        }));
-        duration.find("select").change();
-
-        switch (this.info.type) {
-            case "close":
-                return [duration, numBeats, orientation, customText];
-            case "mt":
-                return [duration, numBeats, orientation, stepType, beatsPerStep, customText];
-        }
-    }
-
-    validatePopup(data) {
-        super.validatePopup(data);
-
-        if (data.duration === "remaining") {
-            data.duration = null;
-        } else {
-            data.duration = parseInt(data.numBeats);
-            if (_.isNaN(data.duration)) {
-                throw new ValidationError("Please provide the number of beats.");
-            } else if (data.duration <= 0) {
-                throw new ValidationError("Duration needs to be a positive integer.");
-            }
-        }
     }
 }

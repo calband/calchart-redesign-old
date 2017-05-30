@@ -2,6 +2,7 @@ import OrderedDotsContinuity from "calchart/continuities/OrderedDotsContinuity";
 import Continuity from "calchart/Continuity";
 import MovementCommandMove from "calchart/movements/MovementCommandMove";
 import MovementCommandStop from "calchart/movements/MovementCommandStop";
+import { TwoStepContinuityPopup } from "popups/ContinuityPopups";
 
 import HTMLBuilder from "utils/HTMLBuilder";
 import { moveElem } from "utils/JSUtils";
@@ -51,6 +52,10 @@ export default class TwoStepContinuity extends OrderedDotsContinuity {
         });
     }
 
+    static get popupClass() {
+        return TwoStepContinuityPopup;
+    }
+
     get info() {
         return {
             type: "two",
@@ -86,6 +91,13 @@ export default class TwoStepContinuity extends OrderedDotsContinuity {
      */
     getContinuities() {
         return this._continuities;
+    }
+
+    /**
+     * @return {boolean}
+     */
+    getIsMarktime() {
+        return this._isMarktime;
     }
 
     getMovements(dot, data) {
@@ -141,17 +153,6 @@ export default class TwoStepContinuity extends OrderedDotsContinuity {
         setupTooltip(editContinuities, "Continuities");
 
         return [editLabel, editDots, editContinuities];
-    }
-
-    getPopup() {
-        let [stepType, orientation, beatsPerStep, customText] = super.getPopup();
-
-        let isMarktime = HTMLBuilder.formfield("Marktime first", HTMLBuilder.input({
-            type: "checkbox",
-            initial: this._isMarktime,
-        }), "isMarktime");
-
-        return [isMarktime, stepType, beatsPerStep, customText];
     }
 
     /**

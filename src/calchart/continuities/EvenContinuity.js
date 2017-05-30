@@ -1,5 +1,6 @@
 import BaseContinuity from "calchart/continuities/BaseContinuity";
 import MovementCommandEven from "calchart/movements/MovementCommandEven";
+import { EvenContinuityPopup } from "popups/ContinuityPopups";
 
 import HTMLBuilder from "utils/HTMLBuilder";
 
@@ -30,6 +31,10 @@ export default class EvenContinuity extends BaseContinuity {
         return new EvenContinuity(sheet, dotType, data);
     }
 
+    static get popupClass() {
+        return EvenContinuityPopup;
+    }
+
     get info() {
         return {
             type: "even",
@@ -37,6 +42,8 @@ export default class EvenContinuity extends BaseContinuity {
             label: "Even",
         };
     }
+
+    /**** METHODS ****/
 
     getMovements(dot, data) {
         let start = data.position;
@@ -59,23 +66,5 @@ export default class EvenContinuity extends BaseContinuity {
             options
         );
         return [move];
-    }
-
-    getPopup() {
-        let [stepType, orientation, beatsPerStep, customText] = super.getPopup();
-
-        let select = HTMLBuilder.select({
-            options: {
-                "": "Direction of Travel",
-                "default": "Default",
-                "east": "East",
-                "west": "West",
-            },
-            initial: this._orientation,
-        });
-        orientation.find("select").remove();
-        orientation.append(select);
-
-        return [stepType, orientation, beatsPerStep, customText];
     }
 }

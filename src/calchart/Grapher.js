@@ -337,7 +337,6 @@ export default class Grapher {
      * @param {int} currentBeat - Beat to draw, relative to the start of the Sheet.
      */
     _drawDots(sheet, currentBeat) {
-        let _this = this;
         let options = this._options;
         let dotRadius = this.getDotRadius();
 

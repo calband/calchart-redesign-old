@@ -1,6 +1,6 @@
 import FollowLeaderContinuity from "calchart/continuities/FollowLeaderContinuity";
+import { CounterMarchContinuityPopup } from "popups/ContinuityPopups";
 
-import { ValidationError } from "utils/errors";
 import HTMLBuilder from "utils/HTMLBuilder";
 import Iterator from "utils/Iterator";
 import { setupTooltip } from "utils/UIUtils";
@@ -39,12 +39,25 @@ export default class CounterMarchContinuity extends FollowLeaderContinuity {
         return data;
     }
 
+    static get popupClass() {
+        return CounterMarchContinuityPopup;
+    }
+
     get info() {
         return {
             type: "cm",
             name: "Counter March",
             label: "CM",
         };
+    }
+
+    /**** METHODS ****/
+
+    /**
+     * @return {?int}
+     */
+    getDuration() {
+        return this._duration;
     }
 
     getPanel(controller) {
@@ -60,46 +73,7 @@ export default class CounterMarchContinuity extends FollowLeaderContinuity {
         return [editLabel, editDots];
     }
 
-    getPopup() {
-        let [stepType, orientation, beatsPerStep, customText] = super.getPopup();
-
-        // duration is a select between remaining/custom, which disables/enables an
-        // input for a custom duration
-        let duration = HTMLBuilder.formfield("Number of beats", HTMLBuilder.select({
-            options: {
-                remaining: "Remaining",
-                custom: "Custom",
-            },
-            change: function() {
-                let disabled = $(this).val() !== "custom";
-                $(this).siblings("input").prop("disabled", disabled);
-            },
-            initial: this._duration === null ? "remaining" : "custom",
-        }), "duration");
-        HTMLBuilder.input({
-            name: "customDuration",
-            type: "number",
-            initial: _.defaultTo(this._duration, 0),
-        }).appendTo(duration);
-        duration.find("select").change();
-
-        return [duration, stepType, beatsPerStep, customText];
-    }
-
-    validatePopup(data) {
-        super.validatePopup(data);
-
-        if (data.duration === "custom") {
-            data.duration = parseInt(data.customDuration);
-            if (_.isNaN(data.duration)) {
-                throw new ValidationError("Please provide the duration.");
-            } else if (data.duration <= 0) {
-                throw new ValidationError("Duration needs to be a positive integer.");
-            }
-        } else {
-            data.duration = null;
-        }
-    }
+    /**** HELPERS ****/
 
     _getPathIterator(index) {
         let path = this._order.map(dot => this.sheet.getDotInfo(dot).position);

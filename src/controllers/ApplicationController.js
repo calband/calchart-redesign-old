@@ -88,7 +88,7 @@ export default class ApplicationController {
         // set up keyboard shortcuts
         $(window).keydown(e => {
             // ignore keypresses when typing into an input field
-            if ($(e.target).is("input")) {
+            if ($(e.target).is("input, textarea")) {
                 return;
             }
 

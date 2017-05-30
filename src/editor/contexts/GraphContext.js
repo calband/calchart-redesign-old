@@ -106,7 +106,7 @@ export default class GraphContext extends BaseContext {
                 $(e.currentTarget).click();
 
                 showContextMenu(e, {
-                    "Properties...": "editSheetProperties",
+                    "Properties...": "showEditSheet",
                     "Duplicate Sheet": "duplicateSheet",
                     "Delete Sheet": "deleteSheet",
                 });
@@ -355,13 +355,6 @@ export default class GraphContext extends BaseContext {
     }
 
     /**
-     * Show the popup for editing the currently active sheet's properties.
-     */
-    editSheetProperties() {
-        new EditSheetPopup(this).show();
-    }
-
-    /**
      * @return {int} The beat in the current sheet to draw when refreshing the grapher.
      */
     getCurrentBeat() {
@@ -424,6 +417,13 @@ export default class GraphContext extends BaseContext {
      */
     showAddSheet() {
         new AddSheetPopup(this.controller).show();
+    }
+
+    /**
+     * Show the popup for editing the currently active sheet's properties.
+     */
+    showEditSheet() {
+        new EditSheetPopup(this).show();
     }
 
     /**

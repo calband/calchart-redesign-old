@@ -24,11 +24,6 @@ export default class EditSheetPopup extends BasePopup {
         };
     }
 
-    show() {
-        super.show();
-        this._updateBackgroundInfo();
-    }
-
     getFields() {
         let sheet = this._context.activeSheet;
 
@@ -101,6 +96,7 @@ export default class EditSheetPopup extends BasePopup {
         HTMLBuilder.div("icons", [editIcon, moveIcon, clearIcon]).appendTo(backgroundImage);
 
         this._popup.find("form").prepend(backgroundImage);
+        this._updateBackgroundInfo();
     }
 
     onSave(data) {
