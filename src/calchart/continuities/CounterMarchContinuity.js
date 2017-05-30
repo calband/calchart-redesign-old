@@ -1,9 +1,7 @@
 import FollowLeaderContinuity from "calchart/continuities/FollowLeaderContinuity";
 import { CounterMarchContinuityPopup } from "popups/ContinuityPopups";
 
-import HTMLBuilder from "utils/HTMLBuilder";
 import Iterator from "utils/Iterator";
-import { setupTooltip } from "utils/UIUtils";
 
 /**
  * A counter-march continuity, which is basically a follow-the-leader continuity
@@ -58,19 +56,6 @@ export default class CounterMarchContinuity extends FollowLeaderContinuity {
      */
     getDuration() {
         return this._duration;
-    }
-
-    getPanel(controller) {
-        let editLabel = HTMLBuilder.label("Edit:");
-
-        let editDots = HTMLBuilder.icon("ellipsis-h").click(() => {
-            controller.loadContext("continuity-dots", {
-                continuity: this,
-            });
-        });
-        setupTooltip(editDots, "Dots");
-
-        return [editLabel, editDots];
     }
 
     /**** HELPERS ****/

@@ -79,14 +79,14 @@ export default class GateTurnContinuity extends BaseContinuity {
         return [movement];
     }
 
-    getPanel(controller) {
+    getPanel(context) {
         let degrees = HTMLBuilder.input({
             type: "number",
             initial: Math.abs(this._degrees),
             change: e => {
                 let degrees = validatePositive(e.currentTarget);
                 this._degrees = Math.sign(this._degrees) * degrees;
-                this._updateMovements(controller);
+                this._updateMovements(context);
             },
         });
 
@@ -99,12 +99,12 @@ export default class GateTurnContinuity extends BaseContinuity {
             change: e => {
                 let sign = $(e.currentTarget).val() === "CW" ? 1 : -1;
                 this._degrees = sign * Math.abs(this._degrees);
-                this._updateMovements(controller);
+                this._updateMovements(context);
             },
         });
 
         let editReference = HTMLBuilder.icon("crosshairs").click(() => {
-            controller.loadContext("gate-reference", {
+            context.controller.loadContext("gate-reference", {
                 continuity: this,
             });
         });

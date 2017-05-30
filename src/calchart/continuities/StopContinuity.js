@@ -87,13 +87,13 @@ export default class StopContinuity extends BaseContinuity {
         return [move];
     }
 
-    getPanel(controller) {
+    getPanel(context) {
         let numBeats = HTMLBuilder.input({
             type: "number",
             initial: this._duration,
             change: e => {
                 this._duration = validatePositive(e.currentTarget);
-                this._updateMovements(controller);
+                this._updateMovements(context);
             },
         });
 
@@ -111,7 +111,7 @@ export default class StopContinuity extends BaseContinuity {
                     case "remaining":
                         numBeats.prop("disabled", true);
                         this._duration = null;
-                        this._updateMovements(controller);
+                        this._updateMovements(context);
                 }
             },
         });

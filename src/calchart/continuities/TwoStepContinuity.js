@@ -135,24 +135,17 @@ export default class TwoStepContinuity extends OrderedDotsContinuity {
         this.sheet.updateMovements(this.dotType);
     }
 
-    getPanel(controller) {
-        let editLabel = HTMLBuilder.label("Edit:");
+    getPanel(context) {
+        let panel = super.getPanel(context);
 
-        let editDots = HTMLBuilder.icon("ellipsis-h").click(() => {
-            controller.loadContext("continuity-dots", {
-                continuity: this,
-            });
-        });
-        setupTooltip(editDots, "Dots");
-
-        let editContinuities = HTMLBuilder.icon("map-signs").click(() => {
-            controller.loadContext("two-step", {
+        let editContinuities = HTMLBuilder.icon("map-signs").click(e => {
+            context.controller.loadContext("two-step", {
                 continuity: this,
             });
         });
         setupTooltip(editContinuities, "Continuities");
 
-        return [editLabel, editDots, editContinuities];
+        return _.concat(panel, editContinuities);
     }
 
     /**

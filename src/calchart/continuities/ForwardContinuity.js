@@ -81,13 +81,13 @@ export default class ForwardContinuity extends BaseContinuity {
         return this._numSteps;
     }
 
-    getPanel(controller) {
+    getPanel(context) {
         let steps = HTMLBuilder.input({
             type: "number",
             initial: this._numSteps,
             change: e => {
                 this._numSteps = validatePositive(e.currentTarget);
-                this._updateMovements(controller);
+                this._updateMovements(context);
             },
         });
 
@@ -96,7 +96,7 @@ export default class ForwardContinuity extends BaseContinuity {
             initial: this._direction,
             change: e => {
                 this._direction = parseNumber($(e.currentTarget).val());
-                this._updateMovements(controller);
+                this._updateMovements(context);
             },
         });
 

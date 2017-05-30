@@ -131,25 +131,17 @@ export default class FollowLeaderContinuity extends OrderedDotsContinuity {
         return movements;
     }
 
-    getPanel(controller) {
-        let editLabel = HTMLBuilder.label("Edit:");
+    getPanel(context) {
+        let panel = super.getPanel(context);
 
-        // TODO: move to ordereddotscontinuity
-        let editDots = HTMLBuilder.icon("ellipsis-h").click(() => {
-            controller.loadContext("continuity-dots", {
-                continuity: this,
-            });
-        });
-        setupTooltip(editDots, "Dots");
-
-        let editPath = HTMLBuilder.icon("crosshairs").click(() => {
-            controller.loadContext("ftl-path", {
+        let editPath = HTMLBuilder.icon("crosshairs").click(e => {
+            context.controller.loadContext("ftl-path", {
                 continuity: this,
             });
         });
         setupTooltip(editPath, "Path");
 
-        return [editLabel, editDots, editPath];
+        return _.concat(panel, editPath);
     }
 
     /**

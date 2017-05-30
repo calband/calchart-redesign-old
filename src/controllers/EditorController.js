@@ -123,10 +123,6 @@ export default class EditorController extends ApplicationController {
         window.open(`/download/${this.show.slug}.json`);
     }
 
-    getContext() {
-        return this._context;
-    }
-
     getShortcut(shortcut) {
         let action = super.getShortcut(shortcut);
         return _.defaultTo(action, this._context.constructor.shortcuts[shortcut]);

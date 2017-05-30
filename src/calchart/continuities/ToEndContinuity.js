@@ -47,13 +47,13 @@ export default class ToEndContinuity extends BaseContinuity {
         return this._end;
     }
 
-    getPanel(controller) {
+    getPanel(context) {
         let endLabel = HTMLBuilder.label("End:");
         let endChoices = HTMLBuilder.select({
             options: ENDINGS,
             change: e => {
                 this._end = $(e.currentTarget).val();
-                this._updateMovements(controller);
+                this._updateMovements(context);
             },
             initial: this._end,
         });
