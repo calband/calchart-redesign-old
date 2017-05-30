@@ -31,18 +31,6 @@ class CreateUserForm(UserCreationForm):
 
 ### EDITOR POPUPS ###
 
-class EditShowPopup(object):
-    """
-    The popup to edit a show.
-    """
-    name = 'edit-show'
-    title = 'Show Properties'
-
-    fieldType = forms.ChoiceField(choices=FIELD_TYPES)
-    beatsPerStep = forms.IntegerField()
-    stepType = forms.ChoiceField(choices=STEP_TYPES)
-    orientation = forms.ChoiceField(choices=ORIENTATIONS)
-
 class AddSongPopup(object):
     """
     The popup to add a song

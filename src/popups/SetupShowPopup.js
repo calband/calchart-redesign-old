@@ -2,7 +2,7 @@ import Show from "calchart/Show";
 import EditorController from "controllers/EditorController";
 import BasePopup from "popups/BasePopup";
 
-import { DOT_FORMATS, FIELD_TYPES } from "utils/CalchartUtils";
+import { DOT_FORMATS, SHOW_FIELD_TYPES } from "utils/CalchartUtils";
 import { ChoiceField, NumberField } from "utils/fields";
 import { doAction } from "utils/UIUtils";
 
@@ -38,6 +38,10 @@ export default class SetupShowPopup extends BasePopup {
     }
 
     getFields() {
+        let fieldType = new ChoiceField("fieldType", SHOW_FIELD_TYPES, {
+            initial: "college",
+        });
+
         return [
             new NumberField("numDots", {
                 label: "Number of dots",
@@ -46,9 +50,7 @@ export default class SetupShowPopup extends BasePopup {
             new ChoiceField("dotFormat", DOT_FORMATS, {
                 initial: "combo",
             }),
-            new ChoiceField("fieldType", FIELD_TYPES, {
-                initial: "college",
-            }),
+            fieldType,
         ];
     }
 

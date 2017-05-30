@@ -24,6 +24,7 @@ export const ENDINGS = {
 
 /** @const {Object.<string, string>} */
 export const FIELD_TYPES = {
+    default: "Default",
     college: "College Field",
 };
 
@@ -53,6 +54,18 @@ export const STEP_TYPES = {
     SH: "Show High",
     JS: "Jerky Step",
 };
+
+/** @const {Object.<string, string>} */
+export const SHOW_FIELD_TYPES = _.clone(FIELD_TYPES);
+delete SHOW_FIELD_TYPES.default;
+
+/** @const {Object.<string, string>} */
+export const SHOW_ORIENTATIONS = _.clone(ORIENTATIONS);
+delete SHOW_ORIENTATIONS.default;
+
+/** @const {Object.<string, string>} */
+export const SHOW_STEP_TYPES = _.clone(STEP_TYPES);
+delete SHOW_STEP_TYPES.default;
 
 /**
  * Return the dot labels for the given number of dots.

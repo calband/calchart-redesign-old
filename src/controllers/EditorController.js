@@ -1,17 +1,16 @@
-import Context from "editor/Context";
-
 import ApplicationController from "controllers/ApplicationController";
+import Context from "editor/Context";
+import EditShowPopup from "popups/EditShowPopup";
 
+import { IS_LOCAL } from "utils/env";
 import { ActionError, ValidationError } from "utils/errors";
 import HTMLBuilder from "utils/HTMLBuilder";
 import { empty, underscoreKeys, update } from "utils/JSUtils";
 import {
     doAction,
-    getData,
     setupMenu,
     setupToolbar,
     showMessage,
-    showPopup,
 } from "utils/UIUtils";
 
 /**
@@ -61,7 +60,7 @@ export default class EditorController extends ApplicationController {
         setupToolbar(".toolbar");
 
         // prompt user if leaving while unsaved, unless in development
-        if (!window.isLocal) {
+        if (!IS_LOCAL) {
             $(window).on("beforeunload", () => {
                 let data = JSON.stringify(this.show.serialize());
                 if (data !== this._savedShow) {
@@ -114,27 +113,7 @@ export default class EditorController extends ApplicationController {
      * Show the popup for editing the show properties.
      */
     editShowProperties() {
-        showPopup("edit-show", {
-            init: popup => {
-                popup.find(".fieldType select").choose(this.show.getFieldType());
-                popup.find(".beatsPerStep input").val(this.show.getBeatsPerStep());
-                popup.find(".stepType select").choose(this.show.getStepType());
-                popup.find(".orientation select").choose(this.show.getOrientation());
-            },
-            onSubmit: popup => {
-                let data = getData(popup);
-
-                // validate data
-                data.beatsPerStep = parseInt(data.beatsPerStep);
-                if (_.isNaN(data.beatsPerStep)) {
-                    throw new ValidationError("Please provide the number of beats per step.");
-                } else if (data.beatsPerStep <= 0) {
-                    throw new ValidationError("Beats per step needs to be a positive integer.");
-                }
-
-                this.doAction("saveShowProperties", [data]);
-            },
-        });
+        new EditShowPopup(this).show();
     }
 
     /**

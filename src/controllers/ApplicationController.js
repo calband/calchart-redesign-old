@@ -1,3 +1,4 @@
+import { IS_LOCAL } from "utils/env";
 import { ActionError } from "utils/errors";
 import { attempt } from "utils/JSUtils";
 import { setupTooltip } from "utils/UIUtils";
@@ -5,9 +6,6 @@ import { setupTooltip } from "utils/UIUtils";
 if (_ === undefined) {
     console.error("lodash is not loaded!");
 }
-
-// The singleton instance of the ApplicationController
-window.controller = null;
 
 /**
  * The abstract superclass that stores the current state of a Calchart application and
@@ -33,12 +31,17 @@ export default class ApplicationController {
      * @return {ApplicationController} The initialized controller.
      */
     static init(show) {
-        if (_.isNull(window.controller)) {
-            window.controller = new this(show);
-            window.controller.init();
+        if (_.isUndefined(this._controller)) {
+            this._controller = new this(show);
+            // TODO: delete
+            window.controller = this._controller;
+            this._controller.init();
+            if (IS_LOCAL) {
+                window.controller = this._controller;
+            }
         }
 
-        return window.controller;
+        return this._controller;
     }
 
     /**

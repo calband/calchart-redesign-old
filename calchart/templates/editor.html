@@ -9,7 +9,6 @@
     {% add_style "editor.css" %}
     {% add_script "editor.js" %}
     <script>
-        window.isLocal = {{ is_local|yesno:"true,false" }};
         {% if show.viewer %}
             window.show = {{ show.viewer|asjson|safe }};
         {% else %}

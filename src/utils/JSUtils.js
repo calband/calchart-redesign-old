@@ -2,12 +2,7 @@
  * @file A collection of Javascript utility/helper functions.
  */
 
-/**
- * true if the user is on a Mac, false otherwise.
- * https://css-tricks.com/snippets/javascript/test-mac-pc-javascript/
- * @const {boolean}
- */
-export const IS_MAC = navigator.userAgent.includes("Mac OS X");
+import { IS_MAC } from "utils/env";
 
 let shortcutMap, shortcutSep;
 if (IS_MAC) {
