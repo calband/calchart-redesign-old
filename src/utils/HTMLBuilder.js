@@ -128,12 +128,11 @@ export default class HTMLBuilder {
      *
      * @param {object} options -- the options to add to the <select>, mapping
      *    the value of the option to the name.
-     * @param {string} class -- the class to add to the <select>
      * @param {function} change -- the callback to run when an option is selected
      * @param {string} initial -- the value of the option to initially mark selected
      */
     static select() {
-        let args = parseArgs(arguments, ["options", "class", "change", "initial"]);
+        let args = parseArgs(arguments, ["options", "change", "initial"]);
 
         let select = $("<select>").addClass(args.class).change(args.change);
 

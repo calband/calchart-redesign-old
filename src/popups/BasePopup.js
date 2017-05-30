@@ -91,10 +91,11 @@ export default class BasePopup {
             }
         });
 
+        // convert selects
+        this._popup.find("select").dropdown();
+
         // auto focus on first input
         fields[0].getField().focus();
-
-        this.onInit();
     }
 
     /**
@@ -136,11 +137,6 @@ export default class BasePopup {
         }
         return HTMLBuilder.make("h1", title);
     }
-
-    /**
-     * Any actions to run after the popup is displayed.
-     */
-    onInit() {}
 
     /**
      * Any actions to run when the Save button is clicked.

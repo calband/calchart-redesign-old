@@ -371,12 +371,11 @@ import Dot from "./Dot";
 import Dot from "calchart/Dot";
 ```
 
-Imports should be organized in newline-separated sections, one for each module, ordered alphabetically. Within each section, order imports alphabetically by **path**.
+Imports should be organized in two sections, one for utilities and one for all other modules. Within each section, order imports alphabetically by **path**.
 
 ```js
 import AnimationState from "calchart/AnimationState";
-import Coordinate from "calchart/Coordinate";
-
+import Grapher from "calchart/Grapher";
 import EditorController from "controllers/EditorController";
 
 import HTMLBuilder from "utils/HTMLBuilder";

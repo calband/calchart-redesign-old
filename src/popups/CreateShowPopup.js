@@ -1,6 +1,5 @@
 import BasePopup from "popups/BasePopup";
 
-import { ValidationError } from "utils/errors";
 import { BooleanField, CharField, FileField } from "utils/fields";
 import HTMLBuilder from "utils/HTMLBuilder";
 import { doAction, showError } from "utils/UIUtils";

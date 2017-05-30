@@ -23,6 +23,11 @@ export const ENDINGS = {
 };
 
 /** @const {Object.<string, string>} */
+export const FIELD_TYPES = {
+    college: "College Field",
+};
+
+/** @const {Object.<string, string>} */
 export const ORIENTATIONS = {
     default: "Default",
     east: "East",

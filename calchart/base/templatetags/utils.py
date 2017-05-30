@@ -17,6 +17,8 @@ def asjson(json_str):
 
     return json_str
 
+# TODO: delete
+
 @register.tag
 def foreach_dottype(parser, token):
     """

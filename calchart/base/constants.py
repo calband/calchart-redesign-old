@@ -1,3 +1,5 @@
+# TODO: delete
+
 # dot types, see DotType
 DOT_TYPES = [
     'plain',

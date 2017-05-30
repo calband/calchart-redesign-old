@@ -31,18 +31,6 @@ class CreateUserForm(UserCreationForm):
 
 ### EDITOR POPUPS ###
 
-class SetUpShowPopup(object):
-    """
-    The popup to set up a show when first opening in the editor view.
-    """
-    name = 'setup-show'
-    template_name = 'partials/popup_no_cancel.html'
-    title = 'Set Up Show'
-
-    numDots = forms.IntegerField(label='Number of dots')
-    dotFormat = forms.ChoiceField(choices=DOT_FORMATS, initial='combo')
-    fieldType = forms.ChoiceField(choices=FIELD_TYPES, initial='college')
-
 class EditShowPopup(object):
     """
     The popup to edit a show.
@@ -103,13 +91,3 @@ class EditContinuityPopup(object):
     """
     name = 'edit-continuity'
     template_name = 'partials/popup_edit_continuity.html'
-
-editor_popups = [
-    SetUpShowPopup,
-    EditShowPopup,
-    AddSongPopup,
-    EditSongPopup,
-    AddStuntsheetPopup,
-    EditStuntsheetPopup,
-    EditContinuityPopup,
-]

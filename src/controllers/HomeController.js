@@ -1,5 +1,4 @@
 import ApplicationController from "controllers/ApplicationController";
-
 import CreateShowPopup from "popups/CreateShowPopup";
 
 import HTMLBuilder from "utils/HTMLBuilder";

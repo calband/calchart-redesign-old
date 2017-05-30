@@ -17,7 +17,6 @@ class Field {
      *   - {string} label - The label of the field. Defaults to the name spaced out.
      *   - {*} initial - The initial value of the field.
      *   - {boolean} required - true if this field is required. Defaults to true.
-     *   - {function} validate - 
      */
     constructor(name, options={}) {
         this._name = name;
@@ -110,6 +109,29 @@ export class CharField extends Field {
     }
 }
 
+export class ChoiceField extends Field {
+    /**
+     * @param {string} name
+     * @param {object} choices - The options to add to the <select>, mapping
+     *   the value of the option to the human-readable name.
+     * @param {object} [options]
+     */
+    constructor(name, choices, options) {
+        super(name, options);
+
+        this._choices = choices;
+    }
+
+    renderField() {
+        let select = HTMLBuilder.select(this._choices);
+
+        // add an empty option to the beginning
+        HTMLBuilder.make("option").prependTo(select);
+
+        return select;
+    }
+}
+
 export class FileField extends Field {
     /**
      * @param {string} name
@@ -137,5 +159,34 @@ export class FileField extends Field {
         }
 
         return this._field[0].files[0];
+    }
+}
+
+export class NumberField extends Field {
+    /**
+     * @param {string} name
+     * @param {object} [options]
+     *   - {boolean} positive - true if should validate to be > 0. Defaults
+     *     to false.
+     */
+    constructor(name, options={}) {
+        super(name, options);
+
+        this._positive = _.defaultTo(options.positive, false);
+    }
+
+    renderField() {
+        return HTMLBuilder.input("number");
+    }
+
+    clean() {
+        let value = super.clean();
+        value = parseInt(value);
+
+        if (this._positive && value <= 0) {
+            throw new ValidationError(`${this._label} needs to be a positive integer.`);
+        }
+
+        return value;
     }
 }
