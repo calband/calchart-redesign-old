@@ -3,6 +3,12 @@
  */
 
 /** @const {Object.<string, string>} */
+export const DEFAULT_CUSTOM = {
+    default: "Default",
+    custom: "Custom",
+};
+
+/** @const {Object.<string, string>} */
 export const DIRECTIONS = {
     0: "E",
     90: "S",

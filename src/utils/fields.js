@@ -132,6 +132,74 @@ export class ChoiceField extends Field {
     }
 }
 
+/**
+ * A field that renders as a dropdown and a number input, and when
+ * the custom choice is selected, the number input can be edited.
+ */
+export class ChoiceOrNumberField extends ChoiceField {
+    /**
+     * @param {string} name
+     * @param {object} choices
+     * @param {object} [options]
+     *   - {object} initial - the initial values for the two fields of the
+     *     form: { choice: "foo", number: 1 }.
+     *   - {boolean} positive - true if should validate to be > 0. Defaults
+     *     to false.
+     */
+    constructor(name, choices, options) {
+        super(name, choices, options);
+
+        let { choice, number } = this._initial;
+        this._initial = choice;
+        this._initialNumber = number;
+
+        this._positive = _.defaultTo(options.positive, false);
+    }
+
+    render() {
+        let field = super.render();
+
+        let name = _.upperFirst(this._name);
+        HTMLBuilder
+            .input({
+                type: "number",
+                initial: this._initialNumber,
+            })
+            .attr("name", `custom${name}`)
+            .appendTo(field);
+
+        field.find("select").change();
+        return field;
+    }
+
+    renderField() {
+        let select = super.renderField();
+        select.change(e => {
+            let disabled = select.val() !== "custom";
+            select.siblings("input").prop("disabled", disabled);
+        });
+        return select;
+    }
+
+    clean() {
+        let value = this._field.val();
+
+        if (value === "custom") {
+            value = this._field.siblings("input").val();
+            if (this._required && value === "") {
+                throw new ValidationError(`${this._label} is required`);
+            }
+
+            value = parseInt(value);
+            if (this._positive && value <= 0) {
+                throw new ValidationError(`${this._label} needs to be a positive integer.`);
+            }
+        }
+
+        return value;
+    }
+}
+
 export class FileField extends Field {
     /**
      * @param {string} name

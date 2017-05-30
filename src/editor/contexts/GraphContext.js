@@ -2,8 +2,9 @@ import Coordinate from "calchart/Coordinate";
 import Dot from "calchart/Dot";
 import Grapher from "calchart/Grapher";
 import Sheet from "calchart/Sheet";
-
 import BaseContext from "editor/contexts/BaseContext";
+import AddSheetPopup from "popups/AddSheetPopup";
+import EditSheetPopup from "popups/EditSheetPopup";
 
 import { ActionError, AnimationStateError, ValidationError } from "utils/errors";
 import HTMLBuilder from "utils/HTMLBuilder";
@@ -22,15 +23,11 @@ import {
 } from "utils/MathUtils";
 import {
     doAction,
-    getData,
-    hidePopup,
-    promptFile,
     setupMenu,
     setupToolbar,
     showContextMenu,
     showError,
     showMessage,
-    showPopup,
 } from "utils/UIUtils";
 
 let GraphState = {
@@ -252,26 +249,6 @@ export default class GraphContext extends BaseContext {
     /**** METHODS ****/
 
     /**
-     * Show the popup that adds a stuntsheet to the Show
-     */
-    addStuntsheet() {
-        showPopup("add-stuntsheet", {
-            onSubmit: popup => {
-                let data = getData(popup);
-
-                data.numBeats = parseInt(data.numBeats);
-                if (_.isNaN(data.numBeats)) {
-                    throw new ValidationError("Please provide the number of beats in the stuntsheet.");
-                } else if (data.numBeats <= 0) {
-                    throw new ValidationError("Need to have a positive number of beats.");
-                }
-
-                this.controller.doAction("addSheet", [data.numBeats]);
-            },
-        });
-    }
-
-    /**
      * Check if any of the given dots have continuity errors in the currently
      * active sheet, showing a UI error if so. Can also pass arguments in as
      * an Object of keyword arguments.
@@ -381,96 +358,7 @@ export default class GraphContext extends BaseContext {
      * Show the popup for editing the currently active sheet's properties.
      */
     editSheetProperties() {
-        // update the background field in the popup
-        let updateBackgroundInfo = popup => {
-            let background = this.activeSheet.getBackground();
-            let fileText;
-            if (_.isUndefined(background)) {
-                fileText = "none selected";
-                popup.find(".hide-if-none").hide();
-            } else {
-                fileText = _.last(background.url.split("/"));
-                popup.find(".hide-if-none").show();
-            }
-            popup.find(".background-image .background-url").text(fileText);
-        };
-
-        showPopup("edit-stuntsheet", {
-            init: popup => {
-                let label = _.defaultTo(this.activeSheet.label, "");
-                popup.find(".label input").val(label);
-                popup.find(".numBeats input").val(this.activeSheet.getDuration());
-                popup.find(".fieldType select").choose(this.activeSheet.fieldType);
-                popup.find(".stepType select").choose(this.activeSheet.stepType);
-                popup.find(".orientation select").choose(this.activeSheet.orientation);
-
-                popup.find(".beatsPerStep select")
-                    .choose(this.activeSheet.beatsPerStep === "default" ? "default" : "custom")
-                    .change(function() {
-                        let disabled = $(this).val() !== "custom";
-                        $(this).siblings("input").prop("disabled", disabled);
-                    })
-                    .change();
-                popup.find(".beatsPerStep > input").val(this.activeSheet.getBeatsPerStep());
-
-                updateBackgroundInfo(popup);
-
-                // add/update/edit/remove image
-                popup.off(".edit-background")
-                    .on("click.edit-background", ".icons .edit-link", e => {
-                        promptFile(file => {
-                            let params = {
-                                sheet: this.activeSheet.getIndex(),
-                                image: file,
-                            };
-
-                            doAction("upload_sheet_image", params, {
-                                dataType: "json",
-                                success: data => {
-                                    this.activeSheet.setBackground(data.url);
-                                    updateBackgroundInfo(popup);
-                                },
-                            });
-                        });
-                    })
-                    .on("click.edit-background", ".icons .move-link", e => {
-                        this.controller.loadContext("background", {
-                            previousContext: this.info.name,
-                        });
-                        hidePopup();
-                    })
-                    .on("click.edit-background", ".icons .clear-link", e => {
-                        this.activeSheet.removeBackground();
-                        updateBackgroundInfo(popup);
-                    });
-            },
-            onSubmit: popup => {
-                let data = getData(popup);
-
-                // validate data
-                if (data.label === "") {
-                    data.label = null;
-                }
-
-                data.numBeats = parseInt(data.numBeats);
-                if (_.isNaN(data.numBeats)) {
-                    throw new ValidationError("Please provide the number of beats.");
-                } else if (data.numBeats <= 0) {
-                    throw new ValidationError("Need to have a positive number of beats.");
-                }
-
-                if (data.beatsPerStep === "custom") {
-                    data.beatsPerStep = parseInt(data.customBeatsPerStep);
-                    if (_.isNaN(data.beatsPerStep)) {
-                        throw new ValidationError("Please provide the number of beats per step.");
-                    } else if (data.beatsPerStep <= 0) {
-                        throw new ValidationError("Beats per step needs to be a positive integer.");
-                    }
-                }
-
-                this.controller.doAction("saveSheetProperties", [data]);
-            },
-        });
+        new EditSheetPopup(this).show();
     }
 
     /**
@@ -529,6 +417,13 @@ export default class GraphContext extends BaseContext {
 
         GraphState.selectedDots = GraphState.selectedDots.add(dots);
         this.grapher.selectDots(GraphState.selectedDots);
+    }
+
+    /**
+     * Show the popup that adds a sheet to the Show
+     */
+    showAddSheet() {
+        new AddSheetPopup(this.controller).show();
     }
 
     /**

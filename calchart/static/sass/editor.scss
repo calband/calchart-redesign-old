@@ -197,7 +197,7 @@ ul.messages {
     @include hover-messages;
 }
 
-.popup-box {
+.popup {
     label {
         width: 90px;
     }
@@ -219,7 +219,7 @@ ul.messages {
             }
         }
     }
-    &.edit-stuntsheet {
+    &.edit-sheet {
         .icons {
             display: inline-block;
             margin-left: 10px;

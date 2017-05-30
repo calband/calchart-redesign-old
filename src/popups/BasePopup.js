@@ -37,14 +37,15 @@ export default class BasePopup {
             .append(buttons)
             .appendTo(form);
 
-        let popupBox = HTMLBuilder.make("div.popup-box")
-            .addClass(this.info.name)
-            .append(title)
-            .append(form);
+        let popupBox = HTMLBuilder.make("div.popup-box").append([title, form]);
 
         this._popup = HTMLBuilder.make("div.popup")
-            .append(popupBox)
-            .appendTo("body");
+            .addClass(this.info.name)
+            .append(popupBox);
+
+        this.onInit();
+
+        this._popup.appendTo("body");
 
         // event listener to save popup
         this._popup.submit(e => {
@@ -137,6 +138,11 @@ export default class BasePopup {
         }
         return HTMLBuilder.make("h1", title);
     }
+
+    /**
+     * Any actions to run after the popup is built but before it is displayed.
+     */
+    onInit() {}
 
     /**
      * Any actions to run when the Save button is clicked.

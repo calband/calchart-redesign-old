@@ -102,8 +102,7 @@ export default class Grapher {
         if (_.isUndefined(background)) {
             image.remove();
         } else {
-            if (image.empty() || image.attr("href") !== background.url) {
-                image.remove();
+            if (image.empty()) {
                 // insert right after field background
                 image = field.insert("image", ".field-background + *")
                     .classed("background-image", true)

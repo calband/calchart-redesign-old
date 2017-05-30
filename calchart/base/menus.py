@@ -294,7 +294,7 @@ class ChoiceToolbarItem(CustomToolbarItem):
 
 editor_menu = Menu(
     SubMenu('File', [
-        MenuContextItem('graph-context', 'New stuntsheet', 'addStuntsheet', icon='file-o'),
+        MenuContextItem('graph-context', 'New stuntsheet', 'showAddSheet', icon='file-o'),
         MenuItem('Rename show', 'promptRename'),
         MenuItem('Save', 'saveShow', icon='floppy-o'),
         MenuItem('Generate PDF', 'generatePoopsheet', icon='file-pdf-o'),
@@ -337,7 +337,7 @@ editor_toolbar = Toolbar(
     ),
     ToolbarContextGroup(
         'graph-context',
-        ToolbarItem('Add Stuntsheet', 'file-o', 'addStuntsheet'),
+        ToolbarItem('Add Stuntsheet', 'file-o', 'showAddSheet'),
     ),
     ToolbarContextGroup(
         'edit-dots',

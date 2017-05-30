@@ -51,28 +51,6 @@ class EditSongPopup(object):
     stepType = forms.ChoiceField(choices=DEF_STEP_TYPES)
     orientation = forms.ChoiceField(choices=DEF_ORIENTATIONS)
 
-class AddStuntsheetPopup(object):
-    """
-    The popup to add a stuntsheet
-    """
-    name = 'add-stuntsheet'
-
-    numBeats = forms.IntegerField(label='Number of beats')
-
-class EditStuntsheetPopup(object):
-    """
-    The popup to edit a stuntsheet
-    """
-    name = 'edit-stuntsheet'
-    template_name = 'partials/popup_edit_sheet.html'
-
-    label = forms.CharField(label='Label (opt.)', required=False)
-    numBeats = forms.IntegerField(label='Number of beats')
-    fieldType = forms.ChoiceField(choices=DEF_FIELD_TYPES)
-    beatsPerStep = BeatsPerStepField(label='Beats per step')
-    stepType = forms.ChoiceField(choices=DEF_STEP_TYPES)
-    orientation = forms.ChoiceField(choices=DEF_ORIENTATIONS)
-
 class EditContinuityPopup(object):
     """
     The popup to edit a continuity
