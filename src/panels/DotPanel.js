@@ -31,7 +31,7 @@ export default class DotPanel extends BasePanel {
     getContent() {
         let dotTypes = HTMLBuilder.make("ul.dot-types");
         DotType.forEach(type => {
-            if (_.startsWith(type, "all-")) {
+            if (DotType.isAll(type)) {
                 return;
             }
 

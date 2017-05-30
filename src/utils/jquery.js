@@ -231,7 +231,7 @@ $.fn.pinch = function(callback) {
  * @param {String|regex} pattern
  */
 $.fn.removeClassRegex = function(pattern) {
-    return this.each((i, elem) => {
+    return _.each(this, elem => {
         let classes = elem.className.split(" ").filter(
             cls => _.isNull(cls.match(pattern))
         );

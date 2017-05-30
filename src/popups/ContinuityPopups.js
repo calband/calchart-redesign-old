@@ -21,7 +21,7 @@ import {
 class EditContinuityPopup extends BasePopup {
     /**
      * @param {EditorController} controller
-     * @param {BaseContinuity} continuity
+     * @param {Continuity} continuity
      */
     constructor(controller, continuity) {
         super();

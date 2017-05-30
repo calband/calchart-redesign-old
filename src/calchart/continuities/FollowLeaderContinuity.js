@@ -134,6 +134,7 @@ export default class FollowLeaderContinuity extends OrderedDotsContinuity {
     getPanel(controller) {
         let editLabel = HTMLBuilder.label("Edit:");
 
+        // TODO: move to ordereddotscontinuity
         let editDots = HTMLBuilder.icon("ellipsis-h").click(() => {
             controller.loadContext("continuity-dots", {
                 continuity: this,

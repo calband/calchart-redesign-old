@@ -227,7 +227,7 @@ export class FileField extends Field {
 
         if (filename) {
             let extension = _.last(filename.split("."));
-            if (this._extensions.indexOf(extension) === -1) {
+            if (!_.includes(this._extensions, extension)) {
                 throw new ValidationError(`Invalid extension: ${extension}`);
             }
         }

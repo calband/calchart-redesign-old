@@ -1,13 +1,13 @@
 import Continuity from "calchart/Continuity";
 import DotType from "calchart/DotType";
-
 import GraphContext from "editor/contexts/GraphContext";
+import ContinuityPanel from "panels/ContinuityPanel";
 
 import { ActionError } from "utils/errors";
 import HTMLBuilder from "utils/HTMLBuilder";
 import { underscoreKeys, update } from "utils/JSUtils";
 import { round } from "utils/MathUtils";
-import { setupPanel, showContextMenu } from "utils/UIUtils";
+import { showContextMenu } from "utils/UIUtils";
 
 /**
  * The Context that allows a user to edit continuities for dot types
@@ -22,8 +22,6 @@ export default class ContinuityContext extends GraphContext {
 
         // track the current beat
         this._currBeat = 0;
-
-        // this._setupPanel();
     }
 
     static get shortcuts() {
@@ -42,7 +40,7 @@ export default class ContinuityContext extends GraphContext {
     }
 
     get panel() {
-        return $(".panel.edit-continuity");
+        return ContinuityPanel;
     }
 
     /**
@@ -52,7 +50,6 @@ export default class ContinuityContext extends GraphContext {
     load(options) {
         super.load(options);
 
-        this.panel.show();
         this._dotType = _.defaultTo(options.dotType, null);
 
         this._addEvents(this.workspace, {
@@ -80,7 +77,6 @@ export default class ContinuityContext extends GraphContext {
     unload() {
         super.unload();
 
-        this.panel.hide();
         this.deselectDots();
 
         this.grapher.setOptions({
@@ -105,54 +101,16 @@ export default class ContinuityContext extends GraphContext {
         $(".toolbar .seek .marker").css("transform", `translateX(${position}px)`);
     }
 
-    /**
-     * Refresh the continuities panel
-     */
-    refreshPanel() {
-        // update tabs list in panel
-        let tabs = this.panel.find(".dot-types").empty();
-        let path = tabs.data("path");
-        this.activeSheet.getDotTypes().forEach(dotType => {
-            let tab = HTMLBuilder.make("li.tab")
-                .addClass(dotType)
-                .data("dotType", dotType)
-                .appendTo(tabs);
-
-            if (DotType.isAll(dotType)) {
-                tab.text("All");
-            } else {
-                let icon = HTMLBuilder.img(path.replace("DOT_TYPE", dotType));
-                tab.append(icon);
-            }
-        });
-
-        // activate dot type tab
-        let tab = tabs.find(`.${this._dotType}`);
-        if (!tab.exists()) {
-            tab = tabs.find("li.tab:first");
-            this._dotType = tab.data("dotType");
-        }
-
-        tab.addClass("active");
-
-        let continuities = this.activeSheet.getContinuities(this._dotType);
-        this._populatePanel(continuities);
-
-        // select dots of the active dot type
-        let dots = $(`.dot.${this._dotType}`);
-        this.selectDots(dots);
-    }
-
     /**** METHODS ****/
 
     /**
      * Delete the given continuity.
      *
      * @param {(jQuery|int)} continuity - The continuity to delete.
-     *   (@see ContinuityContext#_getContinuity)
+     *   (@see ContinuityPanel.getContinuity)
      */
     deleteContinuity(continuity) {
-        continuity = this._getContinuity(continuity);
+        continuity = this._panel.getContinuity(continuity);
         this.controller.doAction("removeContinuity", [continuity]);
     }
 
@@ -160,10 +118,10 @@ export default class ContinuityContext extends GraphContext {
      * Edit the given continuity.
      *
      * @param {(jQuery|int)} continuity - The continuity to edit.
-     *   (@see ContinuityContext#_getContinuity)
+     *   (@see ContinuityPanel.getContinuity)
      */
     editContinuity(continuity) {
-        continuity = this._getContinuity(continuity);
+        continuity = this._panel.getContinuity(continuity);
         let PopupClass = continuity.constructor.popupClass;
         new PopupClass(this.controller, continuity).show();
     }
@@ -178,6 +136,10 @@ export default class ContinuityContext extends GraphContext {
 
     getCurrentBeat() {
         return this._currBeat;
+    }
+
+    getDotType() {
+        return this._dotType;
     }
 
     /**
@@ -197,12 +159,12 @@ export default class ContinuityContext extends GraphContext {
      * Move the given continuity by the given amount.
      *
      * @param {(jQuery|int)} continuity - The continuity to reorder. (@see
-     *   ContinuityContext#_getContinuity)
+     *   ContinuityPanel.getContinuity)
      * @param {int} delta - The amount to move the continuity by; e.g. delta=1
      *   would put the continuity 1 index later, if possible.
      */
     moveContinuity(continuity, delta) {
-        continuity = this._getContinuity(continuity);
+        continuity = this._panel.getContinuity(continuity);
         this.controller.doAction("reorderContinuity", [continuity, delta]);
     }
 
@@ -226,143 +188,11 @@ export default class ContinuityContext extends GraphContext {
         }
     }
 
+    setDotType(dotType) {
+        this._dotType = dotType;
+    }
+
     /**** HELPERS ****/
-
-    /**
-     * Retrieve the given continuity
-     *
-     * @param {(jQuery|int)} continuity - The continuity to get, either
-     *   the continuity HTML element in the panel, or the index of the
-     *   continuity in the panel.
-     * @return {Continuity}
-     */
-    _getContinuity(continuity) {
-        if (_.isNumber(continuity)) {
-            continuity = this.panel.find(".continuity").get(continuity);
-        }
-        return $(continuity).data("continuity");
-    }
-
-    /**
-     * Populate the panel with the given continuities.
-     *
-     * @param {Continuity[]} continuities
-     */
-    _populatePanel(continuities) {
-        let $continuities = this.panel.find(".continuities").empty();
-
-        // action icons
-        let iconEdit = HTMLBuilder.icon("pencil", "edit");
-        let iconDelete = HTMLBuilder.icon("times", "delete");
-        let actions = HTMLBuilder.div("actions", [iconEdit, iconDelete]);
-
-        continuities.forEach(continuity => {
-            let label = HTMLBuilder.span(continuity.info.label);
-            let contents = continuity.getPanel(this.controller);
-            contents = [label].concat(contents);
-
-            let info = HTMLBuilder.div("info", contents);
-
-            let classes = `continuity ${continuity.info.type}`;
-
-            HTMLBuilder.div(classes, [info, actions.clone()])
-                .data("continuity", continuity)
-                .appendTo($continuities);
-        });
-    }
-
-    /**
-     * Initialize the continuity panel and toolbar
-     */
-    _setupPanel() {
-        // setup continuity panel
-        setupPanel(this.panel);
-
-        // using custom panel-dropdowns because chosen doesn't render outside of scroll overflow
-        this.panel.on("mousedown", "select", function(e) {
-            e.preventDefault();
-
-            let select = this;
-            let dropdown = HTMLBuilder.make("ul.panel-dropdown").appendTo("body");
-
-            $(this).children().each(function() {
-                let val = $(this).attr("value");
-                let li = HTMLBuilder.li($(this).text())
-                    .click(function() {
-                        $(select).val(val).change();
-                    })
-                    .appendTo(dropdown);
-            });
-
-            let offset = $(this).offset();
-            let selected = $(this).children(":selected");
-            // move dropdown so mouse starts on selected option
-            offset.top -= selected.index() * dropdown.children(":first").outerHeight();
-            dropdown
-                .css({
-                    top: offset.top,
-                    left: offset.left,
-                    width: $(this).outerWidth(),
-                });
-
-            // make sure dropdown does not go off screen
-            let top = dropdown.offset().top;
-            if (top < 0) {
-                dropdown.css("top", 0);
-            }
-            let max = $(window).height() - dropdown.outerHeight();
-            if (top > max) {
-                dropdown.css("top", max);
-            }
-
-            $(window).one("click", function(e) {
-                $(dropdown).remove();
-            });
-        });
-
-        // changing tabs
-        this.panel.on("click", ".tab", e => {
-            this._dotType = $(e.currentTarget).data("dotType");
-            this.refresh("panel");
-        });
-
-        // add continuity dropdown
-        this.panel
-            .find(".add-continuity select")
-            .dropdown({
-                placeholder_text_single: "Add continuity...",
-                disable_search_threshold: false,
-            })
-            .change(e => {
-                let type = $(e.currentTarget).val();
-                this.controller.doAction("addContinuity", [type]);
-                $(e.currentTarget).choose("");
-            });
-
-        // edit continuity popup
-        this.panel.on("click", ".continuity .edit", e => {
-            let continuity = $(e.currentTarget).parents(".continuity");
-            this.editContinuity(continuity);
-        });
-
-        // remove continuity link
-        this.panel.on("click", ".continuity .delete", e => {
-            let continuity = $(e.currentTarget).parents(".continuity");
-            this.deleteContinuity(continuity);
-        });
-
-        // context menus
-        this.panel.on("contextmenu", ".continuity", function(e) {
-            let index = $(this).index();
-
-            showContextMenu(e, {
-                "Edit...": `editContinuity(${index})`,
-                "Move down": `moveContinuity(${index}, 1)`,
-                "Move up": `moveContinuity(${index}, -1)`,
-                "Delete": `deleteContinuity(${index})`,
-            });
-        });
-    }
 
     /**
      * Set up the seek interface in the toolbar.

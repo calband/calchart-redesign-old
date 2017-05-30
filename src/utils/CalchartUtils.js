@@ -2,6 +2,31 @@
  * @file A collection of utility functions related to charting or shows
  */
 
+/** @const {Object} */
+export const CONTINUITIES = {
+    "Simple": {
+        EWNS: "EWNS",
+        NSEW: "NSEW",
+        FM: "FM: Forward March",
+    },
+    "Stops": {
+        MT: "MT: Mark Time",
+        CL: "CL: Close",
+    },
+    "Off-Grid": {
+        EVEN: "Even",
+        DMHS: "DMHS",
+        HSDM: "HSDM",
+    },
+    "Flows": {
+        FTL: "FTL: Follow the Leader",
+        CM: "CM: Counter March",
+        TWO: "TWO: 2 Step",
+        GT: "GT: Gate Turn",
+        GV: "GV: Grapevine",
+    },
+};
+
 /** @const {Object.<string, string>} */
 export const DEFAULT_CUSTOM = {
     default: "Default",

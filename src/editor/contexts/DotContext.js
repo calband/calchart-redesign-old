@@ -102,7 +102,9 @@ export default class DotContext extends GraphContext {
     unload() {
         super.unload();
 
-        this.deselectDots();
+        this.deselectDots({
+            refresh: false,
+        });
         this.grapher.showBackground(false);
     }
 
@@ -124,9 +126,14 @@ export default class DotContext extends GraphContext {
      * @param {jQuery} [dots] - Dots to deselect (defaults to all dots).
      * @param {Object} [options]
      *   - {boolean} [refresh=true] - Set to false to manually
-     *     refresh the context (optimization).
+     *     refresh the panel (optimization).
      */
     deselectDots(dots, options={}) {
+        if (_.isPlainObject(arguments[0])) {
+            dots = undefined;
+            options = arguments[0];
+        }
+
         options = _.defaults({}, options, {
             refresh: true,
         });
@@ -169,7 +176,7 @@ export default class DotContext extends GraphContext {
      *   - {boolean} [append=false] - If false, deselect all dots
      *     before selecting.
      *   - {boolean} [refresh=true] - Set to false to manually
-     *     refresh the context (optimization).
+     *     refresh the panel (optimization).
      */
     selectDots(dots, options={}) {
         options = _.defaults({}, options, {
@@ -196,7 +203,7 @@ export default class DotContext extends GraphContext {
      * @param {jQuery} dots
      * @param {Object} [options]
      *   - {boolean} [refresh=true] - Set to false to manually
-     *     refresh the context (optimization).
+     *     refresh the panel (optimization).
      */
     toggleDots(dots, options={}) {
         options = _.defaults({}, options, {

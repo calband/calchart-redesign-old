@@ -174,7 +174,7 @@ export function parseArgs(args, labels) {
     if (args.length === 1 && !_.isNull(args[0])) {
         let kwargs = args[0];
         for (let key in kwargs) {
-            if (labels.indexOf(key) === -1) {
+            if (!_.includes(labels, key)) {
                 kwargs = null;
                 break;
             }

@@ -199,7 +199,7 @@ export default class BaseContinuity {
     /**
      * Get the HTML elements to add to the ContinuityContext panel.
      *
-     * @param {EditorController} controller
+     * @param {EditorController} controller // TODO: change to context
      * @return {jQuery[]}
      */
     getPanel(controller) {

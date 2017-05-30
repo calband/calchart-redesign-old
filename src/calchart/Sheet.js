@@ -197,7 +197,7 @@ export default class Sheet {
      * Add the given continuity to the given dot type.
      *
      * @param {DotType} dotType
-     * @param {BaseContinuity} continuity
+     * @param {Continuity} continuity
      */
     addContinuity(dotType, continuity) {
         this._continuities[dotType].push(continuity);
