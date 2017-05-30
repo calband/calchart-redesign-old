@@ -1,12 +1,13 @@
 import Grapher from "calchart/Grapher";
 import Song from "calchart/Song";
-
 import BaseContext from "editor/contexts/BaseContext";
+import AddSongPopup from "popups/AddSongPopup";
+import EditSongPopup from "popups/EditSongPopup";
 
 import { ValidationError } from "utils/errors";
 import HTMLBuilder from "utils/HTMLBuilder";
 import { underscoreKeys, update } from "utils/JSUtils";
-import { getData, showContextMenu, showPopup } from "utils/UIUtils";
+import { showContextMenu } from "utils/UIUtils";
 
 /**
  * The Context that allows a user to edit the songs, audio, and music
@@ -178,13 +179,7 @@ export default class MusicContext extends BaseContext {
      * Show the popup that adds a song to the show.
      */
     showAddSong() {
-        showPopup("add-song", {
-            onSubmit: popup => {
-                let data = getData(popup);
-
-                this.controller.doAction("addSong", [data.songName]);
-            },
-        });
+        new AddSongPopup(this.controller).show();
     }
 
     /**
@@ -194,41 +189,7 @@ export default class MusicContext extends BaseContext {
      */
     showEditSong(index) {
         let song = this.show.getSong(index);
-
-        showPopup("edit-song", {
-            init: popup => {
-                popup.find(".songName input").val(song.getName());
-                popup.find(".fieldType select").choose(song.fieldType);
-                popup.find(".stepType select").choose(song.stepType);
-                popup.find(".orientation select").choose(song.orientation);
-
-                popup.find(".beatsPerStep select")
-                    .choose(song.beatsPerStep === "default" ? "default" : "custom")
-                    .change(function() {
-                        let disabled = $(this).val() !== "custom";
-                        $(this).siblings("input").prop("disabled", disabled);
-                    })
-                    .change();
-
-                popup.find(".beatsPerStep > input").val(song.getBeatsPerStep());
-            },
-            onSubmit: popup => {
-                let data = getData(popup);
-
-                data.name = data.songName;
-
-                if (data.beatsPerStep === "custom") {
-                    data.beatsPerStep = parseInt(data.customBeatsPerStep);
-                    if (_.isNaN(data.beatsPerStep)) {
-                        throw new ValidationError("Please provide the number of beats per step.");
-                    } else if (data.beatsPerStep <= 0) {
-                        throw new ValidationError("Beats per step needs to be a positive integer.");
-                    }
-                }
-
-                this.controller.doAction("saveSong", [song, data]);
-            },
-        });
+        new EditSongPopup(this.controller, song).show();
     }
 }
 

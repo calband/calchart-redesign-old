@@ -5,7 +5,6 @@ from django.forms import modelform_factory
 from django.utils.text import camel_case_to_spaces
 
 from base.constants import *
-from base.fields import *
 from base.models import Show, User
 
 ### FORMS ###
@@ -30,26 +29,6 @@ class CreateUserForm(UserCreationForm):
         return user
 
 ### EDITOR POPUPS ###
-
-class AddSongPopup(object):
-    """
-    The popup to add a song
-    """
-    name = 'add-song'
-
-    songName = forms.CharField(label='Name')
-
-class EditSongPopup(object):
-    """
-    The popup to edit a song
-    """
-    name = 'edit-song'
-
-    songName = forms.CharField(label='Name')
-    fieldType = forms.ChoiceField(choices=DEF_FIELD_TYPES)
-    beatsPerStep = BeatsPerStepField(label='Beats per step')
-    stepType = forms.ChoiceField(choices=DEF_STEP_TYPES)
-    orientation = forms.ChoiceField(choices=DEF_ORIENTATIONS)
 
 class EditContinuityPopup(object):
     """

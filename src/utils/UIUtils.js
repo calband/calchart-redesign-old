@@ -6,7 +6,6 @@
  * - Form utilities
  * - Menu utilities
  * - Panel utilities
- * - Popup utilities
  * - Message utilities
  * - Handles utilities
  */
