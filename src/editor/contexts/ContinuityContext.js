@@ -23,7 +23,7 @@ export default class ContinuityContext extends GraphContext {
         // track the current beat
         this._currBeat = 0;
 
-        this._setupPanel();
+        // this._setupPanel();
     }
 
     static get shortcuts() {
@@ -39,10 +39,6 @@ export default class ContinuityContext extends GraphContext {
             name: "continuity",
             html: "edit-continuity",
         };
-    }
-
-    static get refreshTargets() {
-        return super.refreshTargets.concat(["panel"]);
     }
 
     get panel() {

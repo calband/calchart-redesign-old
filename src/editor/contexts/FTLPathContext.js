@@ -14,7 +14,7 @@ export default class FTLPathContext extends HiddenGraphContext {
     constructor(controller) {
         super(controller);
 
-        this._setupPanel();
+        // this._setupPanel();
 
         // FollowLeaderContinuity
         this._continuity = null;
@@ -35,10 +35,6 @@ export default class FTLPathContext extends HiddenGraphContext {
         return {
             name: "ftl-path",
         };
-    }
-
-    static get refreshTargets() {
-        return super.refreshTargets.concat(["panel"]);
     }
 
     get panel() {

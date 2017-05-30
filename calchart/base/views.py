@@ -200,13 +200,6 @@ class EditorView(CalchartMixin, TemplateView):
         context['show'] = self.show
         context['menu'] = editor_menu
         context['toolbar'] = editor_toolbar
-        context['panels'] = [
-            ('partials/panel_edit_continuity.html', 'edit-continuity'),
-            ('partials/panel_edit_continuity_dots.html', 'edit-continuity-dots'),
-            ('partials/panel_ftl_path.html', 'ftl-path'),
-            ('partials/panel_select_dots.html', 'select-dots'),
-            ('partials/panel_two_step.html', 'two-step'),
-        ]
         return context
 
     def save_show(self):

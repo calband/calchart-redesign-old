@@ -5,7 +5,6 @@
  *
  * - Form utilities
  * - Menu utilities
- * - Panel utilities
  * - Message utilities
  * - Handles utilities
  */
@@ -359,84 +358,6 @@ export function showContextMenu(e, items) {
         if ($(e.target).notIn(".context-menu")) {
             closeMenus();
             $(this).off(e);
-        }
-    });
-}
-
-/**** PANELS ****/
-
-/**
- * Set up a moveable panel.
- *
- * @param {jQuery} panel - The panel to set up.
- * @param {Object} [options] - Options to create a panel. Can include:
- *   - {float} top - The top of the initial position for the panel. (defaults
- *     to bottom-right of the screen)
- *   - {float} left - The left of the initial position for the panel. (defaults
- *     to bottom-right of the screen)
- *   - {float} bottom - The bottom of the initial position for the panel. (defaults
- *     to bottom-right of the screen)
- *   - {float} right - The right of the initial position for the panel. (defaults
- *     to bottom-right of the screen)
- */
-export function setupPanel(panel, options={}) {
-    // set up initial position
-
-    let position = {};
-
-    if (options.top) {
-        position.top = options.top;
-    } else {
-        let bottom = _.defaultTo(options.bottom, 20);
-        position.top = $(window).height() - $(panel).outerHeight() - bottom;
-    }
-
-    if (options.left) {
-        position.left = options.left;
-    } else {
-        let right = _.defaultTo(options.right, 20);
-        position.left = $(window).width() - $(panel).outerWidth() - right;
-    }
-
-    $(panel).css(position);
-
-    // make draggable
-
-    function movePanel(e) {
-        e.preventDefault();
-
-        let offset = $(panel).data("offset");
-        let top = e.pageY + offset.top;
-        let left = e.pageX + offset.left;
-
-        // don't go out of window
-        let maxX = $(window).width() - $(panel).outerWidth();
-        let maxY = $(window).height() - $(panel).outerHeight();
-
-        $(panel).css({
-            top: _.clamp(top, 0, maxY),
-            left: _.clamp(left, 0, maxX),
-        });
-    }
-
-    $(panel).find(".panel-handle").mousedown(function(e) {
-        let offset = $(this).offset();
-        $(panel).data("offset", {
-            top: offset.top - e.pageY,
-            left: offset.left - e.pageX,
-        });
-        $(window).on({
-            mousemove: movePanel,
-            mouseup: function() {
-                $(window).off("mousemove", movePanel);
-            },
-        });
-    });
-
-    // always keep panel on screen
-    $(window).resize(() => {
-        if ($(panel).is(":visible")) {
-            $(panel).keepOnscreen();
         }
     });
 }

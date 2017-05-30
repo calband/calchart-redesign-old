@@ -16,6 +16,7 @@ export default class BaseContext {
     constructor(controller) {
         this._controller = controller;
         this._eventListeners = new Set();
+        this._panel = null;
     }
 
     /**
@@ -52,7 +53,7 @@ export default class BaseContext {
      * @return {string[]} Targets to use when no arguments are passed to refresh().
      */
     static get refreshTargets() {
-        return [];
+        return ["panel"];
     }
 
     get controller() {
@@ -61,6 +62,13 @@ export default class BaseContext {
 
     get info() {
         return this.constructor.info;
+    }
+
+    /**
+     * @return {?BasePanel} The panel to display for this context.
+     */
+    get panel() {
+        return null;
     }
 
     get show() {
@@ -80,6 +88,11 @@ export default class BaseContext {
         $(`.menu-item.${name}-group`).removeClass("disabled");
         // ToolbarContextGroup
         $(`.toolbar .${name}-group`).removeClass("hide");
+
+        if (this.panel) {
+            this._panel = new this.panel(this);
+            this._panel.show();
+        }
     }
 
     /**
@@ -101,6 +114,15 @@ export default class BaseContext {
     }
 
     /**
+     * Refresh the panel.
+     */
+    refreshPanel() {
+        if (this.panel) {
+            this._panel.refresh();
+        }
+    }
+
+    /**
      * Runs any necessary actions to unload the context. Defaults to removing all events
      * set by _addEvents.
      */
@@ -113,6 +135,10 @@ export default class BaseContext {
         $(`.toolbar .${name}`).removeClass("active");
         $(`.menu-item.${name}-group`).addClass("disabled");
         $(`.toolbar .${name}-group`).addClass("hide");
+
+        if (this.panel) {
+            this._panel.hide();
+        }
     }
 
     /**** HELPERS ****/

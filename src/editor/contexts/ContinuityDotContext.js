@@ -11,7 +11,7 @@ export default class ContinuityDotContext extends HiddenGraphContext {
     constructor(controller) {
         super(controller);
 
-        this._setupPanel();
+        // this._setupPanel();
 
         // OrderedDotsContinuity
         this._continuity = null;
@@ -25,10 +25,6 @@ export default class ContinuityDotContext extends HiddenGraphContext {
         return {
             name: "continuity-dots",
         };
-    }
-
-    static get refreshTargets() {
-        return super.refreshTargets.concat(["panel"]);
     }
 
     get panel() {

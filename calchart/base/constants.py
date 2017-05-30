@@ -1,15 +1,3 @@
-# dot types, see DotType
-DOT_TYPES = [
-    'plain',
-    'solid',
-    'plain-forwardslash',
-    'solid-forwardslash',
-    'plain-backslash',
-    'solid-backslash',
-    'plain-x',
-    'solid-x',
-]
-
 # snap to grid options
 SNAP_OPTIONS = [
     (0, 'None'),

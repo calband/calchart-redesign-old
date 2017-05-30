@@ -1,12 +1,11 @@
 import DotType from "calchart/DotType";
-
 import GraphContext from "editor/contexts/GraphContext";
 import EditTools from "editor/EditTools";
+import DotPanel from "panels/DotPanel";
 
-import HTMLBuilder from "utils/HTMLBuilder";
 import { mapSome, parseNumber } from "utils/JSUtils";
 import { round } from "utils/MathUtils";
-import { setupPanel, showContextMenu } from "utils/UIUtils";
+import { showContextMenu } from "utils/UIUtils";
 
 /**
  * The Context that allows a user to select and edit dots with a drag
@@ -22,8 +21,6 @@ export default class DotContext extends GraphContext {
         // number of steps to snap dots to when dragging: 0, 1, 2, 4
         this._grid = 2;
         this._setupSnap();
-
-        this._setupPanel();
 
         // whether to show the Sheet's background image
         this._backgroundVisible = false;
@@ -44,12 +41,8 @@ export default class DotContext extends GraphContext {
         };
     }
 
-    static get refreshTargets() {
-        return super.refreshTargets.concat(["panel"]);
-    }
-
     get panel() {
-        return $(".panel.select-dots");
+        return DotPanel;
     }
 
     load(options) {
@@ -85,10 +78,6 @@ export default class DotContext extends GraphContext {
             },
         });
 
-        this.panel.show()
-            .find(".dot-labels")
-            .scrollTop(0);
-
         this.loadTool("selection");
         this._addEvents(this.workspace, {
             mousedown: e => {
@@ -114,25 +103,12 @@ export default class DotContext extends GraphContext {
         super.unload();
 
         this.deselectDots();
-        this.panel.hide();
         this.grapher.showBackground(false);
     }
 
     refreshGrapher() {
         super.refreshGrapher();
         this.grapher.showBackground(this._backgroundVisible);
-    }
-
-    /**
-     * Refresh the dot selection panel
-     */
-    refreshPanel() {
-        // highlight dots in panel
-        let dotLabels = this.panel.find(".dot-labels");
-        dotLabels.find(".active").removeClass("active");
-        this.getSelectedDots().forEach(dot => {
-            dotLabels.find(`.dot-${dot.id}`).addClass("active");
-        });
     }
 
     refreshZoom(pageX, pageY) {
@@ -231,58 +207,6 @@ export default class DotContext extends GraphContext {
         if (options.refresh) {
             this.refresh("panel");
         }
-    }
-
-    _setupPanel() {
-        // track last dot selected
-        let lastSelected = undefined;
-
-        // add dot labels
-        let dotLabels = this.panel.find(".dot-labels");
-        this.show.getDots().forEach(dot => {
-            HTMLBuilder.li(dot.label)
-                .addClass(`dot-${dot.id}`)
-                .click(e => {
-                    let $dot = this.grapher.getDot(dot);
-                    if (e.ctrlKey || e.metaKey) {
-                        this.toggleDots($dot);
-
-                        if ($(e.currentTarget).hasClass("active")) {
-                            lastSelected = dot;
-                        } else {
-                            lastSelected = undefined;
-                        }
-                    } else if (e.shiftKey && lastSelected) {
-                        let range = $();
-                        let delta = Math.sign(dot.id - lastSelected.id);
-                        let curr = lastSelected.id;
-                        while (curr !== dot.id) {
-                            curr += delta;
-                            range = range.add(this.grapher.getDot(curr));
-                        }
-                        this.selectDots(range);
-                        lastSelected = dot;
-                    } else {
-                        this.selectDots($dot, {
-                            append: false,
-                        });
-                        lastSelected = dot;
-                    }
-                })
-                .appendTo(dotLabels);
-        });
-
-        setupPanel(this.panel);
-
-        // click on dot type
-        this.panel.find(".dot-types li").click(e => {
-            let dotType = $(e.currentTarget).data("type");
-            let dots = this.activeSheet.getDotsOfType(dotType);
-            let $dots = this.grapher.getDots(dots);
-            this.selectDots($dots, {
-                append: e.shiftKey || e.ctrlKey || e.metaKey,
-            });
-        });
     }
 
     _setupSnap() {

@@ -5,22 +5,20 @@
  * class Color {...}
  * makeEnum(Color, ["red", "blue", "green"])
  * Color.RED // "red"
- * Color.RED = "blue" // does nothing
- * for (let color in Color) { console.log(color); } // "RED"
- * for (let color of Color) { console.log(color); } // "red"
  * Color.keys // ["RED"]
  * Color.values // ["red"]
+ * Color.forEach(color => { console.log(color); }) // prints "red", then "green", then "blue"
  *
- * @param {Function} cls
+ * @param {class} cls
  * @param {Array} values
  */
 export default function makeEnum(cls, values) {
     let keys = [];
     for (let val of values) {
         let key = val.toUpperCase().replace(/[\s-]+/g, "_");
+        // creates immutable values
         Object.defineProperty(cls, key, {
             value: val,
-            enumerable: true,
         });
         keys.push(key);
     }
@@ -32,19 +30,12 @@ export default function makeEnum(cls, values) {
         values: {
             value: values,
         },
-    });
-
-    cls[Symbol.iterator] = function() {
-        let index = 0;
-        return {
-            next: function() {
-                let i = index;
-                index++;
-                return {
-                    value: values[i],
-                    done: i === values.length,
-                };
+        forEach: {
+            value: callback => {
+                for (let i = 0; i < values.length; i++) {
+                    callback.call(cls, values[i], keys[i]);
+                }
             },
-        };
-    };
+        },
+    });
 }

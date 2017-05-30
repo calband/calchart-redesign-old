@@ -1,4 +1,4 @@
-{% load staticfiles %}
+{% load static %}
 
 To change dot types for selected dot(s), right click on the selected dot(s) and go to the "Change dot type" menu item. This will show a submenu listing all of the available dot types.
 

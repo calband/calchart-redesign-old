@@ -36,7 +36,7 @@ export default class MusicContext extends BaseContext {
     }
 
     static get refreshTargets() {
-        return ["panels", "workspace"];
+        return _.concat(super.refreshTargets, "panels", "workspace");
     }
 
     get songPanel() {

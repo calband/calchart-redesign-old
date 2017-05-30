@@ -50,7 +50,7 @@ export default class GraphContext extends BaseContext {
     }
 
     static get refreshTargets() {
-        return ["sidebar", "grapher"];
+        return _.concat(super.refreshTargets, "sidebar", "grapher");
     }
 
     get grapher() {
