@@ -176,62 +176,6 @@ export function setupTooltip(selector, label) {
     });
 }
 
-/**
- * Show a context menu with the given items.
- *
- * @param {Event} e - The click event that activated the context menu.
- * @param {Object.<string, (string|Object)>} items - The items to show
- *   in the context menu, mapping label to action. Can also map to
- *   another object, which will be a submenu.
- */
-export function showContextMenu(e, items) {
-    e.preventDefault();
-
-    // prevent all parent elements from scrolling
-    let parents = $(e.target).parents();
-
-    function closeMenus() {
-        $(".context-menu").remove();
-        parents.unlockScroll();
-    };
-
-    // close any existing menus
-    closeMenus();
-    parents.lockScroll();
-    let menu = HTMLBuilder.make("ul.context-menu").appendTo("body");
-
-    // recursively setup menu items
-    function makeMenu(parent, items) {
-        _.each(items, function(action, label) {
-            let item = HTMLBuilder.li(label).appendTo(parent);
-            if (_.isString(action)) {
-                item.click(function() {
-                    window.controller.doAction(action);
-                    closeMenus();
-                });
-
-                addShortcutHint(item, action);
-            } else {
-                let submenu = HTMLBuilder.make("ul.context-menu.submenu");
-                makeMenu(submenu, action);
-                bindSubmenu(parent, item, submenu);
-            }
-        });
-    };
-
-    makeMenu(menu, items);
-
-    menu.smartPosition(e.pageY, e.pageX);
-
-    // clicking outside of context menu and its submenus closes them
-    $(window).mousedown(function(e) {
-        if ($(e.target).notIn(".context-menu")) {
-            closeMenus();
-            $(this).off(e);
-        }
-    });
-}
-
 /**** MESSAGES ****/
 
 /**

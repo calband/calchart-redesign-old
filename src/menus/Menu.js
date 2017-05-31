@@ -86,26 +86,7 @@ export default class Menu {
         });
     }
 
-    /**
-     * Open the given tab and its submenu in the menu.
-     *
-     * @param {jQuery} tab
-     * @param {SubMenu} submenu
-     */
-    openSubmenu(tab, submenu) {
-        // clicking outside of menu and its submenus closes them
-        $(window)
-            .off(".close-submenus")
-            .on("click.close-submenus", e => {
-                if ($(e.target).notIn(".menu-tab, .submenu")) {
-                    this.close();
-                }
-            });
-        submenu.open();
-
-        this._activeTab = tab;
-        this._activeSubmenu = submenu;
-    }
+    /**** METHODS ****/
 
     /**
      * Close this menu.
@@ -117,14 +98,8 @@ export default class Menu {
 
             this._activeTab = null;
             this._activeSubmenu = null;
+            $(window).off(".close-submenus");
         }
-    }
-
-    /**
-     * Close all menus.
-     */
-    closeAll() {
-        this.close();
     }
 
     /**
@@ -133,19 +108,38 @@ export default class Menu {
     closeSubmenus() {
         this.close();
     }
+
+    /**
+     * Open the given tab and its submenu in the menu.
+     *
+     * @param {jQuery} tab
+     * @param {SubMenu} submenu
+     */
+    openSubmenu(tab, submenu) {
+        submenu.open();
+
+        // clicking outside of menu and its submenus closes them
+        $(window).on("click.close-submenus", e => {
+            if ($(e.target).notIn(".menu-tab, .submenu")) {
+                this.close();
+            }
+        });
+
+        this._activeTab = tab;
+        this._activeSubmenu = submenu;
+    }
 }
 
 /**
- * A helper class for creating and interacting with submenus.
+ * A floating menu that is shown when a menu item in the parent menu is hovered over.
  */
-class SubMenu {
+export class SubMenu {
     /**
      * @param {(Menu|SubMenu)} parentMenu - The parent menu
      * @param {jQuery} parentItem - The menu item that opens this submenu
      * @param {object[]} items - The menu items in this submenu
      */
     constructor(parentMenu, parentItem, items) {
-        this._menu = null;
         this._parentMenu = parentMenu;
         this._parentItem = parentItem;
 
@@ -159,10 +153,18 @@ class SubMenu {
             }
         });
 
-        // {Submenu}
-        this._activeSubmenu = null;
+        this._menu = null;
+        this.initMenu();
 
-        this.init();
+        // {SubMenu}
+        this._activeSubmenu = null;
+    }
+
+    /**
+     * @return {string} The class to add to the submenu HTML element.
+     */
+    static get menuClass() {
+        return "controller-menu";
     }
 
     get controller() {
@@ -174,16 +176,58 @@ class SubMenu {
     }
 
     /**
-     * Initialize this menu.
+     * Initialize the submenu HTML element.
      */
-    init() {
+    initMenu() {
+        let submenus = [];
+
         let menuGroups = this._items.map(menuGroup => {
-            let items = menuGroup.map(menuItem => this._makeItem(menuItem));
+            let items = menuGroup.map(menuItem => {
+                let item = HTMLBuilder.li("", "menu-item");
+                item.html(menuItem.label);
+
+                if (menuItem.action) {
+                    item.data("action", menuItem.action)
+                        .click(e => {
+                            if (!item.hasClass("disabled")) {
+                                this.controller.doAction(menuItem.action);
+                                this.closeAll();
+                            }
+                        });
+
+                    addShortcutHint(item, menuItem.action);
+                }
+
+                if (menuItem.submenu) {
+                    let submenu = new SubMenu(this, item, menuItem.submenu);
+                    item.addClass("has-submenu").mouseenter(e => {
+                        if (!item.hasClass("disabled")) {
+                            this.openSubmenu(submenu);
+                        }
+                    });
+                    submenus.push(submenu);
+                }
+
+                item.mouseenter(e => {
+                    if (this._activeSubmenu && item !== this._activeSubmenu.parentItem) {
+                        this.closeSubmenus();
+                    }
+                });
+
+                this.makeItem(item, menuItem);
+
+                return item;
+            });
             return HTMLBuilder.make("ul.menu-group").append(items);
         });
 
-        this._menu = HTMLBuilder.div("controller-menu submenu", menuGroups)
-            .appendTo("body");
+        this._menu = HTMLBuilder.div(`submenu ${this.constructor.menuClass}`, menuGroups);
+        this.attach();
+
+        // make sure submenus appear after the main menu
+        submenus.forEach(submenu => {
+            submenu.attach();
+        });
     }
 
     /**
@@ -192,8 +236,8 @@ class SubMenu {
     open() {
         this._parentMenu.closeSubmenus();
         this._parentItem.addClass("active");
-
         let offset = this._parentItem.offset();
+
         if (this.isTopLevel()) {
             this._menu.css({
                 top: offset.top + this._parentItem.outerHeight(),
@@ -213,14 +257,13 @@ class SubMenu {
         this._menu.show();
     }
 
+    /**** METHODS ****/
+
     /**
-     * Open the given submenu.
-     *
-     * @param {SubMenu} submenu
+     * Add this menu to the page.
      */
-    openSubmenu(submenu) {
-        submenu.open();
-        this._activeSubmenu = submenu;
+    attach() {
+        this._menu.appendTo("body");
     }
 
     /**
@@ -236,7 +279,11 @@ class SubMenu {
      * Close all menus.
      */
     closeAll() {
-        this._parentMenu.close();
+        if (this.isTopLevel()) {
+            this._parentMenu.close();
+        } else {
+            this._parentMenu.closeAll();
+        }
     }
 
     /**
@@ -248,8 +295,6 @@ class SubMenu {
             this._activeSubmenu = null;
         }
     }
-
-    /**** METHODS ****/
 
     /**
      * @return {boolean} true if this submenu is open.
@@ -265,51 +310,31 @@ class SubMenu {
         return this._parentMenu instanceof Menu;
     }
 
-    /**** HELPERS ****/
-
     /**
-     * @param {object} menuItem
-     * @return {jQuery} The menu item specified by the given definition.
+     * @param {jQuery} item - The menu item to customize.
+     * @param {object} menuItem - The parameters for the menu item.
      */
-    _makeItem(menuItem) {
-        let item = HTMLBuilder.li("", "menu-item");
-        item.html(menuItem.label);
-
+    makeItem(item, menuItem) {
         if (menuItem.class) {
             item.addClass(menuItem.class);
         }
+
         if (menuItem.icon) {
             item.prepend(HTMLBuilder.icon(menuItem.icon));
         }
+
         if (menuItem.context) {
             item.addClass(`disabled ${menuItem.context}-group`);
         }
-        if (menuItem.action) {
-            item.data("action", menuItem.action)
-                .click(e => {
-                    if (!item.hasClass("disabled")) {
-                        this.controller.doAction(menuItem.action);
-                        this.closeAll();
-                    }
-                });
+    }
 
-            addShortcutHint(item, menuItem.action);
-        }
-        if (menuItem.submenu) {
-            let submenu = new SubMenu(this, item, menuItem.submenu);
-            item.addClass("has-submenu").mouseenter(e => {
-                if (!item.hasClass("disabled")) {
-                    this.openSubmenu(submenu);
-                }
-            });
-        }
-
-        item.mouseenter(e => {
-            if (this._activeSubmenu && item !== this._activeSubmenu.parentItem) {
-                this.closeSubmenus();
-            }
-        });
-
-        return item;
+    /**
+     * Open the given submenu.
+     *
+     * @param {SubMenu} submenu
+     */
+    openSubmenu(submenu) {
+        submenu.open();
+        this._activeSubmenu = submenu;
     }
 }

@@ -1,5 +1,6 @@
+import Menu from "menus/Menu";
+
 import { ZOOMS } from "utils/CalchartUtils";
-import Menu from "utils/Menu";
 
 export default class EditorMenu extends Menu {
     getItems() {
@@ -114,7 +115,7 @@ export default class EditorMenu extends Menu {
                 {
                     label: "Toggle sheet background",
                     action: "toggleBackground",
-                    context: "edit-dots",
+                    context: "dot",
                 },
                 this.DIVIDER,
                 {

@@ -6,7 +6,7 @@ import HTMLBuilder from "utils/HTMLBuilder";
  */
 export default class BasePanel {
     /**
-     * @param {BaseContext} context
+     * @param {Context} context
      */
     constructor(context) {
         this._context = context;

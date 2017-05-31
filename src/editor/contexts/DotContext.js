@@ -1,11 +1,11 @@
 import DotType from "calchart/DotType";
 import GraphContext from "editor/contexts/GraphContext";
 import EditTools from "editor/EditTools";
+import { DotContextMenus as menus } from "menus/EditorContextMenus";
 import DotPanel from "panels/DotPanel";
 
 import { mapSome, parseNumber } from "utils/JSUtils";
 import { round } from "utils/MathUtils";
-import { showContextMenu } from "utils/UIUtils";
 
 /**
  * The Context that allows a user to select and edit dots with a drag
@@ -47,9 +47,7 @@ export default class DotContext extends GraphContext {
 
         this._addEvents(this.workspace, {
             contextmenu: e => {
-                showContextMenu(e, {
-                    "Edit continuity...": "loadContext(continuity)",
-                });
+                new menus.WorkspaceMenu(this, e).show();
             },
         });
 

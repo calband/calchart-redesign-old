@@ -174,43 +174,44 @@ header {
     }
 }
 
-.controller-menu {
+.submenu {
     @include hover-menu;
+    display: none;
     padding: 0;
     background: $white;
     ul.menu-group {
         padding: 5px 0;
         border-bottom: 1px solid $light-gray;
     }
-    li {
-        color: $dark-gray;
-        &.disabled {
-            color: $semilight-gray;
-            cursor: default;
-            &:hover, &.active {
-                background: $white;
-                color: $semilight-gray;
-            }
-            span.hint {
-                color: $semilight-gray;
-            }
-        }
-        &:hover, &.active {
-            background: $light-gray;
+    &.controller-menu {
+        z-index: z-index(menu);
+        li {
             color: $dark-gray;
             span.hint {
                 color: $medium-gray;
             }
-        }
-        span.hint {
-            color: $medium-gray;
+            &:hover, &.active {
+                background: $light-gray;
+                span.hint {
+                    color: $medium-gray;
+                }
+            }
+            &.disabled {
+                color: $semilight-gray;
+                cursor: default;
+                &:hover, &.active {
+                    background: $white;
+                    color: $semilight-gray;
+                }
+                span.hint {
+                    color: $semilight-gray;
+                }
+            }
         }
     }
-}
-
-.context-menu {
-    @include hover-menu;
-    z-index: z-index(context-menu);
+    &.context-menu {
+        z-index: z-index(context-menu);
+    }
 }
 
 .toolbar {
