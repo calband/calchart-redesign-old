@@ -3,6 +3,7 @@ import Dot from "calchart/Dot";
 import Grapher from "calchart/Grapher";
 import Sheet from "calchart/Sheet";
 import BaseContext from "editor/contexts/BaseContext";
+import { GraphContextMenus as menus } from "menus/EditorContextMenus";
 import AddSheetPopup from "popups/AddSheetPopup";
 import EditSheetPopup from "popups/EditSheetPopup";
 
@@ -25,7 +26,6 @@ import {
     doAction,
     setupMenu,
     setupToolbar,
-    showContextMenu,
     showError,
     showMessage,
 } from "utils/UIUtils";
@@ -95,9 +95,7 @@ export default class GraphContext extends BaseContext {
         this._addEvents(this.sidebar, {
             contextmenu: e => {
                 if ($(e.target).notIn(".stuntsheet")) {
-                    showContextMenu(e, {
-                        "Add Sheet...": "addStuntsheet",
-                    });
+                    new menus.SheetMenu(this, e).show();
                 }
             },
         });
@@ -105,12 +103,7 @@ export default class GraphContext extends BaseContext {
         this._addEvents(this.sidebar, ".stuntsheet", {
             contextmenu: e => {
                 $(e.currentTarget).click();
-
-                showContextMenu(e, {
-                    "Properties...": "showEditSheet",
-                    "Duplicate Sheet": "duplicateSheet",
-                    "Delete Sheet": "deleteSheet",
-                });
+                new menus.SidebarMenu(this, e).show();
             },
             click: e => {
                 let sheet = $(e.currentTarget).data("sheet");

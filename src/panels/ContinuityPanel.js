@@ -1,10 +1,10 @@
 import DotType from "calchart/DotType";
+import { ContinuityPanelMenus as menus } from "menus/EditorContextMenus";
 import BasePanel from "panels/BasePanel";
 
 import { CONTINUITIES } from "utils/CalchartUtils";
 import { STATIC_PATH } from "utils/env";
 import HTMLBuilder from "utils/HTMLBuilder";
-import { showContextMenu } from "utils/UIUtils";
 
 export default class ContinuityPanel extends BasePanel {
     /**
@@ -152,12 +152,7 @@ export default class ContinuityPanel extends BasePanel {
             })
             .on("contextmenu", ".continuity", e => {
                 let index = $(e.currentTarget).index();
-                showContextMenu(e, {
-                    "Edit...": `editContinuity(${index})`,
-                    "Move down": `moveContinuity(${index}, 1)`,
-                    "Move up": `moveContinuity(${index}, -1)`,
-                    "Delete": `deleteContinuity(${index})`,
-                });
+                new menus.ContinuityMenu(this._context, e, index).show();
             });
 
         return [

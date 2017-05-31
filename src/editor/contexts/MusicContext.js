@@ -1,13 +1,13 @@
 import Grapher from "calchart/Grapher";
 import Song from "calchart/Song";
 import BaseContext from "editor/contexts/BaseContext";
+import { MusicContextMenus as menus } from "menus/EditorContextMenus";
 import AddSongPopup from "popups/AddSongPopup";
 import EditSongPopup from "popups/EditSongPopup";
 
 import { ValidationError } from "utils/errors";
 import HTMLBuilder from "utils/HTMLBuilder";
 import { underscoreKeys, update } from "utils/JSUtils";
-import { showContextMenu } from "utils/UIUtils";
 
 /**
  * The Context that allows a user to edit the songs, audio, and music
@@ -60,13 +60,7 @@ export default class MusicContext extends BaseContext {
             },
             contextmenu: e => {
                 let index = $(e.currentTarget).index();
-
-                showContextMenu(e, {
-                    "Edit...": `showEditSong(${index})`,
-                    "Move down": `moveSong(${index}, 1)`,
-                    "Move up": `moveSong(${index}, -1)`,
-                    "Delete": `removeSong(${index})`,
-                });
+                new menus.SongMenu(this, e, index).show();
             },
         });
 
