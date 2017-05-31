@@ -82,7 +82,7 @@ export function promptFile(callback, multiple=false) {
  * @param {jQuery} li - The menu item.
  * @param {string} action
  */
-function addShortcutHint(li, action) {
+export function addShortcutHint(li, action) {
     let shortcut = window.controller.shortcutCommands[action];
     if (!_.isUndefined(shortcut)) {
         HTMLBuilder.span("", "hint")

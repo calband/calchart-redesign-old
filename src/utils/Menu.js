@@ -293,7 +293,7 @@ class SubMenu {
                     }
                 });
 
-            // addShortcutHint(item, menuItem.action);
+            addShortcutHint(item, menuItem.action);
         }
         if (menuItem.submenu) {
             let submenu = new SubMenu(this, item, menuItem.submenu);

@@ -296,7 +296,7 @@ export default class EditorController extends ApplicationController {
     _updateHistory() {
         function updateLabel(action, history) {
             let li = $(`.controller-menu li.${action}`);
-            let span = li.find("span");
+            let span = li.find("span.label");
             let data = _.last(history);
 
             if (_.isUndefined(data)) {

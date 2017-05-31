@@ -47,13 +47,13 @@ export default class EditorMenu extends Menu {
             label: "Edit",
             submenu: [
                 {
-                    label: "Undo <span></span>",
+                    label: "Undo <span class='label'></span>",
                     class: "undo",
                     action: "undo",
                     icon: "undo",
                 },
                 {
-                    label: "Redo <span></span>",
+                    label: "Redo <span class='label'></span>",
                     class: "redo",
                     action: "redo",
                     icon: "repeat",
