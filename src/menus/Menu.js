@@ -199,7 +199,7 @@ export class SubMenu {
                 }
 
                 if (menuItem.submenu) {
-                    let submenu = new SubMenu(this, item, menuItem.submenu);
+                    let submenu = new this.constructor(this, item, menuItem.submenu);
                     item.addClass("has-submenu").mouseenter(e => {
                         if (!item.hasClass("disabled")) {
                             this.openSubmenu(submenu);

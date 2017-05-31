@@ -22,8 +22,7 @@ export default class ContextMenu {
         this._context = context;
         this._event = e;
         this._target = $(e.target);
-
-        this._menu = new ContextSubMenu(this, null, this.getItems());
+        this._menu = null;
     }
 
     get controller() {
@@ -62,6 +61,7 @@ export default class ContextMenu {
             }
         });
 
+        this._menu = new ContextSubMenu(this, null, this.getItems());
         this._menu.open();
     }
 
@@ -112,6 +112,7 @@ class ContextSubMenu extends SubMenu {
     close() {
         if (this.isTopLevel()) {
             this._menu.remove();
+            this.closeSubmenus();
         } else {
             super.close();
         }

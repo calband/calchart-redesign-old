@@ -51,24 +51,13 @@ export default class DotContext extends GraphContext {
             },
         });
 
-        this._addEvents(".dot-marker", {
+        this._addEvents(this.workspace, ".dot-marker", {
             contextmenu: e => {
                 let dot = $(e.currentTarget).parent().data("dot");
                 let dotType = this.activeSheet.getDotType(dot);
+                new menus.DotMenu(this, e, dotType).show();
 
-                showContextMenu(e, {
-                    "Edit continuity...": `loadContext(continuity, dotType=${dotType})`,
-                    "Change dot type": {
-                        "Plain": "changeDotType(plain)",
-                        "Solid": "changeDotType(solid)",
-                        "Plain Forwardslash": "changeDotType(plain-forwardslash)",
-                        "Solid Forwardslash": "changeDotType(solid-forwardslash)",
-                        "Plain Backslash": "changeDotType(plain-backslash)",
-                        "Solid Backslash": "changeDotType(solid-backslash)",
-                        "Plain Cross": "changeDotType(plain-x)",
-                        "Solid Cross": "changeDotType(solid-x)",
-                    },
-                });
+                // don't activate edit tool
                 return false;
             },
         });
