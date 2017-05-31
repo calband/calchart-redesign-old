@@ -14,7 +14,7 @@ from django.templatetags.static import static as get_static_path
 from django.utils.html import format_html, format_html_join, mark_safe
 from django.utils.text import slugify
 
-from base.constants import SNAP_OPTIONS, ZOOMS
+from base.constants import SNAP_OPTIONS
 from utils.general import collapse
 
 ### MENU CLASSES ###
@@ -210,22 +210,22 @@ class ToolbarItem(object):
     """
     A Calchart ToolbarItem, in the format
 
-    <li class="toolbar-item {{ class }}" data-name="{{ name }}" data-action="{{ action }}">
+    <li class="toolbar-item {{ classes }}" data-name="{{ name }}" data-action="{{ action }}">
         <i class="icon-{{ icon }}"></i>
     </li>
-
-    where the class is the slugified name
     """
-    def __init__(self, name, icon, action):
+    def __init__(self, name, icon, action, classes=None):
         self.name = name
         # icon class, e.g. "plus" (see css/fonts/icons-reference.html)
         self.icon = icon
         self.action = action
 
+        self.classes = slugify(self.name) if classes is None else classes
+
     def render(self):
         return format_html(
             '<li class="toolbar-item {}" data-name="{}" data-action="{}">{}</li>',
-            slugify(self.name), self.name, self.action, mark_safe(self._render_contents())
+            self.classes, self.name, self.action, mark_safe(self._render_contents())
         )
 
     def _render_contents(self):
@@ -292,55 +292,18 @@ class ChoiceToolbarItem(CustomToolbarItem):
 
 ### MENUS ###
 
-editor_menu = Menu(
-    SubMenu('File', [
-        MenuContextItem('graph-context', 'New stuntsheet', 'showAddSheet', icon='file-o'),
-        MenuItem('Rename show', 'promptRename'),
-        MenuItem('Save', 'saveShow', icon='floppy-o'),
-        MenuItem('Generate PDF', 'generatePoopsheet', icon='file-pdf-o'),
-        MenuItem('Export', 'export', icon='file-code-o'),
-    ], [
-        MenuItem('Preferences', 'editPreferences'),
-        MenuItem('Edit show properties', 'editShowProperties'),
-    ]),
-    SubMenu('Edit', [
-        MenuItem('Undo', 'undo', icon='undo'),
-        MenuItem('Redo', 'redo', icon='repeat'),
-    ]),
-    SubMenu('View', [
-        SubMenu('View mode', [
-            MenuItem('Music editor', 'loadContext(music)', icon='music'),
-            MenuItem('Dot editor', 'loadContext(dot)', icon='dot-circle-o'),
-            MenuItem('Continuity editor', 'loadContext(continuity)', icon='pencil-square-o'),
-            # MenuItem('3D View', 'loadContext(3d)'),
-        ]),
-        MenuContextItem('edit-dots', 'Toggle sheet background', 'toggleBackground'),
-    ], [
-        SubMenuContext('graph-context', 'Zoom', [
-            MenuItem('Zoom in', 'zoom(0.1)', icon='search-plus'),
-            MenuItem('Zoom out', 'zoom(-0.1)', icon='search-minus'),
-        ], [
-            MenuItem(label, f'zoomTo({zoom})')
-            for zoom, label in ZOOMS
-        ], icon='search'),
-    ]),
-    SubMenu('Help', [
-        MenuItem('Go to help...', 'openHelp', icon='question-circle'),
-    ]),
-)
-
 editor_toolbar = Toolbar(
     ToolbarGroup(
-        ToolbarItem('Edit Music', 'music', 'loadContext(music)'),
-        ToolbarItem('Edit Dots', 'dot-circle-o', 'loadContext(dot)'),
-        ToolbarItem('Edit Continuity', 'pencil-square-o', 'loadContext(continuity)'),
+        ToolbarItem('Edit Music', 'music', 'loadContext(music)', classes='music'),
+        ToolbarItem('Edit Dots', 'dot-circle-o', 'loadContext(dot)', classes='dot'),
+        ToolbarItem('Edit Continuity', 'pencil-square-o', 'loadContext(continuity)', classes='continuity'),
     ),
     ToolbarContextGroup(
         'graph-context',
         ToolbarItem('Add Stuntsheet', 'file-o', 'showAddSheet'),
     ),
     ToolbarContextGroup(
-        'edit-dots',
+        'dot',
         ToolbarItem('Selection', 'mouse-pointer', 'loadTool(selection)'),
         ToolbarItem('Lasso', 'lasso', 'loadTool(lasso)'),
         ToolbarItem('Swap', 'exchange', 'loadTool(swap)'),
@@ -351,19 +314,19 @@ editor_toolbar = Toolbar(
         ToolbarItem('Circle', 'circle-o', 'loadTool(circle)'),
     ),
     ToolbarContextGroup(
-        'edit-dots',
+        'dot',
         ChoiceToolbarItem('Snap to', SNAP_OPTIONS),
         CustomToolbarItem('Resnap', '<button>Resnap</button>'),
     ),
     ToolbarContextGroup(
-        'edit-continuity',
+        'continuity',
         ToolbarItem('Previous Beat', 'chevron-left', 'prevBeat'),
         CustomToolbarItem('Seek', '<span class="bar"></span><span class="marker"></span>'),
         ToolbarItem('Next Beat', 'chevron-right', 'nextBeat'),
         ToolbarItem('Check Continuities', 'check', 'checkContinuities(fullCheck=true)'),
     ),
     ToolbarContextGroup(
-        'edit-background',
+        'background',
         ToolbarItem('Save', 'check', 'exit'),
         ToolbarItem('Cancel', 'times', 'revert'),
     ),
@@ -378,7 +341,7 @@ editor_toolbar = Toolbar(
         ToolbarItem('Save', 'check', 'exit'),
     ),
     ToolbarContextGroup(
-        'edit-music',
+        'music',
         ToolbarItem('Add Song', 'file-o', 'showAddSong'),
     ),
 )

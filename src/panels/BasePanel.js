@@ -20,7 +20,7 @@ export default class BasePanel {
         let handle = HTMLBuilder.div("panel-handle");
         let content = HTMLBuilder.div("panel-content", this.getContent());
 
-        this._panel = HTMLBuilder.div(`panel ${this._context.info.name}`, [handle, content])
+        this._panel = HTMLBuilder.div(`panel ${this._context.name}`, [handle, content])
             .appendTo("body");
 
         // initialize the panel in bottom-right corner of screen

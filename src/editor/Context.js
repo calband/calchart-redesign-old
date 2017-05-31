@@ -34,7 +34,7 @@ export default class Context {
 
         ALL_CONTEXTS.forEach(_Context => {
             let context = new _Context(controller);
-            this.contexts[context.info.name] = context;
+            this.contexts[context.name] = context;
         });
     }
 

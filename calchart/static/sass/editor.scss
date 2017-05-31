@@ -27,7 +27,7 @@ $editor-header-height: 95px;
     }
     .toolbar {
         padding-left: 10px;
-        .edit-continuity-group .seek {
+        .continuity-group .seek {
             @include vertically-center;
             $marker-size: 16px;
             height: $marker-size;
@@ -61,11 +61,6 @@ $editor-header-height: 95px;
             padding: 0.6em 1.5em 0.3em;
         }
     }
-}
-
-// undo/redo labels
-.controller-menu span.label {
-    color: $dark-gray;
 }
 
 .content {

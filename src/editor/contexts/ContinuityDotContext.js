@@ -17,10 +17,8 @@ export default class ContinuityDotContext extends HiddenGraphContext {
         return ContextActions;
     }
 
-    static get info() {
-        return {
-            name: "continuity-dots",
-        };
+    static get name() {
+        return "continuity-dots";
     }
 
     get continuity() {

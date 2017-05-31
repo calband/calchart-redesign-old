@@ -28,11 +28,8 @@ export default class EditBackgroundContext extends HiddenGraphContext {
         return ContextActions;
     }
 
-    static get info() {
-        return {
-            name: "background",
-            html: "edit-background",
-        };
+    static get name() {
+        return "background";
     }
 
     /**

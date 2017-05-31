@@ -27,10 +27,8 @@ export default class FTLPathContext extends HiddenGraphContext {
         return ContextActions;
     }
 
-    static get info() {
-        return {
-            name: "ftl-path",
-        };
+    static get name() {
+        return "ftl-path";
     }
 
     get continuity() {

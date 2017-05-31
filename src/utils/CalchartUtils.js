@@ -86,6 +86,9 @@ export const STEP_TYPES = {
     JS: "Jerky Step",
 };
 
+/** @const {number[]} **/
+export const ZOOMS = [0.5, 0.75, 1, 1.5, 2];
+
 /** @const {Object.<string, string>} */
 export const SHOW_FIELD_TYPES = _.clone(FIELD_TYPES);
 delete SHOW_FIELD_TYPES.default;

@@ -1,5 +1,6 @@
 import ApplicationController from "controllers/ApplicationController";
 import Context from "editor/Context";
+import EditorMenu from "editor/EditorMenu";
 import EditShowPopup from "popups/EditShowPopup";
 
 import { IS_LOCAL } from "utils/env";
@@ -8,7 +9,6 @@ import HTMLBuilder from "utils/HTMLBuilder";
 import { empty, underscoreKeys, update } from "utils/JSUtils";
 import {
     doAction,
-    setupMenu,
     setupToolbar,
     showMessage,
 } from "utils/UIUtils";
@@ -55,9 +55,11 @@ export default class EditorController extends ApplicationController {
         super.init();
 
         Context.init(this);
-
-        setupMenu(".menu");
+        EditorMenu.init(this);
         setupToolbar(".toolbar");
+
+        // initialize undo/redo labels
+        this._updateHistory();
 
         // prompt user if leaving while unsaved, unless in development
         if (!IS_LOCAL) {
@@ -138,7 +140,7 @@ export default class EditorController extends ApplicationController {
     loadContext(name, options={}) {
         if (this._context) {
             // don't load same context
-            if (name === this._context.info.name) {
+            if (name === this._context.name) {
                 return;
             }
             this._context.unload();
@@ -293,18 +295,17 @@ export default class EditorController extends ApplicationController {
      */
     _updateHistory() {
         function updateLabel(action, history) {
-            let li = $(`.controller-menu li[data-action=${action}]`);
-            let span = li.find("span.label");
+            let li = $(`.controller-menu li.${action}`);
+            let span = li.find("span");
             let data = _.last(history);
 
             if (_.isUndefined(data)) {
-                span.remove();
+                span.text("");
+                li.addClass("disabled");
             } else {
-                if (!span.exists()) {
-                    span = HTMLBuilder.span("", "label").appendTo(li);
-                }
                 let label = _.defaultTo(data.label, _.lowerCase(data.name));
                 span.text(` ${label}`);
+                li.removeClass("disabled");
             }
         }
 

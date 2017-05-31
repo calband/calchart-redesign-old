@@ -25,10 +25,8 @@ export default class GateReferenceContext extends HiddenGraphContext {
         return ContextActions;
     }
 
-    static get info() {
-        return {
-            name: "gate-reference",
-        };
+    static get name() {
+        return "gate-reference";
     }
 
     /**

@@ -32,11 +32,8 @@ export default class ContinuityContext extends GraphContext {
         return ContextActions;
     }
 
-    static get info() {
-        return {
-            name: "continuity",
-            html: "edit-continuity",
-        };
+    static get name() {
+        return "continuity";
     }
 
     get panel() {

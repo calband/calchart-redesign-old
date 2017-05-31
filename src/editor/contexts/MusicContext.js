@@ -28,11 +28,8 @@ export default class MusicContext extends BaseContext {
         return ContextActions;
     }
 
-    static get info() {
-        return {
-            name: "music",
-            html: "edit-music",
-        };
+    static get name() {
+        return "music";
     }
 
     static get refreshTargets() {

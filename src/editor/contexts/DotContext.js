@@ -34,11 +34,8 @@ export default class DotContext extends GraphContext {
         return ContextActions;
     }
 
-    static get info() {
-        return {
-            name: "dot",
-            html: "edit-dots",
-        };
+    static get name() {
+        return "dot";
     }
 
     get panel() {

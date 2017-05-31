@@ -145,7 +145,7 @@ header {
 .menu {
     @include unselectable;
     z-index: z-index(menu) + 1;
-    li {
+    .menu-tab {
         display: inline-block;
         cursor: default;
         padding: 5px 10px;
@@ -155,21 +155,21 @@ header {
         &:hover {
             background: $light-gray;
         }
-    }
-    li.active {
-        background: $white;
-        border: 1px solid rgba($black, 0.2);
-        border-bottom: 1px solid $white;
-        box-shadow: 0 1px 2px rgba($black, 0.2);
-        // block the border/shadow on the bottom
-        &:before {
-            content: "";
-            position: absolute;
-            top: 100%;
-            left: 0;
-            width: 100%;
-            height: 4px;
+        &.active {
             background: $white;
+            border: 1px solid rgba($black, 0.2);
+            border-bottom: 1px solid $white;
+            box-shadow: 0 1px 2px rgba($black, 0.2);
+            // block the border/shadow on the bottom
+            &:before {
+                content: "";
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                height: 4px;
+                background: $white;
+            }
         }
     }
 }

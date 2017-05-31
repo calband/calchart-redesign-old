@@ -15,7 +15,7 @@ export default class BaseContext {
      */
     constructor(controller) {
         this._controller = controller;
-        this._eventListeners = new Set();
+        this._eventListeners = [];
         this._panel = null;
     }
 
@@ -41,11 +41,9 @@ export default class BaseContext {
     }
 
     /**
-     * @return {object} meta info for this context, including the following keys:
-     *   - {string} name - The name of the context, the string used for Context.load.
-     *   - {string} [html=name] - The class of the menu/toolbar HTML items for the context.
+     * @return {string} name - The name of the context, the string used for Context.load.
      */
-    static get info() {
+    static get name() {
         throw new NotImplementedError(this);
     }
 
@@ -60,8 +58,8 @@ export default class BaseContext {
         return this._controller;
     }
 
-    get info() {
-        return this.constructor.info;
+    get name() {
+        return this.constructor.name;
     }
 
     /**
@@ -81,13 +79,9 @@ export default class BaseContext {
      * @param {object} options - Options to customize loading the Context.
      */
     load(options) {
-        let name = _.defaultTo(this.info.html, this.info.name);
-        // context icon
-        $(`.toolbar .${name}`).addClass("active");
-        // MenuContextItem
-        $(`.menu-item.${name}-group`).removeClass("disabled");
-        // ToolbarContextGroup
-        $(`.toolbar .${name}-group`).removeClass("hide");
+        $(`.toolbar .${this.name}`).addClass("active");
+        $(`.menu-item.${this.name}-group`).removeClass("disabled");
+        $(`.toolbar .${this.name}-group`).removeClass("hide");
 
         if (this.panel) {
             this._panel = new this.panel(this);
@@ -127,14 +121,13 @@ export default class BaseContext {
      * set by _addEvents.
      */
     unload() {
-        for (let element of this._eventListeners) {
-            $(element).off(".app-context");
-        }
+        this._eventListeners.forEach(event => {
+            $(event.element).off(".app-context", event.selector);
+        });
 
-        let name = _.defaultTo(this.info.html, this.info.name);
-        $(`.toolbar .${name}`).removeClass("active");
-        $(`.menu-item.${name}-group`).addClass("disabled");
-        $(`.toolbar .${name}-group`).addClass("hide");
+        $(`.toolbar .${this.name}`).removeClass("active");
+        $(`.menu-item.${this.name}-group`).addClass("disabled");
+        $(`.toolbar .${this.name}-group`).addClass("hide");
 
         if (this._panel) {
             this._panel.hide();
@@ -163,6 +156,6 @@ export default class BaseContext {
         events = _.mapKeys(events, (handler, name) => `${name}.app-context`);
 
         $(element).on(events, selector);
-        this._eventListeners.add(element);
+        this._eventListeners.push({ element, selector });
     }
 }

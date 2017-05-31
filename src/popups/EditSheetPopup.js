@@ -83,7 +83,7 @@ export default class EditSheetPopup extends BasePopup {
 
         let moveIcon = HTMLBuilder.icon("arrows", "move-link hide-if-none").click(e => {
             this._context.controller.loadContext("background", {
-                previousContext: this._context.info.name,
+                previousContext: this._context.name,
             });
             this.hide();
         });
