@@ -71,16 +71,9 @@ export default class ContextMenu {
      * Close this context menu.
      */
     close() {
-        this._menu.close();
+        this._menu.destroy();
         this._target.parents().unlockScroll();
         $(window).off(".context-menu");
-    }
-
-    /**
-     * A noop for SubMenu.open(); there is nothing to close when the top-level
-     * context submenu is opened.
-     */
-    closeSubmenus() {
     }
 }
 
@@ -93,29 +86,25 @@ class ContextSubMenu extends SubMenu {
         return "context-menu";
     }
 
-    /**** METHODS ****/
-
     open() {
         if (this.isTopLevel()) {
             let event = this._parentMenu.event;
             this._menu
-                .css({
-                    top: event.pageY,
-                    left: event.pageX,
-                })
+                .smartPosition(event.pageY, event.pageX)
                 .show();
         } else {
             super.open();
         }
     }
 
-    close() {
-        if (this.isTopLevel()) {
-            this._menu.remove();
-            this.closeSubmenus();
-        } else {
-            super.close();
-        }
+    /**** METHODS ****/
+
+    /**
+     * Close and remove this menu.
+     */
+    destroy() {
+        this._menu.remove();
+        this._submenus.forEach(submenu => submenu.destroy());
     }
 
     isTopLevel() {

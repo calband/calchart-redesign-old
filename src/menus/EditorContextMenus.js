@@ -4,6 +4,46 @@
 
 import ContextMenu from "menus/ContextMenu";
 
+class ContinuityContextWorkspace extends ContextMenu {
+    getItems() {
+        return [
+            {
+                label: "Edit dots...",
+                action: "loadContext(dot)",
+            },
+            {
+                label: "Go to",
+                submenu: [
+                    {
+                        label: "First beat",
+                        action: "firstBeat",
+                    },
+                    {
+                        label: "Previous beat",
+                        action: "prevBeat",
+                    },
+                    {
+                        label: "Next beat",
+                        action: "nextBeat",
+                    },
+                    {
+                        label: "Last beat",
+                        action: "lastBeat",
+                    },
+                ],
+            },
+            {
+                label: "Check Continuities...",
+                action: "checkContinuities(fullCheck=true)",
+            },
+        ];
+    }
+}
+
+export let ContinuityContextMenus = {
+    WorkspaceMenu: ContinuityContextWorkspace,
+};
+
 class DotContextWorkspace extends ContextMenu {
     getItems() {
         return [

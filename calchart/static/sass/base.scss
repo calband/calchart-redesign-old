@@ -182,6 +182,9 @@ header {
     ul.menu-group {
         padding: 5px 0;
         border-bottom: 1px solid $light-gray;
+        &:last-child {
+            border-bottom: none;
+        }
     }
     &.controller-menu {
         z-index: z-index(menu);

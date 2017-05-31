@@ -154,6 +154,7 @@ export class SubMenu {
         });
 
         this._menu = null;
+        this._submenus = [];
         this.initMenu();
 
         // {SubMenu}
@@ -179,8 +180,6 @@ export class SubMenu {
      * Initialize the submenu HTML element.
      */
     initMenu() {
-        let submenus = [];
-
         let menuGroups = this._items.map(menuGroup => {
             let items = menuGroup.map(menuItem => {
                 let item = HTMLBuilder.li("", "menu-item");
@@ -205,7 +204,7 @@ export class SubMenu {
                             this.openSubmenu(submenu);
                         }
                     });
-                    submenus.push(submenu);
+                    this._submenus.push(submenu);
                 }
 
                 item.mouseenter(e => {
@@ -225,7 +224,7 @@ export class SubMenu {
         this.attach();
 
         // make sure submenus appear after the main menu
-        submenus.forEach(submenu => {
+        this._submenus.forEach(submenu => {
             submenu.attach();
         });
     }
@@ -271,8 +270,11 @@ export class SubMenu {
      */
     close() {
         this._menu.hide();
-        this._parentItem.removeClass("active");
         this.closeSubmenus();
+
+        if (this._parentItem) {
+            this._parentItem.removeClass("active");
+        }
     }
 
     /**
