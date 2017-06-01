@@ -8,6 +8,7 @@
  * - Handles utilities
  */
 
+import { CSRF_TOKEN } from "utils/env";
 import HTMLBuilder from "utils/HTMLBuilder";
 import { attempt } from "utils/JSUtils";
 
@@ -25,7 +26,7 @@ import { attempt } from "utils/JSUtils";
  */
 export function doAction(action, params={}, options={}) {
     let data = new FormData();
-    data.append("csrfmiddlewaretoken", $("input[name=csrfmiddlewaretoken]").val());
+    data.append("csrfmiddlewaretoken", CSRF_TOKEN);
     data.append("action", action);
     $.each(params, function(name, val) {
         data.append(name, val);
@@ -40,11 +41,21 @@ export function doAction(action, params={}, options={}) {
         processData: false,
         error: function(xhr) {
             console.error(xhr);
+
+            let message;
             if (xhr.responseJSON) {
-                showError(xhr.responseJSON.message);
+                message = xhr.responseJSON.message;
             } else {
-                showError("An error occurred.");
+                switch (xhr.status) {
+                    case 403:
+                        message = "Invalid permissions. Please refresh the page.";
+                        break;
+                    default:
+                        message = "An error occurred.";
+                }
             }
+
+            showError(message);
         },
     };
     _.extend(ajaxOptions, options);

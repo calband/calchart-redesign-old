@@ -3,6 +3,11 @@
  */
 
 /**
+ * @const {string} The CSRF token for POST requests.
+ */
+export const CSRF_TOKEN = document.cookie.match(/csrftoken=(\w+)/)[1];
+
+/**
  * true if working on the development site.
  * @const {boolean}
  */
