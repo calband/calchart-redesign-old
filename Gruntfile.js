@@ -1,6 +1,13 @@
 var path = require("path");
 
-module.exports = function (grunt) {
+var entryPoints = {};
+var entryFiles = ["home", "editor", "viewer", "wiki"].map(function(file) {
+    var filepath = "./src/" + file + ".js";
+    entryPoints[file] = filepath;
+    return filepath;
+});
+
+module.exports = function(grunt) {
     grunt.loadNpmTasks("grunt-webpack");
     grunt.loadNpmTasks("grunt-contrib-sass");
     grunt.loadNpmTasks("grunt-contrib-watch");
@@ -8,12 +15,7 @@ module.exports = function (grunt) {
     grunt.initConfig({
         webpack: {
             build: {
-                entry: {
-                    home: "./src/home.js",
-                    editor: "./src/editor.js",
-                    viewer: "./src/viewer.js",
-                    wiki: "./src/wiki.js",
-                },
+                entry: entryPoints,
                 output: {
                     path: path.resolve("calchart/static/js/"),
                     filename: "[name].js",
@@ -30,7 +32,6 @@ module.exports = function (grunt) {
                     rules: [
                         {
                             test: /\.js$/,
-                            // include: path.resolve("./src"),
                             exclude: /node_modules/,
                             use: {
                                 loader: "babel-loader",
@@ -40,7 +41,7 @@ module.exports = function (grunt) {
                                         "es2015",
                                     ],
                                     plugins: [
-                                        // reduces size by taking out redundant helper functions
+                                        // allows ES6 primitives such as Set
                                         "transform-runtime",
                                     ],
                                     minified: true,
