@@ -71,7 +71,7 @@ export default class EditTools {
             context.workspace.removeClass("edit-tools-active");
         }
 
-        $(".toolbar .dot-group li").removeClass("active");
+        $(".toolbar .dot-context li").removeClass("active");
         $(`.toolbar .${name}`).addClass("active");
 
         tool.load();

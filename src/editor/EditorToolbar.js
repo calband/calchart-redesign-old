@@ -26,7 +26,7 @@ export default class EditorToolbar extends Toolbar {
                 ],
             },
             {
-                context: "graph-context",
+                context: "graph",
                 items: [
                     {
                         label: "Add Stuntsheet",

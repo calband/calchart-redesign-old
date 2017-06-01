@@ -9,7 +9,7 @@ export default class EditorMenu extends Menu {
                 {
                     label: "New stuntsheet",
                     action: "showAddSheet",
-                    context: "graph-context",
+                    context: "graph",
                     icon: "file-o",
                 },
                 {

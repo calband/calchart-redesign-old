@@ -27,7 +27,7 @@ $editor-header-height: 95px;
     }
     .toolbar {
         padding-left: 10px;
-        .continuity-group .seek {
+        .continuity-context .seek {
             @include vertically-center;
             $marker-size: 16px;
             height: $marker-size;

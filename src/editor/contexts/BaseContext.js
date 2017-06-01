@@ -41,7 +41,9 @@ export default class BaseContext {
     }
 
     /**
-     * @return {string} name - The name of the context, the string used for Context.load.
+     * @return {string} name - The name of the context, the string used for
+     *   Context.load and other areas of the code that need to uniquely identify
+     *   this context.
      */
     static get name() {
         throw new NotImplementedError(this);
@@ -80,8 +82,8 @@ export default class BaseContext {
      */
     load(options) {
         $(`.toolbar .${this.name}`).addClass("active");
-        $(`.menu-item.${this.name}-group`).removeClass("disabled");
-        $(`.toolbar .${this.name}-group`).removeClass("hide");
+        $(`.menu-item.${this.name}-context`).removeClass("disabled");
+        $(`.toolbar ul.${this.name}-context`).removeClass("hide");
 
         if (this.panel) {
             this._panel = new this.panel(this);
@@ -126,8 +128,8 @@ export default class BaseContext {
         });
 
         $(`.toolbar .${this.name}`).removeClass("active");
-        $(`.menu-item.${this.name}-group`).addClass("disabled");
-        $(`.toolbar .${this.name}-group`).addClass("hide");
+        $(`li.menu-item.${this.name}-context`).addClass("disabled");
+        $(`.toolbar ul.${this.name}-context`).addClass("hide");
 
         if (this._panel) {
             this._panel.hide();

@@ -328,7 +328,7 @@ export class SubMenu {
         }
 
         if (menuItem.context) {
-            item.addClass(`disabled ${menuItem.context}-group`);
+            item.addClass(`disabled ${menuItem.context}-context`);
         }
     }
 

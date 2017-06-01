@@ -133,16 +133,16 @@ export default class GraphContext extends BaseContext {
             this.refreshZoom(e.pageX, e.pageY);
         });
 
-        $(".menu-item.graph-context-group").removeClass("disabled");
-        $(".toolbar .graph-context-group").removeClass("hide");
+        $(".menu-item.graph-context").removeClass("disabled");
+        $(".toolbar .graph-context").removeClass("hide");
     }
 
     unload() {
         super.unload();
 
         this.workspace.off(".pinch");
-        $(".menu-item.graph-context-group").addClass("disabled");
-        $(".toolbar .graph-context-group").addClass("hide");
+        $(".menu-item.graph-context").addClass("disabled");
+        $(".toolbar .graph-context").addClass("hide");
 
         $(".graph-content").hide();
     }
@@ -471,7 +471,7 @@ export default class GraphContext extends BaseContext {
 }
 
 let GraphShortcuts = {
-    "alt+n": "addStuntsheet", // can't capture ctrl+n: http://stackoverflow.com/a/7296303/4966649
+    "alt+n": "showAddSheet", // can't capture ctrl+n: http://stackoverflow.com/a/7296303/4966649
     "ctrl+backspace": "deleteSheet",
     "ctrl+d": "duplicateSheet",
 };

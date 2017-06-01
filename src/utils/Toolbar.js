@@ -58,7 +58,7 @@ export default class Toolbar {
         this.getItems().forEach(toolbarGroup => {
             let group = HTMLBuilder.make("ul.toolbar-group");
             if (toolbarGroup.context) {
-                group.addClass(`hide ${toolbarGroup.context}-group`);
+                group.addClass(`hide ${toolbarGroup.context}-context`);
             }
 
             toolbarGroup.items.forEach(toolbarItem => {

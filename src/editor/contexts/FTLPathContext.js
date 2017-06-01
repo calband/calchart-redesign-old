@@ -200,8 +200,8 @@ export default class FTLPathContext extends HiddenGraphContext {
             this._helper = null;
         }
 
-        $(".toolbar .ftl-path-group li").removeClass("active");
-        $(`.toolbar .ftl-path-group .${name}`).addClass("active");
+        $(".toolbar .ftl-path-context li").removeClass("active");
+        $(`.toolbar .ftl-path-context .${name}`).addClass("active");
     }
 
     /**** HELPERS ****/
