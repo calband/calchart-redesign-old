@@ -7,28 +7,17 @@ import { GraphContextMenus as menus } from "menus/EditorContextMenus";
 import AddSheetPopup from "popups/AddSheetPopup";
 import EditSheetPopup from "popups/EditSheetPopup";
 
-import { ActionError, AnimationStateError, ValidationError } from "utils/errors";
+import { AnimationStateError } from "utils/errors";
 import HTMLBuilder from "utils/HTMLBuilder";
 import {
     attempt,
-    empty,
     mapSome,
     parseArgs,
-    parseNumber,
     underscoreKeys,
     update,
 } from "utils/JSUtils";
-import {
-    isEqual,
-    round,
-} from "utils/MathUtils";
-import {
-    doAction,
-    setupMenu,
-    setupToolbar,
-    showError,
-    showMessage,
-} from "utils/UIUtils";
+import { isEqual, round } from "utils/MathUtils";
+import { showError, showMessage } from "utils/UIUtils";
 
 let GraphState = {
     grapher: null,
