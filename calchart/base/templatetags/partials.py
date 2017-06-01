@@ -165,7 +165,3 @@ class CreateFormNode(template.Node):
             mark_safe(fields),
             mark_safe(rest)
         )
-
-@register.simple_tag
-def make_menu(menu):
-    return menu.render()
