@@ -43,18 +43,17 @@ export default class BasePanel {
                     let left = e.pageX - offsetX;
                     let top = e.pageY - offsetY;
 
-                    // // don't go out of window
-                    // let maxX = $(window).width() - $(panel).outerWidth();
-                    // let maxY = $(window).height() - $(panel).outerHeight();
+                    // don't go out of window
+                    let maxX = $(window).width() - this._panel.outerWidth();
+                    let maxY = $(window).height() - this._panel.outerHeight();
 
-                    // $(panel).css({
-                    //     top: _.clamp(top, 0, maxY),
-                    //     left: _.clamp(left, 0, maxX),
-                    // });
+                    this._panel.css({
+                        top: _.clamp(top, 0, maxY),
+                        left: _.clamp(left, 0, maxX),
+                    });
                 },
                 "mouseup.panel-drag": e => {
                     $(window).off(".panel-drag");
-                    this._panel.keepOnscreen();
                 },
             });
         });

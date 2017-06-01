@@ -108,7 +108,7 @@ export function setupTooltip(selector, label) {
                 });
             }, 750);
         })
-        .mouseleave(e => {
+        .on("click mouseleave", function() {
             clearTimeout(tooltipTimeout);
             tooltip.remove();
         });

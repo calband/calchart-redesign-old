@@ -280,7 +280,7 @@ header {
     color: $white;
     padding: 5px 7px;
     font-size: 14px;
-    z-index: z-index(popup);
+    z-index: z-index(tooltip);
     .tooltip-arrow {
         position: absolute;
         top: 100%;

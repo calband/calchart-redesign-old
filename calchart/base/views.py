@@ -10,7 +10,6 @@ from django.shortcuts import get_object_or_404, redirect
 from django.views.generic import TemplateView, RedirectView, CreateView
 from django.utils import timezone
 
-import json, os
 from datetime import timedelta
 
 from base.forms import *
