@@ -68,11 +68,6 @@ export default class EditorController extends ApplicationController {
         }
 
         this.loadContext("dot");
-
-        let sheet = this.show.getSheet(0);
-        if (sheet) {
-            this._context.loadSheet(sheet);
-        }
     }
 
     /**

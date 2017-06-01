@@ -23,6 +23,7 @@ let GraphState = {
     grapher: null,
     activeSheet: null,
     selectedDots: $(),
+    isInitialized: false,
 };
 
 /**
@@ -30,6 +31,15 @@ let GraphState = {
  * Most contexts are GraphContexts, except MusicContext.
  */
 export default class GraphContext extends BaseContext {
+    constructor(controller) {
+        super(controller);
+
+        if (!GraphState.isInitialized) {
+            this.init();
+            GraphState.isInitialized = true;
+        }
+    }
+
     static get shortcuts() {
         return GraphShortcuts;
     }
@@ -39,8 +49,7 @@ export default class GraphContext extends BaseContext {
     }
 
     static get refreshTargets() {
-        // refresh sidebar and grapher before panel
-        return _.concat(["sidebar", "grapher"], super.refreshTargets);
+        return _.concat(super.refreshTargets, "grapher");
     }
 
     get grapher() {
@@ -59,27 +68,39 @@ export default class GraphContext extends BaseContext {
         return $(".graph-content .workspace");
     }
 
+    /**
+     * Actions to run when the editor is first loaded.
+     */
+    init() {
+        $(".graph-content").show();
+
+        // initialize grapher
+        GraphState.grapher = new Grapher(this.show, this.workspace, {
+            boundDots: true,
+            dotFormat: "dot-type",
+            drawYardlineNumbers: true,
+            draw4Step: true,
+            expandField: true,
+            showLabels: true,
+            zoom: 1,
+        });
+
+        // initialize with field in view
+        let scale = this.grapher.getScale();
+        this.workspace.scrollLeft(scale.minX - 30);
+        this.workspace.scrollTop(scale.minY - 30);
+
+        // initialize sidebar
+        let sheet = this.show.getSheet(0);
+        if (sheet) {
+            this.loadSheet(sheet);
+        }
+    }
+
     load(options) {
         super.load(options);
 
         $(".graph-content").show();
-
-        // initialize grapher if not initialized
-        if (_.isNull(this.grapher)) {
-            GraphState.grapher = new Grapher(this.show, this.workspace, {
-                boundDots: true,
-                dotFormat: "dot-type",
-                drawYardlineNumbers: true,
-                draw4Step: true,
-                expandField: true,
-                showLabels: true,
-                zoom: 1,
-            });
-            // initialize with field in view
-            let scale = this.grapher.getScale();
-            this.workspace.scrollLeft(scale.minX - 30);
-            this.workspace.scrollTop(scale.minY - 30);
-        }
 
         this._addEvents(this.sidebar, {
             contextmenu: e => {
@@ -369,7 +390,7 @@ export default class GraphContext extends BaseContext {
      */
     loadSheet(sheet) {
         GraphState.activeSheet = sheet;
-        this.refresh();
+        this.refresh("all", "sidebar");
     }
 
     /**

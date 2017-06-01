@@ -70,7 +70,10 @@ $.fn.clickOff = function() {
  * @param {Object} [options] - Additional options to pass to the Chosen
  *      constructor, which override any defaults we set for all dropdowns.
  *      The full list of Chosen options can be found at
- *      {@link https://harvesthq.github.io/chosen/options.html}.
+ *      {@link https://harvesthq.github.io/chosen/options.html}. Additional
+ *      options:
+ *        - {boolean} [refresh=true] - If true, destroy Chosen if it already
+ *          exists
  * @return {jQuery} @this
  */
 $.fn.dropdown = function(options) {
@@ -91,8 +94,7 @@ $.fn.dropdown = function(options) {
     }
     options = _.defaults({}, options, defaults);
 
-    // destroy Chosen if exists
-    if (this.data("chosen") !== undefined) {
+    if (this.data("chosen") && _.defaultTo(options.refresh, true)) {
         this.chosen("destroy");
     }
 

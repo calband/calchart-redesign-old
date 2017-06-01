@@ -3,6 +3,25 @@ import BasePanel from "panels/BasePanel";
 import HTMLBuilder from "utils/HTMLBuilder";
 
 export default class ContinuityDotPanel extends BasePanel {
+    show() {
+        let list = this._panel.find(".dot-order").empty();
+        this._getDots().forEach(dot => {
+            let $dot = this._context.grapher.getDot(dot);
+
+            HTMLBuilder.li(dot.label, `dot dot-${dot.id}`)
+                .data("dot", dot)
+                .appendTo(list)
+                .mouseenter(e => {
+                    this._context.selectDots($dot);
+                })
+                .mouseleave(e => {
+                    this._context.deselectDots($dot);
+                });
+        });
+
+        super.show();
+    }
+
     refresh() {
         // re-order dots on every refresh
         let list = this._panel.find(".dot-order");
@@ -23,7 +42,6 @@ export default class ContinuityDotPanel extends BasePanel {
             .click(e => {
                 this._context.exit();
             });
-            
 
         let list = HTMLBuilder.make("ul.dot-order")
             .sortable({
@@ -33,20 +51,6 @@ export default class ContinuityDotPanel extends BasePanel {
                     this._context.controller.doAction("changeDotOrder", [order]);
                 },
             });
-
-        this._getDots().forEach(dot => {
-            let $dot = this._context.grapher.getDot(dot);
-
-            HTMLBuilder.li(dot.label, `dot dot-${dot.id}`)
-                .data("dot", dot)
-                .appendTo(list)
-                .mouseenter(e => {
-                    this._context.selectDots($dot);
-                })
-                .mouseleave(e => {
-                    this._context.deselectDots($dot);
-                });
-        });
 
         return [
             list,

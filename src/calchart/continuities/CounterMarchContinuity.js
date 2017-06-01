@@ -58,6 +58,15 @@ export default class CounterMarchContinuity extends FollowLeaderContinuity {
         return this._duration;
     }
 
+    getPanel(context) {
+        let panel = super.getPanel(context);
+
+        // remove edit path icon
+        panel.pop();
+
+        return panel;
+    }
+
     /**** HELPERS ****/
 
     _getPathIterator(index) {

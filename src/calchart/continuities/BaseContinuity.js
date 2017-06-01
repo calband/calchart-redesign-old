@@ -246,6 +246,6 @@ export default class BaseContinuity {
      */
     _updateMovements(context) {
         this.sheet.updateMovements(this.dotType);
-        context.controller.refresh("grapher");
+        context.refresh("grapher");
     }
 }

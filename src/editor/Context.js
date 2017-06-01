@@ -8,9 +8,9 @@ import MusicContext from "editor/contexts/MusicContext";
 import TwoStepContext from "editor/contexts/TwoStepContext";
 
 let ALL_CONTEXTS = [
+    DotContext, // put first so that GraphContext initializes correctly
     ContinuityContext,
     ContinuityDotContext,
-    DotContext,
     EditBackgroundContext,
     FTLPathContext,
     GateReferenceContext,

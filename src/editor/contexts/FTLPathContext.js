@@ -31,6 +31,11 @@ export default class FTLPathContext extends HiddenGraphContext {
         return "ftl-path";
     }
 
+    static get refreshTargets() {
+        // reorder grapher first so that points exist for panel
+        return ["grapher", "panel"];
+    }
+
     get continuity() {
         return this._continuity;
     }
