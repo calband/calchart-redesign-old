@@ -8,7 +8,7 @@ if (_ === undefined) {
     console.error("lodash is not loaded!");
 }
 
-// the singleton controller
+// The singleton instance of the ApplicationController
 window.controller = null;
 
 /**
