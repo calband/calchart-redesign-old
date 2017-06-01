@@ -3,17 +3,15 @@ import { convertShortcut } from "utils/JSUtils";
 import { setupTooltip } from "utils/UIUtils";
 
 /**
- * A toolbar menu for a Calchart application. Initialized with objects of the form:
- *
- * {
- *     label: string,   // the label of the toolbar item; required
- *     class: string,   // the class for the HTML element, defaulting to the label hypenated
- *     action: string,  // the action to run when clicked; see ApplicationController._parseAction
- *     icon: string,    // the icon to display for the toolbar item
- *     choices: object, // instead of showing an icon, display a <select> element with
- *                      // the given choices, mapping value to label
- *     custom: string,  // instead of showing an icon, display the given HTML string
- * }
+ * A toolbar menu for a Calchart application. Toolbar items should be specified with the
+ * following options:
+ *   - {string} label - The label of the menu item; required, can be HTML
+ *   - {string} class - The class for the HTML element
+ *   - {string} action - The action to run when clicked; see ApplicationController._parseAction
+ *   - {string} icon - The icon to display next to the menu item
+ *   - {object} choices - Instead of showing an icon, display a <select> element with the
+ *     given choices, mapping value to label
+ *   - {string} custom - Instead of showing an icon, display the given HTML string
  */
 export default class Toolbar {
     /**
@@ -40,12 +38,10 @@ export default class Toolbar {
     }
 
     /**
-     * @return {object[]} An array of toolbar groups of the format:
-     *
-     * {
-     *     context: string, // the context to enable the toolbar group for, if applicable
-     *     items: object[], // the toolbar items in the group, in the format given above.
-     * }
+     * @return {object[]} An array of toolbar groups that should contain the following
+     *   values:
+     *     - {string} context - The context to enable the toolbar group for, if applicable
+     *     - {object[]} items - The toolbar items in the group
      */
     getItems() {
         throw new NotImplementedError(this);
