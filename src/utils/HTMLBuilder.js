@@ -21,8 +21,9 @@ export default class HTMLBuilder {
      *   [TAG]#[ID].[CLASS]
      *   where ID and CLASS are optional and multiple classes may be
      *   specified. Examples: "p.message", "div#sidebar", "span.foo.bar".
+     * @param {string} [text] - The text to set for the HTML element.
      */
-    static make(elem) {
+    static make(elem, text) {
         let [match, tag, id, classes=""] = elem.match(/^(\w+)(?:#([\w-]+))?((?:\.[\w-]+)+)?$/);
 
         if (_.isNull(match)) {
@@ -32,7 +33,7 @@ export default class HTMLBuilder {
         tag = `<${tag}>`;
         classes = classes.slice(1).replace(/\./g, " ");
 
-        return $(tag).attr("id", id).addClass(classes);
+        return $(tag).attr("id", id).addClass(classes).text(text);
     }
 
     /**
@@ -47,33 +48,6 @@ export default class HTMLBuilder {
         return $("<div>")
             .addClass(args.class)
             .append(args.append);
-    }
-
-    /**
-     * Build a <div> element for a form field
-     *
-     * @param {string} label -- the label for the field
-     * @param {jQuery|string} field -- the field to wrap in the form field, either
-     *    the HTML element itself or a string to pass to HTMLBuilder.make
-     * @param {string} name -- the name attribute for the field (defaults to label as camel case)
-     */
-    static formfield() {
-        let args = parseArgs(arguments, ["label", "field", "name"]);
-        let name = args.name || _.camelCase(args.label);
-
-        if (_.isString(args.field)) {
-            args.field = this.make(args.field);
-        }
-        args.field
-            .attr("name", name)
-            .attr("id", name);
-
-        let label = $("<label>")
-            .attr("for", name)
-            .text(`${args.label}:`);
-
-        return this.make(`div.field.${name}`)
-            .append([label, args.field]);
     }
 
     /**
@@ -102,19 +76,15 @@ export default class HTMLBuilder {
     /**
      * Build an <input> element
      *
-     * @param {string} class -- the class to add to the <input>
-     * @param {string} type -- the type of the input
-     * @param {string} name -- the name of the input
-     * @param {string|float} initial -- the initial value of the input
-     * @param {function} change -- the callback to run when the value is changed
+     * @param {string} type - The type of the input.
+     * @param {*} initial - The initial value of the input.
+     * @param {function} change - The callback to run when the value is changed.
      */
     static input() {
-        let args = parseArgs(arguments, ["class", "type", "name", "initial", "change"]);
+        let args = parseArgs(arguments, ["type", "initial", "change"]);
 
         let input = $("<input>")
-            .addClass(args.class)
             .attr("type", args.type)
-            .attr("name", args.name)
             .attr("value", args.initial)
             .change(args.change);
 
@@ -158,12 +128,11 @@ export default class HTMLBuilder {
      *
      * @param {object} options -- the options to add to the <select>, mapping
      *    the value of the option to the name.
-     * @param {string} class -- the class to add to the <select>
      * @param {function} change -- the callback to run when an option is selected
      * @param {string} initial -- the value of the option to initially mark selected
      */
     static select() {
-        let args = parseArgs(arguments, ["options", "class", "change", "initial"]);
+        let args = parseArgs(arguments, ["options", "change", "initial"]);
 
         let select = $("<select>").addClass(args.class).change(args.change);
 

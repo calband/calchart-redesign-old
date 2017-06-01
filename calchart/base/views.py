@@ -10,11 +10,9 @@ from django.shortcuts import get_object_or_404, redirect
 from django.views.generic import TemplateView, RedirectView, CreateView
 from django.utils import timezone
 
-import json, os
 from datetime import timedelta
 
 from base.forms import *
-from base.menus import *
 from base.mixins import CalchartMixin
 from base.models import User, Show
 from utils.api import get_login_url
@@ -90,9 +88,6 @@ class HomeView(CalchartMixin, TemplateView):
     by the STUNT committee in a Google Drive-like format.
     """
     template_name = 'home.html'
-    popup_forms = [
-        CreateShowPopup,
-    ]
 
     def get(self, request, *args, **kwargs):
         """
@@ -183,9 +178,9 @@ class HomeView(CalchartMixin, TemplateView):
             'audio_file': self.request.FILES.get('audio'),
         }
         show = Show.objects.create(**kwargs)
-        url = reverse('editor', kwargs={'slug': show.slug})
+
         return {
-            'url': url,
+            'url': reverse('editor', kwargs={'slug': show.slug}),
         }
 
 class EditorView(CalchartMixin, TemplateView):
@@ -193,7 +188,6 @@ class EditorView(CalchartMixin, TemplateView):
     The editor view that can edit shows
     """
     template_name = 'editor.html'
-    popup_forms = editor_popups
 
     def dispatch(self, request, *args, **kwargs):
         self.show = get_object_or_404(Show, slug=kwargs['slug'])
@@ -202,16 +196,6 @@ class EditorView(CalchartMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['show'] = self.show
-        context['menu'] = editor_menu
-        context['toolbar'] = editor_toolbar
-        context['is_local'] = settings.IS_LOCAL
-        context['panels'] = [
-            ('partials/panel_edit_continuity.html', 'edit-continuity'),
-            ('partials/panel_edit_continuity_dots.html', 'edit-continuity-dots'),
-            ('partials/panel_ftl_path.html', 'ftl-path'),
-            ('partials/panel_select_dots.html', 'select-dots'),
-            ('partials/panel_two_step.html', 'two-step'),
-        ]
         return context
 
     def save_show(self):

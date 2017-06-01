@@ -18,29 +18,36 @@ module.exports = function (grunt) {
                     path: path.resolve("calchart/static/js/"),
                     filename: "[name].js",
                 },
-                // set import paths relative to src/ directory
                 resolve: {
                     modules: [
-                        path.resolve("./src")
+                        // set import paths relative to src/ directory
+                        path.resolve("./src"),
+                        // needed for babel-runtime
+                        path.resolve("./node_modules"),
                     ],
                 },
                 module: {
-                    loaders: [
-                        // convert ES6 to ES5
+                    rules: [
                         {
                             test: /\.js$/,
-                            include: ["./src"],
-                            loader: "babel-loader",
-                            query: {
-                                presets: ["es2015"],
-                                plugins: [
-                                    ["babel-plugin-transform-builtin-extend", {
-                                        globals: ["Error"],
-                                    }],
-                                ],
-                                minified: true,
-                                comments: false,
-                                cacheDirectory: true,
+                            // include: path.resolve("./src"),
+                            exclude: /node_modules/,
+                            use: {
+                                loader: "babel-loader",
+                                options: {
+                                    presets: [
+                                        // converts ES6 to ES5
+                                        "es2015",
+                                    ],
+                                    plugins: [
+                                        // reduces size by taking out redundant helper functions
+                                        "transform-runtime",
+                                    ],
+                                    minified: true,
+                                    comments: false,
+                                    // faster compilation
+                                    cacheDirectory: true,
+                                },
                             },
                         },
                     ],

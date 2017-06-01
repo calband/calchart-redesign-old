@@ -2,6 +2,7 @@ import OrderedDotsContinuity from "calchart/continuities/OrderedDotsContinuity";
 import Continuity from "calchart/Continuity";
 import MovementCommandMove from "calchart/movements/MovementCommandMove";
 import MovementCommandStop from "calchart/movements/MovementCommandStop";
+import { TwoStepContinuityPopup } from "popups/ContinuityPopups";
 
 import HTMLBuilder from "utils/HTMLBuilder";
 import { moveElem } from "utils/JSUtils";
@@ -51,6 +52,10 @@ export default class TwoStepContinuity extends OrderedDotsContinuity {
         });
     }
 
+    static get popupClass() {
+        return TwoStepContinuityPopup;
+    }
+
     get info() {
         return {
             type: "two",
@@ -88,6 +93,13 @@ export default class TwoStepContinuity extends OrderedDotsContinuity {
         return this._continuities;
     }
 
+    /**
+     * @return {boolean}
+     */
+    getIsMarktime() {
+        return this._isMarktime;
+    }
+
     getMovements(dot, data) {
         // number of steps to wait
         let options = {
@@ -123,35 +135,17 @@ export default class TwoStepContinuity extends OrderedDotsContinuity {
         this.sheet.updateMovements(this.dotType);
     }
 
-    getPanel(controller) {
-        let editLabel = HTMLBuilder.label("Edit:");
+    getPanel(context) {
+        let panel = super.getPanel(context);
 
-        let editDots = HTMLBuilder.icon("ellipsis-h").click(() => {
-            controller.loadContext("continuity-dots", {
-                continuity: this,
-            });
-        });
-        setupTooltip(editDots, "Dots");
-
-        let editContinuities = HTMLBuilder.icon("map-signs").click(() => {
-            controller.loadContext("two-step", {
+        let editContinuities = HTMLBuilder.icon("map-signs").click(e => {
+            context.controller.loadContext("two-step", {
                 continuity: this,
             });
         });
         setupTooltip(editContinuities, "Continuities");
 
-        return [editLabel, editDots, editContinuities];
-    }
-
-    getPopup() {
-        let [stepType, orientation, beatsPerStep, customText] = super.getPopup();
-
-        let isMarktime = HTMLBuilder.formfield("Marktime first", HTMLBuilder.input({
-            type: "checkbox",
-            initial: this._isMarktime,
-        }), "isMarktime");
-
-        return [isMarktime, stepType, beatsPerStep, customText];
+        return _.concat(panel, editContinuities);
     }
 
     /**

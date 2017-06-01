@@ -2,6 +2,37 @@
  * @file A collection of utility functions related to charting or shows
  */
 
+/** @const {Object} */
+export const CONTINUITIES = {
+    "Simple": {
+        EWNS: "EWNS",
+        NSEW: "NSEW",
+        FM: "FM: Forward March",
+    },
+    "Stops": {
+        MT: "MT: Mark Time",
+        CL: "CL: Close",
+    },
+    "Off-Grid": {
+        EVEN: "Even",
+        DMHS: "DMHS",
+        HSDM: "HSDM",
+    },
+    "Flows": {
+        FTL: "FTL: Follow the Leader",
+        CM: "CM: Counter March",
+        TWO: "TWO: 2 Step",
+        GT: "GT: Gate Turn",
+        GV: "GV: Grapevine",
+    },
+};
+
+/** @const {Object.<string, string>} */
+export const DEFAULT_CUSTOM = {
+    default: "Default",
+    custom: "Custom",
+};
+
 /** @const {Object.<string, string>} */
 export const DIRECTIONS = {
     0: "E",
@@ -20,6 +51,12 @@ export const DOT_FORMATS = {
 export const ENDINGS = {
     MT: "Mark Time",
     CL: "Close",
+};
+
+/** @const {Object.<string, string>} */
+export const FIELD_TYPES = {
+    default: "Default",
+    college: "College Field",
 };
 
 /** @const {Object.<string, string>} */
@@ -48,6 +85,21 @@ export const STEP_TYPES = {
     SH: "Show High",
     JS: "Jerky Step",
 };
+
+/** @const {number[]} **/
+export const ZOOMS = [0.5, 0.75, 1, 1.5, 2];
+
+/** @const {Object.<string, string>} */
+export const SHOW_FIELD_TYPES = _.clone(FIELD_TYPES);
+delete SHOW_FIELD_TYPES.default;
+
+/** @const {Object.<string, string>} */
+export const SHOW_ORIENTATIONS = _.clone(ORIENTATIONS);
+delete SHOW_ORIENTATIONS.default;
+
+/** @const {Object.<string, string>} */
+export const SHOW_STEP_TYPES = _.clone(STEP_TYPES);
+delete SHOW_STEP_TYPES.default;
 
 /**
  * Return the dot labels for the given number of dots.

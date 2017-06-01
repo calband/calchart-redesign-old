@@ -197,7 +197,7 @@ export default class Sheet {
      * Add the given continuity to the given dot type.
      *
      * @param {DotType} dotType
-     * @param {BaseContinuity} continuity
+     * @param {Continuity} continuity
      */
     addContinuity(dotType, continuity) {
         this._continuities[dotType].push(continuity);
@@ -566,8 +566,6 @@ export default class Sheet {
      * @param {string} url
      */
     setBackground(url) {
-        let _this = this;
-
         this._background = {
             url: url,
             width: undefined,
@@ -584,16 +582,16 @@ export default class Sheet {
                 top: "-1000%",
             })
             .attr("src", url)
-            .on("load", function() {
+            .on("load", e => {
                 // set to 20 yards wide
                 let width = 32;
-                let ratio = $(this).height() / $(this).width();
+                let ratio = $(e.currentTarget).height() / $(e.currentTarget).width();
                 let height = width * ratio;
 
-                _this._background.width = width;
-                _this._background.height = height;
+                this._background.width = width;
+                this._background.height = height;
 
-                $(this).remove();
+                $(e.currentTarget).remove();
             })
             .appendTo("body");
     }

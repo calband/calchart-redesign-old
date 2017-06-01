@@ -165,10 +165,3 @@ class CreateFormNode(template.Node):
             mark_safe(fields),
             mark_safe(rest)
         )
-
-@register.simple_tag
-def make_menu(menu):
-    """
-    Creates a menu from the given Menu or Toolbar, defined in menus.py
-    """
-    return menu.render()

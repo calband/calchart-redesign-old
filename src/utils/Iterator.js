@@ -24,7 +24,15 @@ export default class Iterator {
      * @return {Object} The element currently loaded.
      */
     get() {
-        return this._source[this._index];
+        let index = this._index % this._source.length;
+        return this._source[index];
+    }
+
+    /**
+     * @return {boolean} true if the iterator has cycled at least once.
+     */
+    hasCycled() {
+        return this._index >= this._source.length;
     }
 
     /**
@@ -39,9 +47,5 @@ export default class Iterator {
      */
     next() {
         this._index++;
-
-        if (this._index === this._source.length && this._cycle) {
-            this._index = 0;
-        }
     }
 }

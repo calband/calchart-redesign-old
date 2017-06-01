@@ -1,5 +1,6 @@
 import BaseContinuity from "calchart/continuities/BaseContinuity";
 import MovementCommandMove from "calchart/movements/MovementCommandMove";
+import { ForwardContinuityPopup } from "popups/ContinuityPopups";
 
 import { DIRECTIONS } from "utils/CalchartUtils";
 import HTMLBuilder from "utils/HTMLBuilder";
@@ -37,6 +38,10 @@ export default class ForwardContinuity extends BaseContinuity {
         });
     }
 
+    static get popupClass() {
+        return ForwardContinuityPopup;
+    }
+
     get info() {
         return {
             type: "fm",
@@ -46,6 +51,13 @@ export default class ForwardContinuity extends BaseContinuity {
     }
 
     /**** METHODS ****/
+
+    /**
+     * @return {int}
+     */
+    getDirection() {
+        return this._direction;
+    }
 
     getMovements(dot, data) {
         let options = {
@@ -62,13 +74,20 @@ export default class ForwardContinuity extends BaseContinuity {
         return [move];
     }
 
-    getPanel(controller) {
+    /**
+     * @return {int}
+     */
+    getNumSteps() {
+        return this._numSteps;
+    }
+
+    getPanel(context) {
         let steps = HTMLBuilder.input({
             type: "number",
             initial: this._numSteps,
             change: e => {
                 this._numSteps = validatePositive(e.currentTarget);
-                this._updateMovements(controller);
+                this._updateMovements(context);
             },
         });
 
@@ -77,26 +96,10 @@ export default class ForwardContinuity extends BaseContinuity {
             initial: this._direction,
             change: e => {
                 this._direction = parseNumber($(e.currentTarget).val());
-                this._updateMovements(controller);
+                this._updateMovements(context);
             },
         });
 
         return [steps, direction];
-    }
-
-    getPopup() {
-        let [stepType, orientation, beatsPerStep, customText] = super.getPopup();
-
-        let steps = HTMLBuilder.formfield("Number of steps", HTMLBuilder.input({
-            type: "number",
-            initial: this._numSteps,
-        }), "numSteps");
-
-        let direction = HTMLBuilder.formfield("Direction", HTMLBuilder.select({
-            options: DIRECTIONS,
-            initial: this._direction,
-        }));
-
-        return [steps, direction, stepType, beatsPerStep, customText];
     }
 }

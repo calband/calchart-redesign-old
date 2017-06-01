@@ -27,7 +27,7 @@ $editor-header-height: 95px;
     }
     .toolbar {
         padding-left: 10px;
-        .edit-continuity-group .seek {
+        .continuity-context .seek {
             @include vertically-center;
             $marker-size: 16px;
             height: $marker-size;
@@ -61,11 +61,6 @@ $editor-header-height: 95px;
             padding: 0.6em 1.5em 0.3em;
         }
     }
-}
-
-// undo/redo labels
-.controller-menu span.label {
-    color: $dark-gray;
 }
 
 .content {
@@ -197,7 +192,7 @@ ul.messages {
     @include hover-messages;
 }
 
-.popup-box {
+.popup {
     label {
         width: 90px;
     }
@@ -219,7 +214,7 @@ ul.messages {
             }
         }
     }
-    &.edit-stuntsheet {
+    &.edit-sheet {
         .icons {
             display: inline-block;
             margin-left: 10px;
@@ -238,10 +233,9 @@ ul.messages {
 }
 
 .panel {
-    display: none;
     position: absolute;
     background: $dark-gray;
-    z-index: z-index(popup);
+    z-index: z-index(panel);
     box-shadow: 0 0 5px $black;
     white-space: nowrap;
     $panel-handle-height: 10px;
@@ -270,7 +264,7 @@ body.context-background .workspace .graph {
 
 /** DOT CONTEXT **/
 
-.panel.select-dots {
+.panel.dot {
     $dot-type-size: 24px;
     $li-size: $dot-type-size + 10px;
     $li-margin: 5px;
@@ -332,7 +326,7 @@ body.context-background .workspace .graph {
 
 /** CONTINUITY CONTEXT **/
 
-.popup-box.edit-continuity {
+.popup.edit-continuity {
     label {
         width: 125px;
     }
@@ -346,8 +340,11 @@ body.context-background .workspace .graph {
             max-width: 100%;
         }
     }
-    &.continuity-cm {
+    &.continuity-cm, &.continuity-mt, &.continuity-close {
         .duration {
+            label {
+                width: initial;
+            }
             select {
                 width: 125px;
             }
@@ -360,7 +357,7 @@ body.context-background .workspace .graph {
     }
 }
 
-.panel.edit-continuity {
+.panel.continuity {
     width: 300px;
     .add-continuity {
         padding: 10px;
@@ -506,7 +503,7 @@ body.context-continuity-dots .workspace .graph {
     }
 }
 
-.panel.edit-continuity-dots {
+.panel.continuity-dots {
     .panel-content {
         padding: 5px;
     }
@@ -597,7 +594,7 @@ body.context-gate-reference .workspace .graph {
 /** TWO STEP CONTEXT **/
 
 .panel.two-step {
-    @extend .panel.edit-continuity;
+    @extend .panel.continuity;
     .buttons {
         background: $dark-gray;
         padding: 5px;

@@ -1,5 +1,6 @@
 import BaseContinuity from "calchart/continuities/BaseContinuity";
 import MovementCommandStop from "calchart/movements/MovementCommandStop";
+import { ToEndContinuityPopup } from "popups/ContinuityPopups";
 
 import { ENDINGS } from "utils/CalchartUtils";
 import HTMLBuilder from "utils/HTMLBuilder";
@@ -33,31 +34,31 @@ export default class ToEndContinuity extends BaseContinuity {
         return super.serialize(data);
     }
 
+    static get popupClass() {
+        return ToEndContinuityPopup;
+    }
+
     /**** METHODS ****/
 
-    getPanel(controller) {
+    /**
+     * @return {string}
+     */
+    getEnd() {
+        return this._end;
+    }
+
+    getPanel(context) {
         let endLabel = HTMLBuilder.label("End:");
         let endChoices = HTMLBuilder.select({
             options: ENDINGS,
             change: e => {
                 this._end = $(e.currentTarget).val();
-                this._updateMovements(controller);
+                this._updateMovements(context);
             },
             initial: this._end,
         });
 
         return [endLabel, endChoices];
-    }
-
-    getPopup() {
-        let fields = super.getPopup();
-
-        let end = HTMLBuilder.formfield("End", HTMLBuilder.select({
-            options: ENDINGS,
-            initial: this._end,
-        }));
-
-        return [end].concat(fields);
     }
 
     /**** HELPERS ****/

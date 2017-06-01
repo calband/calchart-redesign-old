@@ -181,7 +181,7 @@ class B extends A {
 new B()._a;
 ```
 
-2. Use read-only getters (`get foo() {}`) if the field is not expected to change after creating the object. Use explicit getters (`getFoo() {}`) if calculations are involved or if the field is something that can be modified with some action by the user. For example, `ApplicationController` has a read-only getter for `show`, since a show will not change after being opened by the application. On the other hand, `EditorController` has an explicit `getContext` because the context in the editor is expected to change in the normal usage of the editor.
+2. Use read-only getters (`get foo() {}`) if the field is not expected to change after creating the object. Use explicit getters (`getFoo() {}`) if calculations are involved or if the field is something that can be modified with some action by the user. For example, `ApplicationController` has a read-only getter for `show`, since a show will not change after being opened by the application. On the other hand, `Show` has an explicit `getSheets` because the sheets in a show is expected to change in the normal usage of the editor.
 
 3. If a class exposes a read-only getter, subclasses should use the read-only getter unless they need to modify the field.
 
@@ -371,12 +371,12 @@ import Dot from "./Dot";
 import Dot from "calchart/Dot";
 ```
 
-Imports should be organized in three sections, with a newline between each section: external libraries, calchart modules, and utils modules. Within each section, order imports alphabetically by path.
+Imports should be organized in two sections, one for utilities and one for all other modules. Within each section, order imports alphabetically by **path**.
 
 ```js
 import AnimationState from "calchart/AnimationState";
-import EditorController from "calchart/controllers/EditorController";
-import Coordinate from "calchart/Coordinate";
+import Grapher from "calchart/Grapher";
+import EditorController from "controllers/EditorController";
 
 import HTMLBuilder from "utils/HTMLBuilder";
 import { empty } from "utils/JSUtils";

@@ -111,9 +111,6 @@ select {
 
 button {
     @include display-button;
-    &.red-button {
-        @include display-button($red);
-    }
 }
 
 header {
@@ -148,7 +145,7 @@ header {
 .menu {
     @include unselectable;
     z-index: z-index(menu) + 1;
-    li {
+    .menu-tab {
         display: inline-block;
         cursor: default;
         padding: 5px 10px;
@@ -158,63 +155,66 @@ header {
         &:hover {
             background: $light-gray;
         }
-    }
-    li.active {
-        background: $white;
-        border: 1px solid rgba($black, 0.2);
-        border-bottom: 1px solid $white;
-        box-shadow: 0 1px 2px rgba($black, 0.2);
-        // block the border/shadow on the bottom
-        &:before {
-            content: "";
-            position: absolute;
-            top: 100%;
-            left: 0;
-            width: 100%;
-            height: 4px;
+        &.active {
             background: $white;
+            border: 1px solid rgba($black, 0.2);
+            border-bottom: 1px solid $white;
+            box-shadow: 0 1px 2px rgba($black, 0.2);
+            // block the border/shadow on the bottom
+            &:before {
+                content: "";
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                height: 4px;
+                background: $white;
+            }
         }
     }
 }
 
-
-.controller-menu {
+.submenu {
     @include hover-menu;
+    display: none;
     padding: 0;
     background: $white;
     ul.menu-group {
         padding: 5px 0;
         border-bottom: 1px solid $light-gray;
-    }
-    li {
-        color: $dark-gray;
-        &.disabled {
-            color: $semilight-gray;
-            cursor: default;
-            &:hover, &.active {
-                background: $white;
-                color: $semilight-gray;
-            }
-            span.hint {
-                color: $semilight-gray;
-            }
+        &:last-child {
+            border-bottom: none;
         }
-        &:hover, &.active {
-            background: $light-gray;
+    }
+    &.controller-menu {
+        z-index: z-index(menu);
+        li {
             color: $dark-gray;
             span.hint {
                 color: $medium-gray;
             }
-        }
-        span.hint {
-            color: $medium-gray;
+            &:hover, &.active {
+                background: $light-gray;
+                span.hint {
+                    color: $medium-gray;
+                }
+            }
+            &.disabled {
+                color: $semilight-gray;
+                cursor: default;
+                &:hover, &.active {
+                    background: $white;
+                    color: $semilight-gray;
+                }
+                span.hint {
+                    color: $semilight-gray;
+                }
+            }
         }
     }
-}
-
-.context-menu {
-    @include hover-menu;
-    z-index: z-index(context-menu);
+    &.context-menu {
+        z-index: z-index(context-menu);
+    }
 }
 
 .toolbar {
@@ -280,7 +280,7 @@ header {
     color: $white;
     padding: 5px 7px;
     font-size: 14px;
-    z-index: z-index(popup);
+    z-index: z-index(tooltip);
     .tooltip-arrow {
         position: absolute;
         top: 100%;
@@ -332,24 +332,20 @@ ul.messages {
     height: 100%;
     background: rgba($white, 0.4);
     text-align: center;
-    display: none;
     overflow-y: auto;
     padding: 50px 0;
     .popup-box {
-        display: none;
+        display: inline-block;
         width: 500px;
         border-radius: 5px;
         background: white;
         box-shadow: 0 0 10px $dark-gray;
         padding: 20px 30px;
-        &.active {
-            display: inline-block;
-        }
-        p {
-            margin: 10px 0;
-        }
         .buttons {
             margin-top: 20px;
+            .cancel {
+                @include display-button($red);
+            }
         }
     }
 }

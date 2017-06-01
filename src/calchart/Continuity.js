@@ -20,7 +20,7 @@ export default class Continuity {
     /**
      * Create a Continuity of the given type.
      *
-     * @param {string} type - The type of Continuity to create (see partials/panel_edit_continuity.html).
+     * @param {string} type - The type of Continuity to create (@see CalchartUtils.CONTINUITIES).
      * @param {Sheet} sheet - The sheet the Continuity is for.
      * @param {DotType} dotType - The dot type the Continuity is for.
      * @return {Continuity}
@@ -52,7 +52,7 @@ export default class Continuity {
                 return new TwoStepContinuity(sheet, dotType, dots, []);
             case "GT":
                 let reference = sheet.getDotInfo(dots[0]).position;
-                return new GateTurnContinuity(sheet, dotType, 90, true, reference);
+                return new GateTurnContinuity(sheet, dotType, 90, reference);
             case "GV":
                 return new GrapevineContinuity(sheet, dotType, 0, 90);
         }

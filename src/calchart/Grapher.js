@@ -102,8 +102,7 @@ export default class Grapher {
         if (_.isUndefined(background)) {
             image.remove();
         } else {
-            if (image.empty() || image.attr("href") !== background.url) {
-                image.remove();
+            if (image.empty()) {
                 // insert right after field background
                 image = field.insert("image", ".field-background + *")
                     .classed("background-image", true)
@@ -183,8 +182,8 @@ export default class Grapher {
             if (dots[0] instanceof Dot) {
                 dots = dots.map(dot => dot.id);
             }
-            dotGroups = dotGroups.filter(
-                (i, dot) => _.includes(dots, $(dot).data("dot").id)
+            dotGroups = dotGroups.filter((i, dot) =>
+                _.includes(dots, $(dot).data("dot").id)
             );
         }
         return dotGroups;
@@ -338,7 +337,6 @@ export default class Grapher {
      * @param {int} currentBeat - Beat to draw, relative to the start of the Sheet.
      */
     _drawDots(sheet, currentBeat) {
-        let _this = this;
         let options = this._options;
         let dotRadius = this.getDotRadius();
 

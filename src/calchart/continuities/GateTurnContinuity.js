@@ -1,6 +1,7 @@
 import BaseContinuity from "calchart/continuities/BaseContinuity";
 import Coordinate from "calchart/Coordinate";
 import MovementCommandArc from "calchart/movements/MovementCommandArc";
+import { GateTurnContinuityPopup } from "popups/ContinuityPopups";
 
 import HTMLBuilder from "utils/HTMLBuilder";
 import { validatePositive } from "utils/JSUtils";
@@ -16,31 +17,32 @@ export default class GateTurnContinuity extends BaseContinuity {
      * @param {DotType} dotType
      * @param {int} degrees - The number of degrees to rotate around. Positive
      *   goes clockwise, negative goes counterclockwise.
-     * @param {int} isCW - true if turning clockwise; false for counterclockwise.
      * @param {Coordinate} reference - The point to rotate around.
      * @param {object} [options] - Options for the continuity, including:
      *   - {string} stepType
      *   - {int} beatsPerStep
      */
-    constructor(sheet, dotType, degrees, isCW, reference, options) {
+    constructor(sheet, dotType, degrees, reference, options) {
         super(sheet, dotType, options);
 
         this._degrees = degrees;
-        this._isCW = isCW;
         this._reference = reference;
     }
 
     static deserialize(sheet, dotType, data) {
         let reference = Coordinate.deserialize(data.reference);
-        return new GateTurnContinuity(sheet, dotType, data.degrees, data.isCW, reference, data);
+        return new GateTurnContinuity(sheet, dotType, data.degrees, reference, data);
     }
 
     serialize() {
         return super.serialize({
             degrees: this._degrees,
-            isCW: this._isCW,
             reference: this._reference.serialize(),
         });
+    }
+
+    static get popupClass() {
+        return GateTurnContinuityPopup;
     }
 
     get info() {
@@ -53,28 +55,38 @@ export default class GateTurnContinuity extends BaseContinuity {
 
     /**** METHODS ****/
 
+    /**
+     * @return {int}
+     */
+    getDegrees() {
+        return this._degrees;
+    }
+
     getMovements(dot, data) {
-        let sign = this._isCW ? 1 : -1;
+        let options = {
+            beatsPerStep: this.getBeatsPerStep(),
+        };
+
         let movement = new MovementCommandArc(
             data.position.x,
             data.position.y,
             this._reference,
-            sign * this._degrees,
-            data.remaining
+            this._degrees,
+            data.remaining,
+            options
         );
 
         return [movement];
     }
 
-    getPanel(controller) {
-        let _this = this;
-
+    getPanel(context) {
         let degrees = HTMLBuilder.input({
             type: "number",
-            initial: this._degrees,
-            change: function() {
-                _this._degrees = validatePositive(this);
-                _this._updateMovements(controller);
+            initial: Math.abs(this._degrees),
+            change: e => {
+                let degrees = validatePositive(e.currentTarget);
+                this._degrees = Math.sign(this._degrees) * degrees;
+                this._updateMovements(context);
             },
         });
 
@@ -83,40 +95,22 @@ export default class GateTurnContinuity extends BaseContinuity {
                 CW: "CW",
                 CCW: "CCW",
             },
-            initial: this._isCW ? "CW" : "CCW",
-            change: function() {
-                _this._isCW = $(this).val() === "CW";
-                _this._updateMovements(controller);
+            initial: this._degrees > 0 ? "CW" : "CCW",
+            change: e => {
+                let sign = $(e.currentTarget).val() === "CW" ? 1 : -1;
+                this._degrees = sign * Math.abs(this._degrees);
+                this._updateMovements(context);
             },
         });
 
         let editReference = HTMLBuilder.icon("crosshairs").click(() => {
-            controller.loadContext("gate-reference", {
+            context.controller.loadContext("gate-reference", {
                 continuity: this,
             });
         });
         setupTooltip(editReference, "Reference Point");
 
         return [degrees, direction, editReference];
-    }
-
-    getPopup() {
-        let [stepType, orientation, beatsPerStep, customText] = super.getPopup();
-
-        let degrees = HTMLBuilder.formfield("Degrees to turn", HTMLBuilder.input({
-            type: "number",
-            initial: this._degrees,
-        }), "degrees");
-
-        let direction = HTMLBuilder.formfield("Direction", HTMLBuilder.select({
-            options: {
-                CW: "Clockwise",
-                CCW: "Counter-clockwise",
-            },
-            initial: this._isCW ? "CW" : "CCW",
-        }), "isCW");
-
-        return [degrees, direction, stepType, beatsPerStep, customText];
     }
 
     /**
@@ -133,11 +127,5 @@ export default class GateTurnContinuity extends BaseContinuity {
      */
     setReference(reference) {
         this._reference = reference;
-    }
-
-    validatePopup(data) {
-        super.validatePopup(data);
-
-        data.isCW = data.isCW === "CW";
     }
 }

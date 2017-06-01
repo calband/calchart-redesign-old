@@ -30,7 +30,14 @@ class ActionsMixin(object):
         except KeyError:
             return super().post(request, *args, **kwargs)
 
-        response = getattr(self, action)()
+        try:
+            response = getattr(self, action)()
+        except Exception as e:
+            data = {
+                'message': str(e),
+            }
+            return JsonResponse(data, status=500)
+
         if response is None:
             return redirect(request.path)
         elif isinstance(response, HttpResponse):
@@ -38,17 +45,5 @@ class ActionsMixin(object):
         else:
             return JsonResponse(response)
 
-class PopupMixin(object):
-    """
-    Views with this mixin can define forms in the `popup_forms` class variable
-    that will be rendered in the HTML as popup boxes.
-    """
-    popup_forms = []
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['popup_forms'] = [PopupForm() for PopupForm in self.popup_forms]
-        return context
-
-class CalchartMixin(LoginRequiredMixin, ActionsMixin, PopupMixin):
+class CalchartMixin(LoginRequiredMixin, ActionsMixin):
     pass

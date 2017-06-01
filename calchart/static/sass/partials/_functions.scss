@@ -2,9 +2,11 @@
 $z-layers: (
     toolbar: 100,
     menu: 200,
+    panel: 250,
     popup: 300,
     messages: 400,
     context-menu: 500,
+    tooltip: 600,
 );
 
 @function z-index($key) {

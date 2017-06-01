@@ -9,7 +9,6 @@
     {% add_style "editor.css" %}
     {% add_script "editor.js" %}
     <script>
-        window.isLocal = {{ is_local|yesno:"true,false" }};
         {% if show.viewer %}
             window.show = {{ show.viewer|asjson|safe }};
         {% else %}
@@ -22,8 +21,8 @@
 {% block body %}
     <div class="editor-header">
         <h1>{{ show.name }}</h1>
-        {% make_menu menu %}
-        {% make_menu toolbar %}
+        <div class="menu"></div>
+        <div class="toolbar"></div>
     </div>
     <div class="content graph-content">
         <div class="sidebar"></div>
@@ -38,7 +37,4 @@
             TODO: BEATS EDITOR
         </div>
     </div>
-    {% for template, name in panels %}
-        {% include template with name=name only %}
-    {% endfor %}
 {% endblock %}

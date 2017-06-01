@@ -1,11 +1,12 @@
 import DiagonalContinuity from "calchart/continuities/DiagonalContinuity";
 import OrderedDotsContinuity from "calchart/continuities/OrderedDotsContinuity";
 import Coordinate from "calchart/Coordinate";
+import { FollowLeaderContinuityPopup } from "popups/ContinuityPopups";
 
 import HTMLBuilder from "utils/HTMLBuilder";
 import Iterator from "utils/Iterator";
 import { calcAngle } from "utils/MathUtils";
-import { setupTooltip, showPopup } from "utils/UIUtils";
+import { setupTooltip } from "utils/UIUtils";
 
 /**
  * A follow-the-leader continuity, where the sequence of dots is defined and
@@ -44,6 +45,10 @@ export default class FollowLeaderContinuity extends OrderedDotsContinuity {
         });
     }
 
+    static get popupClass() {
+        return FollowLeaderContinuityPopup;
+    }
+
     get info() {
         return {
             type: "ftl",
@@ -76,6 +81,11 @@ export default class FollowLeaderContinuity extends OrderedDotsContinuity {
         let maxDuration = this._getMaxDuration(data);
 
         while (beats < maxDuration && path.hasNext()) {
+            // stop infinite loops #haltingproblemsolved
+            if (path.hasCycled() && movements.length === 0) {
+                return [];
+            }
+
             path.next();
             let next = path.get();
 
@@ -121,24 +131,17 @@ export default class FollowLeaderContinuity extends OrderedDotsContinuity {
         return movements;
     }
 
-    getPanel(controller) {
-        let editLabel = HTMLBuilder.label("Edit:");
+    getPanel(context) {
+        let panel = super.getPanel(context);
 
-        let editDots = HTMLBuilder.icon("ellipsis-h").click(() => {
-            controller.loadContext("continuity-dots", {
-                continuity: this,
-            });
-        });
-        setupTooltip(editDots, "Dots");
-
-        let editPath = HTMLBuilder.icon("crosshairs").click(() => {
-            controller.loadContext("ftl-path", {
+        let editPath = HTMLBuilder.icon("crosshairs").click(e => {
+            context.controller.loadContext("ftl-path", {
                 continuity: this,
             });
         });
         setupTooltip(editPath, "Path");
 
-        return [editLabel, editDots, editPath];
+        return _.concat(panel, editPath);
     }
 
     /**
@@ -146,12 +149,6 @@ export default class FollowLeaderContinuity extends OrderedDotsContinuity {
      */
     getPath() {
         return this._path;
-    }
-
-    getPopup() {
-        let [stepType, orientation, beatsPerStep, customText] = super.getPopup();
-
-        return [stepType, beatsPerStep, customText];
     }
 
     /**
