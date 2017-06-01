@@ -16,7 +16,12 @@ export default class BaseContext {
     constructor(controller) {
         this._controller = controller;
         this._eventListeners = [];
-        this._panel = null;
+
+        if (this.panel) {
+            this._panel = new this.panel(this);
+        } else {
+            this._panel = null;
+        }
     }
 
     /**
@@ -50,7 +55,7 @@ export default class BaseContext {
     }
 
     /**
-     * @return {string[]} Targets to use when no arguments are passed to refresh().
+     * @return {string[]} Targets to use when refresh("all") is called.
      */
     static get refreshTargets() {
         return ["panel"];
@@ -85,8 +90,7 @@ export default class BaseContext {
         $(`.menu-item.${this.name}-context`).removeClass("disabled");
         $(`.toolbar ul.${this.name}-context`).removeClass("hide");
 
-        if (this.panel) {
-            this._panel = new this.panel(this);
+        if (this._panel) {
             this._panel.show();
         }
     }
@@ -101,8 +105,10 @@ export default class BaseContext {
      */
     refresh(...targets) {
         if (targets.length === 0 || _.includes(targets, "all")) {
-            targets = targets.concat(this.constructor.refreshTargets);
+            let index = targets.indexOf("all");
+            targets.splice(index, 1, ...this.constructor.refreshTargets);
         }
+
         targets.forEach(target => {
             target = _.capitalize(target);
             this[`refresh${target}`]();

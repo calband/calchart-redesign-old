@@ -7,18 +7,12 @@ import { STATIC_PATH } from "utils/env";
 import HTMLBuilder from "utils/HTMLBuilder";
 
 export default class ContinuityPanel extends BasePanel {
-    /**
-     * @param {ContinuityContext} context
-     */
-    constructor(context) {
-        super(context);
-    }
-
     show() {
         super.show();
 
         this._panel.find(".add-continuity select").dropdown({
             placeholder_text_single: "Add Continuity...",
+            refresh: false,
         });
     }
 
@@ -47,8 +41,10 @@ export default class ContinuityPanel extends BasePanel {
         this.refreshFooter();
 
         // select dots of the active dot type
-        let dots = $(`.dot.${this.getDotType()}`);
-        this._context.selectDots(dots);
+        let dotType = this.getDotType();
+        let dots = this._context.activeSheet.getDotsOfType(dotType);
+        let $dots = this._context.grapher.getDots(dots);
+        this._context.selectDots($dots);
     }
 
     refreshFooter() {
