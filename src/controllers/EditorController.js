@@ -265,7 +265,7 @@ export default class EditorController extends ApplicationController {
                     canUndo: canUndo,
                 };
             }
-        };
+        }
 
         let action = (
             getAction(this, this, false) ||

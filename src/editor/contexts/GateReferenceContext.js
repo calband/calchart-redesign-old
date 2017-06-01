@@ -1,7 +1,4 @@
-import Coordinate from "calchart/Coordinate";
 import HiddenGraphContext from "editor/contexts/HiddenContext";
-
-import { round } from "utils/MathUtils";
 
 /**
  * The Context that allows a user to define the reference point

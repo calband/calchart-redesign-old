@@ -12,10 +12,18 @@
         "sourceType": "module"
     },
     "rules": {
-        "indent": ["error", 4],
+        "indent": ["error", 4, {
+            "SwitchCase": 1
+        }],
         "linebreak-style": ["error", "unix"],
+        "no-console": ["error", {
+            "allow": ["error"]
+        }],
+        "no-unused-vars": ["error", {
+            "args": "none",
+            "varsIgnorePattern": "^_"
+        }],
         "quotes": ["error", "double"],
-        "semi": ["error", "always"],
-        "no-unused-vars": ["error", {"argsIgnorePattern": "^e$"}]
+        "semi": ["error", "always"]
     }
 }

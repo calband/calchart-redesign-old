@@ -268,6 +268,14 @@ export default class Sheet {
     }
 
     /**
+     * @return {?Sheet} Either the sheet before or the sheet after this sheet
+     *   in the show.
+     */
+    getAdjacentSheet() {
+        return _.defaultTo(this.getPrevSheet(), this.getNextSheet());
+    }
+
+    /**
      * Return an AnimationState object that describes the given Dot's position,
      * orientation, etc. for the Sheet.
      *

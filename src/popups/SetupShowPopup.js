@@ -4,7 +4,6 @@ import BasePopup from "popups/BasePopup";
 
 import { DOT_FORMATS, SHOW_FIELD_TYPES } from "utils/CalchartUtils";
 import { ChoiceField, NumberField } from "utils/fields";
-import { doAction } from "utils/UIUtils";
 
 /**
  * The popup to setup a show when first opening it in the editor.
@@ -23,8 +22,8 @@ export default class SetupShowPopup extends BasePopup {
 
     get info() {
         return {
-            name: 'setup-show',
-            title: 'Set Up Show',
+            name: "setup-show",
+            title: "Set Up Show",
         };
     }
 

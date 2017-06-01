@@ -5,7 +5,6 @@
 
 import { NotImplementedError, ValidationError } from "utils/errors";
 import HTMLBuilder from "utils/HTMLBuilder";
-import { parseArgs } from "utils/JSUtils";
 
 /**
  * The superclass for all Fields.
