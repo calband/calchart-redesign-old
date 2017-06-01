@@ -1,5 +1,5 @@
 import Show from "calchart/Show";
-import EditorController from "controllers/EditorController";
+import EditorController from "editor/EditorController";
 import BasePopup from "popups/BasePopup";
 
 import { DOT_FORMATS, SHOW_FIELD_TYPES } from "utils/CalchartUtils";

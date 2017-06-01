@@ -71,7 +71,7 @@ export default class EditTools {
             context.workspace.removeClass("edit-tools-active");
         }
 
-        $(".toolbar .edit-dots-group li").removeClass("active");
+        $(".toolbar .dot-group li").removeClass("active");
         $(`.toolbar .${name}`).addClass("active");
 
         tool.load();
@@ -108,8 +108,6 @@ class BaseTool {
 
         // {?number} the snap grid, in distance. null if no snap grid.
         this._snap = null;
-
-        this.refreshZoom();
     }
 
     get context() {
@@ -136,14 +134,7 @@ class BaseTool {
     /**
      * Runs any actions whenever the grapher zoom changes.
      */
-    refreshZoom() {
-        let grid = this.context.getGrid();
-        if (grid) {
-            this._snap = this.scale.toDistance(grid);
-        } else {
-            this._snap = null;
-        }
-    }
+    refreshZoom() {}
 
     /**
      * Runs any actions when the tool is unloaded from the toolbar.
@@ -164,6 +155,13 @@ class BaseTool {
      * @param {Event} e
      */
     handle(e) {
+        let grid = this.context.getGrid();
+        if (grid) {
+            this._snap = this.scale.toDistance(grid);
+        } else {
+            this._snap = null;
+        }
+
         this.mousedown(e);
     }
 
@@ -880,15 +878,6 @@ class ArcTool extends BaseEdit {
  * will fill in.
  */
 class BlockTool extends BaseEdit {
-    refreshZoom() {
-        super.refreshZoom();
-
-        // always make sure there's a grid; default to 2
-        if (_.isNull(this._snap)) {
-            this._snap = this.scale.toDistance(2);
-        }
-    }
-
     mousedown(e) {
         let [startX, startY] = this._makeRelativeSnap(e);
         this._startX = startX;
@@ -901,6 +890,11 @@ class BlockTool extends BaseEdit {
             .attr("x1", this._startX)
             .attr("y1", this._startY);
         this._line = $.fromD3(line);
+
+        // always make sure there's a grid; default to 2
+        if (_.isNull(this._snap)) {
+            this._snap = this.scale.toDistance(2);
+        }
     }
 
     mousemove(e) {

@@ -1,6 +1,4 @@
-import Show from "calchart/Show";
-
-import ViewerController from "controllers/ViewerController";
+import ViewerController from "viewer/ViewerController";
 
 import "utils/jquery";
 
@@ -10,5 +8,5 @@ $(function() {
         return;
     }
 
-    ViewerController.init(Show.deserialize(window.show));
+    ViewerController.init(window.show);
 });

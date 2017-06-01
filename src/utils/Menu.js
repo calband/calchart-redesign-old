@@ -19,10 +19,11 @@ const DIVIDER = Symbol("DIVIDER");
 export default class Menu {
     /**
      * @param {ApplicationController} controller
+     * @param {jQuery} menu
      */
-    constructor(controller) {
+    constructor(controller, menu) {
         this._controller = controller;
-        this._menu = $("ul.menu");
+        this._menu = menu;
 
         // {jQuery}
         this._activeTab = null;
@@ -32,12 +33,12 @@ export default class Menu {
     }
 
     /**
-     * Initialize this menu within the ul.menu element in the page.
+     * Initialize this menu within the div.menu element in the page.
      *
      * @param {ApplicationController} controller
      */
     static init(controller) {
-        new this(controller).init();
+        new this(controller, $("div.menu")).init();
     }
 
     get controller() {
@@ -63,7 +64,8 @@ export default class Menu {
      */
     init() {
         this.getItems().forEach(menuTab => {
-            let tab = HTMLBuilder.li(menuTab.label, "menu-tab")
+            let tab = HTMLBuilder.div("menu-tab")
+                .text(menuTab.label)
                 .appendTo(this._menu);
 
             let submenu = new SubMenu(this, tab, menuTab.submenu);

@@ -1,5 +1,4 @@
-import Show from "calchart/Show";
-import EditorController from "controllers/EditorController";
+import EditorController from "editor/EditorController";
 import SetupShowPopup from "popups/SetupShowPopup";
 
 import "utils/jquery";
@@ -9,7 +8,7 @@ import "utils/jquery";
  */
 $(function() {
     if (window.show) {
-        EditorController.init(Show.deserialize(window.show));
+        EditorController.init(window.show);
     } else {
         // controller initialized in onSave()
         new SetupShowPopup(window.showName, window.showSlug).show();

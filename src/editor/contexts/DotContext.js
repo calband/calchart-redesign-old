@@ -205,7 +205,7 @@ export default class DotContext extends GraphContext {
             .change(e => {
                 this._grid = parseNumber($(e.currentTarget).val());
             })
-            .choose(2);
+            .choose(this._grid);
 
         $(".toolbar .resnap button").click(e => {
             if (this._grid !== 0) {

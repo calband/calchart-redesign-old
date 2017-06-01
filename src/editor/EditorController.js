@@ -1,17 +1,14 @@
-import ApplicationController from "controllers/ApplicationController";
 import Context from "editor/Context";
 import EditorMenu from "editor/EditorMenu";
+import EditorToolbar from "editor/EditorToolbar";
 import EditShowPopup from "popups/EditShowPopup";
 
+import ApplicationController from "utils/ApplicationController";
 import { IS_LOCAL } from "utils/env";
 import { ActionError, ValidationError } from "utils/errors";
 import HTMLBuilder from "utils/HTMLBuilder";
 import { empty, underscoreKeys, update } from "utils/JSUtils";
-import {
-    doAction,
-    setupToolbar,
-    showMessage,
-} from "utils/UIUtils";
+import { doAction, showMessage } from "utils/UIUtils";
 
 /**
  * The controller that stores the state of the editor application and contains
@@ -54,9 +51,9 @@ export default class EditorController extends ApplicationController {
     init() {
         super.init();
 
-        Context.init(this);
         EditorMenu.init(this);
-        setupToolbar(".toolbar");
+        EditorToolbar.init(this);
+        Context.init(this);
 
         // initialize undo/redo labels
         this._updateHistory();

@@ -1,3 +1,4 @@
+import Show from "calchart/Show";
 
 import { ActionError } from "utils/errors";
 import { attempt } from "utils/JSUtils";
@@ -30,11 +31,14 @@ export default class ApplicationController {
     /**
      * Initialize an ApplicationController if one has not already been initialized.
      *
-     * @param {Show} show
+     * @param {(Show|object)} show - The serialized show.
      * @return {ApplicationController} The initialized controller.
      */
     static init(show) {
         if (_.isNull(window.controller)) {
+            if (_.isPlainObject(show)) {
+                show = Show.deserialize(show);
+            }
             window.controller = new this(show);
             window.controller.init();
         }

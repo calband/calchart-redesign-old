@@ -92,49 +92,6 @@ export function addShortcutHint(li, action) {
 }
 
 /**
- * Set up the given toolbar element.
- *
- * @param {jQuery|string} toolbar - jQuery object or toolbar to setup.
- */
-export function setupToolbar(toolbar) {
-    let controller = window.controller;
-
-    // set up click and tooltip
-    $(toolbar).find("li").each(function() {
-        let name = $(this).data("name");
-        let action = $(this).data("action");
-        let shortcut = controller.shortcutCommands[action];
-
-        $(this)
-            .mousedown(function() {
-                if (!$(this).hasClass("disabled")) {
-                    $(this).addClass("focus");
-                }
-            })
-            .mouseup(function() {
-                if (!$(this).hasClass("focus")) {
-                    return;
-                }
-
-                $(this).removeClass("focus");
-                if (action !== undefined) {
-                    window.controller.doAction(action);
-                }
-            });
-
-        if (!_.isUndefined(name)) {
-            // update name with shortcut
-            if (!_.isUndefined(shortcut)) {
-                let shortcutHint = convertShortcut(shortcut);
-                name = `${name} (${shortcutHint})`;
-            }
-
-            setupTooltip(this, name);
-        }
-    });
-}
-
-/**
  * Set up a tooltip popup for the given element, using the given label.
  *
  * @param {jQuery|string} selector
@@ -145,35 +102,33 @@ export function setupTooltip(selector, label) {
     let tooltip = HTMLBuilder.span("", "tooltip").html(label);
     let arrow = HTMLBuilder.make("span.tooltip-arrow").appendTo(tooltip);
 
-    $(selector).mouseenter(function() {
-        let offset = $(this).offset();
-        let width = $(this).outerWidth();
+    $(selector)
+        .mouseenter(function() {
+            let offset = $(this).offset();
+            let width = $(this).outerWidth();
 
-        tooltipTimeout = setTimeout(function() {
-            tooltip.appendTo("body");
+            clearTimeout(tooltipTimeout);
+            tooltipTimeout = setTimeout(function() {
+                tooltip.appendTo("body");
 
-            let left = offset.left - tooltip.outerWidth() / 2 + width / 2;
-            if (left < 0) {
-                left = 0;
-                arrow.css("left", offset.left + width / 2);
-            } else {
-                arrow.css("left", "");
-            }
+                let left = offset.left - tooltip.outerWidth() / 2 + width / 2;
+                if (left < 0) {
+                    left = 0;
+                    arrow.css("left", offset.left + width / 2);
+                } else {
+                    arrow.css("left", "");
+                }
 
-            tooltip.css({
-                top: offset.top - tooltip.outerHeight() - arrow.outerHeight() + 2,
-                left: left,
-            });
-        }, 750);
-
-        $(window).mousemove(e => {
-            if ($(e.target).notIn(selector)) {
-                clearTimeout(tooltipTimeout);
-                tooltip.remove();
-                $(window).off(e);
-            }
+                tooltip.css({
+                    top: offset.top - tooltip.outerHeight() - arrow.outerHeight() + 2,
+                    left: left,
+                });
+            }, 750);
+        })
+        .mouseleave(e => {
+            clearTimeout(tooltipTimeout);
+            tooltip.remove();
         });
-    });
 }
 
 /**** MESSAGES ****/

@@ -112,7 +112,7 @@ export default class FollowLeaderContinuity extends OrderedDotsContinuity {
             movements = movements.concat(movesToNext);
 
             // combine moves if in same direction
-            if (lastMove) {
+            if (lastMove && movesToNext.length > 0) {
                 let currMove = movesToNext[0];
                 let dir1 = lastMove.getDirection();
                 let dir2 = currMove.getDirection();

@@ -14,7 +14,6 @@ import json, os
 from datetime import timedelta
 
 from base.forms import *
-from base.menus import *
 from base.mixins import CalchartMixin
 from base.models import User, Show
 from utils.api import get_login_url
@@ -198,7 +197,6 @@ class EditorView(CalchartMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['show'] = self.show
-        context['toolbar'] = editor_toolbar
         return context
 
     def save_show(self):
