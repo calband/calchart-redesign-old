@@ -1,4 +1,5 @@
 var path = require("path");
+var eslint = require("eslint");
 
 var entryPoints = {};
 var entryFiles = ["home", "editor", "viewer", "wiki"].map(function(file) {
@@ -42,7 +43,7 @@ module.exports = function(grunt) {
                                     ],
                                     plugins: [
                                         // allows ES6 primitives such as Set
-                                        "transform-runtime",
+                                        require("babel-plugin-transform-runtime"),
                                     ],
                                     minified: true,
                                     comments: false,
@@ -55,6 +56,8 @@ module.exports = function(grunt) {
                 },
                 // emit source maps
                 devtool: "source-map",
+                // control output
+                stats: "normal",
             },
         },
         sass: {
@@ -85,4 +88,17 @@ module.exports = function(grunt) {
 
     grunt.registerTask("build", ["sass", "webpack:build"]);
     grunt.registerTask("default", ["build", "watch"]);
+
+    // our custom task for linting
+    grunt.registerTask("lint", "Run the ESLint linter.", function() {
+        var engine = new eslint.CLIEngine();
+        var report = engine.executeOnFiles(["src/"]);
+        var formatter = engine.getFormatter();
+        var output = formatter(report.results);
+        grunt.log.writeln(output);
+
+        if (report.errorCount + report.warningCount > 0) {
+            grunt.fail.warn("Linting failed.");
+        }
+    });
 };
