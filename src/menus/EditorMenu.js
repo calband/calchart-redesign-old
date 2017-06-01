@@ -120,7 +120,7 @@ export default class EditorMenu extends Menu {
                 this.DIVIDER,
                 {
                     label: "Zoom",
-                    context: "graph-context",
+                    context: "graph",
                     icon: "search",
                     submenu: zooms,
                 },

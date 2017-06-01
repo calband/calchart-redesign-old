@@ -1,43 +1,32 @@
-import { SubMenu } from "menus/Menu";
+import { AbstractMenu, AbstractSubMenu } from "menus/AbstractMenu";
 
 // only one context menu can be active at once
 let activeContextMenu = null;
 
 /**
- * A context menu displays when a user right-clicks in a Calchart
- * application. Initialized with objects of the form:
- *
- * {
- *     label: string,     // the label of the menu item; required, can be HTML
- *     action: string,    // the action to run when clicked; see ApplicationController._parseAction
- *     submenu: object[], // a recursive list of objects of menu items to use as a submenu
- * }
+ * A context menu created and displayed when a user right-clicks in a
+ * Calchart application. Menu items should be formatted as specified
+ * in menus/AbstractMenu.
  */
-export default class ContextMenu {
+export default class ContextMenu extends AbstractMenu {
     /**
      * @param {Context} context
      * @param {Event} e
      */
     constructor(context, e) {
-        this._context = context;
-        this._event = e;
-        this._target = $(e.target);
-        this._menu = null;
-    }
+        super(context.controller);
 
-    get controller() {
-        return this._context.controller;
+        this._event = e;
+
+        // {ContextSubMenu}
+        this._menu = null;
+
+        // {jQuery}
+        this._target = $(e.target);
     }
 
     get event() {
         return this._event;
-    }
-
-    /**
-     * @return {object[]} An array of menu items of the format given above.
-     */
-    getItems() {
-        throw new NotImplementedError(this);
     }
 
     /**
@@ -65,11 +54,6 @@ export default class ContextMenu {
         this._menu.open();
     }
 
-    /**** METHODS ****/
-
-    /**
-     * Close this context menu.
-     */
     close() {
         this._menu.destroy();
         this._target.parents().unlockScroll();
@@ -77,27 +61,10 @@ export default class ContextMenu {
     }
 }
 
-/**
- * A floating menu in a context menu, both for the main context menu and
- * any of its submenus.
- */
-class ContextSubMenu extends SubMenu {
+class ContextSubMenu extends AbstractSubMenu {
     static get menuClass() {
         return "context-menu";
     }
-
-    open() {
-        if (this.isTopLevel()) {
-            let event = this._parentMenu.event;
-            this._menu
-                .smartPosition(event.pageY, event.pageX)
-                .show();
-        } else {
-            super.open();
-        }
-    }
-
-    /**** METHODS ****/
 
     /**
      * Close and remove this menu.
@@ -107,11 +74,10 @@ class ContextSubMenu extends SubMenu {
         this._submenus.forEach(submenu => submenu.destroy());
     }
 
-    isTopLevel() {
-        return this._parentMenu instanceof ContextMenu;
-    }
-
-    makeItem(item, menuItem) {
-        // any context menu-specific customizations to menu items
+    openTopLevel() {
+        let event = this._parentMenu.event;
+        this._menu
+            .smartPosition(event.pageY, event.pageX)
+            .show();
     }
 }

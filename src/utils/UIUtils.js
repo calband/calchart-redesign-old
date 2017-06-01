@@ -4,14 +4,12 @@
  * in the following sections:
  *
  * - Form utilities
- * - Menu utilities
  * - Message utilities
  * - Handles utilities
  */
 
-import { ValidationError } from "utils/errors";
 import HTMLBuilder from "utils/HTMLBuilder";
-import { attempt, convertShortcut } from "utils/JSUtils";
+import { attempt } from "utils/JSUtils";
 
 /**** FORMS ****/
 
@@ -74,22 +72,7 @@ export function promptFile(callback, multiple=false) {
         .click();
 }
 
-/**** MENUS ****/
-
-/**
- * Add a shortcut hint for the given action to the given menu item.
- *
- * @param {jQuery} li - The menu item.
- * @param {string} action
- */
-export function addShortcutHint(li, action) {
-    let shortcut = window.controller.shortcutCommands[action];
-    if (!_.isUndefined(shortcut)) {
-        HTMLBuilder.span("", "hint")
-            .html(convertShortcut(shortcut))
-            .appendTo(li);
-    }
-}
+/**** MESSAGES ****/
 
 /**
  * Set up a tooltip popup for the given element, using the given label.
@@ -130,8 +113,6 @@ export function setupTooltip(selector, label) {
             tooltip.remove();
         });
 }
-
-/**** MESSAGES ****/
 
 /**
  * Show a message at the top of the screen.
