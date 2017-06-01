@@ -5,7 +5,6 @@ import { MusicContextMenus as menus } from "menus/EditorContextMenus";
 import AddSongPopup from "popups/AddSongPopup";
 import EditSongPopup from "popups/EditSongPopup";
 
-import { ValidationError } from "utils/errors";
 import HTMLBuilder from "utils/HTMLBuilder";
 import { underscoreKeys, update } from "utils/JSUtils";
 
