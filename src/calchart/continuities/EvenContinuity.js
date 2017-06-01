@@ -2,8 +2,6 @@ import BaseContinuity from "calchart/continuities/BaseContinuity";
 import MovementCommandEven from "calchart/movements/MovementCommandEven";
 import { EvenContinuityPopup } from "popups/ContinuityPopups";
 
-import HTMLBuilder from "utils/HTMLBuilder";
-
 /**
  * A continuity where dots use the rest of the time to go straight to
  * their next dot

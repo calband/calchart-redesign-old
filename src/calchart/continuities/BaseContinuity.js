@@ -1,7 +1,4 @@
-import { STEP_TYPES, ORIENTATIONS } from "utils/CalchartUtils";
-import { NotImplementedError, ValidationError } from "utils/errors";
-import HTMLBuilder from "utils/HTMLBuilder";
-import { setDefaults, underscoreKeys, update } from "utils/JSUtils";
+import { NotImplementedError } from "utils/errors";
 
 /**
  * Represents a Continuity for a dot type during a stuntsheet. This is

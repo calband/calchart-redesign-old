@@ -1,8 +1,6 @@
 import Coordinate from "calchart/Coordinate";
-
 import HiddenGraphContext from "editor/contexts/HiddenContext";
 
-import HTMLBuilder from "utils/HTMLBuilder";
 import { round } from "utils/MathUtils";
 
 /**

@@ -5,8 +5,7 @@ import EditorToolbar from "menus/EditorToolbar";
 import EditShowPopup from "popups/EditShowPopup";
 
 import { IS_LOCAL } from "utils/env";
-import { ActionError, ValidationError } from "utils/errors";
-import HTMLBuilder from "utils/HTMLBuilder";
+import { ActionError } from "utils/errors";
 import { empty, underscoreKeys, update } from "utils/JSUtils";
 import { doAction, showMessage } from "utils/UIUtils";
 

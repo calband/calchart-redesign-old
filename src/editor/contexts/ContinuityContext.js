@@ -5,7 +5,6 @@ import { ContinuityContextMenus as menus } from "menus/EditorContextMenus";
 import ContinuityPanel from "panels/ContinuityPanel";
 
 import { ActionError } from "utils/errors";
-import HTMLBuilder from "utils/HTMLBuilder";
 import { underscoreKeys, update } from "utils/JSUtils";
 import { round } from "utils/MathUtils";
 
