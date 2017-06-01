@@ -1,7 +1,7 @@
 import Continuity from "calchart/Continuity";
 import DotType from "calchart/DotType";
 import GraphContext from "editor/contexts/GraphContext";
-import { ContinuityContextMenus as menus } from "menus/EditorContextMenus";
+import { ContinuityContextMenus as menus } from "editor/EditorContextMenus";
 import ContinuityPanel from "panels/ContinuityPanel";
 
 import { ActionError } from "utils/errors";

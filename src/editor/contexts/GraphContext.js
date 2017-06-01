@@ -3,7 +3,7 @@ import Dot from "calchart/Dot";
 import Grapher from "calchart/Grapher";
 import Sheet from "calchart/Sheet";
 import BaseContext from "editor/contexts/BaseContext";
-import { GraphContextMenus as menus } from "menus/EditorContextMenus";
+import { GraphContextMenus as menus } from "editor/EditorContextMenus";
 import AddSheetPopup from "popups/AddSheetPopup";
 import EditSheetPopup from "popups/EditSheetPopup";
 

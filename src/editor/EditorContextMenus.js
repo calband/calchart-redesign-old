@@ -2,7 +2,7 @@
  * @file All the context menus in the editor application.
  */
 
-import ContextMenu from "menus/ContextMenu";
+import ContextMenu from "utils/ContextMenu";
 
 class ContinuityContextWorkspace extends ContextMenu {
     getItems() {

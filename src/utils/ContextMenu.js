@@ -1,4 +1,4 @@
-import { SubMenu } from "menus/Menu";
+import { SubMenu } from "utils/Menu";
 
 // only one context menu can be active at once
 let activeContextMenu = null;

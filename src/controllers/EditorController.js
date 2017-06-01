@@ -1,6 +1,6 @@
 import ApplicationController from "controllers/ApplicationController";
 import Context from "editor/Context";
-import EditorMenu from "menus/EditorMenu";
+import EditorMenu from "editor/EditorMenu";
 import EditShowPopup from "popups/EditShowPopup";
 
 import { IS_LOCAL } from "utils/env";
