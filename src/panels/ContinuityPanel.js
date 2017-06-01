@@ -1,5 +1,5 @@
 import DotType from "calchart/DotType";
-import { ContinuityPanelMenus as menus } from "editor/EditorContextMenus";
+import { ContinuityPanelMenus as menus } from "menus/EditorContextMenus";
 import BasePanel from "panels/BasePanel";
 
 import { CONTINUITIES } from "utils/CalchartUtils";

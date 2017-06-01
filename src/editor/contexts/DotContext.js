@@ -1,7 +1,7 @@
 import DotType from "calchart/DotType";
 import GraphContext from "editor/contexts/GraphContext";
 import EditTools from "editor/EditTools";
-import { DotContextMenus as menus } from "editor/EditorContextMenus";
+import { DotContextMenus as menus } from "menus/EditorContextMenus";
 import DotPanel from "panels/DotPanel";
 
 import { mapSome, parseNumber } from "utils/JSUtils";

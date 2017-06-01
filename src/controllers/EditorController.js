@@ -1,9 +1,9 @@
+import ApplicationController from "controllers/ApplicationController";
 import Context from "editor/Context";
-import EditorMenu from "editor/EditorMenu";
-import EditorToolbar from "editor/EditorToolbar";
+import EditorMenu from "menus/EditorMenu";
+import EditorToolbar from "menus/EditorToolbar";
 import EditShowPopup from "popups/EditShowPopup";
 
-import ApplicationController from "utils/ApplicationController";
 import { IS_LOCAL } from "utils/env";
 import { ActionError, ValidationError } from "utils/errors";
 import HTMLBuilder from "utils/HTMLBuilder";

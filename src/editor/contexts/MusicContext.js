@@ -1,7 +1,7 @@
 import Grapher from "calchart/Grapher";
 import Song from "calchart/Song";
 import BaseContext from "editor/contexts/BaseContext";
-import { MusicContextMenus as menus } from "editor/EditorContextMenus";
+import { MusicContextMenus as menus } from "menus/EditorContextMenus";
 import AddSongPopup from "popups/AddSongPopup";
 import EditSongPopup from "popups/EditSongPopup";
 

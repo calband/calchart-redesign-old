@@ -1,4 +1,4 @@
-import ViewerController from "viewer/ViewerController";
+import ViewerController from "controllers/ViewerController";
 
 import "utils/jquery";
 

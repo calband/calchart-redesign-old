@@ -1,4 +1,4 @@
-import EditorController from "editor/EditorController";
+import EditorController from "controllers/EditorController";
 import SetupShowPopup from "popups/SetupShowPopup";
 
 import "utils/jquery";

@@ -1,4 +1,4 @@
-import Toolbar from "utils/Toolbar";
+import Toolbar from "menus/Toolbar";
 
 export default class EditorToolbar extends Toolbar {
     getItems() {

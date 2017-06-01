@@ -1,4 +1,4 @@
-import HomeController from "home/HomeController";
+import HomeController from "controllers/HomeController";
 
 import "utils/jquery";
 

@@ -1,6 +1,6 @@
+import ApplicationController from "controllers/ApplicationController";
 import CreateShowPopup from "popups/CreateShowPopup";
 
-import ApplicationController from "utils/ApplicationController";
 import HTMLBuilder from "utils/HTMLBuilder";
 
 export default class HomeController extends ApplicationController {
