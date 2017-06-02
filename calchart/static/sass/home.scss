@@ -49,7 +49,6 @@ $height-offset: $header-height + $buttons-height + 20px;
 }
 
 .tabs {
-    padding-top: 5px;
     width: $tabs-width;
     margin-right: 50px;
     li {
@@ -63,11 +62,11 @@ $height-offset: $header-height + $buttons-height + 20px;
 }
 
 .shows {
-    padding: 5px;
     width: calc(100% - #{$tabs-width + 70px});
     height: 100%;
     overflow-y: auto;
     .show-list {
+        margin: 5px;
         background: $white;
         box-shadow: 0 0 5px $dark-gray;
         li {
@@ -80,5 +79,14 @@ $height-offset: $header-height + $buttons-height + 20px;
                 border-bottom: none;
             }
         }
+    }
+    h2.unpublished {
+        margin-top: 0;
+    }
+    h2.published {
+        margin-top: 20px;
+    }
+    p.loading {
+        text-align: center;
     }
 }

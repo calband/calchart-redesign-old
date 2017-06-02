@@ -5,14 +5,23 @@ import CreateShowPopup from "popups/CreateShowPopup";
 import { IS_STUNT } from "utils/env";
 import HTMLBuilder from "utils/HTMLBuilder";
 
+// map tab name to the jQuery list of shows
+let shows = {};
+
 export default class HomeController extends ApplicationController {
     init() {
         super.init();
 
         window.tabs.forEach(([name, label]) => {
-            HTMLBuilder.li(label, name)
+            HTMLBuilder.li(label)
+                .data("name", name)
                 .click(e => {
-                    this.loadTab(name);
+                    let tab = $(e.currentTarget);
+                    if (!tab.hasClass("active")) {
+                        $(".tabs li.active").removeClass("active");
+                        tab.addClass("active");
+                        this.loadTab(name);
+                    }
                 })
                 .appendTo(".tabs");
         });
@@ -43,22 +52,13 @@ export default class HomeController extends ApplicationController {
      * @param {string} tab - The name of the tab to load.
      */
     loadTab(tab) {
-        let $tab = $(`.tabs li.${tab}`);
-        if ($tab.hasClass("active")) {
-            return;
-        }
-
         let activateTab = () => {
-            $(".show-list").hide();
-            $(`.show-list.${tab}`).show();
-
-            $(".tabs li.active").removeClass("active");
-            $tab.addClass("active");
+            $(".shows > *").hide();
+            shows[tab].show();
         };
 
-        if (!$(`.show-list.${tab}`).exists()) {
-            let showList = HTMLBuilder.make(`ul.show-list.${tab}`)
-                .appendTo(".shows");
+        if (!_.has(shows, tab)) {
+            $(".shows .loading").show();
 
             $.ajax({
                 data: {
@@ -66,12 +66,46 @@ export default class HomeController extends ApplicationController {
                 },
                 dataType: "json",
                 success: data => {
-                    data.shows.forEach(show => {
-                        HTMLBuilder.li(show.name)
-                            .data("type", tab)
-                            .data("slug", show.slug)
+                    let showList;
+                    if (tab === "band" && IS_STUNT) {
+                        showList = HTMLBuilder.div();
+                        let unpublished = [];
+                        let published = [];
+                        data.shows.forEach(show => {
+                            let li = HTMLBuilder.li(show.name)
+                                .data("type", tab)
+                                .data("slug", show.slug);
+                            if (show.published) {
+                                published.push(li);
+                            } else {
+                                unpublished.push(li);
+                            }
+                        });
+                        HTMLBuilder.make("h2.unpublished", "Unpublished")
                             .appendTo(showList);
-                    });
+                        HTMLBuilder.make("ul.show-list")
+                            .append(unpublished)
+                            .appendTo(showList);
+                        HTMLBuilder.make("h2.published", "Published")
+                            .appendTo(showList);
+                        HTMLBuilder.make("ul.show-list")
+                            .append(published)
+                            .appendTo(showList);
+                        shows[tab] = showList;
+                    } else {
+                        showList = HTMLBuilder.make("ul.show-list");
+                        data.shows.forEach(show => {
+                            HTMLBuilder.li(show.name)
+                                .data("type", tab)
+                                .data("slug", show.slug)
+                                .appendTo(showList);
+                        });
+                    }
+                    showList.appendTo(".shows");
+                    shows[tab] = showList;
+
+                    $(".shows .loading").hide();
+
                     activateTab();
                 },
             });
