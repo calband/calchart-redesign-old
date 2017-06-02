@@ -10,11 +10,11 @@ let activeContextMenu = null;
  */
 export default class ContextMenu extends AbstractMenu {
     /**
-     * @param {Context} context
+     * @param {Controller} controller
      * @param {Event} e
      */
-    constructor(context, e) {
-        super(context.controller);
+    constructor(controller, e) {
+        super(controller);
 
         this._event = e;
 
@@ -58,6 +58,7 @@ export default class ContextMenu extends AbstractMenu {
         this._menu.destroy();
         this._target.parents().unlockScroll();
         $(window).off(".context-menu");
+        activeContextMenu = null;
     }
 }
 

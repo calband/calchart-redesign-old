@@ -4,7 +4,17 @@
 
 import ContextMenu from "menus/ContextMenu";
 
-class ContinuityContextWorkspace extends ContextMenu {
+class EditorContextMenu extends ContextMenu {
+    /**
+     * @param {Context} context
+     * @param {Event} e
+     */
+    constructor(context, e) {
+        super(context.controller, e);
+    }
+}
+
+class ContinuityContextWorkspace extends EditorContextMenu {
     getItems() {
         return [
             {
@@ -44,7 +54,7 @@ export let ContinuityContextMenus = {
     WorkspaceMenu: ContinuityContextWorkspace,
 };
 
-class ContinuityPanelContinuity extends ContextMenu {
+class ContinuityPanelContinuity extends EditorContextMenu {
     /**
      * @param {ContinuityContext} context
      * @param {Event} e
@@ -81,7 +91,7 @@ export let ContinuityPanelMenus = {
     ContinuityMenu: ContinuityPanelContinuity,
 };
 
-class GraphContextSidebar extends ContextMenu {
+class GraphContextSidebar extends EditorContextMenu {
     getItems() {
         return [
             {
@@ -100,7 +110,7 @@ class GraphContextSidebar extends ContextMenu {
     }
 }
 
-class GraphContextSheet extends ContextMenu {
+class GraphContextSheet extends EditorContextMenu {
     getItems() {
         return [
             {
@@ -116,7 +126,7 @@ export let GraphContextMenus = {
     SheetMenu: GraphContextSheet,
 };
 
-class DotContextWorkspace extends ContextMenu {
+class DotContextWorkspace extends EditorContextMenu {
     getItems() {
         return [
             {
@@ -127,7 +137,7 @@ class DotContextWorkspace extends ContextMenu {
     }
 }
 
-class DotContextDot extends ContextMenu {
+class DotContextDot extends EditorContextMenu {
     /**
      * @param {DotContext} context
      * @param {Event} e
@@ -190,7 +200,7 @@ export let DotContextMenus = {
     DotMenu: DotContextDot,
 };
 
-class MusicContextSong extends ContextMenu {
+class MusicContextSong extends EditorContextMenu {
     /**
      * @param {MusicContext} context
      * @param {Event} e

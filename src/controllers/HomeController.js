@@ -1,6 +1,8 @@
 import ApplicationController from "controllers/ApplicationController";
+import * as menus from "menus/HomeContextMenus";
 import CreateShowPopup from "popups/CreateShowPopup";
 
+import { IS_STUNT } from "utils/env";
 import HTMLBuilder from "utils/HTMLBuilder";
 
 export default class HomeController extends ApplicationController {
@@ -14,27 +16,27 @@ export default class HomeController extends ApplicationController {
                 return;
             }
 
-            let name = $(e.currentTarget).data("name");
+            let tabName = $(e.currentTarget).data("name");
             let activateTab = () => {
                 $(".shows").hide();
-                $(`.shows.${name}`).show();
+                $(`.shows.${tabName}`).show();
 
                 $(".tabs li.active").removeClass("active");
                 tab.addClass("active");
             };
 
-            if (!$(`.shows.${name}`).exists()) {
+            if (!$(`.shows.${tabName}`).exists()) {
                 $.ajax({
                     data: {
-                        tab: name,
+                        tab: tabName,
                     },
                     dataType: "json",
                     success: data => {
                         let items = data.shows.map(show =>
-                            HTMLBuilder.li(show.name).data("slug", show.slug)
+                            HTMLBuilder.li(show.name, tabName).data("slug", show.slug)
                         );
 
-                        HTMLBuilder.make(`ul.shows.${name}`)
+                        HTMLBuilder.make(`ul.shows.${tabName}`)
                             .append(items)
                             .appendTo(".content");
 
@@ -46,13 +48,28 @@ export default class HomeController extends ApplicationController {
             }
         });
 
-        $(".shows").on("click", "li", e => {
-            let slug = $(e.currentTarget).data("slug");
-            location.href = `/editor/${slug}`;
-        });
+        $(".content")
+            .on("click", ".shows li", e => {
+                let show = $(e.currentTarget);
+                let slug = show.data("slug");
+                let app = show.hasClass("band") && !IS_STUNT ? "viewer" : "editor";
+                this.openShow(app, slug, e.metaKey || e.ctrlKey);
+            })
+            .on("contextmenu", ".shows li", e => {
+                new menus.ShowMenu(this, e).show();
+            });
 
         $(".main-buttons button.new-show").click(e => {
             new CreateShowPopup().show();
         });
+    }
+
+    openShow(app, slug, newTab=false) {
+        let url = `/${app}/${slug}`;
+        if (newTab) {
+            window.open(url, "_blank");
+        } else {
+            location.href = url;
+        }
     }
 }
