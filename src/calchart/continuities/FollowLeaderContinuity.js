@@ -5,7 +5,6 @@ import { FollowLeaderContinuityPopup } from "popups/ContinuityPopups";
 
 import HTMLBuilder from "utils/HTMLBuilder";
 import Iterator from "utils/Iterator";
-import { calcAngle } from "utils/MathUtils";
 import { setupTooltip } from "utils/UIUtils";
 
 /**

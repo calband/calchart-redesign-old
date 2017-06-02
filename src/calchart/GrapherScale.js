@@ -42,7 +42,7 @@ export default class GrapherScale {
 
         // conversion ratio distance per step; ratio same for x and y axes
         this._ratio = this.xScale(1) - this.xScale(0);
-    };
+    }
 
     get width() { return this._width; }
     get height() { return this._height; }

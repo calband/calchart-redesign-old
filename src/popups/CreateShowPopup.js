@@ -19,7 +19,7 @@ export default class CreateShowPopup extends BasePopup {
 
     get info() {
         return {
-            name: 'create-show',
+            name: "create-show",
         };
     }
 

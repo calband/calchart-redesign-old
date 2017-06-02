@@ -99,7 +99,7 @@ export class EvenContinuityPopup extends EditContinuityPopup {
 
 export class FollowLeaderContinuityPopup extends EditContinuityPopup {
     getFields() {
-        let [stepType, orientation, beatsPerStep, customText] = super.getFields();
+        let [stepType, _orientation, beatsPerStep, customText] = super.getFields();
         return [stepType, beatsPerStep, customText];
     }
 }
@@ -136,7 +136,7 @@ export class CounterMarchContinuityPopup extends FollowLeaderContinuityPopup {
 
 export class ForwardContinuityPopup extends EditContinuityPopup {
     getFields() {
-        let [stepType, orientation, beatsPerStep, customText] = super.getFields();
+        let [stepType, _orientation, beatsPerStep, customText] = super.getFields();
 
         let steps = new NumberField("numSteps", {
             label: "Number of steps",
@@ -154,7 +154,7 @@ export class ForwardContinuityPopup extends EditContinuityPopup {
 
 export class GateTurnContinuityPopup extends EditContinuityPopup {
     getFields() {
-        let [stepType, orientation, beatsPerStep, customText] = super.getFields();
+        let [stepType, _orientation, beatsPerStep, customText] = super.getFields();
 
         let degrees = this._continuity.getDegrees();
         let degreesField = new NumberField("degrees", {
@@ -229,7 +229,7 @@ export class ToEndContinuityPopup extends EditContinuityPopup {
 
 export class TwoStepContinuityPopup extends EditContinuityPopup {
     getFields() {
-        let [stepType, orientation, beatsPerStep, customText] = super.getFields();
+        let [stepType, _orientation, beatsPerStep, customText] = super.getFields();
 
         let isMarktime = new BooleanField("isMarktime", {
             label: "Marktime first",

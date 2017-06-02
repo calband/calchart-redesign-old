@@ -10,7 +10,6 @@
 
 import { CSRF_TOKEN } from "utils/env";
 import HTMLBuilder from "utils/HTMLBuilder";
-import { attempt } from "utils/JSUtils";
 
 /**** FORMS ****/
 
@@ -271,7 +270,6 @@ export function resizeHandles(handle, start, end) {
 
     // handles to change width
     if (mod !== 1) {
-        let x, width;
         if (deltaX > startWidth) {
             // handle on right side of element
             data.left = startX + startWidth;
@@ -285,7 +283,6 @@ export function resizeHandles(handle, start, end) {
 
     // handles to change height
     if (div !== 1) {
-        let y, height;
         if (deltaY > startHeight) {
             // handle on bottom side of element
             data.top = startY + startHeight;

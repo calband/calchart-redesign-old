@@ -1,7 +1,6 @@
 import Coordinate from "calchart/Coordinate";
 import Dot from "calchart/Dot";
 import Grapher from "calchart/Grapher";
-import Sheet from "calchart/Sheet";
 import BaseContext from "editor/contexts/BaseContext";
 import { GraphContextMenus as menus } from "menus/EditorContextMenus";
 import AddSheetPopup from "popups/AddSheetPopup";
@@ -493,13 +492,14 @@ class GraphActions {
      * @param {int} numBeats - The number of beats for the stuntsheet.
      */
     static addSheet(numBeats) {
+        let other = sheet.getAdjacentSheet();
         let sheet = this.show.addSheet(numBeats);
         this.loadSheet(sheet);
 
         return {
             undo: function() {
                 this.show.removeSheet(sheet);
-                this.loadSheet(prevSheet);
+                this.loadSheet(other);
             },
         };
     }
@@ -510,11 +510,9 @@ class GraphActions {
      * @param {Sheet} [sheet=this.activeSheet]
      */
     static deleteSheet(sheet=this.activeSheet) {
-        let prevSheet = sheet.getPrevSheet();
-        let nextSheet = sheet.getNextSheet();
-
+        let other = sheet.getAdjacentSheet();
         this.show.removeSheet(sheet);
-        this.loadSheet(_.defaultTo(prevSheet, nextSheet));
+        this.loadSheet(other);
 
         return {
             data: [sheet],

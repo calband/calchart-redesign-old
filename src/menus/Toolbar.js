@@ -1,3 +1,4 @@
+import { NotImplementedError } from "utils/errors";
 import HTMLBuilder from "utils/HTMLBuilder";
 import { convertShortcut } from "utils/JSUtils";
 import { setupTooltip } from "utils/UIUtils";
@@ -62,7 +63,8 @@ export default class Toolbar {
                 this.makeItem(item, toolbarItem);
 
                 let action = toolbarItem.action;
-                item.mousedown(e => {
+                item
+                    .mousedown(e => {
                         this._isMousedown = true;
                         $(window).one("mouseup", e => {
                             this._focusedItem.removeClass("focus");

@@ -1,3 +1,5 @@
+import { NotImplementedError } from "utils/errors";
+
 /**
  * Represents a Context that defines a state of the editor application and
  * the actions that can be run when the editor application is in the

@@ -59,7 +59,8 @@ export default class ViewerController extends ApplicationController {
                 .data("dot", dot)
                 .appendTo(dots);
         });
-        dots.dropdown({
+        dots
+            .dropdown({
                 placeholder_text_single: "None",
                 allow_single_deselect: true,
             })
@@ -111,7 +112,7 @@ export default class ViewerController extends ApplicationController {
      */
     play() {
         // TODO
-        console.log("play!");
+        console.error("play is not defined");
     }
 
     /**
@@ -119,7 +120,7 @@ export default class ViewerController extends ApplicationController {
      */
     stop() {
         // TODO
-        console.log("stop!");
+        console.error("stop is not defined");
     }
 
     /**** CONTROLS ****/

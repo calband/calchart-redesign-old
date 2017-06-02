@@ -3,7 +3,6 @@
  * in the DotContext.
  */
 
-import { NotImplementedError } from "utils/errors";
 import HTMLBuilder from "utils/HTMLBuilder";
 import {
     calcAngle,
@@ -536,7 +535,7 @@ class BaseEdit extends BaseTool {
                 x: roundSmall(position.x),
                 y: roundSmall(position.y),
             };
-        })
+        });
         this.controller.doAction("moveDotsTo", [data]);
     }
 }

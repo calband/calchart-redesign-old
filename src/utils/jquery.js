@@ -334,14 +334,14 @@ $.fn.scrollLeft = function(val) {
     } else {
         return this._scrollLeft(Math.round(val));
     }
-}
+};
 $.fn.scrollTop = function(val) {
     if (arguments.length === 0) {
         return this._scrollTop();
     } else {
         return this._scrollTop(Math.round(val));
     }
-}
+};
 
 /**
  * Position this element at the given position in the top, left corner. If

@@ -50,9 +50,10 @@ export default class Continuity {
                 return new CounterMarchContinuity(sheet, dotType, null, dots);
             case "TWO":
                 return new TwoStepContinuity(sheet, dotType, dots, []);
-            case "GT":
+            case "GT": {
                 let reference = sheet.getDotInfo(dots[0]).position;
                 return new GateTurnContinuity(sheet, dotType, 90, reference);
+            }
             case "GV":
                 return new GrapevineContinuity(sheet, dotType, 0, 90);
         }

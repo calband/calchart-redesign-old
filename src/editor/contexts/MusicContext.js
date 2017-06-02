@@ -233,7 +233,6 @@ class ContextActions {
      * @param {int} delta - The amount to change the index
      */
     static moveSong(index, delta) {
-        let song = this.show.getSong(index);
         let newIndex = index + delta;
         if (newIndex < 0 || newIndex >= this.show.getSongs().length) {
             return false;

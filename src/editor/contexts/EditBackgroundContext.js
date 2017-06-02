@@ -1,7 +1,6 @@
 import HiddenGraphContext from "editor/contexts/HiddenContext";
 
 import HTMLBuilder from "utils/HTMLBuilder";
-import { getDimensions } from "utils/MathUtils";
 import { addHandles, resizeHandles } from "utils/UIUtils";
 
 /**

@@ -1,4 +1,3 @@
-import DotType from "calchart/DotType";
 import GraphContext from "editor/contexts/GraphContext";
 import EditTools from "editor/EditTools";
 import { DotContextMenus as menus } from "menus/EditorContextMenus";

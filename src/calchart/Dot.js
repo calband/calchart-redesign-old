@@ -1,5 +1,3 @@
-import AnimationState from "calchart/AnimationState";
-
 /**
  * A Dot represents a marcher in a Show, containing the following information:
  *  - the dot ID

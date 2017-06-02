@@ -1,4 +1,3 @@
-import AnimationState from "calchart/AnimationState";
 import Coordinate from "calchart/Coordinate";
 import Continuity from "calchart/Continuity";
 import TwoStepContinuity from "calchart/continuities/TwoStepContinuity";
@@ -238,7 +237,7 @@ export default class Sheet {
                 case "_show":
                 case "_song":
                     return val;
-                case "_continuities":
+                case "_continuities": {
                     let dotContinuities = {};
                     _.each(val, (continuities, dotType) => {
                         dotContinuities[dotType] = continuities.map(continuity => {
@@ -252,10 +251,11 @@ export default class Sheet {
                                 allContinuities = allContinuities.concat(nested);
                             }
 
-                            return clone
+                            return clone;
                         });
-                    })
+                    });
                     return dotContinuities;
+                }
             }
         });
 
@@ -265,6 +265,14 @@ export default class Sheet {
         });
 
         return clone;
+    }
+
+    /**
+     * @return {?Sheet} Either the sheet before or the sheet after this sheet
+     *   in the show.
+     */
+    getAdjacentSheet() {
+        return _.defaultTo(this.getPrevSheet(), this.getNextSheet());
     }
 
     /**
