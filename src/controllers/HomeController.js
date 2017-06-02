@@ -9,53 +9,24 @@ export default class HomeController extends ApplicationController {
     init() {
         super.init();
 
-        // set up tabs
-        $(".tabs").on("click", "li", e => {
-            let tab = $(e.currentTarget);
-            if (tab.hasClass("active")) {
-                return;
-            }
-
-            let tabName = $(e.currentTarget).data("name");
-            let activateTab = () => {
-                $(".shows").hide();
-                $(`.shows.${tabName}`).show();
-
-                $(".tabs li.active").removeClass("active");
-                tab.addClass("active");
-            };
-
-            if (!$(`.shows.${tabName}`).exists()) {
-                $.ajax({
-                    data: {
-                        tab: tabName,
-                    },
-                    dataType: "json",
-                    success: data => {
-                        let items = data.shows.map(show =>
-                            HTMLBuilder.li(show.name, tabName).data("slug", show.slug)
-                        );
-
-                        HTMLBuilder.make(`ul.shows.${tabName}`)
-                            .append(items)
-                            .appendTo(".content");
-
-                        activateTab();
-                    },
-                });
-            } else {
-                activateTab();
-            }
+        window.tabs.forEach(([name, label]) => {
+            HTMLBuilder.li(label, name)
+                .click(e => {
+                    this.loadTab(name);
+                })
+                .appendTo(".tabs");
         });
+        $(".tabs li:first").click();
 
-        $(".content")
-            .on("click", ".shows li", e => {
+        $(".shows")
+            .on("click", "li", e => {
                 let show = $(e.currentTarget);
                 let slug = show.data("slug");
-                let app = show.hasClass("owned") || IS_STUNT ? "editor" : "viewer";
+                let type = show.data("type");
+                let app = type === "owned" || IS_STUNT ? "editor" : "viewer";
                 this.openShow(app, slug, e.metaKey || e.ctrlKey);
             })
-            .on("contextmenu", ".shows li", e => {
+            .on("contextmenu", "li", e => {
                 new menus.ShowMenu(this, e).show();
             });
 
@@ -64,6 +35,58 @@ export default class HomeController extends ApplicationController {
         });
     }
 
+    /**** METHODS ****/
+
+    /**
+     * Load the given tab.
+     *
+     * @param {string} tab - The name of the tab to load.
+     */
+    loadTab(tab) {
+        let $tab = $(`.tabs li.${tab}`);
+        if ($tab.hasClass("active")) {
+            return;
+        }
+
+        let activateTab = () => {
+            $(".show-list").hide();
+            $(`.show-list.${tab}`).show();
+
+            $(".tabs li.active").removeClass("active");
+            $tab.addClass("active");
+        };
+
+        if (!$(`.show-list.${tab}`).exists()) {
+            let showList = HTMLBuilder.make(`ul.show-list.${tab}`)
+                .appendTo(".shows");
+
+            $.ajax({
+                data: {
+                    tab: tab,
+                },
+                dataType: "json",
+                success: data => {
+                    data.shows.forEach(show => {
+                        HTMLBuilder.li(show.name)
+                            .data("type", tab)
+                            .data("slug", show.slug)
+                            .appendTo(showList);
+                    });
+                    activateTab();
+                },
+            });
+        } else {
+            activateTab();
+        }
+    }
+
+    /**
+     * Open the given show in the given app.
+     *
+     * @param {string} app - The application to load, "viewer" or "editor"
+     * @param {string} slug - The slug of the show to open
+     * @param {boolean} [newTab=false] - true to open the show in a new tab
+     */
     openShow(app, slug, newTab=false) {
         let url = `/${app}/${slug}`;
         if (newTab) {

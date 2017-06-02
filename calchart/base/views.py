@@ -111,13 +111,7 @@ class HomeView(CalchartMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
-        tabs = self.get_tabs()
-        context['tabs'] = tabs
-        active_tab = tabs[0][0]
-        context['active_tab'] = active_tab
-        context['shows'] = self.get_tab(active_tab)
-
+        context['tabs'] = self.get_tabs()
         return context
 
     def get_tabs(self):
@@ -157,7 +151,7 @@ class HomeView(CalchartMixin, TemplateView):
             return Show.objects.filter(**kwargs)
 
         if tab == 'owned':
-            return Show.objects.filter(owner=self.request.user)
+            return Show.objects.filter(owner=self.request.user, is_band=False)
 
     def create_show(self):
         """

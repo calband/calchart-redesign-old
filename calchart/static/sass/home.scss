@@ -49,8 +49,9 @@ $height-offset: $header-height + $buttons-height + 20px;
 }
 
 .tabs {
+    padding-top: 5px;
     width: $tabs-width;
-    margin-right: 100px;
+    margin-right: 50px;
     li {
         &.active {
             background: darken($light-gray, 10);
@@ -62,19 +63,22 @@ $height-offset: $header-height + $buttons-height + 20px;
 }
 
 .shows {
-    width: calc(100% - #{$tabs-width + 120px});
-    background: $white;
-    max-height: 100%;
+    padding: 5px;
+    width: calc(100% - #{$tabs-width + 70px});
+    height: 100%;
     overflow-y: auto;
-    box-shadow: 0 0 5px $dark-gray;
-    li {
-        border-bottom: 1px solid darken($semilight-gray, 10);
-        &:hover, &.active {
-            color: lighten($blue, 20);
-            background: $white;
-        }
-        &:last-child {
-            border-bottom: none;
+    .show-list {
+        background: $white;
+        box-shadow: 0 0 5px $dark-gray;
+        li {
+            border-bottom: 1px solid darken($semilight-gray, 10);
+            &:hover, &.active {
+                color: lighten($blue, 20);
+                background: $white;
+            }
+            &:last-child {
+                border-bottom: none;
+            }
         }
     }
 }

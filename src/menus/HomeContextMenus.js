@@ -25,11 +25,12 @@ export class ShowMenu extends ContextMenu {
             },
         ];
 
-        if (this._show.hasClass("owned") || IS_STUNT) {
+        let type = this._show.data("type");
+        if (type === "owned" || IS_STUNT) {
             items = items.concat(this.getOwnedItems());
         }
 
-        if (this._show.hasClass("band") && IS_STUNT) {
+        if (type === "band" && IS_STUNT) {
             items = items.concat(this.getBandItems());
         }
 
