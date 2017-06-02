@@ -11,6 +11,6 @@ $(function() {
         EditorController.init(window.show);
     } else {
         // controller initialized in onSave()
-        new SetupShowPopup(window.showName, window.showSlug).show();
+        new SetupShowPopup(window.showName, window.showSlug, window.showIsBand).show();
     }
 });

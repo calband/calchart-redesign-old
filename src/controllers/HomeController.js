@@ -40,7 +40,7 @@ export default class HomeController extends ApplicationController {
         });
 
         $(".main-buttons button.new-show").click(e => {
-            new CreateShowPopup(window.isStunt).show();
+            new CreateShowPopup().show();
         });
     }
 }

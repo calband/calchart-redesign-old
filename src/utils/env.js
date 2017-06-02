@@ -8,8 +8,7 @@
 export const CSRF_TOKEN = document.cookie.match(/csrftoken=(\w+)/)[1];
 
 /**
- * true if working on the development site.
- * @const {boolean}
+ * @const {boolean} true if working on the development site.
  */
 export const IS_LOCAL = location.hostname === "localhost";
 
@@ -19,6 +18,11 @@ export const IS_LOCAL = location.hostname === "localhost";
  * @const {boolean}
  */
 export const IS_MAC = navigator.userAgent.includes("Mac OS X");
+
+/**
+ * @const {boolean} true if the current user is on Stunt
+ */
+export const IS_STUNT = window.isStunt;
 
 /**
  * @const {string} The path to staticfiles, without a trailing slash.

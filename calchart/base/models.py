@@ -4,6 +4,7 @@ from django.db import models
 from django.utils.text import slugify
 from django.utils import timezone
 
+import json
 from datetime import timedelta
 
 from utils.api import call_endpoint
@@ -37,6 +38,9 @@ class User(AbstractUser):
         Check if this user is part of the given committee. See the Members
         Only API endpoint.
         """
+        if self.is_superuser:
+            return True
+
         if not self.is_members_only_user():
             return False
 
@@ -77,6 +81,11 @@ class Show(models.Model):
 
     @viewer.setter
     def viewer(self, viewer):
+        # update model according to viewer file
+        show = json.loads(viewer)
+        self.name = show['name']
+        self.is_band = show['isBand']
+
         # overwrite any existing viewer file
         self.viewer_file.delete()
         self.viewer_file.save(f'{self.slug}.viewer', ContentFile(viewer))

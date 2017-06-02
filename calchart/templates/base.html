@@ -7,6 +7,7 @@
         {% add_style "vendor/reset.css" "vendor/chosen.min.css" "vendor/icons.css" "base.css" %}
         <script>
             window.staticPath = "{% get_static_prefix %}";
+            window.isStunt = {{ is_stunt|yesno:"true,false" }};
         </script>
         {% add_script "vendor/jquery-3.2.1.min.js" "vendor/lodash.min.js" "vendor/chosen.jquery.min.js" "vendor/d3.min.js" "vendor/jquery-ui.min.js" %}
         {% block head %}{% endblock %}

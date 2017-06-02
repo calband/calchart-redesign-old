@@ -112,11 +112,6 @@ class HomeView(CalchartMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        # if Members Only user, shows this year's shows by default
-        # otherwise, show the user's shows
-        if self.request.user.is_members_only_user():
-            context['is_stunt'] = self.request.user.has_committee('STUNT')
-
         tabs = self.get_tabs()
         context['tabs'] = tabs
         context['shows'] = self.get_tab(tabs[0][0])
@@ -132,7 +127,7 @@ class HomeView(CalchartMixin, TemplateView):
         Returns tabs in a tuple of the form (id, display_name). The first
         tab in the list is the first tab.
         """
-        if self.request.user.is_members_only_user():
+        if self.request.user.has_committee('MEMBER'):
             year = timezone.now().year
             return [
                 ('band', f'{year} Shows'),
@@ -148,7 +143,7 @@ class HomeView(CalchartMixin, TemplateView):
         Get Shows for the given tab (see get_tabs).
         """
         if tab == 'band':
-            if not self.request.user.is_members_only_user():
+            if not self.request.user.has_committee('MEMBER'):
                 raise PermissionDenied
             kwargs = {
                 'is_band': True,
