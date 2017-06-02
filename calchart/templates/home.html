@@ -23,7 +23,7 @@
         </ul>
         <ul class="shows {{ active_tab }}">
             {% for show in shows %}
-                <li data-slug="{{ show.slug }}">{{ show.name }}</li>
+                <li class="{{ active_tab }}" data-slug="{{ show.slug }}">{{ show.name }}</li>
             {% endfor %}
         </ul>
     </div>

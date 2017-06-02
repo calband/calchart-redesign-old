@@ -52,7 +52,7 @@ export default class HomeController extends ApplicationController {
             .on("click", ".shows li", e => {
                 let show = $(e.currentTarget);
                 let slug = show.data("slug");
-                let app = show.hasClass("band") && !IS_STUNT ? "viewer" : "editor";
+                let app = show.hasClass("owned") || IS_STUNT ? "editor" : "viewer";
                 this.openShow(app, slug, e.metaKey || e.ctrlKey);
             })
             .on("contextmenu", ".shows li", e => {
