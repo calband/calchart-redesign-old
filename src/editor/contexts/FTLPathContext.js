@@ -80,10 +80,9 @@ export default class FTLPathContext extends HiddenGraphContext {
             click: e => {
                 let coord = this._eventToSnapSteps(e);
                 switch (this._activeTool) {
-                    case "add-point": {
+                    case "add-point":
                         this.controller.doAction("addPoint", [coord.x, coord.y]);
                         break;
-                    }
                     case "remove-point": {
                         let point = $(e.target);
                         if (point.is(".ref-point")) {

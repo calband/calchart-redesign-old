@@ -95,10 +95,12 @@ module.exports = function(grunt) {
         var report = engine.executeOnFiles(["src/"]);
         var formatter = engine.getFormatter();
         var output = formatter(report.results);
-        grunt.log.writeln(output);
 
         if (report.errorCount + report.warningCount > 0) {
+            grunt.log.writeln(output);
             grunt.fail.warn("Linting failed.");
+        } else {
+            grunt.log.writeln("No linting errors.");
         }
     });
 };

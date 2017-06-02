@@ -4,7 +4,6 @@ import CollegeGrapher from "calchart/graphers/CollegeGrapher";
 import Dot from "calchart/Dot";
 
 import { getNearestOrientation } from "utils/CalchartUtils";
-import { parseArgs } from "utils/JSUtils";
 
 if (_.isUndefined(d3)) {
     console.error("D3 is not loaded!");
@@ -449,7 +448,7 @@ export default class Grapher {
 
                 if (options.showLabels) {
                     dotLabel.attr("font-size", dotRadius * 2);
-                    let width = $.fromD3(dotLabel).getDimensions().width
+                    let width = $.fromD3(dotLabel).getDimensions().width;
                     let offsetX = 1.25 * width;
                     let offsetY = -1.25 * dotRadius;
                     if (options.labelLeft) {

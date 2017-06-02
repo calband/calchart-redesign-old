@@ -1,6 +1,5 @@
 import OrderedDotsContinuity from "calchart/continuities/OrderedDotsContinuity";
 import Continuity from "calchart/Continuity";
-import MovementCommandMove from "calchart/movements/MovementCommandMove";
 import MovementCommandStop from "calchart/movements/MovementCommandStop";
 import { TwoStepContinuityPopup } from "popups/ContinuityPopups";
 

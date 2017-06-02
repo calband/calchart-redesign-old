@@ -129,9 +129,10 @@ export default class ApplicationController {
                     pressedKeys.push("down"); break;
                 case 46:
                     pressedKeys.push("delete"); break;
-                default:
+                default: {
                     let character = String.fromCharCode(code).toLowerCase();
                     pressedKeys.push(character);
+                }
             }
 
             let _function = this.getShortcut(pressedKeys.join("+"));
@@ -236,7 +237,8 @@ export default class ApplicationController {
                             i++;
                             char = argsData[i];
                         }
-                        // don't break to add ending bracket
+                        buffer += char;
+                        break;
                     default:
                         buffer += char;
                 }
