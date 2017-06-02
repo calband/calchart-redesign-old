@@ -18,10 +18,10 @@
     <div class="content">
         <ul class="tabs">
             {% for id, name in tabs %}
-                <li class="{% if forloop.first %}active{% endif %}" data-tab="{{ id }}">{{ name }}</li>
+                <li class="{% if forloop.first %}active{% endif %}" data-name="{{ id }}">{{ name }}</li>
             {% endfor %}
         </ul>
-        <ul class="shows">
+        <ul class="shows {{ active_tab }}">
             {% for show in shows %}
                 <li data-slug="{{ show.slug }}">{{ show.name }}</li>
             {% endfor %}

@@ -8,34 +8,46 @@ export default class HomeController extends ApplicationController {
         super.init();
 
         // set up tabs
-        $(".tabs li").click(function() {
-            if ($(this).hasClass("active")) {
+        $(".tabs").on("click", "li", e => {
+            let tab = $(e.currentTarget);
+            if (tab.hasClass("active")) {
                 return;
             }
 
-            let tab = $(this).data("tab");
+            let name = $(e.currentTarget).data("name");
+            let activateTab = () => {
+                $(".shows").hide();
+                $(`.shows.${name}`).show();
 
-            $.ajax({
-                data: {
-                    tab: tab,
-                },
-                dataType: "json",
-                success: data => {
-                    $(".shows li").remove();
-                    data.shows.forEach(show => {
-                        HTMLBuilder.li(show.name)
-                            .data("slug", show.slug)
-                            .appendTo(".shows");
-                    });
+                $(".tabs li.active").removeClass("active");
+                tab.addClass("active");
+            };
 
-                    $(".tabs li.active").removeClass("active");
-                    $(this).addClass("active");
-                },
-            });
+            if (!$(`.shows.${name}`).exists()) {
+                $.ajax({
+                    data: {
+                        tab: name,
+                    },
+                    dataType: "json",
+                    success: data => {
+                        let items = data.shows.map(show =>
+                            HTMLBuilder.li(show.name).data("slug", show.slug)
+                        );
+
+                        HTMLBuilder.make(`ul.shows.${name}`)
+                            .append(items)
+                            .appendTo(".content");
+
+                        activateTab();
+                    },
+                });
+            } else {
+                activateTab();
+            }
         });
 
-        $(".shows li").click(function() {
-            let slug = $(this).data("slug");
+        $(".shows").on("click", "li", e => {
+            let slug = $(e.currentTarget).data("slug");
             location.href = `/editor/${slug}`;
         });
 

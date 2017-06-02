@@ -114,7 +114,9 @@ class HomeView(CalchartMixin, TemplateView):
 
         tabs = self.get_tabs()
         context['tabs'] = tabs
-        context['shows'] = self.get_tab(tabs[0][0])
+        active_tab = tabs[0][0]
+        context['active_tab'] = active_tab
+        context['shows'] = self.get_tab(active_tab)
 
         return context
 
@@ -186,6 +188,10 @@ class EditorView(CalchartMixin, TemplateView):
 
     def dispatch(self, request, *args, **kwargs):
         self.show = get_object_or_404(Show, slug=kwargs['slug'])
+
+        if self.show.is_band and not self.request.user.has_committee('STUNT'):
+            raise PermissionDenied
+
         return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
