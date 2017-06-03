@@ -158,12 +158,12 @@ class HomeView(CalchartMixin, TemplateView):
         A POST action that creates a show with a name and audio file
         """
         if self.request.user.has_committee('STUNT'):
-            is_band = 'is_band' in self.request.POST
+            is_band = self.request.POST['isBand']
         else:
             is_band = False
 
         kwargs = {
-            'name': self.request.POST['show_name'],
+            'name': self.request.POST['name'],
             'owner': self.request.user,
             'is_band': is_band,
             'audio_file': self.request.FILES.get('audio'),
