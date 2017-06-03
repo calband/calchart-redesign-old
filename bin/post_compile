@@ -17,7 +17,7 @@ grunt webpack:build
 python calchart/manage.py collectstatic --noinput -i *.scss -i *.map
 
 # if running on a review app, automatically create superuser
-if [[ $HEROKU_APP_NAME == membersonly-staging-pr-* ]]; then
+if [[ $HEROKU_APP_NAME == calchart-staging-pr-* ]]; then
     message "Creating superuser"
     python calchart/manage.py shell < scripts/createsuperuser.py
 fi
