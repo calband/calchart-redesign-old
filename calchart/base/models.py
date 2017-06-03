@@ -18,8 +18,15 @@ class User(AbstractUser):
     User.set_unusable_password) and an API token is used to communicate
     with Members Only.
     """
+    members_only_username = models.CharField(max_length=150, null=True)
     api_token = models.CharField(max_length=40)
     api_token_expiry = models.DateTimeField(null=True)
+
+    def get_username(self):
+        if self.is_superuser or not self.is_members_only_user():
+            return self.username
+        else:
+            return self.members_only_username
 
     def is_members_only_user(self):
         return self.is_superuser or len(self.api_token) > 0
