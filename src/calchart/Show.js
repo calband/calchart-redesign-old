@@ -16,7 +16,7 @@ import { moveElem } from "utils/JSUtils";
  * After incrementing this variable, add a migration to update all Shows in
  * the database. See docs/Versioning.md for more details on this variable.
  */
-const VERSION = 6;
+const VERSION = 5;
 
 /**
  * A Show represents a Calchart show, containing the following information:

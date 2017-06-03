@@ -7,6 +7,7 @@ from utils.db import UpdateShowVersion
 
 def update_version(show):
     show['isBand'] = False
+    show['published'] = False
 
 class Migration(migrations.Migration):
 
