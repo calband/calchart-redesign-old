@@ -4,6 +4,7 @@ import CreateShowPopup from "popups/CreateShowPopup";
 
 import { IS_STUNT } from "utils/env";
 import HTMLBuilder from "utils/HTMLBuilder";
+import { doAction } from "utils/UIUtils";
 
 // map tab name to the jQuery list of shows
 let shows = {};
@@ -72,9 +73,10 @@ export default class HomeController extends ApplicationController {
                         let unpublished = [];
                         let published = [];
                         data.shows.forEach(show => {
-                            let li = HTMLBuilder.li(show.name)
+                            let li = HTMLBuilder.li(show.name, show.slug)
                                 .data("type", tab)
-                                .data("slug", show.slug);
+                                .data("slug", show.slug)
+                                .data("published", show.published);
                             if (show.published) {
                                 published.push(li);
                             } else {
@@ -95,7 +97,7 @@ export default class HomeController extends ApplicationController {
                     } else {
                         showList = HTMLBuilder.make("ul.show-list");
                         data.shows.forEach(show => {
-                            HTMLBuilder.li(show.name)
+                            HTMLBuilder.li(show.name, show.slug)
                                 .data("type", tab)
                                 .data("slug", show.slug)
                                 .appendTo(showList);
@@ -124,5 +126,23 @@ export default class HomeController extends ApplicationController {
         } else {
             location.href = url;
         }
+    }
+
+    /**
+     * Publish/unpublish the given show.
+     *
+     * @param {boolean} publish - true to publish, false to unpublish
+     * @param {string} slug - The slug of the show to publish
+     */
+    publishShow(publish, slug) {
+        let params = { publish, slug };
+        doAction("publish_show", params, {
+            success: data => {
+                let headerClass = publish ? "published" : "unpublished";
+                $(`.shows li.${slug}`)
+                    .data("published", publish)
+                    .appendTo(`h2.${headerClass} + .show-list`);
+            },
+        });
     }
 }

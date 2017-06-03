@@ -83,16 +83,26 @@ class Show(models.Model):
 
     @viewer.setter
     def viewer(self, viewer):
-        # update model according to viewer file
-        show = json.loads(viewer)
-        self.name = show['name']
-        self.is_band = show['isBand']
-        self.published = show['published']
-
         # overwrite any existing viewer file
         self.viewer_file.delete()
         self.viewer_file.save(f'{self.slug}.viewer', ContentFile(viewer))
         self._viewer = viewer
+        delattr(self, '_viewer_json')
+
+        # update model according to viewer file
+        self.name = self.viewer_json['name']
+        self.is_band = self.viewer_json['isBand']
+        self.published = self.viewer_json['published']
+
+    @property
+    def viewer_json(self):
+        if not hasattr(self, '_viewer_json'):
+            if self.viewer:
+                self._viewer_json = json.loads(self.viewer)
+            else:
+                self._viewer_json = None
+
+        return self._viewer_json
 
     @property
     def beats(self):
@@ -120,3 +130,10 @@ class Show(models.Model):
                 self.slug = f'{slug}-{i}'
 
         return super().save(*args, **kwargs)
+
+    def save_viewer_json(self):
+        """
+        Save the contents of viewer_json
+        """
+        self.viewer = json.dumps(self.viewer_json)
+        self.save()

@@ -174,6 +174,21 @@ class HomeView(CalchartMixin, TemplateView):
             'url': reverse('editor', kwargs={'slug': show.slug}),
         }
 
+    def publish_show(self):
+        """
+        A POST action that publishes or unpublishes a show
+        """
+        published = self.request.POST['publish'] == 'true'
+        slug = self.request.POST['slug']
+
+        show = Show.objects.get(slug=slug)
+        show.published = published
+        show.save()
+
+        if show.viewer_json:
+            show.viewer_json['published'] = published
+            show.save_viewer_json()
+
 class EditorView(CalchartMixin, TemplateView):
     """
     The editor view that can edit shows

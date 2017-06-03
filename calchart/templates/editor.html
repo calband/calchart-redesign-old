@@ -10,7 +10,7 @@
     {% add_script "editor.js" %}
     <script>
         {% if show.viewer %}
-            window.show = {{ show.viewer|asjson|safe }};
+            window.show = {{ show.viewer|safe }};
         {% else %}
             window.showName = "{{ show.name }}";
             window.showSlug = "{{ show.slug }}";

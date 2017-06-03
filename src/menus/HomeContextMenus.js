@@ -55,10 +55,11 @@ export class ShowMenu extends ContextMenu {
      * and the current user is on Stunt.
      */
     getBandItems() {
+        let published = this._show.data("published");
         return [
             {
-                label: "Publish",
-                action: "TODO",
+                label: published ? "Unpublish" : "Publish",
+                action: `publishShow(${!published}, ${this._slug})`,
             },
         ];
     }
