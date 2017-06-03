@@ -29,7 +29,9 @@ class User(AbstractUser):
         Return True if this User has a valid API token. Also returns
         True if this user is not a Members Only user.
         """
-        return not self.is_members_only_user() or (
+        return (
+            self.is_superuser or
+            not self.is_members_only_user() or
             timezone.now() + timedelta(days=1) < self.api_token_expiry
         )
 
