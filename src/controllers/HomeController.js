@@ -52,12 +52,12 @@ export default class HomeController extends ApplicationController {
      * @param {string} tab - The name of the tab to load.
      */
     loadTab(tab) {
-        let activateTab = () => {
-            $(".shows > *").hide();
-            shows[tab].show();
-        };
+        $(".shows > *").hide();
+        let $show = shows[tab];
 
-        if (!_.has(shows, tab)) {
+        if ($show) {
+            $show.show();
+        } else {
             $(".shows .loading").show();
 
             $.ajax({
@@ -105,12 +105,8 @@ export default class HomeController extends ApplicationController {
                     shows[tab] = showList;
 
                     $(".shows .loading").hide();
-
-                    activateTab();
                 },
             });
-        } else {
-            activateTab();
         }
     }
 
