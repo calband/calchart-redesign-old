@@ -85,6 +85,7 @@ class Show(models.Model):
         show = json.loads(viewer)
         self.name = show['name']
         self.is_band = show['isBand']
+        self.published = show['published']
 
         # overwrite any existing viewer file
         self.viewer_file.delete()

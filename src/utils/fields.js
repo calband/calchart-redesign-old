@@ -45,10 +45,11 @@ class Field {
 
         let label = _.defaultTo(this._label, _.capitalize(_.lowerCase(this._name)));
         HTMLBuilder.make("label", `${label}:`)
-            .attr("for", name)
+            .attr("for", this._name)
             .appendTo(field);
 
         this._field = this.renderField()
+            .attr("id", this._name)
             .attr("name", this._name)
             .prop("required", this._required)
             .val(this._initial)

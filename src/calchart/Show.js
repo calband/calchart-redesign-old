@@ -16,7 +16,7 @@ import { moveElem } from "utils/JSUtils";
  * After incrementing this variable, add a migration to update all Shows in
  * the database. See docs/Versioning.md for more details on this variable.
  */
-const VERSION = 5;
+const VERSION = 6;
 
 /**
  * A Show represents a Calchart show, containing the following information:
@@ -53,6 +53,7 @@ export default class Show {
         this._name = metadata.name;
         this._slug = metadata.slug;
         this._isBand = metadata.isBand;
+        this._published = metadata.published;
         this._dotFormat = metadata.dotFormat;
         this._version = metadata.version;
 
@@ -94,6 +95,7 @@ export default class Show {
             name: name,
             slug: slug,
             isBand: isBand,
+            published: false,
             dotFormat: data.dotFormat,
             version: VERSION,
         };
@@ -121,6 +123,7 @@ export default class Show {
             name: this._name,
             slug: this._slug,
             isBand: this._isBand,
+            published: this._published,
             dotFormat: this._dotFormat,
             version: this._version,
             fieldType: this._fieldType,
@@ -261,6 +264,13 @@ export default class Show {
      */
     isForBand() {
         return this._isBand;
+    }
+
+    /**
+     * @return {boolean} true if this show is published for the band.
+     */
+    isPublished() {
+        return this._published;
     }
 
     /**
