@@ -1,6 +1,8 @@
+from django.conf import settings
 from django.contrib.auth.mixins import AccessMixin
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, JsonResponse
+from django.middleware.csrf import get_token
 from django.shortcuts import redirect
 
 from utils.api import get_login_url
@@ -45,5 +47,19 @@ class ActionsMixin(object):
         else:
             return JsonResponse(response)
 
-class CalchartMixin(LoginRequiredMixin, ActionsMixin):
+class EnvMixin(object):
+    """
+    Add context variables to indicate various environment flags.
+    """
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['env'] = {
+            'csrf_token': get_token(self.request),
+            'static_path': settings.STATIC_URL[:-1],
+            'is_stunt': self.request.user.has_committee('STUNT'),
+            'is_local': settings.IS_LOCAL,
+        }
+        return context
+
+class CalchartMixin(LoginRequiredMixin, ActionsMixin, EnvMixin):
     pass

@@ -8,7 +8,7 @@ import {
     calcRotatedXPos,
     calcRotatedYPos,
     roundSmall,
-    wrap
+    wrap,
 } from "utils/MathUtils";
  
 /**

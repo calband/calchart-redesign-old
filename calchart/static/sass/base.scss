@@ -219,6 +219,7 @@ header {
 
 .toolbar {
     @include unselectable;
+    display: none;
     z-index: z-index(toolbar);
     padding: 5px 0;
     background: $light-gray;

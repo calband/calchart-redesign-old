@@ -62,7 +62,7 @@ export default class EditorMenu extends Menu {
             ],
         };
 
-        let contexts = [
+        let viewModes = [
             {
                 label: "Music editor",
                 action: "loadContext(music)",
@@ -82,6 +82,10 @@ export default class EditorMenu extends Menu {
             //     label: "3D view",
             //     action: "loadContext(3d)",
             // },
+            {
+                label: "Open in viewer...",
+                action: "openViewer",
+            },
         ];
 
         let zooms = [
@@ -110,7 +114,7 @@ export default class EditorMenu extends Menu {
             submenu: [
                 {
                     label: "View mode",
-                    submenu: contexts,
+                    submenu: viewModes,
                 },
                 {
                     label: "Toggle sheet background",

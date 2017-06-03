@@ -61,9 +61,12 @@ class AuthMembersOnlyView(RedirectView):
         api_token = self.request.GET['api_token']
         ttl_days = self.request.GET['ttl_days']
 
-        user = User.objects.filter(username=username).first()
+        user = User.objects.filter(members_only_username=username).first()
         if user is None:
-            user = User.objects.create_user(username=username)
+            _username = username
+            while User.objects.filter(username=_username).exists():
+                _username = f'{username}_'
+            user = User.objects.create_user(username=_username, members_only_username=username)
 
         user.api_token = api_token
         user.api_token_expiry = timezone.now() + timedelta(days=int(ttl_days))
@@ -111,16 +114,7 @@ class HomeView(CalchartMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
-        # if Members Only user, shows this year's shows by default
-        # otherwise, show the user's shows
-        if self.request.user.is_members_only_user():
-            context['is_stunt'] = self.request.user.has_committee('STUNT')
-
-        tabs = self.get_tabs()
-        context['tabs'] = tabs
-        context['shows'] = self.get_tab(tabs[0][0])
-
+        context['tabs'] = self.get_tabs()
         return context
 
     def get_tabs(self):
@@ -160,19 +154,19 @@ class HomeView(CalchartMixin, TemplateView):
             return Show.objects.filter(**kwargs)
 
         if tab == 'owned':
-            return Show.objects.filter(owner=self.request.user)
+            return Show.objects.filter(owner=self.request.user, is_band=False)
 
     def create_show(self):
         """
         A POST action that creates a show with a name and audio file
         """
         if self.request.user.has_committee('STUNT'):
-            is_band = self.request.POST['is_band']
+            is_band = self.request.POST['is_band'] == 'true'
         else:
             is_band = False
 
         kwargs = {
-            'name': self.request.POST['show_name'],
+            'name': self.request.POST['name'],
             'owner': self.request.user,
             'is_band': is_band,
             'audio_file': self.request.FILES.get('audio'),
@@ -183,6 +177,21 @@ class HomeView(CalchartMixin, TemplateView):
             'url': reverse('editor', kwargs={'slug': show.slug}),
         }
 
+    def publish_show(self):
+        """
+        A POST action that publishes or unpublishes a show
+        """
+        published = self.request.POST['publish'] == 'true'
+        slug = self.request.POST['slug']
+
+        show = Show.objects.get(slug=slug)
+        show.published = published
+        show.save()
+
+        if show.viewer_json:
+            show.viewer_json['published'] = published
+            show.save_viewer_json()
+
 class EditorView(CalchartMixin, TemplateView):
     """
     The editor view that can edit shows
@@ -191,6 +200,10 @@ class EditorView(CalchartMixin, TemplateView):
 
     def dispatch(self, request, *args, **kwargs):
         self.show = get_object_or_404(Show, slug=kwargs['slug'])
+
+        if self.show.is_band and not self.request.user.has_committee('STUNT'):
+            raise PermissionDenied
+
         return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):

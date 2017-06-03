@@ -1,5 +1,6 @@
 import BasePopup from "popups/BasePopup";
 
+import { IS_STUNT } from "utils/env";
 import { BooleanField, CharField, FileField } from "utils/fields";
 import HTMLBuilder from "utils/HTMLBuilder";
 import { doAction, showError } from "utils/UIUtils";
@@ -8,15 +9,6 @@ import { doAction, showError } from "utils/UIUtils";
  * The popup to create a show.
  */
 export default class CreateShowPopup extends BasePopup {
-    /**
-     * @param {boolean} isStunt - True if the current user is on Stunt.
-     */
-    constructor(isStunt) {
-        super();
-
-        this._isStunt = isStunt;
-    }
-
     get info() {
         return {
             name: "create-show",
@@ -36,7 +28,7 @@ export default class CreateShowPopup extends BasePopup {
             }),
         ];
 
-        if (!this._isStunt) {
+        if (!IS_STUNT) {
             _.pullAt(fields, 1);
         }
 
@@ -45,9 +37,9 @@ export default class CreateShowPopup extends BasePopup {
 
     onSave(data) {
         let params = {
-            show_name: data.name,
+            name: data.name,
             audio: data.audio,
-            isBand: data.isBand,
+            is_band: data.isBand,
         };
 
         let buttons = this._popup.find(".buttons").hide();

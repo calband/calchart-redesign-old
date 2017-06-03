@@ -4,6 +4,7 @@ from django.db import models
 from django.utils.text import slugify
 from django.utils import timezone
 
+import json
 from datetime import timedelta
 
 from utils.api import call_endpoint
@@ -17,18 +18,27 @@ class User(AbstractUser):
     User.set_unusable_password) and an API token is used to communicate
     with Members Only.
     """
+    members_only_username = models.CharField(max_length=150, null=True)
     api_token = models.CharField(max_length=40)
     api_token_expiry = models.DateTimeField(null=True)
 
+    def get_username(self):
+        if self.is_superuser or not self.is_members_only_user():
+            return self.username
+        else:
+            return self.members_only_username
+
     def is_members_only_user(self):
-        return len(self.api_token) > 0
+        return self.is_superuser or len(self.api_token) > 0
 
     def is_valid_api_token(self):
         """
         Return True if this User has a valid API token. Also returns
         True if this user is not a Members Only user.
         """
-        return not self.is_members_only_user() or (
+        return (
+            self.is_superuser or
+            not self.is_members_only_user() or
             timezone.now() + timedelta(days=1) < self.api_token_expiry
         )
 
@@ -37,6 +47,9 @@ class User(AbstractUser):
         Check if this user is part of the given committee. See the Members
         Only API endpoint.
         """
+        if self.is_superuser:
+            return True
+
         if not self.is_members_only_user():
             return False
 
@@ -81,6 +94,22 @@ class Show(models.Model):
         self.viewer_file.delete()
         self.viewer_file.save(f'{self.slug}.viewer', ContentFile(viewer))
         self._viewer = viewer
+        delattr(self, '_viewer_json')
+
+        # update model according to viewer file
+        self.name = self.viewer_json['name']
+        self.is_band = self.viewer_json['isBand']
+        self.published = self.viewer_json['published']
+
+    @property
+    def viewer_json(self):
+        if not hasattr(self, '_viewer_json'):
+            if self.viewer:
+                self._viewer_json = json.loads(self.viewer)
+            else:
+                self._viewer_json = None
+
+        return self._viewer_json
 
     @property
     def beats(self):
@@ -108,3 +137,10 @@ class Show(models.Model):
                 self.slug = f'{slug}-{i}'
 
         return super().save(*args, **kwargs)
+
+    def save_viewer_json(self):
+        """
+        Save the contents of viewer_json
+        """
+        self.viewer = json.dumps(self.viewer_json)
+        self.save()

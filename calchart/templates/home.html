@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load partials %}
+{% load partials utils %}
 
 {% block title %}
     - Home
@@ -9,7 +9,7 @@
     {% add_style "home.css" %}
     {% add_script "home.js" %}
     <script>
-        window.isStunt = {{ is_stunt|yesno:"true,false" }};
+        window.tabs = {{ tabs|asjson|safe }};
     </script>
 {% endblock %}
 
@@ -19,15 +19,9 @@
         <button class="new-show">New Show</button>
     </div>
     <div class="content">
-        <ul class="tabs">
-            {% for id, name in tabs %}
-                <li class="{% if forloop.first %}active{% endif %}" data-tab="{{ id }}">{{ name }}</li>
-            {% endfor %}
-        </ul>
-        <ul class="shows">
-            {% for show in shows %}
-                <li data-slug="{{ show.slug }}">{{ show.name }}</li>
-            {% endfor %}
-        </ul>
+        <ul class="tabs"></ul>
+        <div class="shows">
+            <p class="loading">Loading...</p>
+        </div>
     </div>
 {% endblock %}

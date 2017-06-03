@@ -12,12 +12,14 @@ export default class SetupShowPopup extends BasePopup {
     /**
      * @param {string} name - The name of the show.
      * @param {string} slug - The slug of the show.
+     * @param {boolean} isBand - true if the show is a band show.
      */
-    constructor(name, slug) {
+    constructor(name, slug, isBand) {
         super();
 
         this._name = name;
         this._slug = slug;
+        this._isBand = isBand;
     }
 
     get info() {
@@ -53,9 +55,18 @@ export default class SetupShowPopup extends BasePopup {
         ];
     }
 
+    /**
+     * This popup can't be hidden unless saved successfully
+     */
+    hide() {}
+
     onSave(data) {
-        let show = Show.create(this._name, this._slug, data);
+        let show = Show.create(this._name, this._slug, this._isBand, data);
         let controller = EditorController.init(show);
         controller.saveShow();
+
+        // manually hide popup
+        super.hide();
+        return false;
     }
 }

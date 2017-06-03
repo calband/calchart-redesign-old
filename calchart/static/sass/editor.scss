@@ -214,6 +214,11 @@ ul.messages {
             }
         }
     }
+    &.edit-show {
+        .isBand label {
+            width: initial;
+        }
+    }
     &.edit-sheet {
         .icons {
             display: inline-block;

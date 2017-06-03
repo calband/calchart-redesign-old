@@ -16,7 +16,7 @@ import { moveElem } from "utils/JSUtils";
  * After incrementing this variable, add a migration to update all Shows in
  * the database. See docs/Versioning.md for more details on this variable.
  */
-let VERSION = 4;
+const VERSION = 5;
 
 /**
  * A Show represents a Calchart show, containing the following information:
@@ -52,6 +52,8 @@ export default class Show {
     constructor(metadata, dots, sheets, songs, fieldType, options={}) {
         this._name = metadata.name;
         this._slug = metadata.slug;
+        this._isBand = metadata.isBand;
+        this._published = metadata.published;
         this._dotFormat = metadata.dotFormat;
         this._version = metadata.version;
 
@@ -80,16 +82,20 @@ export default class Show {
      * popup.
      *
      * @param {string} name - The name of the show.
+     * @param {string} slug - The slug of the show.
+     * @param {boolean} isBand - true if the show is a band show.
      * @param {Object} data - The form data from the setup-show popup.
      * @return {Show}
      */
-    static create(name, slug, data) {
+    static create(name, slug, isBand, data) {
         let dots = getDotLabels(data.dotFormat, data.numDots).map(
             (label, i) => new Dot(i, label).serialize()
         );
         let metadata = {
             name: name,
             slug: slug,
+            isBand: isBand,
+            published: false,
             dotFormat: data.dotFormat,
             version: VERSION,
         };
@@ -116,6 +122,8 @@ export default class Show {
         let data = {
             name: this._name,
             slug: this._slug,
+            isBand: this._isBand,
+            published: this._published,
             dotFormat: this._dotFormat,
             version: this._version,
             fieldType: this._fieldType,
@@ -249,6 +257,20 @@ export default class Show {
         });
 
         this.updateMovements(index - 1, index);
+    }
+
+    /**
+     * @return {boolean} true if this show is for the band.
+     */
+    isForBand() {
+        return this._isBand;
+    }
+
+    /**
+     * @return {boolean} true if this show is published for the band.
+     */
+    isPublished() {
+        return this._published;
     }
 
     /**

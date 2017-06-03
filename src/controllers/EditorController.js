@@ -150,6 +150,13 @@ export default class EditorController extends ApplicationController {
     }
 
     /**
+     * Open the viewer application.
+     */
+    openViewer() {
+        window.open(`/viewer/${this.show.slug}`, "_blank");
+    }
+
+    /**
      * Redo the last undone action.
      */
     redo() {
