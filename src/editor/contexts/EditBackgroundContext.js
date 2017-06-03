@@ -63,7 +63,7 @@ export default class EditBackgroundContext extends HiddenGraphContext {
                     "mouseup.edit-background": e => {
                         this.controller.doAction("saveBackground", [oldData]);
                         $(document).off(".edit-background");
-                    }
+                    },
                 });
             },
         });
