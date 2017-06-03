@@ -55,9 +55,18 @@ export default class SetupShowPopup extends BasePopup {
         ];
     }
 
+    /**
+     * This popup can't be hidden unless saved successfully
+     */
+    hide() {}
+
     onSave(data) {
         let show = Show.create(this._name, this._slug, this._isBand, data);
         let controller = EditorController.init(show);
         controller.saveShow();
+
+        // manually hide popup
+        super.hide();
+        return false;
     }
 }

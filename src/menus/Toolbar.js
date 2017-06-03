@@ -35,7 +35,8 @@ export default class Toolbar {
      * @param {ApplicationController} controller
      */
     static init(controller) {
-        new this(controller, $("div.toolbar")).init();
+        let toolbar = $("div.toolbar").show();
+        new this(controller, toolbar).init();
     }
 
     /**
