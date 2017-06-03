@@ -22,7 +22,7 @@ class User(AbstractUser):
     api_token_expiry = models.DateTimeField(null=True)
 
     def is_members_only_user(self):
-        return len(self.api_token) > 0
+        return len(self.api_token) > 0 or self.is_superuser
 
     def is_valid_api_token(self):
         """

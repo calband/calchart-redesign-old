@@ -123,7 +123,7 @@ class HomeView(CalchartMixin, TemplateView):
         Returns tabs in a tuple of the form (id, display_name). The first
         tab in the list is the first tab.
         """
-        if self.request.user.has_committee('MEMBER'):
+        if self.request.user.is_members_only_user():
             year = timezone.now().year
             return [
                 ('band', f'{year} Shows'),
@@ -139,7 +139,7 @@ class HomeView(CalchartMixin, TemplateView):
         Get Shows for the given tab (see get_tabs).
         """
         if tab == 'band':
-            if not self.request.user.has_committee('MEMBER'):
+            if not self.request.user.is_members_only_user():
                 raise PermissionDenied
             kwargs = {
                 'is_band': True,
