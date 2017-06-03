@@ -20,7 +20,7 @@ def get_login_url(request, redirect_url=None):
     if settings.IS_LOCAL:
         domain = 'http://localhost:8000'
     else:
-        domain = 'https://membersonly-prod.heroku.com'
+        domain = 'https://membersonly-prod.herokuapp.com'
 
     return f'{domain}/api/auth-login/?redirect_uri={redirect_uri}&app_name={APP_NAME}'
 
@@ -44,7 +44,7 @@ def call_endpoint(endpoint, user, method='GET', **params):
         # Calchart VM -> host -> Members Only VM
         domain = 'http://10.0.2.2:8000'
     else:
-        domain = 'https://membersonly-prod.heroku.com'
+        domain = 'https://membersonly-prod.herokuapp.com'
 
     r = call(f'{domain}/api/{endpoint}/', params=params, timeout=1)
     # error if bad status code
