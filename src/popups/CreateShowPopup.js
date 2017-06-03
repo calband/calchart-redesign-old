@@ -37,9 +37,9 @@ export default class CreateShowPopup extends BasePopup {
 
     onSave(data) {
         let params = {
-            show_name: data.name,
+            name: data.name,
             audio: data.audio,
-            isBand: data.isBand,
+            is_band: data.isBand,
         };
 
         let buttons = this._popup.find(".buttons").hide();
