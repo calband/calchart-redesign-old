@@ -5,12 +5,12 @@
 /**
  * @const {string} The CSRF token for POST requests.
  */
-export const CSRF_TOKEN = document.cookie.match(/csrftoken=(\w+)/)[1];
+export const CSRF_TOKEN = window.env.csrf_token;
 
 /**
  * @const {boolean} true if working on the development site.
  */
-export const IS_LOCAL = location.hostname === "localhost";
+export const IS_LOCAL = window.env.is_local;
 
 /**
  * true if the user is on a Mac, false otherwise.
@@ -22,9 +22,9 @@ export const IS_MAC = navigator.userAgent.includes("Mac OS X");
 /**
  * @const {boolean} true if the current user is on Stunt
  */
-export const IS_STUNT = window.isStunt;
+export const IS_STUNT = window.env.is_stunt;
 
 /**
  * @const {string} The path to staticfiles, without a trailing slash.
  */
-export const STATIC_PATH = window.staticPath.slice(0, window.staticPath.length - 1);
+export const STATIC_PATH = window.env.static_path;
