@@ -1,9 +1,10 @@
+import UploadBackgroundAction from "actions/UploadBackgroundAction";
 import BasePopup from "popups/BasePopup";
 
 import { DEFAULT_CUSTOM, FIELD_TYPES, STEP_TYPES, ORIENTATIONS } from "utils/CalchartUtils";
 import { CharField, ChoiceField, ChoiceOrNumberField, NumberField } from "utils/fields";
 import HTMLBuilder from "utils/HTMLBuilder";
-import { doAction, promptFile } from "utils/UIUtils";
+import { promptFile } from "utils/UIUtils";
 
 /**
  * The popup to edit a sheet.
@@ -66,17 +67,9 @@ export default class EditSheetPopup extends BasePopup {
 
         let editIcon = HTMLBuilder.icon("pencil", "edit-link").click(e => {
             promptFile(file => {
-                let params = {
+                new UploadBackgroundAction(this, this._context).send({
                     sheet: this._context.activeSheet.getIndex(),
                     image: file,
-                };
-
-                doAction("upload_sheet_image", params, {
-                    dataType: "json",
-                    success: data => {
-                        this._context.activeSheet.setBackground(data.url);
-                        this._updateBackgroundInfo();
-                    },
                 });
             });
         });
@@ -90,13 +83,13 @@ export default class EditSheetPopup extends BasePopup {
 
         let clearIcon = HTMLBuilder.icon("times", "clear-link hide-if-none").click(e => {
             this._context.activeSheet.removeBackground();
-            this._updateBackgroundInfo();
+            this.updateBackgroundInfo();
         });
 
         HTMLBuilder.div("icons", [editIcon, moveIcon, clearIcon]).appendTo(backgroundImage);
 
         this._popup.find("form").prepend(backgroundImage);
-        this._updateBackgroundInfo();
+        this.updateBackgroundInfo();
     }
 
     onSave(data) {
@@ -107,12 +100,10 @@ export default class EditSheetPopup extends BasePopup {
         this._context.controller.doAction("saveSheetProperties", [data]);
     }
 
-    /**** HELPERS ****/
-
     /**
      * Update the background information in the popup.
      */
-    _updateBackgroundInfo() {
+    updateBackgroundInfo() {
         let background = this._context.activeSheet.getBackground();
         let fileText;
         if (_.isUndefined(background)) {

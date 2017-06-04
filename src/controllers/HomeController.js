@@ -1,10 +1,10 @@
+import PublishShowAction from "actions/PublishShowAction";
 import ApplicationController from "controllers/ApplicationController";
 import * as menus from "menus/HomeContextMenus";
 import CreateShowPopup from "popups/CreateShowPopup";
 
 import { IS_STUNT } from "utils/env";
 import HTMLBuilder from "utils/HTMLBuilder";
-import { doAction } from "utils/UIUtils";
 
 // map tab name to the jQuery list of shows
 let shows = {};
@@ -135,14 +135,6 @@ export default class HomeController extends ApplicationController {
      * @param {string} slug - The slug of the show to publish
      */
     publishShow(publish, slug) {
-        let params = { publish, slug };
-        doAction("publish_show", params, {
-            success: data => {
-                let headerClass = publish ? "published" : "unpublished";
-                $(`.shows li.${slug}`)
-                    .data("published", publish)
-                    .appendTo(`h2.${headerClass} + .show-list`);
-            },
-        });
+        new PublishShowAction().send({ publish, slug });
     }
 }
