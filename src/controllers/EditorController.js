@@ -1,3 +1,4 @@
+import SaveShowAction from "actions/SaveShowAction";
 import ApplicationController from "controllers/ApplicationController";
 import Context from "editor/Context";
 import EditorMenu from "menus/EditorMenu";
@@ -7,7 +8,6 @@ import EditShowPopup from "popups/EditShowPopup";
 import { IS_LOCAL } from "utils/env";
 import { ActionError } from "utils/errors";
 import { empty, underscoreKeys, update } from "utils/JSUtils";
-import { doAction, showMessage } from "utils/UIUtils";
 
 /**
  * The controller that stores the state of the editor application and contains
@@ -213,19 +213,8 @@ export default class EditorController extends ApplicationController {
      */
     saveShow() {
         let data = JSON.stringify(this.show.serialize());
-        let params = {
+        new SaveShowAction(this).send({
             viewer: data,
-        };
-
-        let li = showMessage("Saving...", {
-            autohide: false,
-        });
-
-        doAction("save_show", params, {
-            success: () => {
-                li.text("Saved!").delayHide();
-                this._savedShow = data;
-            },
         });
     }
 
@@ -243,6 +232,17 @@ export default class EditorController extends ApplicationController {
         this._redoHistory.push(actionData);
         this._updateHistory();
     }
+
+    /**
+     * Update the saved show in the controller.
+     *
+     * @param {object} data - The serialized show data.
+     */
+    updateSavedShow(data) {
+        this._savedShow = data;
+    }
+
+    /**** HELPERS ****/
 
     /**
      * Get the action represented by the given parameter. Overriding

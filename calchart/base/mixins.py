@@ -41,7 +41,7 @@ class ActionsMixin(object):
             return JsonResponse(data, status=500)
 
         if response is None:
-            return redirect(request.path)
+            return JsonResponse({})
         elif isinstance(response, HttpResponse):
             return response
         else:

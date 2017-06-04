@@ -94,7 +94,9 @@ class Show(models.Model):
         self.viewer_file.delete()
         self.viewer_file.save(f'{self.slug}.viewer', ContentFile(viewer))
         self._viewer = viewer
-        delattr(self, '_viewer_json')
+
+        if hasattr(self, '_viewer_json'):
+            delattr(self, '_viewer_json')
 
         # update model according to viewer file
         self.name = self.viewer_json['name']
