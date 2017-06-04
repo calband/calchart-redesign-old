@@ -21,6 +21,7 @@
         "no-console": ["error", {
             "allow": ["error"]
         }],
+        "no-trailing-spaces": ["error"],
         "no-unused-vars": ["error", {
             "args": "none",
             "varsIgnorePattern": "^_"

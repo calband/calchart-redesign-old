@@ -152,7 +152,7 @@ export default class Sheet {
             orientation: this._orientation,
             stepType: this._stepType,
         };
-        
+
         data.dots = this._dots.map(dotInfo => {
             return {
                 type: dotInfo.type,

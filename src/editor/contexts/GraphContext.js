@@ -173,7 +173,7 @@ export default class GraphContext extends BaseContext {
      */
     refreshSidebar() {
         this.sidebar.empty();
-        
+
         this.show.getSheets().forEach(sheet => {
             let label = HTMLBuilder.span(sheet.getLabel(), "label");
 

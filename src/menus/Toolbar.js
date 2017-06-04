@@ -112,7 +112,7 @@ export default class Toolbar {
             item.addClass("toolbar-item")
                 .append(HTMLBuilder.icon(toolbarItem.icon));
 
-            let tooltipLabel = toolbarItem.label; 
+            let tooltipLabel = toolbarItem.label;
             let shortcut = this._controller.shortcutCommands[toolbarItem.action];
             if (shortcut) {
                 let shortcutHint = convertShortcut(shortcut);

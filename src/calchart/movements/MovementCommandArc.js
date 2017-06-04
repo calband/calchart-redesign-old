@@ -10,7 +10,7 @@ import {
     roundSmall,
     wrap,
 } from "utils/MathUtils";
- 
+
 /**
  * A MovementCommand which represents a circular movement around an origin.
  */
@@ -24,7 +24,7 @@ export default class MovementCommandArc extends BaseMovementCommand {
      * @param {int} duration - The duration of the movement, in beats.
      * @param {object} [options] - Options for the movement, including:
      *   - {int} [beatsPerStep=1]
-     */ 
+     */
     constructor(startX, startY, origin, degrees, duration, options) {
         super(startX, startY, null, null, duration, options);
 

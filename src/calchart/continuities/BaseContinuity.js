@@ -77,7 +77,7 @@ export default class BaseContinuity {
      * @param {Continuity[]} continuities
      * @param {Dot} dot
      * @param {Coordinate} start - The starting position of the dot.
-     * @param {int} duration - The number of beats to use for the movements. 
+     * @param {int} duration - The number of beats to use for the movements.
      */
     static buildMovements(continuities, dot, start, duration) {
         // getMovements() can modify anything passed in

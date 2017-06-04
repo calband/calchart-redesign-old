@@ -42,7 +42,7 @@ export default class Iterator {
         return this._cycle || this._index < this._source.length - 1;
     }
 
-    /** 
+    /**
      * Load the next element in the iterator.
      */
     next() {

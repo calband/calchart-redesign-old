@@ -51,6 +51,13 @@ export default class ViewerController extends ApplicationController {
         $(".controls .next-beat").click(e => this.nextBeat());
         $(".controls .next-sheet").click(e => this.nextSheet());
 
+        // buttons
+        $(".buttons .open-viewpsheet").click(e => {
+            if (!$(e.currentTarget).hasClass("disabled")) {
+                this.openViewpsheet();
+            }
+        });
+
         // select dot
         let dots = $(".select-dot");
         this._show.getDots().forEach(dot => {
@@ -65,10 +72,9 @@ export default class ViewerController extends ApplicationController {
                 allow_single_deselect: true,
             })
             .change(e => {
-                let dot = dots.find("option:selected");
-                if (dot.exists()) {
-                    let $dot = this._grapher.getDot(dot.data("dot"));
-                    this._currDot = $dot;
+                let dot = dots.find("option:selected").data("dot");
+                if (dot) {
+                    this._currDot = this._grapher.getDot(dot);
                 } else {
                     this._currDot = null;
                 }
@@ -92,7 +98,13 @@ export default class ViewerController extends ApplicationController {
         }
 
         this._grapher.draw(this._currSheet, this._currBeat);
-        this._grapher.selectDots(this._currDot);
+
+        if (this._currDot) {
+            this._grapher.selectDots(this._currDot);
+            $(".buttons .open-viewpsheet").removeClass("disabled");
+        } else {
+            $(".buttons .open-viewpsheet").addClass("disabled");
+        }
 
         $(".details .sheet").text(this._currSheet.getLabel());
         let beatNum = this._currBeat === 0 ? "Hup" : this._currBeat;
@@ -219,6 +231,17 @@ export default class ViewerController extends ApplicationController {
 
         this._isPlaying = !this._isPlaying;
     }
+
+    /**** VIEWPSHEET ****/
+
+    /**
+     * Open the viewpsheet
+     */
+    openViewpsheet() {
+
+    }
+
+    /**** HELPERS ****/
 
     /**
      * Get the cumulative number of beats for the current sheet and beat

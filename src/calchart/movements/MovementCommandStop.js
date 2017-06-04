@@ -20,7 +20,7 @@ export default class MovementCommandStop extends BaseMovementCommand {
         options.orientation = orientation;
 
         super(startX, startY, startX, startY, duration, options);
-        
+
         this._isMarkTime = isMarkTime;
     }
 

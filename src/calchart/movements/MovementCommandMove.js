@@ -4,7 +4,7 @@ import Coordinate from "calchart/Coordinate";
 
 import { STEP_SIZES } from "utils/CalchartUtils";
 import { calcRotatedXPos, calcRotatedYPos, roundSmall } from "utils/MathUtils";
- 
+
 /**
  * A MovementCommand which represents a constant movement in the given direction.
  */
@@ -20,7 +20,7 @@ export default class MovementCommandMove extends BaseMovementCommand {
      *     into standard step sizes. @see STEP_SIZES.
      *   - {number} [orientation=direction]
      *   - {int} beatsPerStep
-     */ 
+     */
     constructor(startX, startY, direction, duration, options={}) {
         options = _.defaults({}, options, {
             stepSize: STEP_SIZES.STANDARD,

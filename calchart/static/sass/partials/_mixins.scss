@@ -18,6 +18,9 @@
     &:hover {
         background: lighten($primary-color, 5);
     }
+    &.disabled {
+        background: $medium-gray;
+    }
 }
 
 // any menu that hovers over content

@@ -1,7 +1,7 @@
 import MovementCommandMove from "calchart/movements/MovementCommandMove";
 
 import { calcAngle, calcDistance } from "utils/MathUtils";
- 
+
 /**
  * A MovementCommand which represents an even-step transition between two points.
  */
@@ -15,7 +15,7 @@ export default class MovementCommandEven extends MovementCommandMove {
      * @param {object} options - Options for the movement, including:
      *   - {number} [orientation=direction]
      *   - {int} [beatsPerStep=1]
-     */ 
+     */
     constructor(startX, startY, endX, endY, duration, options={}) {
         let direction = calcAngle(startX, startY, endX, endY);
         if (_.isNaN(direction)) {

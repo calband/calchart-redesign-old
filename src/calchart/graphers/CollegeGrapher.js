@@ -17,7 +17,7 @@ export default class CollegeGrapher extends FieldGrapher {
         let SOUTH = this._scale.minX;
         let WEST = this._scale.minY;
         let NORTH = this._scale.maxX;
-        
+
         // field background
         this._field.append("rect")
             .attr("class", "field-background")
