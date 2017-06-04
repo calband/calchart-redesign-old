@@ -104,6 +104,12 @@ export default class DiagonalContinuity extends FountainGridContinuity {
 
     /**** METHODS ****/
 
+    getContinuityText() {
+        let directions = this._diagFirst ? "DHS/HS" : "HS/DHS";
+        let end = this._getEndText();
+        return `FM${directions} ${end}`;
+    }
+
     getMovements(dot, data) {
         let start = data.position;
         let end = this._getNextPosition(dot);

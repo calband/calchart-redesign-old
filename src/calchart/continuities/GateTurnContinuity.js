@@ -55,6 +55,12 @@ export default class GateTurnContinuity extends BaseContinuity {
 
     /**** METHODS ****/
 
+    getContinuityText() {
+        let degrees = Math.abs(this._degrees);
+        let orientation = this._degrees < 0 ? "CCW" : "CW";
+        return `Gate Turn ${degrees} degrees ${orientation}`;
+    }
+
     /**
      * @return {int}
      */

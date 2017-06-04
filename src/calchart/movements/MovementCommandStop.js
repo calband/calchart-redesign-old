@@ -51,7 +51,7 @@ export default class MovementCommandStop extends BaseMovementCommand {
     /**
      * @return {string} The continuity text in the form "MT 4 E" or "Close".
      */
-    getContinuityText() {
+    getText() {
         if (this._isMarkTime) {
             let steps = this._duration / this._beatsPerStep;
             let orientation = this.getOrientation();

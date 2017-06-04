@@ -18,6 +18,12 @@ export default class GrapevineContinuity extends ToEndContinuity {
         };
     }
 
+    getContinuityText() {
+        let orientation = this.getOrientation();
+        let end = this._getEndText();
+        return `Grapevine facing ${orientation} ${end}`;
+    }
+
     getMovements(dot, data) {
         let start = data.position;
         let end = this._getNextPosition(dot);

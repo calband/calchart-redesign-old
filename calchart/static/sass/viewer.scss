@@ -64,15 +64,48 @@ body {
 }
 
 .popup.viewpsheet {
-    .controls i {
-        margin-right: 20px;
-        font-size: 24px;
-        cursor: pointer;
-        &:last-child {
-            margin-right: 0;
+    .sheet {
+        .text {
+            max-height: 125px;
+            overflow-y: scroll;
+            text-align: left;
+            margin-bottom: 10px;
+            ul {
+                display: inline-block;
+                vertical-align: top;
+                width: 50%;
+                &.continuities {
+                    padding-right: 10px;
+                }
+                &.movements {
+                    padding-left: 10px;
+                }
+                li {
+                    margin-bottom: 5px;
+                }
+            }
         }
-        &:hover {
-            color: lighten($blue, 10);
+        .individual-path {
+            display: inline-block;
+            width: 50%;
+            path.path-movements {
+                stroke: $gold;
+                fill: none;
+            }
+        }
+    }
+    .controls {
+        margin: 10px 0;
+        i {
+            margin-right: 20px;
+            font-size: 24px;
+            cursor: pointer;
+            &:last-child {
+                margin-right: 0;
+            }
+            &:hover {
+                color: lighten($blue, 10);
+            }
         }
     }
     .buttons .close {

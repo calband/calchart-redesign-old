@@ -68,6 +68,10 @@ export default class FollowLeaderContinuity extends OrderedDotsContinuity {
         this._path.splice(index, 0, coordinate);
     }
 
+    getContinuityText() {
+        return "Follow the leader";
+    }
+
     getMovements(dot, data) {
         let index = this.getOrderIndex(dot);
         let path = this._getPathIterator(index);

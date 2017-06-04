@@ -48,7 +48,7 @@ export default class MovementCommandEven extends MovementCommandMove {
      * @return {string} The continuity text in the form "Even 8 E, 4 S" or "Move 8 NE" if
      * in one direction.
      */
-    getContinuityText() {
+    getText() {
         let deltaX = this._endX - this._startX;
         let deltaY = this._endY - this._startY;
         let dirX = (deltaX < 0) ? "S" : "N";

@@ -80,4 +80,14 @@ export default class ToEndContinuity extends BaseContinuity {
             movements.push(stop);
         }
     }
+
+    /**
+     * @return {string} The text to attach to the end of the continuity text.
+     */
+    _getEndText() {
+        let label = this.sheet.getNextSheet().getLabel();
+        let end = this._end === "MT" ? `MT${this.getStepType()}` : "CLOSE";
+        let orientation = this.getOrientation();
+        return `TO SS ${label} [${end} ${orientation}]`;
+    }
 }

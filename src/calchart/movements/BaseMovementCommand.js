@@ -111,10 +111,10 @@ export default class BaseMovementCommand {
     }
 
     /**
-     * @return {string} The continuity text to be displayed for this movement. Used
-     * for individual continuities; use Continuity for dot type continuities.
+     * @return {string} The text to be displayed for this movement. Used for
+     * individual continuities; use Continuity for dot type continuities.
      */
-    getContinuityText() {
+    getText() {
         throw new NotImplementedError(this);
     }
 }

@@ -11,7 +11,7 @@ export default class CounterMarchContinuity extends FollowLeaderContinuity {
     /**
      * @param {Sheet} sheet
      * @param {DotType} dotType
-     * @param {?int} duration - The number of beats to mark time or close. If null,
+     * @param {?int} duration - The number of beats to execute countermarch. If null,
      *   use remaining beats.
      * @param {Dot[]} order - The order of dots in the line. order[i] moves towards
      *   order[i+1], and order[len - 1] follows order[0].
@@ -50,6 +50,12 @@ export default class CounterMarchContinuity extends FollowLeaderContinuity {
     }
 
     /**** METHODS ****/
+
+    getContinuityText() {
+        let step = this.getStepType();
+        let duration = this._duration ? ` ${this._duration} beats` : "";
+        return `Countermarch FM${step}${duration}`;
+    }
 
     /**
      * @return {?int}

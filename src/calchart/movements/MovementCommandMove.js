@@ -66,27 +66,27 @@ export default class MovementCommandMove extends BaseMovementCommand {
     }
 
     /**
+     * @return {number}
+     */
+    getDirection() {
+        return this._direction;
+    }
+
+    /**
      * @return {string} The continuity text in the form "Move 4 E".
      */
-    getContinuityText() {
-        let deltaX = Math.abs(this._endX - this._startX);
-        let deltaY = Math.abs(this._endY - this._startY);
+    getText() {
+        let deltaX = this._endX - this._startX;
+        let deltaY = this._endY - this._startY;
         let dirX = (deltaX < 0) ? "S" : "N";
         let dirY = (deltaY < 0) ? "W" : "E";
 
         // This movement can only move in one direction
         if (deltaX === 0) {
-            return `Move ${deltaY} ${dirY}`;
+            return `Move ${Math.abs(deltaY)} ${dirY}`;
         } else {
-            return `Move ${deltaX} ${dirX}`;
+            return `Move ${Math.abs(deltaX)} ${dirX}`;
         }
-    }
-
-    /**
-     * @return {number}
-     */
-    getDirection() {
-        return this._direction;
     }
 
     /**
@@ -101,6 +101,8 @@ export default class MovementCommandMove extends BaseMovementCommand {
         this._endX = end.x;
         this._endY = end.y;
     }
+
+    /**** HELPERS ****/
 
     /**
      * Get the coordinate the dot will be at at the given beat
