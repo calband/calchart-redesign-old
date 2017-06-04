@@ -1,5 +1,6 @@
 import Grapher from "calchart/Grapher";
 import ApplicationController from "controllers/ApplicationController";
+import ViewpsheetPopup from "popups/ViewpsheetPopup";
 
 import HTMLBuilder from "utils/HTMLBuilder";
 import { round, roundSmall } from "utils/MathUtils";
@@ -53,8 +54,8 @@ export default class ViewerController extends ApplicationController {
 
         // buttons
         $(".buttons .open-viewpsheet").click(e => {
-            if (!$(e.currentTarget).hasClass("disabled")) {
-                this.openViewpsheet();
+            if (this._currDot) {
+                new ViewpsheetPopup(this).show();
             }
         });
 
@@ -115,6 +116,15 @@ export default class ViewerController extends ApplicationController {
         let beat = this._getCumulativeBeat();
         let position = $(".seek").width() / this._totalBeats * beat;
         $(".seek .marker").css("transform", `translateX(${position}px)`);
+    }
+
+    /**** METHODS ****/
+
+    /**
+     * @return {Dot} The currently selected dot.
+     */
+    getDot() {
+        return this._currDot.data("dot");
     }
 
     /**** ANIMATION ****/
@@ -230,15 +240,6 @@ export default class ViewerController extends ApplicationController {
         }
 
         this._isPlaying = !this._isPlaying;
-    }
-
-    /**** VIEWPSHEET ****/
-
-    /**
-     * Open the viewpsheet
-     */
-    openViewpsheet() {
-
     }
 
     /**** HELPERS ****/

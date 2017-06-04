@@ -1,11 +1,11 @@
-import BasePopup from "popups/BasePopup";
+import FormPopup from "popups/FormPopup";
 
 import { CharField } from "utils/fields";
 
 /**
  * The popup to add a song.
  */
-export default class AddSongPopup extends BasePopup {
+export default class AddSongPopup extends FormPopup {
     /**
      * @param {EditorController} controller
      */

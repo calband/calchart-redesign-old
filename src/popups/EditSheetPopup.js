@@ -1,5 +1,5 @@
 import UploadBackgroundAction from "actions/UploadBackgroundAction";
-import BasePopup from "popups/BasePopup";
+import FormPopup from "popups/FormPopup";
 
 import { DEFAULT_CUSTOM, FIELD_TYPES, STEP_TYPES, ORIENTATIONS } from "utils/CalchartUtils";
 import { CharField, ChoiceField, ChoiceOrNumberField, NumberField } from "utils/fields";
@@ -9,7 +9,7 @@ import { promptFile } from "utils/UIUtils";
 /**
  * The popup to edit a sheet.
  */
-export default class EditSheetPopup extends BasePopup {
+export default class EditSheetPopup extends FormPopup {
     /**
      * @param {GraphContext} context
      */

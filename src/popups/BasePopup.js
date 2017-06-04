@@ -1,7 +1,5 @@
-import { NotImplementedError, ValidationError } from "utils/errors";
+import { NotImplementedError } from "utils/errors";
 import HTMLBuilder from "utils/HTMLBuilder";
-import { attempt } from "utils/JSUtils";
-import { showError } from "utils/UIUtils";
 
 /**
  * The base class for any popups in Calchart.
@@ -26,18 +24,11 @@ export default class BasePopup {
      */
     show() {
         let title = this.getTitle();
-        let fields = this.getFields();
-        let buttons = this.getButtons();
+        let content = this.getContent();
 
-        let form = HTMLBuilder.make("form");
-        fields.forEach(field => {
-            form.append(field.render());
-        });
-        HTMLBuilder.div("buttons")
-            .append(buttons)
-            .appendTo(form);
-
-        let popupBox = HTMLBuilder.make("div.popup-box").append([title, form]);
+        let popupBox = HTMLBuilder.make("div.popup-box")
+            .append(title)
+            .append(content);
 
         this._popup = HTMLBuilder.make("div.popup")
             .addClass(this.info.name)
@@ -46,37 +37,6 @@ export default class BasePopup {
         this.onInit();
 
         this._popup.appendTo("body");
-
-        // event listener to save popup
-        this._popup.submit(e => {
-            e.preventDefault();
-
-            let data = attempt(() => {
-                let data = {};
-
-                fields.forEach(field => {
-                    data[field.name] = field.clean();
-                });
-
-                return data;
-            }, {
-                class: ValidationError,
-                callback: ex => {
-                    showError(ex.message);
-                },
-            });
-
-            if (_.isNull(data)) {
-                return;
-            }
-
-            let result = this.onSave(data);
-
-            // if onSave returned false explicitly don't hide the popup
-            if (result !== false) {
-                this.hide();
-            }
-        });
 
         // event listeners to close popup
         this._popup.click(e => {
@@ -91,12 +51,6 @@ export default class BasePopup {
                 this.hide();
             }
         });
-
-        // convert selects
-        this._popup.find("select").dropdown();
-
-        // auto focus on first input
-        fields[0].getField().focus();
     }
 
     /**
@@ -109,22 +63,12 @@ export default class BasePopup {
         $(window).off(".popup");
     }
 
-    /**** HOOKS ****/
+    /**** METHODS ****/
 
     /**
-     * @return {jQuery[]} The buttons in the popup.
+     * @return {jQuery[]} The content of the popup.
      */
-    getButtons() {
-        return [
-            HTMLBuilder.make("button.save", "Save"),
-            HTMLBuilder.make("button.cancel", "Cancel").attr("type", "button"),
-        ];
-    }
-
-    /**
-     * @return {Field[]} The form fields in the popup.
-     */
-    getFields() {
+    getContent() {
         throw new NotImplementedError(this);
     }
 
@@ -143,13 +87,4 @@ export default class BasePopup {
      * Any actions to run after the popup is built but before it is displayed.
      */
     onInit() {}
-
-    /**
-     * Any actions to run when the Save button is clicked.
-     *
-     * @param {object} data - The data in the popup.
-     * @return {(undefined|boolean)} Return an explicit false to prevent
-     *   the popup from hiding.
-     */
-    onSave(data) {}
 }

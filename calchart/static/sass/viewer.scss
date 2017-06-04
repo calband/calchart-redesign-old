@@ -62,3 +62,20 @@ body {
         }
     }
 }
+
+.popup.viewpsheet {
+    .controls i {
+        margin-right: 20px;
+        font-size: 24px;
+        cursor: pointer;
+        &:last-child {
+            margin-right: 0;
+        }
+        &:hover {
+            color: lighten($blue, 10);
+        }
+    }
+    .buttons .close {
+        @include display-button($red);
+    }
+}
