@@ -35,13 +35,18 @@ class ActionsMixin(object):
         try:
             response = getattr(self, action)()
         except Exception as e:
+            if isinstance(e, AttributeError):
+                message = f'Action does not exist: {action}'
+            else:
+                message = str(e)
+
             data = {
-                'message': str(e),
+                'message': message,
             }
             return JsonResponse(data, status=500)
 
         if response is None:
-            return redirect(request.path)
+            return JsonResponse({})
         elif isinstance(response, HttpResponse):
             return response
         else:

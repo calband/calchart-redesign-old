@@ -8,59 +8,9 @@
  * - Handles utilities
  */
 
-import { CSRF_TOKEN } from "utils/env";
 import HTMLBuilder from "utils/HTMLBuilder";
 
 /**** FORMS ****/
-
-/**
- * Send an AJAX POST action to the server with the given
- * action name and the given parameters
- *
- * @param {string} action - The name of the action.
- * @param {Object} [params] - An optional object mapping
- *   key/value pairs to send to the server.
- * @param {Object} [options] - An optional object containing additional
- *   AJAX options.
- */
-export function doAction(action, params={}, options={}) {
-    let data = new FormData();
-    data.append("csrfmiddlewaretoken", CSRF_TOKEN);
-    data.append("action", action);
-    $.each(params, function(name, val) {
-        data.append(name, val);
-    });
-
-    // http://www.mattlunn.me.uk/blog/2012/05/sending-formdata-with-jquery-ajax/
-    let ajaxOptions = {
-        method: "POST",
-        data: data,
-        cache: false,
-        contentType: false,
-        processData: false,
-        error: function(xhr) {
-            console.error(xhr);
-
-            let message;
-            if (xhr.responseJSON) {
-                message = xhr.responseJSON.message;
-            } else {
-                switch (xhr.status) {
-                    case 403:
-                        message = "Invalid permissions. Please refresh the page.";
-                        break;
-                    default:
-                        message = "An error occurred.";
-                }
-            }
-
-            showError(message);
-        },
-    };
-    _.extend(ajaxOptions, options);
-
-    $.ajax("", ajaxOptions);
-}
 
 /**
  * Prompt user to upload a file, running the given callback when the
