@@ -90,9 +90,12 @@ body {
             width: 50%;
             height: 200px;
             path.path-movements {
-                stroke-width: 5px;
+                stroke-width: 4px;
                 stroke: $gold;
                 fill: none;
+            }
+            circle.start-position {
+                fill: $highlight-purple;
             }
         }
     }

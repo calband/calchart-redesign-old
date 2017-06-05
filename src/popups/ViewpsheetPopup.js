@@ -31,7 +31,7 @@ export default class ViewpsheetPopup extends BasePopup {
             let sheet = $($sheet).data("sheet");
             let path = $($sheet).find(".individual-path");
             let pathGrapher = new Grapher(this._controller.show, path, {
-                // four step, yardlines
+                // TODO: four step, yardlines, zoomable
             });
             pathGrapher.drawPath(sheet, this._dot);
         });

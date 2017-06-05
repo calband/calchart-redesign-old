@@ -186,7 +186,22 @@ export default class Grapher {
         // width/height of field in steps
         let width = maxX - minX;
         let height = maxY - minY;
-        width = Math.max(width, height / FIELD_RATIO);
+
+        // keep y-bounds in view
+        if (height > width * FIELD_RATIO) {
+            let newWidth = height / FIELD_RATIO;
+            minX = minX + width / 2 - newWidth / 2;
+            maxX = maxX - width / 2 + newWidth / 2;
+            width = newWidth;
+        }
+
+        // width is always at least 16 steps
+        let minWidth = 16;
+        if (width < minWidth) {
+            minX = minX + width / 2 - minWidth / 2;
+            maxX = maxX - width / 2 + minWidth / 2;
+            width = minWidth;
+        }
 
         let FieldGrapher = FIELD_GRAPHERS[sheet.getFieldType()];
         let targetWidth = this._drawTarget.width();
@@ -220,7 +235,11 @@ export default class Grapher {
             .classed("path-movements", true)
             .attr("d", pathDef);
 
-        // TODO: add start/stop markers
+        this._svg.append("circle")
+            .classed("start-position", true)
+            .attr("cx", position.x)
+            .attr("cy", position.y)
+            .attr("r", 6);
     }
 
     /**
