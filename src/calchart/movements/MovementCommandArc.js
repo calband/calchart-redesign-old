@@ -90,7 +90,7 @@ export default class MovementCommandArc extends BaseMovementCommand {
         let r = scale.toDistance(this._radius);
         let largeArc = Math.abs(this._degrees) < 180 ? 0 : 1;
         let sweepFlag = this._degrees < 0 ? 0 : 1;
-        let { x, y } = scale.toDistance(this._origin);
+        let { x, y } = scale.toDistance(this.getEndPosition());
         return `A ${r} ${r} 0 ${largeArc} ${sweepFlag} ${x} ${y}`;
     }
 
@@ -100,7 +100,7 @@ export default class MovementCommandArc extends BaseMovementCommand {
     getText() {
         let direction = this._degrees > 0 ? "CW" : "CCW";
         let degrees = Math.abs(this._degrees);
-        let steps = this._duration / this.getBeatsPerStep();
+        let steps = this._duration / this._beatsPerStep;
         return `GT ${direction} ${degrees} deg. (${steps} steps)`;
     }
 }

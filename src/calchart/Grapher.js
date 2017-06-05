@@ -1,7 +1,8 @@
 import AnimationState from "calchart/AnimationState";
 import Coordinate from "calchart/Coordinate";
-import CollegeGrapher from "calchart/graphers/CollegeGrapher";
 import Dot from "calchart/Dot";
+import CollegeGrapher from "calchart/graphers/CollegeGrapher";
+import MovementCommandArc from "calchart/movements/MovementCommandArc";
 
 import { getNearestOrientation } from "utils/CalchartUtils";
 
@@ -9,8 +10,11 @@ if (_.isUndefined(d3)) {
     console.error("D3 is not loaded!");
 }
 
-let FIELD_RATIO = 700 / 1250; // height = width * ratio
-let BASE_WIDTH = 1250; // the width of the SVG at 100% zoom
+const FIELD_GRAPHERS = {
+    college: CollegeGrapher,
+};
+const FIELD_RATIO = 700 / 1250; // height = width * ratio
+const BASE_WIDTH = 1250; // the width of the SVG at 100% zoom
 
 /**
  * A Grapher is responsible for drawing the field and the dots according to
@@ -132,17 +136,14 @@ export default class Grapher {
             fieldType = this._show.getFieldType();
         }
 
-        let zoom = this._options.zoom;
         let svgWidth, svgHeight;
-        if (_.isNull(zoom)) {
+        if (_.isNull(this._options.zoom)) {
             svgWidth = this._drawTarget.width();
             svgHeight = this._drawTarget.height();
         } else {
-            // bound zoom
-            zoom = _.clamp(zoom, 0.4, 2);
-            svgWidth = BASE_WIDTH * zoom;
+            this._drawTarget.css("overflow", "auto");
+            svgWidth = BASE_WIDTH * this._options.zoom;
             svgHeight = svgWidth * FIELD_RATIO;
-            this._options.zoom = zoom;
         }
 
         this._svg.insert("g", ":first-child")
@@ -153,6 +154,73 @@ export default class Grapher {
         this._scale = fieldGrapher.getScale();
         this._svgWidth = fieldGrapher.svgWidth;
         this._svgHeight = fieldGrapher.svgHeight;
+    }
+
+    /**
+     * Draw the path of a single dot for a sheet onto the field.
+     *
+     * @param {Sheet} sheet
+     * @param {Dot} dot
+     */
+    drawPath(sheet, dot) {
+        let info = sheet.getDotInfo(dot);
+
+        let minX = info.position.x;
+        let maxX = info.position.x;
+        let minY = info.position.y;
+        let maxY = info.position.y;
+        info.movements.forEach(movement => {
+            let end = movement.getEndPosition();
+            minX = Math.min(minX, end.x);
+            maxX = Math.max(maxX, end.x);
+            minY = Math.min(minY, end.y);
+            maxY = Math.max(maxY, end.y);
+        });
+
+        // 2 step margin
+        minX -= 2;
+        maxX += 2;
+        minY -= 2;
+        maxY += 2;
+
+        // width/height of field in steps
+        let width = maxX - minX;
+        let height = maxY - minY;
+        width = Math.max(width, height / FIELD_RATIO);
+
+        let FieldGrapher = FIELD_GRAPHERS[sheet.getFieldType()];
+        let targetWidth = this._drawTarget.width();
+        let targetHeight = this._drawTarget.height();
+
+        // width of field in pixels
+        let fieldWidth = targetWidth / width * FieldGrapher.FIELD_WIDTH;
+        this._options.zoom = (fieldWidth + this._options.fieldPadding * 2) / BASE_WIDTH;
+
+        // draw field and position around bounds
+        this.drawField(sheet.getFieldType());
+        let midX = this._scale.toDistanceX(minX + width / 2);
+        this._drawTarget.scrollLeft(midX - targetWidth / 2);
+        let midY = this._scale.toDistanceY(minY + height / 2);
+        this._drawTarget.scrollTop(midY - targetHeight / 2);
+
+        // draw path
+        let position = this._scale.toDistance(info.position);
+        let pathDef = `M ${position.x} ${position.y}`;
+        info.movements.forEach(movement => {
+            if (movement instanceof MovementCommandArc) {
+                let arcPath = movement.getPathDef(this._scale);
+                pathDef += ` ${arcPath}`;
+            } else {
+                let position = this._scale.toDistance(movement.getEndPosition());
+                pathDef += ` L ${position.x} ${position.y}`;
+            }
+        });
+
+        this._svg.append("path")
+            .classed("path-movements", true)
+            .attr("d", pathDef);
+
+        // TODO: add start/stop markers
     }
 
     /**
@@ -214,11 +282,6 @@ export default class Grapher {
      * @return {GrapherScale} The scale of the Grapher field.
      */
     getScale() {
-        // initialize scale if not initialized
-        if (_.isNull(this._scale)) {
-            this.drawField();
-            this.clearField();
-        }
         return this._scale;
     }
 
@@ -288,7 +351,8 @@ export default class Grapher {
      *  - {boolean} [drawYardlines=true] - If true, draw yardlines and hashes.
      *  - {boolean} [expandField=false] - If true, expand the boundaries of the field beyond the
      *    field (and fieldPadding).
-     *  - {number} [fieldPadding=30] - The minimum amount of space between the field and the SVG.
+     *  - {number} [fieldPadding=30] - The minimum amount of space between the field and the SVG,
+     *    in pixels.
      *  - {boolean} [labelLeft=true] - If true, show the label on the left of the dot.
      *  - {boolean} [showCollisions=false] - If true, color dots less than 1 step spacing away
      *  - {boolean} [showLabels=false] - If true, show the label next to each dot.
@@ -296,6 +360,11 @@ export default class Grapher {
      *    of the field. If a number, zoom the field to the given ratio.
      */
     setOption(name, val) {
+        switch (name) {
+            case "zoom":
+                val = _.clamp(val, 0.4, 2);
+                break;
+        }
         this._options[name] = val;
     }
 
@@ -324,7 +393,7 @@ export default class Grapher {
      */
     zoom(delta) {
         let zoom = _.defaultTo(this._options.zoom, 1);
-        this._options.zoom = zoom + delta;
+        this.setOption("zoom", zoom + delta);
     }
 
     /**** HELPERS ****/
@@ -471,18 +540,17 @@ export default class Grapher {
     /**
      * Get the FieldGrapher of the given type.
      *
-     * @param {string} fieldType - The field type of the FieldGrapher to get. Options are:
-     *   - college: CollegeGrapher
+     * @param {string} fieldType - The field type of the FieldGrapher to get.
      * @param {number} svgWidth - The width of the SVG to pass to the FieldGrapher.
      * @param {number} svgHeight - The height of the SVG to pass to the FieldGrapher.
      * @return {FieldGrapher}
      */
     _getFieldGrapher(fieldType, svgWidth, svgHeight) {
-        switch (fieldType) {
-            case "college":
-                return new CollegeGrapher(this._svg, svgWidth, svgHeight, this._options);
-            default:
-                throw new Error(`No FieldGrapher of type: ${fieldType}`);
+        let FieldGrapher = FIELD_GRAPHERS[fieldType];
+        if (FieldGrapher) {
+            return new FieldGrapher(this._svg, svgWidth, svgHeight, this._options);
+        } else {
+            throw new Error(`No FieldGrapher of type: ${fieldType}`);
         }
     }
 }

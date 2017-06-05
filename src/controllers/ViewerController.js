@@ -40,6 +40,7 @@ export default class ViewerController extends ApplicationController {
     init() {
         super.init();
 
+        // make zoomable
         this._grapher = new Grapher(this._show, $(".viewer"));
         this.refresh();
 

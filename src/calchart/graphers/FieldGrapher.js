@@ -38,23 +38,25 @@ export default class FieldGrapher {
         this._scale = new GrapherScale(this, this._svgWidth, this._svgHeight, paddingWidth, paddingHeight);
     }
 
-    // get dimensions of the SVG
-    get svgWidth() { return this._svgWidth; }
-    get svgHeight() { return this._svgHeight; }
-
     /**
      * @return {int} The height of the field, in steps.
      */
-    get FIELD_HEIGHT() {
+    static get FIELD_HEIGHT() {
         throw new NotImplementedError(this);
     }
 
     /**
      * @return {int} The width of the field, in steps.
      */
-    get FIELD_WIDTH() {
+    static get FIELD_WIDTH() {
         throw new NotImplementedError(this);
     }
+
+    // get dimensions of the SVG
+    get FIELD_HEIGHT() { return this.constructor.FIELD_HEIGHT; }
+    get FIELD_WIDTH() { return this.constructor.FIELD_WIDTH; }
+    get svgWidth() { return this._svgWidth; }
+    get svgHeight() { return this._svgHeight; }
 
     /**
      * Draw the field.

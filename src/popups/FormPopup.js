@@ -17,6 +17,16 @@ export default class FormPopup extends BasePopup {
     }
 
     /**
+     * @return {object} meta info for this popup; see BasePopup.info. Also contains
+     *   the following keys:
+     *   - {string} [title] - The title to use for the popup (defaults to the name
+     *     capitalized); e.g. "Create Show"
+     */
+    get info() {
+        throw new NotImplementedError(this);
+    }
+
+    /**
      * Display this popup.
      */
     show() {
@@ -73,6 +83,7 @@ export default class FormPopup extends BasePopup {
     }
 
     getContent() {
+        let title = this.getTitle();
         this._fields = this.getFields();
 
         let form = HTMLBuilder.make("form");
@@ -82,7 +93,7 @@ export default class FormPopup extends BasePopup {
 
         HTMLBuilder.div("buttons", this.getButtons()).appendTo(form);
 
-        return [form];
+        return [title, form];
     }
 
     /**
@@ -90,6 +101,17 @@ export default class FormPopup extends BasePopup {
      */
     getFields() {
         throw new NotImplementedError(this);
+    }
+
+    /**
+     * @return {jQuery} The title of the popup.
+     */
+    getTitle() {
+        let title = this.info.title;
+        if (_.isUndefined(title)) {
+            title = _.startCase(this.info.name.replace("-", " "));
+        }
+        return HTMLBuilder.make("h1", title);
     }
 
     /**

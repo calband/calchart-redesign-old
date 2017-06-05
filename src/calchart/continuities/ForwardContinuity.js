@@ -54,7 +54,7 @@ export default class ForwardContinuity extends BaseContinuity {
 
     getContinuityText() {
         let direction = DIRECTIONS[this._direction];
-        return `FM${this.getStepType()} ${this._steps} ${direction}`;
+        return `FM${this.getStepType()} ${this._numSteps} ${direction}`;
     }
 
     /**

@@ -12,8 +12,6 @@ export default class BasePopup {
     /**
      * @return {object} meta info for this popup, including the following keys:
      *   - {string} name - The short, unique name of the popup; e.g. "create-show"
-     *   - {string} [title] - The title to use for the popup (defaults to the name
-     *     capitalized); e.g. "Create Show"
      */
     get info() {
         throw new NotImplementedError(this);
@@ -23,16 +21,9 @@ export default class BasePopup {
      * Display this popup.
      */
     show() {
-        let title = this.getTitle();
         let content = this.getContent();
-
-        let popupBox = HTMLBuilder.make("div.popup-box")
-            .append(title)
-            .append(content);
-
-        this._popup = HTMLBuilder.make("div.popup")
-            .addClass(this.info.name)
-            .append(popupBox);
+        let popupBox = HTMLBuilder.div("popup-box", content);
+        this._popup = HTMLBuilder.div(`popup ${this.info.name}`, [popupBox]);
 
         this.onInit();
 
@@ -70,17 +61,6 @@ export default class BasePopup {
      */
     getContent() {
         throw new NotImplementedError(this);
-    }
-
-    /**
-     * @return {jQuery} The title of the popup.
-     */
-    getTitle() {
-        let title = this.info.title;
-        if (_.isUndefined(title)) {
-            title = _.startCase(this.info.name.replace("-", " "));
-        }
-        return HTMLBuilder.make("h1", title);
     }
 
     /**

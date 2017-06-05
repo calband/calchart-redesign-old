@@ -6,8 +6,8 @@ let HASH_WIDTH = 10;
  * A FieldGrapher that can draw a representation of a college football field.
  */
 export default class CollegeGrapher extends FieldGrapher {
-    get FIELD_HEIGHT() { return 84; }
-    get FIELD_WIDTH() { return 160; }
+    static get FIELD_HEIGHT() { return 84; }
+    static get FIELD_WIDTH() { return 160; }
 
     drawField() {
         // GrapherScale aliases

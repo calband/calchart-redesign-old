@@ -1,5 +1,4 @@
 import Grapher from "calchart/Grapher";
-import MovementCommandArc from "calchart/movements/MovementCommandArc";
 import BasePopup from "popups/BasePopup";
 
 import HTMLBuilder from "utils/HTMLBuilder";
@@ -22,20 +21,19 @@ export default class ViewpsheetPopup extends BasePopup {
     get info() {
         return {
             name: "viewpsheet",
-            title: `Viewpsheet for ${this._dot.label}`,
         };
     }
 
     show() {
         super.show();
 
-        _.each(this._popup.find(".sheet"), sheet => {
-            let info = $(sheet).data("sheet").getDotInfo(this._dot);
-            let path = $(sheet).find(".individual-path");
-
-            let pathGrapher = new Grapher(this._controller.show, path);
-            pathGrapher.drawField();
-            this._drawPath(pathGrapher, info);
+        _.each(this._popup.find(".sheet"), $sheet => {
+            let sheet = $($sheet).data("sheet");
+            let path = $($sheet).find(".individual-path");
+            let pathGrapher = new Grapher(this._controller.show, path, {
+                // four step, yardlines
+            });
+            pathGrapher.drawPath(sheet, this._dot);
         });
 
         this.loadSheet(this._popup.find(".sheet:first"));
@@ -47,7 +45,8 @@ export default class ViewpsheetPopup extends BasePopup {
         let svgs = sheets.map(sheet => {
             let info = sheet.getDotInfo(this._dot);
 
-            let label = HTMLBuilder.make("h2", `SS ${sheet.getLabel()}`);
+            let title = `Dot ${this._dot.label}: SS ${sheet.getLabel()}`;
+            let header = HTMLBuilder.make("h2", title);
 
             let continuities = HTMLBuilder.make("ul.continuities");
             sheet.getContinuities(info.type).forEach(continuity => {
@@ -67,11 +66,10 @@ export default class ViewpsheetPopup extends BasePopup {
 
             let path = HTMLBuilder.div("individual-path");
 
-            // individual path
-            // whole formation with dot type
+            // TODO: whole formation with dot type
 
             return HTMLBuilder.div("sheet", [
-                label,
+                header,
                 HTMLBuilder.div("text", [continuities, movements]),
                 path,
             ]).data("sheet", sheet);
@@ -110,7 +108,7 @@ export default class ViewpsheetPopup extends BasePopup {
         });
 
         this._popup.find("button.download").click(e => {
-            // TODO
+            // TODO: download pdf
         });
 
         this._popup.find("button.close").click(e => {
@@ -126,39 +124,5 @@ export default class ViewpsheetPopup extends BasePopup {
     loadSheet(sheet) {
         this._popup.find(".sheet").hide();
         sheet.show();
-    }
-
-    /**** HELPERS ****/
-
-    /**
-     * Draw the given movements onto the grapher.
-     *
-     * @param {Grapher} grapher
-     * @param {object} info - Info from Sheet.getDotInfo
-     */
-    _drawPath(grapher, info) {
-        let path = grapher.getSVG()
-            .append("path")
-            .classed("path-movements", true);
-
-        let scale = grapher.getScale();
-        let position = scale.toDistance(info.position);
-        let pathDef = `M ${position.x} ${position.y}`;
-
-        info.movements.forEach(movement => {
-            if (movement instanceof MovementCommandArc) {
-                let arcPath = movement.getPathDef(scale);
-                pathDef += ` ${arcPath}`;
-            } else {
-                let position = scale.toDistance(movement.getEndPosition());
-                pathDef += ` L ${position.x} ${position.y}`;
-            }
-        });
-
-        path.attr("d", pathDef);
-
-        // TODO: add start/stop markers
-
-        // TODO: start grapher zoomed-in
     }
 }

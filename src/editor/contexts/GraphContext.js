@@ -84,16 +84,16 @@ export default class GraphContext extends BaseContext {
             zoom: 1,
         });
 
-        // initialize with field in view
-        let scale = this.grapher.getScale();
-        this.workspace.scrollLeft(scale.minX - 30);
-        this.workspace.scrollTop(scale.minY - 30);
-
         // initialize sidebar
         let sheet = this.show.getSheet(0);
         if (sheet) {
             this.loadSheet(sheet);
         }
+
+        // initialize grapher with field in view
+        let scale = this.grapher.getScale();
+        this.workspace.scrollLeft(scale.minX - 30);
+        this.workspace.scrollTop(scale.minY - 30);
     }
 
     load(options) {

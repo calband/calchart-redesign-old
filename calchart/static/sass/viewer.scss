@@ -88,7 +88,9 @@ body {
         .individual-path {
             display: inline-block;
             width: 50%;
+            height: 200px;
             path.path-movements {
+                stroke-width: 5px;
                 stroke: $gold;
                 fill: none;
             }
