@@ -2,7 +2,7 @@ var path = require("path");
 var eslint = require("eslint");
 
 var entryPoints = {};
-var entryFiles = ["home", "editor", "viewer", "wiki"].map(function(file) {
+var entryFiles = ["home", "editor", "viewer", "viewpsheet", "wiki"].map(function(file) {
     var filepath = "./src/" + file + ".js";
     entryPoints[file] = filepath;
     return filepath;

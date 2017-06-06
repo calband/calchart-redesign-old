@@ -1,0 +1,15 @@
+@import "partials/vars", "partials/mixins", "partials/functions";
+
+.content {
+    .buttons {
+        text-align: center;
+    }
+}
+
+.popup {
+    &.viewpsheet-settings {
+        label {
+            width: 130px;
+        }
+    }
+}

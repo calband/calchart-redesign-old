@@ -1,6 +1,5 @@
 import Grapher from "calchart/Grapher";
 import ApplicationController from "controllers/ApplicationController";
-import ViewpsheetPopup from "popups/ViewpsheetPopup";
 
 import HTMLBuilder from "utils/HTMLBuilder";
 import { round, roundSmall } from "utils/MathUtils";
@@ -34,7 +33,7 @@ export default class ViewerController extends ApplicationController {
     }
 
     static get shortcuts() {
-        return EditorShortcuts;
+        return ViewerShortcuts;
     }
 
     init() {
@@ -59,9 +58,8 @@ export default class ViewerController extends ApplicationController {
 
         // buttons
         $(".buttons .open-viewpsheet").click(e => {
-            if (this._currDot) {
-                new ViewpsheetPopup(this).show();
-            }
+            let dot = this._currDot ? this._currDot.data("dot").id : "";
+            location.href = `/viewpsheet/${this.show.slug}/?dot=${dot}`;
         });
 
         // select dot
@@ -107,9 +105,6 @@ export default class ViewerController extends ApplicationController {
 
         if (this._currDot) {
             this._grapher.selectDots(this._currDot);
-            $(".buttons .open-viewpsheet").removeClass("disabled");
-        } else {
-            $(".buttons .open-viewpsheet").addClass("disabled");
         }
 
         $(".details .sheet").text(this._currSheet.getLabel());
@@ -316,7 +311,7 @@ export default class ViewerController extends ApplicationController {
     }
 }
 
-let EditorShortcuts = {
+let ViewerShortcuts = {
     "left": "prevBeat",
     "right": "nextBeat",
     "shift+left": "prevSheet",

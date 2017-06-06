@@ -86,6 +86,14 @@ export const STEP_TYPES = {
     JS: "Jerky Step",
 };
 
+/** @const {Object.<string, string>} */
+
+export const VIEWPSHEET_ORIENTATIONS = {
+    default: "Default",
+    east: "Always East",
+    west: "Always West",
+};
+
 /** @const {number[]} **/
 export const ZOOMS = [0.5, 0.75, 1, 1.5, 2];
 

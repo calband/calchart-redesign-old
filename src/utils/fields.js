@@ -120,16 +120,20 @@ export class ChoiceField extends Field {
      * @param {string} name
      * @param {object} choices - The options to add to the <select>, mapping
      *   the value of the option to the human-readable name.
-     * @param {object} [options]
+     * @param {object} [options] - See Field options. Can also include:
+     *   - {boolean} [multiple=false] - If true, allow multiple options to be
+     *     chosen.
      */
     constructor(name, choices, options) {
         super(name, options);
 
         this._choices = choices;
+        this._multiple = _.defaultTo(options.multiple, false);
+        // TODO: chosen options
     }
 
     renderField() {
-        let select = HTMLBuilder.select(this._choices);
+        let select = HTMLBuilder.select(this._choices).attr("multiple", this._multiple);
 
         // add an empty option to the beginning
         HTMLBuilder.make("option").prependTo(select);

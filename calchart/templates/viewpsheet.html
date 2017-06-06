@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% load partials utils %}
+
+{% block title %}
+    Calchart Viewpsheet - {{ show.name }}
+{% endblock %}
+
+{% block head %}
+    {% add_style "viewpsheet.css" %}
+    {% add_script "viewpsheet.js" %}
+    <script>
+        {% if show.viewer %}
+            window.show = {{ show.viewer|asjson|safe }};
+        {% else %}
+            window.show = null;
+        {% endif %}
+        {% if dot %}
+            window.dot = {{ dot }};
+        {% else %}
+            window.dot = null;
+        {% endif %}
+    </script>
+{% endblock %}
+
+{% block body %}
+    <div class="content">
+        <h1>{{ show.name }}</h1>
+        <div class="buttons">
+            <button class="open-settings">Viewpsheet Settings</button>
+        </div>
+        <div class="viewpsheet"></div>
+    </div>
+{% endblock %}

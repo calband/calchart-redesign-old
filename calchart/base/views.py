@@ -247,3 +247,21 @@ class ViewerView(CalchartMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         context['show'] = self.show
         return context
+
+class ViewpsheetView(CalchartMixin, TemplateView):
+    """
+    The view that generates viewpsheets for a show. Can also pass in
+    a dot ID in the GET parameters to initialize the dot to generate
+    viewpsheets for.
+    """
+    template_name = 'viewpsheet.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        self.show = get_object_or_404(Show, slug=kwargs['slug'])
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['show'] = self.show
+        context['dot'] = self.request.GET.get('dot')
+        return context
