@@ -61,11 +61,12 @@ export default class Grapher {
         this._svgHeight = undefined;
 
         if (this._options.zoomable) {
+            let sensitivity = this._drawTarget.width() / 10;
             this._drawTarget
                 .css("overflow", "auto")
                 .pinch(e => {
                     e.preventDefault();
-                    this.zoomBy(e.deltaY / 100, e);
+                    this.zoomBy(e.deltaY / sensitivity, e);
                 });
         }
 
@@ -168,9 +169,9 @@ export default class Grapher {
      *
      * @param {Sheet} sheet
      * @param {Dot} dot
-     * @param {boolean} setZoom - If true, set the zoom to fit the path.
+     * @param {boolean} containPath - If true, set the zoom and scroll to fit the path.
      */
-    drawPath(sheet, dot, setZoom) {
+    drawPath(sheet, dot, containPath) {
         this._svg.selectAll(".draw-path").remove();
 
         let info = sheet.getDotInfo(dot);
@@ -221,17 +222,20 @@ export default class Grapher {
 
         // width of field in pixels
         let fieldWidth = targetWidth / width * FieldGrapher.FIELD_WIDTH;
-        if (setZoom) {
+        if (containPath) {
             this._options.zoom = (fieldWidth + this._options.fieldPadding * 2) / targetWidth;
         }
 
         // draw field and position around bounds
         this.clearField();
         this.drawField(sheet.getFieldType());
-        let midX = this._scale.toDistanceX(minX + width / 2);
-        this._drawTarget.scrollLeft(midX - targetWidth / 2);
-        let midY = this._scale.toDistanceY(minY + height / 2);
-        this._drawTarget.scrollTop(midY - targetHeight / 2);
+
+        if (containPath) {
+            let midX = this._scale.toDistanceX(minX + width / 2);
+            this._drawTarget.scrollLeft(midX - targetWidth / 2);
+            let midY = this._scale.toDistanceY(minY + height / 2);
+            this._drawTarget.scrollTop(midY - targetHeight / 2);
+        }
 
         // draw path
         let position = this._scale.toDistance(info.position);
