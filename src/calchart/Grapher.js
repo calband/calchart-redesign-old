@@ -13,8 +13,6 @@ if (_.isUndefined(d3)) {
 const FIELD_GRAPHERS = {
     college: CollegeGrapher,
 };
-const FIELD_RATIO = 700 / 1250; // height = width * ratio
-const BASE_WIDTH = 1250; // the width of the SVG at 100% zoom
 
 /**
  * A Grapher is responsible for drawing the field and the dots according to
@@ -41,16 +39,18 @@ export default class Grapher {
             expandField: false,
             fieldPadding: 30,
             labelLeft: true,
+            onZoom: null,
             showCollisions: false,
             showLabels: false,
-            zoom: null,
+            zoom: 1,
+            zoomable: false,
         });
 
-        // true to trigger drawing zoom-dependent aspects of the grapher; to
-        // avoid redundant calculations in _drawDots
-        this._redrawZoom = true;
+        // // true to trigger drawing zoom-dependent aspects of the grapher; to
+        // // avoid redundant calculations in _drawDots
+        // this._redrawZoom = true;
 
-        // the GrapherScale containing data about scale
+        // {GrapherScale}
         this._scale = null;
 
         this._svg = d3.select(this._drawTarget.get(0))
@@ -59,6 +59,19 @@ export default class Grapher {
 
         this._svgWidth = undefined;
         this._svgHeight = undefined;
+
+        if (this._options.zoomable) {
+            this._drawTarget
+                .css("overflow", "auto")
+                .pinch(e => {
+                    e.preventDefault();
+                    this.zoomBy(e.deltaY / 100, e);
+                });
+        }
+
+        this.drawField();
+        this._drawDots();
+        this._redrawDots();
     }
 
     get svgWidth() { return this._svgWidth; }
@@ -94,12 +107,13 @@ export default class Grapher {
         let field = this._svg.select("g.field");
 
         // re-draw field if needed
-        if (field.empty() || !field.classed(`field-${fieldType}`) || this._redrawZoom) {
+        if (field.empty() || !field.classed(`field-${fieldType}`)) {
             field.remove();
             this.drawField(fieldType);
             field = this._svg.select("g.field");
         }
 
+        // add/remove background image element
         let background = sheet.getBackground();
         let image = field.select("image.background-image");
         if (_.isUndefined(background)) {
@@ -121,7 +135,7 @@ export default class Grapher {
             this.showBackground();
         }
 
-        this._drawDots(sheet, currentBeat);
+        this._updateDots(sheet, currentBeat);
     }
 
     /**
@@ -136,15 +150,8 @@ export default class Grapher {
             fieldType = this._show.getFieldType();
         }
 
-        let svgWidth, svgHeight;
-        if (_.isNull(this._options.zoom)) {
-            svgWidth = this._drawTarget.width();
-            svgHeight = this._drawTarget.height();
-        } else {
-            this._drawTarget.css("overflow", "auto");
-            svgWidth = BASE_WIDTH * this._options.zoom;
-            svgHeight = svgWidth * FIELD_RATIO;
-        }
+        let svgWidth = this._drawTarget.width() * this._options.zoom;
+        let svgHeight = this._drawTarget.height() * this._options.zoom;
 
         this._svg.insert("g", ":first-child")
             .classed(`field field-${fieldType}`, true);
@@ -161,8 +168,11 @@ export default class Grapher {
      *
      * @param {Sheet} sheet
      * @param {Dot} dot
+     * @param {boolean} setZoom - If true, set the zoom to fit the path.
      */
-    drawPath(sheet, dot) {
+    drawPath(sheet, dot, setZoom) {
+        this._svg.selectAll(".draw-path").remove();
+
         let info = sheet.getDotInfo(dot);
 
         let minX = info.position.x;
@@ -187,9 +197,13 @@ export default class Grapher {
         let width = maxX - minX;
         let height = maxY - minY;
 
+        let targetWidth = this._drawTarget.width();
+        let targetHeight = this._drawTarget.height();
+        let ratio = targetHeight / targetWidth;
+
         // keep y-bounds in view
-        if (height > width * FIELD_RATIO) {
-            let newWidth = height / FIELD_RATIO;
+        if (height > width * ratio) {
+            let newWidth = height / ratio;
             minX = minX + width / 2 - newWidth / 2;
             maxX = maxX - width / 2 + newWidth / 2;
             width = newWidth;
@@ -204,14 +218,15 @@ export default class Grapher {
         }
 
         let FieldGrapher = FIELD_GRAPHERS[sheet.getFieldType()];
-        let targetWidth = this._drawTarget.width();
-        let targetHeight = this._drawTarget.height();
 
         // width of field in pixels
         let fieldWidth = targetWidth / width * FieldGrapher.FIELD_WIDTH;
-        this._options.zoom = (fieldWidth + this._options.fieldPadding * 2) / BASE_WIDTH;
+        if (setZoom) {
+            this._options.zoom = (fieldWidth + this._options.fieldPadding * 2) / targetWidth;
+        }
 
         // draw field and position around bounds
+        this.clearField();
         this.drawField(sheet.getFieldType());
         let midX = this._scale.toDistanceX(minX + width / 2);
         this._drawTarget.scrollLeft(midX - targetWidth / 2);
@@ -231,15 +246,18 @@ export default class Grapher {
             }
         });
 
+        let dotRadius = this.getDotRadius();
+
         this._svg.append("path")
-            .classed("path-movements", true)
-            .attr("d", pathDef);
+            .classed("draw-path path-movements", true)
+            .attr("d", pathDef)
+            .style("stroke-width", dotRadius / 1.5);
 
         this._svg.append("circle")
-            .classed("start-position", true)
+            .classed("draw-path start-position", true)
             .attr("cx", position.x)
             .attr("cy", position.y)
-            .attr("r", 6);
+            .attr("r", dotRadius * 1.25);
     }
 
     /**
@@ -286,7 +304,7 @@ export default class Grapher {
      * @return {jQuery} The SVG graph element.
      */
     getGraph() {
-        return $(this._svg.node());
+        return $.fromD3(this._svg);
     }
 
     /**
@@ -343,10 +361,47 @@ export default class Grapher {
     }
 
     /**
-     * Trigger redrawing zoom-dependent aspects next time draw() is called.
+     * Redraw the graph after zooming, keeping the given coordinate
+     * in the same place afterwards.
+     *
+     * @param {number} [pageX] - The x-coordinate in the page to zoom
+     *   into/out of. Defaults to the center of the graph.
+     * @param {number} [pageY] - The y-coordinate in the page to zoom
+     *   into/out of. Defaults to the center of the graph.
      */
-    redrawZoom() {
-        this._redrawZoom = true;
+    redrawZoom(pageX, pageY) {
+        // distance from top-left corner of draw target
+        let left, top;
+        let offset = this._drawTarget.offset();
+        if (_.isUndefined(pageX)) {
+            left = this._drawTarget.width() / 2;
+        } else {
+            left = pageX - offset.left;
+        }
+        if (_.isUndefined(pageY)) {
+            top = this._drawTarget.height() / 2;
+        } else {
+            top = pageY - offset.top;
+        }
+
+        // steps from top-left corner of field
+        let start = this._scale.toSteps({
+            x: this._drawTarget.scrollLeft() + left,
+            y: this._drawTarget.scrollTop() + top,
+        });
+
+        this.clearField();
+        this.drawField();
+        this._redrawDots();
+
+        // scroll draw target to keep same location under cursor
+        let end = this._scale.toDistance(start);
+        this._drawTarget.scrollLeft(end.x - left);
+        this._drawTarget.scrollTop(end.y - top);
+
+        if (this._options.onZoom) {
+            this._options.onZoom(this);
+        }
     }
 
     /**
@@ -373,17 +428,15 @@ export default class Grapher {
      *  - {number} [fieldPadding=30] - The minimum amount of space between the field and the SVG,
      *    in pixels.
      *  - {boolean} [labelLeft=true] - If true, show the label on the left of the dot.
+     *  - {function} [onZoom] - If given, runs the given function whenever the graph is redrawn
+     *    due to zooming. Receives the Grapher as a parameter.
      *  - {boolean} [showCollisions=false] - If true, color dots less than 1 step spacing away
      *  - {boolean} [showLabels=false] - If true, show the label next to each dot.
-     *  - {?number} [zoom=null] - If null, use the dimensions of the draw target as the dimensions
-     *    of the field. If a number, zoom the field to the given ratio.
+     *  - {number} [zoom=1] - The ratio to zoom the field to. A ratio of 1 means the graph exactly
+     *    fills the draw target.
+     *  - {boolean} [zoomable=false] - If true, allow the user to pinch (or ctrl+scroll) to zoom.
      */
     setOption(name, val) {
-        switch (name) {
-            case "zoom":
-                val = _.clamp(val, 0.4, 2);
-                break;
-        }
         this._options[name] = val;
     }
 
@@ -401,65 +454,131 @@ export default class Grapher {
      *   background image. If undefined, use the backgroundVisible option.
      */
     showBackground(visible=this._options.backgroundVisible) {
-        this.setOption("backgroundVisible", visible);
+        this._options.backgroundVisible = visible;
         this._svg.select("image.background-image").style("display", visible ? "block" : "none");
     }
 
     /**
-     * Change the zoom by the given amount. Won't take effect until draw() is called again.
+     * Zoom by the given value.
      *
      * @param {number} delta
+     * @param {Event} [e] - If given, zoom keeping the same coordinates under
+     *   the mouse.
      */
-    zoom(delta) {
-        let zoom = _.defaultTo(this._options.zoom, 1);
-        this.setOption("zoom", zoom + delta);
+    zoomBy(delta, e={}) {
+        this.zoomTo(this._options.zoom + delta, e);
+    }
+
+    /**
+     * Zoom to the given value.
+     *
+     * @param {number} zoom
+     * @param {Event} [e] - If given, zoom keeping the same coordinates under
+     *   the mouse.
+     */
+    zoomTo(zoom, e={}) {
+        this._options.zoom = Math.max(zoom, 1);
+        this.redrawZoom(e.pageX, e.pageY);
     }
 
     /**** HELPERS ****/
 
     /**
-     * Draw the dots in the given Sheet at the given beat onto the SVG.
-     *
-     * @param {Sheet} sheet - The sheet to draw.
-     * @param {int} currentBeat - Beat to draw, relative to the start of the Sheet.
+     * Draw all dot elements onto the graph.
      */
-    _drawDots(sheet, currentBeat) {
-        let options = this._options;
-        let dotRadius = this.getDotRadius();
-
+    _drawDots() {
         // group containing all dots
-        let dotsGroup = this._svg.select("g.dots");
-        if (dotsGroup.empty()) {
-            dotsGroup = this._svg.append("g").classed("dots", true);
-        }
+        let dotsGroup = this._svg.append("g").classed("dots", true);
 
         // separate labels from dots to keep in a separate layer
-        let labelsGroup = this._svg.select("g.dot-labels");
-        if (!options.showLabels) {
-            labelsGroup.remove();
-        } else if (labelsGroup.empty()) {
-            labelsGroup = this._svg.append("g").classed("dot-labels", true);
+        let labelsGroup = this._svg.append("g").classed("dot-labels", true);
+        if (!this._options.showLabels) {
+            $.fromD3(labelsGroup).hide();
         }
 
-        let drawDot = dot => {
-            let dotGroup = dotsGroup.append("g");
+        // order dots in reverse order so that lower dot values are drawn on top
+        // of higher dot values
+        let dots = this._show.getDots();
+        _.clone(dots).reverse().forEach(dot => {
+            let dotGroup = dotsGroup.append("g")
+                .classed(`dot dot-${dot.id}`, true);
 
-            if (options.dotFormat === "dot-type") {
+            if (this._options.dotFormat === "dot-type") {
                 dotGroup.append("line").classed("fslash", true);
                 dotGroup.append("line").classed("bslash", true);
             }
             dotGroup.append("circle").classed("dot-marker", true);
 
-            let dotLabel;
-            if (options.showLabels) {
-                dotLabel = labelsGroup.append("text")
-                    .classed(`dot-label dot-label-${dot.id}`, true)
-                    .text(dot.label);
+            let dotLabel = labelsGroup.append("text")
+                .classed(`dot-label dot-label-${dot.id}`, true)
+                .text(dot.label);
+
+            // save dot in jQuery data
+            $.fromD3(dotGroup).data("dot", dot);
+        });
+    }
+
+    /**
+     * Get the FieldGrapher of the given type.
+     *
+     * @param {string} fieldType - The field type of the FieldGrapher to get.
+     * @param {number} svgWidth - The width of the SVG to pass to the FieldGrapher.
+     * @param {number} svgHeight - The height of the SVG to pass to the FieldGrapher.
+     * @return {FieldGrapher}
+     */
+    _getFieldGrapher(fieldType, svgWidth, svgHeight) {
+        let FieldGrapher = FIELD_GRAPHERS[fieldType];
+        if (FieldGrapher) {
+            return new FieldGrapher(this._svg, svgWidth, svgHeight, this._options);
+        } else {
+            throw new Error(`No FieldGrapher of type: ${fieldType}`);
+        }
+    }
+
+    /**
+     * Redraw zoom-dependent aspects of dots.
+     */
+    _redrawDots() {
+        let dotRadius = this.getDotRadius();
+        let start = -1.1 * dotRadius;
+        let end = 1.1 * dotRadius;
+
+        this._svg.selectAll(".dot-marker")
+            .attr("r", dotRadius);
+
+        this._svg.selectAll(".fslash")
+            .attr("x1", start)
+            .attr("y1", end)
+            .attr("x2", end)
+            .attr("y2", start);
+
+        this._svg.selectAll(".bslash")
+            .attr("x1", start)
+            .attr("y1", start)
+            .attr("x2", end)
+            .attr("y2", end);
+
+        this._svg.selectAll(".dot-label")
+            .attr("font-size", dotRadius * 2);
+
+        let dotLabels = this.getGraph().find(".dot-label");
+        _.each(dotLabels, dotLabel => {
+            let width = $(dotLabel).getDimensions().width;
+            let offsetX = 1.25 * width;
+            let offsetY = -1.25 * dotRadius;
+            if (this._options.labelLeft) {
+                offsetX *= -1;
             }
+            $(dotLabel)
+                .attr("x", offsetX)
+                .attr("y", offsetY);
+        });
+    }
 
-            return [dotGroup, dotLabel];
-        };
-
+    /**
+     * Update beat-specific aspects of a dot.
+     */
+    _updateDots(sheet, currentBeat) {
         let getState = dot => {
             let state;
             try {
@@ -482,30 +601,11 @@ export default class Grapher {
             return new AnimationState(position, orientation);
         };
 
-        // order dots in reverse order so that lower dot values are drawn on top
-        // of higher dot values
-        let dots = this._show.getDots();
-        _.clone(dots).reverse().forEach(dot => {
-            let dotGroup = dotsGroup.select(`.dot-${dot.id}`);
-            let dotLabel = labelsGroup.select(`.dot-label-${dot.id}`);
+        this._show.getDots().forEach(dot => {
+            let $dot = this.getDot(dot);
 
-            if (dotGroup.empty()) {
-                let temp = drawDot(dot);
-                dotGroup = temp[0];
-                dotLabel = temp[1];
-            }
-
-            // save dot in jQuery data
-            let $dot = $.fromD3(dotGroup).data("dot", dot);
-
-            let state = getState(dot);
-            let x = this._scale.toDistanceX(state.x);
-            let y = this._scale.toDistanceY(state.y);
-            this.moveDotTo($dot, x, y);
-
-            // overwrite dot class each time
             let dotClass = "";
-            switch (options.dotFormat) {
+            switch (this._options.dotFormat) {
                 case "orientation":
                     dotClass = getNearestOrientation(state.angle);
                     break;
@@ -513,63 +613,19 @@ export default class Grapher {
                     dotClass = sheet.getDotType(dot);
                     break;
             }
-            dotGroup.attr("class", `dot ${dotClass} dot-${dot.id}`);
 
-            if (this._redrawZoom) {
-                dotGroup.select(".dot-marker")
-                    .attr("r", dotRadius);
+            // overwrite dot class each time
+            $dot.attr("class", `dot dot-${dot.id} ${dotClass}`);
 
-                let start = -1.1 * dotRadius;
-                let end = 1.1 * dotRadius;
-
-                dotGroup.select(".fslash")
-                    .attr("x1", start)
-                    .attr("y1", end)
-                    .attr("x2", end)
-                    .attr("y2", start);
-
-                dotGroup.select(".bslash")
-                    .attr("x1", start)
-                    .attr("y1", start)
-                    .attr("x2", end)
-                    .attr("y2", end);
-
-                if (options.showLabels) {
-                    dotLabel.attr("font-size", dotRadius * 2);
-                    let width = $.fromD3(dotLabel).getDimensions().width;
-                    let offsetX = 1.25 * width;
-                    let offsetY = -1.25 * dotRadius;
-                    if (options.labelLeft) {
-                        offsetX *= -1;
-                    }
-                    dotLabel.attr("x", offsetX).attr("y", offsetY);
-                }
-            }
+            let state = getState(dot);
+            let position = this._scale.toDistance(state);
+            this.moveDotTo($dot, position.x, position.y);
         });
 
-        if (options.showCollisions) {
+        if (this._options.showCollisions) {
             sheet.getCollisions(currentBeat).forEach(dot => {
                 this.getDot(dot).addClass("collision");
             });
-        }
-
-        this._redrawZoom = false;
-    }
-
-    /**
-     * Get the FieldGrapher of the given type.
-     *
-     * @param {string} fieldType - The field type of the FieldGrapher to get.
-     * @param {number} svgWidth - The width of the SVG to pass to the FieldGrapher.
-     * @param {number} svgHeight - The height of the SVG to pass to the FieldGrapher.
-     * @return {FieldGrapher}
-     */
-    _getFieldGrapher(fieldType, svgWidth, svgHeight) {
-        let FieldGrapher = FIELD_GRAPHERS[fieldType];
-        if (FieldGrapher) {
-            return new FieldGrapher(this._svg, svgWidth, svgHeight, this._options);
-        } else {
-            throw new Error(`No FieldGrapher of type: ${fieldType}`);
         }
     }
 }

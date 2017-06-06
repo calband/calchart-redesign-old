@@ -24,6 +24,9 @@ export default class GrapherScale {
             this._width = this._height * grapher.FIELD_WIDTH / grapher.FIELD_HEIGHT;
         }
 
+        this._width = Math.max(this._width, 0);
+        this._height = Math.max(this._height, 0);
+
         // pixels to the edges of the field
         this._minX = (svgWidth - this._width) / 2;
         this._maxX = this._minX + this._width;

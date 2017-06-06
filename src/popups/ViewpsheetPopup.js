@@ -31,9 +31,14 @@ export default class ViewpsheetPopup extends BasePopup {
             let sheet = $($sheet).data("sheet");
             let path = $($sheet).find(".individual-path");
             let pathGrapher = new Grapher(this._controller.show, path, {
-                // TODO: four step, yardlines, zoomable
+                draw4Step: true,
+                drawYardlineNumbers: true,
+                onZoom: grapher => {
+                    grapher.drawPath(sheet, this._dot, false);
+                },
+                zoomable: true,
             });
-            pathGrapher.drawPath(sheet, this._dot);
+            pathGrapher.drawPath(sheet, this._dot, true);
         });
 
         this.loadSheet(this._popup.find(".sheet:first"));

@@ -81,7 +81,7 @@ export default class GraphContext extends BaseContext {
             draw4Step: true,
             expandField: true,
             showLabels: true,
-            zoom: 1,
+            zoomable: true,
         });
 
         // initialize sidebar
@@ -90,6 +90,7 @@ export default class GraphContext extends BaseContext {
             this.loadSheet(sheet);
         }
 
+        // TODO: move to grapher with expandField set
         // initialize grapher with field in view
         let scale = this.grapher.getScale();
         this.workspace.scrollLeft(scale.minX - 30);
@@ -100,6 +101,10 @@ export default class GraphContext extends BaseContext {
         super.load(options);
 
         $(".graph-content").show();
+
+        GraphState.grapher.setOption("onZoom", grapher => {
+            this.refresh("grapher");
+        });
 
         this._addEvents(this.sidebar, {
             contextmenu: e => {
@@ -134,14 +139,6 @@ export default class GraphContext extends BaseContext {
             },
         });
 
-        this.workspace.pinch(e => {
-            e.preventDefault();
-
-            let delta = e.deltaY / 100;
-            this.grapher.zoom(delta);
-            this.refreshZoom(e.pageX, e.pageY);
-        });
-
         $(".menu-item.graph-context").removeClass("disabled");
         $(".toolbar .graph-context").removeClass("hide");
     }
@@ -149,7 +146,6 @@ export default class GraphContext extends BaseContext {
     unload() {
         super.unload();
 
-        this.workspace.off(".pinch");
         $(".menu-item.graph-context").addClass("disabled");
         $(".toolbar .graph-context").addClass("hide");
 
@@ -207,46 +203,6 @@ export default class GraphContext extends BaseContext {
         } else {
             $(".toolbar li").removeClass("inactive");
         }
-    }
-
-    /**
-     * Refresh the graph after zooming, keeping the given coordinate
-     * in the same place afterwards.
-     *
-     * @param {number} [pageX] - The x-coordinate in the page to zoom
-     *   into/out of. Defaults to the center of the graph.
-     * @param {number} [pageY] - The y-coordinate in the page to zoom
-     *   into/out of. Defaults to the center of the graph.
-     */
-    refreshZoom(pageX, pageY) {
-        let offset = this.workspace.offset();
-
-        // distance from top-left corner of workspace
-        let left, top;
-        if (_.isUndefined(pageX)) {
-            left = this.workspace.outerWidth() / 2;
-        } else {
-            left = pageX - offset.left;
-        }
-        if (_.isUndefined(pageY)) {
-            top = this.workspace.outerHeight() / 2;
-        } else {
-            top = pageY - offset.top;
-        }
-
-        // steps from top-left corner of field
-        let start = this.grapher.getScale().toSteps({
-            x: this.workspace.scrollLeft() + left,
-            y: this.workspace.scrollTop() + top,
-        });
-
-        this.grapher.redrawZoom();
-        this.refresh("grapher");
-
-        // scroll workspace to keep same location under cursor
-        let end = this.grapher.getScale().toDistance(start);
-        this.workspace.scrollLeft(end.x - left);
-        this.workspace.scrollTop(end.y - top);
     }
 
     /**** METHODS ****/
@@ -448,19 +404,18 @@ export default class GraphContext extends BaseContext {
      *
      * @param {number} delta
      */
-    zoom(delta) {
-        this.grapher.zoom(delta);
-        this.refreshZoom();
+    zoomBy(delta) {
+        this.grapher.zoomBy(delta);
     }
 
     /**
-     * Zoom to the given ratio.
+     * Zoom to the given value.
      *
-     * @param {number} ratio
+     * @param {number} zoom
      */
-    zoomTo(ratio) {
-        this.grapher.setOption("zoom", ratio);
-        this.refreshZoom();
+    zoomTo(zoom) {
+        // make 1.5 the new 100%
+        this.grapher.zoomTo(zoom * 1.5);
     }
 
     /**** HELPERS ****/
