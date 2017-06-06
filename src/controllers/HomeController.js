@@ -124,7 +124,7 @@ export default class HomeController extends ApplicationController {
         if (newTab) {
             window.open(url, "_blank");
         } else {
-            location.href = url;
+            window.location.href = url;
         }
     }
 

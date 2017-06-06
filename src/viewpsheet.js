@@ -9,9 +9,7 @@ $(function() {
     }
 
     let controller = ViewpsheetController.init(window.show);
-    let dot = controller.show.getDot(window.dot);
-    if (dot) {
-        controller.setDots([dot]);
-    }
+    let dots = window.dots.map(id => controller.show.getDot(id));
+    controller.setDots(dots);
 });
 

@@ -178,7 +178,6 @@ export default class Grapher {
      */
     drawNearby(sheet, dot) {
         let targetWidth = this._drawTarget.width();
-        let targetHeight = this._drawTarget.height();
 
         let FieldGrapher = FIELD_GRAPHERS[sheet.getFieldType()];
 
@@ -547,7 +546,7 @@ export default class Grapher {
             }
             dotGroup.append("circle").classed("dot-marker", true);
 
-            let dotLabel = labelsGroup.append("text")
+            labelsGroup.append("text")
                 .classed(`dot-label dot-label-${dot.id}`, true)
                 .text(dot.label);
 

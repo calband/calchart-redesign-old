@@ -67,7 +67,6 @@ export default class StopContinuity extends BaseContinuity {
         }
 
         if (_.isNull(this._duration)) {
-            duration = this.sheet.getDuration();
             return `MT${this.getStepType()} ${orientation}`;
         } else {
             let duration = this._duration * this.getBeatsPerStep();

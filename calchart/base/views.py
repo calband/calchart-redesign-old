@@ -263,5 +263,5 @@ class ViewpsheetView(CalchartMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['show'] = self.show
-        context['dot'] = self.request.GET.get('dot')
+        context['dots'] = self.request.GET.get('dots')
         return context

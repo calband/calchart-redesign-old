@@ -63,8 +63,9 @@ export default class FormPopup extends BasePopup {
             }
         });
 
-        // convert selects
-        this._popup.find("select").dropdown();
+        this._fields.forEach(field => {
+            field.onShow();
+        });
 
         // auto focus on first input
         this._fields[0].getField().focus();

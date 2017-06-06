@@ -63,6 +63,23 @@ $.fn.clickOff = function() {
 };
 
 /**
+ * Call on an element to not scroll the page when scrolling inside the element. Source:
+ * https://github.com/harvesthq/chosen/blob/b1d71127c8e083eec25280e5a07237183fc22b7d/coffee/chosen.jquery.coffee#L147
+ */
+$.fn.containScroll = function() {
+    return this.on("mousewheel DOMMouseScroll", function(e) {
+        if (e.originalEvent !== undefined) {
+            var delta = e.originalEvent.deltaY || -e.originalEvent.wheelDelta || e.originalEvent.detail;
+            e.preventDefault();
+            if (e.type === 'DOMMouseScroll') {
+                delta = delta * 40;
+            }
+            $(this).scrollTop(delta + $(this).scrollTop());
+        }
+    });
+};
+
+/**
  * Convert a <select> element into a fancy dropdown. We use the
  * [Chosen library]{@link http://harvesthq.github.io/chosen/} to
  * convert the selects.

@@ -59,7 +59,7 @@ export default class ViewerController extends ApplicationController {
         // buttons
         $(".buttons .open-viewpsheet").click(e => {
             let dot = this._currDot ? this._currDot.data("dot").id : "";
-            location.href = `/viewpsheet/${this.show.slug}/?dot=${dot}`;
+            window.location.href = `/viewpsheet/${this.show.slug}/?dots=${dot}`;
         });
 
         // select dot

@@ -159,7 +159,7 @@ export default class BaseContinuity {
      *   this is a sheet after this sheet.
      */
     getContinuityText() {
-       throw new NotImplementedError(this);
+        throw new NotImplementedError(this);
     }
 
     /**

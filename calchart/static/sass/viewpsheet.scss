@@ -1,8 +1,35 @@
 @import "partials/vars", "partials/mixins", "partials/functions";
 
+body {
+    min-width: 900px;
+    min-height: 500px;
+}
+
 .content {
     .buttons {
         text-align: center;
+        padding-bottom: 20px;
+    }
+    .viewpsheet {
+        height: calc(100% - 175px);
+        overflow-y: auto;
+        background: $dark-gray;
+        text-align: center;
+        padding: 20px;
+        border: 1px solid $dark-gray;
+        p.no-dots-message {
+            @include vertically-center-self;
+            display: inline-block;
+            background: $white;
+            padding: 15px 20px;
+            font-size: 1.2em;
+        }
+        .page {
+            background: $white;
+            line.page-divider {
+                stroke: $medium-gray;
+            }
+        }
     }
 }
 

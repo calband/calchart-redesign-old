@@ -1,9 +1,8 @@
 import FormPopup from "popups/FormPopup";
 
-import { VIEWPSHEET_ORIENTATIONS } from "utils/CalchartUtils";
 import { ChoiceField } from "utils/fields";
-import HTMLBuilder from "utils/HTMLBuilder";
 import { update } from "utils/JSUtils";
+import { ORIENTATIONS } from "utils/ViewpsheetUtils";
 
 /**
  * The popup to change the settings for generating viewpsheets.
@@ -34,28 +33,30 @@ export default class ViewpsheetSettingsPopup extends FormPopup {
         this._controller.show.getDots().forEach(dot => {
             allDots[dot.id] = dot.label;
         });
-        let dotIds = this._settings.dots.map(dot => dot.id);
 
         return [
-            new ChoiceField("pathOrientation", VIEWPSHEET_ORIENTATIONS, {
+            new ChoiceField("pathOrientation", ORIENTATIONS, {
                 label: "Individual path orientation",
                 initial: this._settings.pathOrientation,
             }),
-            new ChoiceField("nearbyOrientation", VIEWPSHEET_ORIENTATIONS, {
+            new ChoiceField("nearbyOrientation", ORIENTATIONS, {
                 label: "Nearby dots orientation",
                 initial: this._settings.pathOrientation,
             }),
-            new ChoiceField("birdsEyeOrientation", VIEWPSHEET_ORIENTATIONS, {
+            new ChoiceField("birdsEyeOrientation", ORIENTATIONS, {
                 label: "Birds eye orientation",
                 initial: this._settings.pathOrientation,
             }),
             new ChoiceField("layoutLeftRight", layoutLeftRight, {
                 label: "Layout order",
-                initial: this._settings.layoutLeftRight,
+                initial: this._settings.layoutLeftRight ? "leftRight" : "topBottom",
             }),
             new ChoiceField("dots", allDots, {
                 initial: this._settings.dots.map(dot => dot.id),
                 multiple: true,
+                dropdown: {
+                    placeholder_text_multiple: "Select some dots...",
+                },
             }),
         ];
     }
@@ -63,9 +64,11 @@ export default class ViewpsheetSettingsPopup extends FormPopup {
     onSave(data) {
         data.layoutLeftRight = data.layoutLeftRight === "leftRight";
         let show = this._controller.show;
-        data.dots = data.dots.map(id => show.getDot(id));
+        let ids = data.dots;
+        data.dots = ids.map(id => show.getDot(id));
 
         update(this._settings, data);
+        window.history.replaceState(null, "", `?dots=${ids.join(",")}`);
         this._controller.generate();
     }
 }
