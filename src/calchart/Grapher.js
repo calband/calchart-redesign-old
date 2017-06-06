@@ -33,6 +33,7 @@ export default class Grapher {
             backgroundVisible: false,
             boundDots: false,
             dotFormat: "none",
+            dotRadius: 0.75,
             draw4Step: false,
             drawYardlineNumbers: false,
             drawYardlines: true,
@@ -167,6 +168,33 @@ export default class Grapher {
         this._scale = fieldGrapher.getScale();
         this._svgWidth = fieldGrapher.svgWidth;
         this._svgHeight = fieldGrapher.svgHeight;
+    }
+
+    /**
+     * Draw the given sheet, zooming into the given dot and its neighbors.
+     *
+     * @param {Sheet} sheet
+     * @param {Dot} dot
+     */
+    drawNearby(sheet, dot) {
+        let targetWidth = this._drawTarget.width();
+        let targetHeight = this._drawTarget.height();
+
+        let FieldGrapher = FIELD_GRAPHERS[sheet.getFieldType()];
+
+        // width of field (8 steps) in pixels
+        let fieldWidth = targetWidth / 8 * FieldGrapher.FIELD_WIDTH;
+        this._options.zoom = (fieldWidth + this._options.fieldPadding * 2) / targetWidth;
+
+        this.clearField();
+        this.draw(sheet);
+        this._redrawDots();
+
+        let info = sheet.getDotInfo(dot);
+        let position = this._scale.toDistance(info.position);
+        let fourStep = this._scale.toDistance(4);
+        this._drawTarget.scrollLeft(position.x - fourStep);
+        this._drawTarget.scrollTop(position.y - fourStep);
     }
 
     /**
@@ -306,7 +334,7 @@ export default class Grapher {
      * @return {number} The radius of the dots in the Grapher.
      */
     getDotRadius() {
-        return this._scale.toDistance(3/4);
+        return this._scale.toDistance(this._options.dotRadius);
     }
 
     /**
@@ -429,6 +457,7 @@ export default class Grapher {
      *  - {boolean} [boundDots=false] - If true, prevent dots from going out of the SVG.
      *  - {string} [dotFormat="none"] - The format to draw the dots. The available formats
      *    are: none, orientation, dot-type.
+     *  - {number} [dotRadius=0.75] - The radius of the dots to draw
      *  - {boolean} [draw4Step=false] - If true, draws 4 step lines.
      *  - {boolean} [drawYardlineNumbers=false] - If true, draws yardline numbers.
      *  - {boolean} [drawYardlines=true] - If true, draw yardlines and hashes.

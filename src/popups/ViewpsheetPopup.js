@@ -29,6 +29,8 @@ export default class ViewpsheetPopup extends BasePopup {
 
         _.each(this._popup.find(".sheet"), $sheet => {
             let sheet = $($sheet).data("sheet");
+
+            // individual path
             let path = $($sheet).find(".individual-path");
             let pathGrapher = new Grapher(this._controller.show, path, {
                 draw4Step: true,
@@ -39,6 +41,23 @@ export default class ViewpsheetPopup extends BasePopup {
                 zoomable: true,
             });
             pathGrapher.drawPath(sheet, this._dot, true);
+
+            // birds eye
+            let birdsEye = $($sheet).find(".birds-eye");
+            let birdsEyeGrapher = new Grapher(this._controller.show, birdsEye, {
+                dotFormat: "dot-type",
+                dotRadius: 0.5,
+                draw4Step: true,
+                drawYardlineNumbers: true,
+                onZoom: grapher => {
+                    grapher.draw(sheet);
+                },
+                showLabels: true,
+                zoomable: true,
+            });
+            birdsEyeGrapher.drawNearby(sheet, this._dot);
+            let $dot = birdsEyeGrapher.getDot(this._dot);
+            birdsEyeGrapher.selectDots($dot);
         });
 
         this.loadSheet(this._popup.find(".sheet:first"));
@@ -70,13 +89,13 @@ export default class ViewpsheetPopup extends BasePopup {
             });
 
             let path = HTMLBuilder.div("individual-path");
-
-            // TODO: whole formation with dot type
+            let birdsEye = HTMLBuilder.div("birds-eye");
 
             return HTMLBuilder.div("sheet", [
                 header,
                 HTMLBuilder.div("text", [continuities, movements]),
                 path,
+                birdsEye,
             ]).data("sheet", sheet);
         });
 

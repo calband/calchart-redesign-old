@@ -70,7 +70,7 @@ export default class CollegeGrapher extends FieldGrapher {
         });
 
         if (this._options.drawYardlineNumbers) {
-            let fontSize = Math.max(this._scale.toDistance(3), 8);
+            let fontSize = this._scale.toDistance(3);
             this._field
                 .selectAll("text.yardline-label")
                 .data(_.range(0, 210, 5))

@@ -85,10 +85,13 @@ body {
                 }
             }
         }
-        .individual-path {
+        .individual-path, .birds-eye {
             display: inline-block;
-            width: 50%;
+            width: 200px;
             height: 200px;
+        }
+        .individual-path {
+            margin-right: 20px;
             path.path-movements {
                 stroke: $gold;
                 fill: none;

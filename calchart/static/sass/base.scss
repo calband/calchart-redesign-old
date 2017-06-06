@@ -358,6 +358,7 @@ ul.messages {
 
 svg.graph {
     @include unselectable;
+    cursor: default;
     .field {
         .field-background {
             fill: $field-green;
