@@ -89,12 +89,6 @@ export default class GraphContext extends BaseContext {
         if (sheet) {
             this.loadSheet(sheet);
         }
-
-        // TODO: move to grapher with expandField set
-        // initialize grapher with field in view
-        let scale = this.grapher.getScale();
-        this.workspace.scrollLeft(scale.minX - 30);
-        this.workspace.scrollTop(scale.minY - 30);
     }
 
     load(options) {

@@ -73,6 +73,11 @@ export default class Grapher {
         this.drawField();
         this._drawDots();
         this._redrawDots();
+
+        if (this._options.expandField) {
+            this._drawTarget.scrollLeft(this._scale.minX - 30);
+            this._drawTarget.scrollTop(this._scale.minY - 30);
+        }
     }
 
     get svgWidth() { return this._svgWidth; }
