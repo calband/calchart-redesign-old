@@ -143,28 +143,21 @@ export function writeLines(container, lines, wrap) {
         return;
     }
 
-    let words = [];
-    lines.forEach(line => {
-        words = _.concat(words, line.split(/\s/), "\n");
-    });
-    // pop off last "\n"
-    words.pop();
+    // split up lines containing "\n", and split each line into list of words
+    lines = _.flatMap(lines, line => line.split("\n").map(line => line.split(" ")));
 
-    let buffer = [];
-    let line = newline();
-    words.forEach(word => {
-        if (word === "\n") {
-            line = newline();
-            return;
-        }
-
-        buffer.push(word);
-        line.text(buffer.join(" "));
-        if (line.node().getComputedTextLength() > wrap) {
-            buffer.pop();
+    lines.forEach(words => {
+        let buffer = [];
+        let line = newline();
+        words.forEach(word => {
+            buffer.push(word);
             line.text(buffer.join(" "));
-            buffer = [word];
-            line = newline();
-        }
+            if (line.node().getComputedTextLength() > wrap) {
+                buffer.pop();
+                line.text(buffer.join(" "));
+                buffer = [word];
+                line = newline();
+            }
+        });
     });
 }

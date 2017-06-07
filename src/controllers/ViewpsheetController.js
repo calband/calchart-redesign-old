@@ -12,7 +12,7 @@ import {
     QUADRANT_HEIGHT,
     QUADRANT_ROWS,
     QUADRANT_WIDTH,
-    TOP_BOTTOM_QUARDRANTS,
+    TOP_BOTTOM_QUADRANTS,
     WIDGET_MARGIN,
     WIDGET_HEIGHTS,
     writeLines,
@@ -80,7 +80,7 @@ export default class ViewpsheetController extends ApplicationController {
 
             let quadrants = this._settings.layoutLeftRight
                 ? LEFT_RIGHT_QUADRANTS
-                : TOP_BOTTOM_QUARDRANTS;
+                : TOP_BOTTOM_QUADRANTS;
 
             let page;
             this.show.getSheets().forEach((sheet, i) => {
@@ -179,23 +179,24 @@ export default class ViewpsheetController extends ApplicationController {
             .attr("height", WIDGET_HEIGHTS[1] - 2 * WIDGET_MARGIN);
 
         let dotType = sheet.getDotType(dot);
-        let fontSize = 12;
+        let fontSize = 13;
 
-        let dotRadius = fontSize / 2;
+        let dotRadius = fontSize * 0.4;
         let $dot = dotContinuities.append("g")
             .attr("transform", `translate(${WIDGET_MARGIN}, ${WIDGET_MARGIN})`);
         drawDot($dot, dotRadius, dotType);
 
-        let colonPosition = dotRadius * 2 + 2;
+        let colonPosition = dotRadius * 2 + 3;
         let colon = $dot.append("text")
             .text(":")
             .attr("x", colonPosition)
-            .attr("y", colonPosition);
+            .attr("y", colonPosition - 2)
+            .attr("font-size", fontSize);
         align(colon, "bottom", "left");
 
         let continuities = sheet.getContinuities(dotType).map(continuity => continuity.getText());
         let text = dotContinuities.append("text")
-            .attr("x", WIDGET_MARGIN + colonPosition + 10)
+            .attr("x", WIDGET_MARGIN + colonPosition + 7)
             .attr("y", WIDGET_MARGIN)
             .attr("font-size", fontSize);
         align(text, "top", "left");
