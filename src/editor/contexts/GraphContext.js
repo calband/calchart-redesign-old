@@ -1,7 +1,7 @@
 import Coordinate from "calchart/Coordinate";
 import Dot from "calchart/Dot";
-import Grapher from "calchart/Grapher";
 import BaseContext from "editor/contexts/BaseContext";
+import Grapher from "graphers/Grapher";
 import { GraphContextMenus as menus } from "menus/EditorContextMenus";
 import AddSheetPopup from "popups/AddSheetPopup";
 import EditSheetPopup from "popups/EditSheetPopup";

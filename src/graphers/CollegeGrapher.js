@@ -1,4 +1,4 @@
-import FieldGrapher from "calchart/graphers/FieldGrapher";
+import FieldGrapher from "graphers/FieldGrapher";
 
 let HASH_WIDTH = 10;
 

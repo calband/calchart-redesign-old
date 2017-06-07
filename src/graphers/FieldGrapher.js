@@ -1,4 +1,4 @@
-import GrapherScale from "calchart/GrapherScale";
+import GrapherScale from "graphers/GrapherScale";
 
 import { NotImplementedError } from "utils/errors";
 

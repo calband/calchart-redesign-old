@@ -375,7 +375,7 @@ Imports should be organized in two sections, one for utilities and one for all o
 
 ```js
 import AnimationState from "calchart/AnimationState";
-import Grapher from "calchart/Grapher";
+import Show from "calchart/Show";
 import EditorController from "controllers/EditorController";
 
 import HTMLBuilder from "utils/HTMLBuilder";
