@@ -82,3 +82,89 @@ export function align(text, vertical, horizontal) {
     let anchor = alignHorizontal[horizontal];
     text.attr("dominant-baseline", baseline).attr("text-anchor", anchor);
 }
+
+/**
+ * Draw a dot within the given container.
+ *
+ * @param {D3} container - The <g> element to draw the dot in.
+ * @param {number} dotRadius
+ * @param {DotType} dotType
+ */
+export function drawDot(container, dotRadius, dotType) {
+    let dot = container.append("circle")
+        .attr("cx", dotRadius)
+        .attr("cy", dotRadius)
+        .attr("r", dotRadius);
+    if (dotType.match(/plain/)) {
+        dot.attr("fill", "none");
+        dot.attr("stroke", "black");
+    }
+    if (dotType.match(/forwardslash|x/)) {
+        container.append("line")
+            .attr("stroke", "black")
+            .attr("x1", 0)
+            .attr("y1", dotRadius * 2)
+            .attr("x2", dotRadius * 2)
+            .attr("y2", 0);
+    }
+    if (dotType.match(/backslash|x/)) {
+        container.append("line")
+            .attr("stroke", "black")
+            .attr("x1", 0)
+            .attr("y1", 0)
+            .attr("x2", dotRadius * 2)
+            .attr("y2", dotRadius * 2);
+    }
+}
+
+/**
+ * Write the given lines in the given container.
+ *
+ * @param {D3} container - A <text> element to write in.
+ * @param {string[]} lines - Each line will be written below the
+ *   previous line.
+ * @param {number} [wrap] - If given, the width of the container to
+ *   wrap text at.
+ */
+export function writeLines(container, lines, wrap) {
+    let lineNumber = -1;
+    function newline() {
+        lineNumber++;
+        return container.append("tspan")
+            .attr("x", container.attr("x"))
+            .attr("y", container.attr("y"))
+            .attr("dy", `${lineNumber}em`);
+    }
+
+    if (_.isUndefined(wrap)) {
+        lines.forEach(line => {
+            newline().text(line);
+        });
+        return;
+    }
+
+    let words = [];
+    lines.forEach(line => {
+        words = _.concat(words, line.split(/\s/), "\n");
+    });
+    // pop off last "\n"
+    words.pop();
+
+    let buffer = [];
+    let line = newline();
+    words.forEach(word => {
+        if (word === "\n") {
+            line = newline();
+            return;
+        }
+
+        buffer.push(word);
+        line.text(buffer.join(" "));
+        if (line.node().getComputedTextLength() > wrap) {
+            buffer.pop();
+            line.text(buffer.join(" "));
+            buffer = [word];
+            line = newline();
+        }
+    });
+}

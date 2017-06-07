@@ -4,6 +4,7 @@ import ViewpsheetSettingsPopup from "popups/ViewpsheetSettingsPopup";
 import HTMLBuilder from "utils/HTMLBuilder";
 import {
     align,
+    drawDot,
     LABEL_SIZE,
     LEFT_RIGHT_QUADRANTS,
     PAGE_HEIGHT,
@@ -14,6 +15,7 @@ import {
     TOP_BOTTOM_QUARDRANTS,
     WIDGET_MARGIN,
     WIDGET_HEIGHTS,
+    writeLines,
 } from "utils/ViewpsheetUtils";
 
 /**
@@ -65,7 +67,8 @@ export default class ViewpsheetController extends ApplicationController {
      * to PDFs to be downloaded.
      */
     generate() {
-        this.viewpsheet.find("p.no-dots-message").remove();
+        this.viewpsheet.empty();
+
         if (this._settings.dots.length === 0) {
             HTMLBuilder.make("p.no-dots-message", "No dots selected")
                 .appendTo(this.viewpsheet);
@@ -166,11 +169,37 @@ export default class ViewpsheetController extends ApplicationController {
      * @param {Dot} dot
      */
     _drawDotContinuities(quadrant, sheet, dot) {
-        let dotContinuities = quadrant.append("rect")
+        let dotContinuities = quadrant.append("g")
+            .attr("transform", `translate(0, ${QUADRANT_ROWS[1] + WIDGET_MARGIN})`);
+
+        dotContinuities.append("rect")
             .attr("x", 0)
-            .attr("y", QUADRANT_ROWS[1] + WIDGET_MARGIN)
+            .attr("y", 0)
             .attr("width", QUADRANT_WIDTH)
             .attr("height", WIDGET_HEIGHTS[1] - 2 * WIDGET_MARGIN);
+
+        let dotType = sheet.getDotType(dot);
+        let fontSize = 12;
+
+        let dotRadius = fontSize / 2;
+        let $dot = dotContinuities.append("g")
+            .attr("transform", `translate(${WIDGET_MARGIN}, ${WIDGET_MARGIN})`);
+        drawDot($dot, dotRadius, dotType);
+
+        let colonPosition = dotRadius * 2 + 2;
+        let colon = $dot.append("text")
+            .text(":")
+            .attr("x", colonPosition)
+            .attr("y", colonPosition);
+        align(colon, "bottom", "left");
+
+        let continuities = sheet.getContinuities(dotType).map(continuity => continuity.getText());
+        let text = dotContinuities.append("text")
+            .attr("x", WIDGET_MARGIN + colonPosition + 10)
+            .attr("y", WIDGET_MARGIN)
+            .attr("font-size", fontSize);
+        align(text, "top", "left");
+        writeLines(text, continuities, QUADRANT_WIDTH - 2 * WIDGET_MARGIN);
     }
 
     /**
@@ -238,10 +267,10 @@ export default class ViewpsheetController extends ApplicationController {
             .attr("font-size", LABEL_SIZE);
         align(label, "top", "right");
 
-        this._addDotContinuities(quadrant, sheet, dot);
-        this._addIndividualContinuities(quadrant, sheet, dot);
-        this._addMovementDiagram(quadrant, sheet, dot);
-        this._addNearbyDiagram(quadrant, sheet, dot);
+        this._drawDotContinuities(quadrant, sheet, dot);
+        this._drawIndividualContinuities(quadrant, sheet, dot);
+        this._drawMovementDiagram(quadrant, sheet, dot);
+        this._drawNearbyDiagram(quadrant, sheet, dot);
 
         return quadrant;
     }
