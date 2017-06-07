@@ -251,11 +251,27 @@ export default class ViewpsheetController extends ApplicationController {
      * @param {Dot} dot
      */
     _drawMovementDiagram(quadrant, sheet, dot) {
-        let movementDiagram = quadrant.append("rect")
-            .attr("x", QUADRANT_WIDTH / 2 + WIDGET_MARGIN)
-            .attr("y", QUADRANT_ROWS[2] + WIDGET_MARGIN)
-            .attr("width", QUADRANT_WIDTH / 2 - WIDGET_MARGIN)
-            .attr("height", WIDGET_HEIGHTS[2] - 2 * WIDGET_MARGIN);
+        let x = QUADRANT_WIDTH / 2 + WIDGET_MARGIN;
+        let y = QUADRANT_ROWS[2] + WIDGET_MARGIN;
+        let movementDiagram = quadrant.append("g")
+            .attr("transform", `translate(${x}, ${y})`);
+
+        let eastLabel = movementDiagram.append("text")
+            .classed("east-label", true)
+            .text("Cal side")
+            .attr("y", 0)
+            .attr("textLength", 75);
+        align(eastLabel, "top", "center");
+
+        let boxY = $.fromD3(eastLabel).getDimensions().height;
+        let boxWidth = QUADRANT_WIDTH / 2 - WIDGET_MARGIN;
+        let boxHeight = WIDGET_HEIGHTS[2] - 2 * WIDGET_MARGIN - boxY;
+        eastLabel.attr("x", boxWidth / 2);
+        movementDiagram.append("rect")
+            .attr("x", 0)
+            .attr("y", boxY)
+            .attr("width", boxWidth)
+            .attr("height", boxHeight);
     }
 
     /**
