@@ -137,66 +137,6 @@ export default class ViewpsheetController extends ApplicationController {
     }
 
     /**
-     * Add the dot continuities text box
-     *
-     * @param {D3} quadrant
-     * @param {Sheet} sheet
-     * @param {Dot} dot
-     */
-    _addDotContinuities(quadrant, sheet, dot) {
-        let dotContinuities = quadrant.append("rect")
-            .attr("x", 0)
-            .attr("y", QUADRANT_ROWS[1] + WIDGET_MARGIN)
-            .attr("width", QUADRANT_WIDTH)
-            .attr("height", WIDGET_HEIGHTS[1] - 2 * WIDGET_MARGIN);
-    }
-
-    /**
-     * Add the individual continuities text box
-     *
-     * @param {D3} quadrant
-     * @param {Sheet} sheet
-     * @param {Dot} dot
-     */
-    _addIndividualContinuities(quadrant, sheet, dot) {
-        let individualContinuities = quadrant.append("rect")
-            .attr("x", 0)
-            .attr("y", QUADRANT_ROWS[2] + WIDGET_MARGIN)
-            .attr("width", QUADRANT_WIDTH / 2 - WIDGET_MARGIN)
-            .attr("height", WIDGET_HEIGHTS[2] - 2 * WIDGET_MARGIN);
-    }
-
-    /**
-     * Add the movement diagram widget
-     *
-     * @param {D3} quadrant
-     * @param {Sheet} sheet
-     * @param {Dot} dot
-     */
-    _addMovementDiagram(quadrant, sheet, dot) {
-        let movementDiagram = quadrant.append("rect")
-            .attr("x", QUADRANT_WIDTH / 2 + WIDGET_MARGIN)
-            .attr("y", QUADRANT_ROWS[2] + WIDGET_MARGIN)
-            .attr("width", QUADRANT_WIDTH / 2 - WIDGET_MARGIN)
-            .attr("height", WIDGET_HEIGHTS[2] - 2 * WIDGET_MARGIN);
-    }
-
-    /**
-     * Add the nearby dots widget
-     *
-     * @param {D3} quadrant
-     * @param {Sheet} sheet
-     * @param {Dot} dot
-     */
-    _addNearbyDiagram(quadrant, sheet, dot) {
-        let nearbyDiagram = quadrant.append("rect")
-            .attr("x", 0)
-            .attr("y", QUADRANT_ROWS[3] + WIDGET_MARGIN)
-            .attr("width", QUADRANT_WIDTH)
-            .attr("height", WIDGET_HEIGHTS[3] - WIDGET_MARGIN);
-    }
-
-    /**
      * Setup a page for drawing sheets on.
      *
      * @return {D3}
@@ -216,6 +156,66 @@ export default class ViewpsheetController extends ApplicationController {
      */
     _addSummary(dot) {
         // let page = this._addPage()
+    }
+
+    /**
+     * Draw the dot continuities text box
+     *
+     * @param {D3} quadrant
+     * @param {Sheet} sheet
+     * @param {Dot} dot
+     */
+    _drawDotContinuities(quadrant, sheet, dot) {
+        let dotContinuities = quadrant.append("rect")
+            .attr("x", 0)
+            .attr("y", QUADRANT_ROWS[1] + WIDGET_MARGIN)
+            .attr("width", QUADRANT_WIDTH)
+            .attr("height", WIDGET_HEIGHTS[1] - 2 * WIDGET_MARGIN);
+    }
+
+    /**
+     * Draw the individual continuities text box
+     *
+     * @param {D3} quadrant
+     * @param {Sheet} sheet
+     * @param {Dot} dot
+     */
+    _drawIndividualContinuities(quadrant, sheet, dot) {
+        let individualContinuities = quadrant.append("rect")
+            .attr("x", 0)
+            .attr("y", QUADRANT_ROWS[2] + WIDGET_MARGIN)
+            .attr("width", QUADRANT_WIDTH / 2 - WIDGET_MARGIN)
+            .attr("height", WIDGET_HEIGHTS[2] - 2 * WIDGET_MARGIN);
+    }
+
+    /**
+     * Draw the movement diagram widget
+     *
+     * @param {D3} quadrant
+     * @param {Sheet} sheet
+     * @param {Dot} dot
+     */
+    _drawMovementDiagram(quadrant, sheet, dot) {
+        let movementDiagram = quadrant.append("rect")
+            .attr("x", QUADRANT_WIDTH / 2 + WIDGET_MARGIN)
+            .attr("y", QUADRANT_ROWS[2] + WIDGET_MARGIN)
+            .attr("width", QUADRANT_WIDTH / 2 - WIDGET_MARGIN)
+            .attr("height", WIDGET_HEIGHTS[2] - 2 * WIDGET_MARGIN);
+    }
+
+    /**
+     * Draw the nearby dots widget
+     *
+     * @param {D3} quadrant
+     * @param {Sheet} sheet
+     * @param {Dot} dot
+     */
+    _drawNearbyDiagram(quadrant, sheet, dot) {
+        let nearbyDiagram = quadrant.append("rect")
+            .attr("x", 0)
+            .attr("y", QUADRANT_ROWS[3] + WIDGET_MARGIN)
+            .attr("width", QUADRANT_WIDTH)
+            .attr("height", WIDGET_HEIGHTS[3] - WIDGET_MARGIN);
     }
 
     /**
