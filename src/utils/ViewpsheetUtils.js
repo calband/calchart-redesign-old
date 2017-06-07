@@ -123,10 +123,17 @@ export function drawDot(container, dotRadius, dotType) {
  * @param {D3} container - A <text> element to write in.
  * @param {string[]} lines - Each line will be written below the
  *   previous line.
- * @param {number} [wrap] - If given, the width of the container to
- *   wrap text at.
+ * @param {object} [options] - Possible options include:
+ *   - {number} maxWidth - The maximum width for text to wrap at.
+ *   - {number} maxHeight - The maximum height for text to go to,
+ *     at which point, the text will scale in size to fit.
+ *   - {number} [padding=0] - Padding within maxWidth and maxHeight
  */
-export function writeLines(container, lines, wrap) {
+export function writeLines(container, lines, options={}) {
+    options = _.defaults({}, options, {
+        padding: 0,
+    });
+
     let lineNumber = -1;
     function newline() {
         lineNumber++;
@@ -137,28 +144,41 @@ export function writeLines(container, lines, wrap) {
             .attr("dy", `${dy}em`);
     }
 
-    if (_.isUndefined(wrap)) {
+    // split up lines containing "\n"
+    lines = _.flatMap(lines, line => line.split("\n"));
+
+    if (_.isUndefined(options.maxWidth)) {
         lines.forEach(line => {
             newline().text(line);
         });
-        return;
-    }
-
-    // split up lines containing "\n", and split each line into list of words
-    lines = _.flatMap(lines, line => line.split("\n").map(line => line.split(" ")));
-
-    lines.forEach(words => {
-        let buffer = [];
-        let line = newline();
-        words.forEach(word => {
-            buffer.push(word);
-            line.text(buffer.join(" "));
-            if (line.node().getComputedTextLength() > wrap) {
-                buffer.pop();
+    } else {
+        let maxWidth = options.maxWidth - 2 * options.padding;
+        // split line into words
+        lines = lines.map(line => line.split(" "));
+        lines.forEach(words => {
+            let buffer = [];
+            let line = newline();
+            for (let i = 0; i < words.length; i++) {
+                let word = words[i];
+                buffer.push(word);
                 line.text(buffer.join(" "));
-                buffer = [word];
-                line = newline();
+                if (line.node().getComputedTextLength() > maxWidth) {
+                    buffer.pop();
+                    line.text(buffer.join(" "));
+                    line = newline();
+                    buffer = [];
+                    i--;
+                }
             }
         });
-    });
+    }
+
+    if (options.maxHeight) {
+        let maxHeight = options.maxHeight - 2 * options.padding;
+        let textHeight = $.fromD3(container).getDimensions().height;
+        let factor = maxHeight / textHeight;
+        if (factor < 1) {
+            container.attr("transform", `scale(${factor})`);
+        }
+    }
 }

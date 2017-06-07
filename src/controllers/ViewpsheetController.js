@@ -173,11 +173,13 @@ export default class ViewpsheetController extends ApplicationController {
         let dotContinuities = quadrant.append("g")
             .attr("transform", `translate(0, ${y})`);
 
+        let boxWidth = QUADRANT_WIDTH;
+        let boxHeight = WIDGET_HEIGHTS[1] - 2 * WIDGET_MARGIN;
         dotContinuities.append("rect")
             .attr("x", 0)
             .attr("y", 0)
-            .attr("width", QUADRANT_WIDTH)
-            .attr("height", WIDGET_HEIGHTS[1] - 2 * WIDGET_MARGIN);
+            .attr("width", boxWidth)
+            .attr("height", boxHeight);
 
         let dotType = sheet.getDotType(dot);
         let fontSize = 13;
@@ -201,7 +203,11 @@ export default class ViewpsheetController extends ApplicationController {
             .attr("y", WIDGET_MARGIN)
             .attr("font-size", fontSize);
         align(text, "top", "left");
-        writeLines(text, continuities, QUADRANT_WIDTH - 2 * WIDGET_MARGIN);
+        writeLines(text, continuities, {
+            padding: WIDGET_MARGIN,
+            maxWidth: boxWidth,
+            maxHeight: boxHeight,
+        });
     }
 
     /**
@@ -232,7 +238,11 @@ export default class ViewpsheetController extends ApplicationController {
             .attr("y", WIDGET_MARGIN)
             .attr("font-size", fontSize);
         align(text, "top", "left");
-        writeLines(text, movements, boxWidth - 2 * WIDGET_MARGIN);
+        writeLines(text, movements, {
+            padding: WIDGET_MARGIN,
+            maxWidth: boxWidth,
+            maxHeight: boxHeight - fontSize,
+        });
 
         let duration = sheet.getDuration();
         let totalBeats = individualContinuities.append("text")
