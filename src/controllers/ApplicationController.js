@@ -1,7 +1,7 @@
 import Show from "calchart/Show";
 
 import { ActionError } from "utils/errors";
-import { attempt } from "utils/JSUtils";
+import { attempt, newCall } from "utils/JSUtils";
 import { setupTooltip } from "utils/UIUtils";
 
 if (_ === undefined) {
@@ -32,14 +32,15 @@ export default class ApplicationController {
      * Initialize an ApplicationController if one has not already been initialized.
      *
      * @param {(Show|object)} show - The serialized show.
+     * @param {...*} Any other arguments to pass to the constructor
      * @return {ApplicationController} The initialized controller.
      */
     static init(show) {
         if (_.isNull(window.controller)) {
             if (_.isPlainObject(show)) {
-                show = Show.deserialize(show);
+                arguments[0] = Show.deserialize(show);
             }
-            window.controller = new this(show);
+            window.controller = newCall(this, ...arguments);
             window.controller.init();
         }
 

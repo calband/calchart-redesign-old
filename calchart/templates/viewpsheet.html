@@ -9,6 +9,7 @@
     {% add_style "viewpsheet.css" %}
     {% add_script "viewpsheet.js" %}
     <script>
+        window.settings = {{ request.user.viewpsheet_settings|safe }};
         {% if show.viewer %}
             window.show = {{ show.viewer|asjson|safe }};
         {% else %}

@@ -1,7 +1,9 @@
+import SaveViewpSettingsAction from "actions/SaveViewpSettingsAction";
 import ApplicationController from "controllers/ApplicationController";
 import ViewpsheetSettingsPopup from "popups/ViewpsheetSettingsPopup";
 
 import HTMLBuilder from "utils/HTMLBuilder";
+import { update } from "utils/JSUtils";
 import {
     align,
     drawDot,
@@ -21,24 +23,27 @@ import {
 /**
  * The controller that stores the state of the viewpsheet application and contains
  * all of the actions that can be run in the viewpsheet page.
+ *
+ * Settings are saved to server in the User model.
  */
 export default class ViewpsheetController extends ApplicationController {
     /**
      * @param {Show} show - The show being viewed in the application.
+     * @param {int[]} dots - Dot IDs to generate viewpsheets for.
+     * @param {object} settings - User settings for generating viewpsheets.
      */
-    constructor(show) {
+    constructor(show, dots, settings) {
         super(show);
 
-        this._settings = {
+        this._dots = dots.map(id => show.getDot(id));
+        this._settings = _.defaults(settings, {
             // see CalchartUtils.ORIENTATION_OPTIONS
             pathOrientation: "default",
             nearbyOrientation: "default",
             birdsEyeOrientation: "default",
             // {boolean} if true, stuntsheets go left/right; else top/bottom
             layoutLeftRight: true,
-            // {Dot[]}
-            dots: [],
-        };
+        });
     }
 
     get viewpsheet() {
@@ -69,13 +74,13 @@ export default class ViewpsheetController extends ApplicationController {
     generate() {
         this.viewpsheet.empty();
 
-        if (this._settings.dots.length === 0) {
+        if (this._dots.length === 0) {
             HTMLBuilder.make("p.no-dots-message", "No dots selected")
                 .appendTo(this.viewpsheet);
             return;
         }
 
-        this._settings.dots.forEach(dot => {
+        this._dots.forEach(dot => {
             this._addBirdsEye(dot);
 
             let quadrants = this._settings.layoutLeftRight
@@ -112,6 +117,13 @@ export default class ViewpsheetController extends ApplicationController {
     }
 
     /**
+     * @return {Dot[]}
+     */
+    getDots() {
+        return this._dots;
+    }
+
+    /**
      * @return {object}
      */
     getSettings() {
@@ -119,12 +131,21 @@ export default class ViewpsheetController extends ApplicationController {
     }
 
     /**
-     * Set the dots generating viewpsheets for, and re-generate the viewpsheet.
+     * Save settings from the popup and save them on the server.
      *
-     * @param {Dot[]} dots
+     * @param {object} settings
      */
-    setDots(dots) {
-        this._settings.dots = dots;
+    saveSettings(settings) {
+        let ids = settings.dots;
+        this._dots = ids.map(id => this.show.getDot(id));
+        delete settings.dots;
+
+        update(this._settings, settings);
+        window.history.replaceState(null, "", `?dots=${ids.join(",")}`);
+
+        // save to server
+        new SaveViewpSettingsAction().send(this._settings);
+
         this.generate();
     }
 

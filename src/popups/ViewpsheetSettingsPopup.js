@@ -1,7 +1,6 @@
 import FormPopup from "popups/FormPopup";
 
 import { ChoiceField } from "utils/fields";
-import { update } from "utils/JSUtils";
 import { ORIENTATIONS } from "utils/ViewpsheetUtils";
 
 /**
@@ -41,18 +40,18 @@ export default class ViewpsheetSettingsPopup extends FormPopup {
             }),
             new ChoiceField("nearbyOrientation", ORIENTATIONS, {
                 label: "Nearby dots orientation",
-                initial: this._settings.pathOrientation,
+                initial: this._settings.nearbyOrientation,
             }),
             new ChoiceField("birdsEyeOrientation", ORIENTATIONS, {
                 label: "Birds eye orientation",
-                initial: this._settings.pathOrientation,
+                initial: this._settings.birdsEyeOrientation,
             }),
             new ChoiceField("layoutLeftRight", layoutLeftRight, {
                 label: "Layout order",
                 initial: this._settings.layoutLeftRight ? "leftRight" : "topBottom",
             }),
             new ChoiceField("dots", allDots, {
-                initial: this._settings.dots.map(dot => dot.id),
+                initial: this._controller.getDots().map(dot => dot.id),
                 multiple: true,
                 dropdown: {
                     placeholder_text_multiple: "Select some dots...",
@@ -63,12 +62,6 @@ export default class ViewpsheetSettingsPopup extends FormPopup {
 
     onSave(data) {
         data.layoutLeftRight = data.layoutLeftRight === "leftRight";
-        let show = this._controller.show;
-        let ids = data.dots;
-        data.dots = ids.map(id => show.getDot(id));
-
-        update(this._settings, data);
-        window.history.replaceState(null, "", `?dots=${ids.join(",")}`);
-        this._controller.generate();
+        this._controller.saveSettings(data);
     }
 }

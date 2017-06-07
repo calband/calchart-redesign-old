@@ -138,6 +138,18 @@ export function moveElem(array, from, to) {
 }
 
 /**
+ * Call a constructor for a class with dynamic arguments. Source:
+ * https://stackoverflow.com/a/8843181/4966649
+ *
+ * @param {class} Cls
+ * @param {...*} any arguments to pass to the constructor.
+ * @return {Cls}
+ */
+export function newCall(Cls) {
+    return new (Function.prototype.bind.apply(Cls, arguments));
+}
+
+/**
  * Update the given object with the given data, returning an object mapping
  * any keys that have been changed to the old value.
  *
