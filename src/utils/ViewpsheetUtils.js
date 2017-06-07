@@ -45,9 +45,9 @@ export const LABEL_SIZE = 36;
 let totalHeight = QUADRANT_HEIGHT - LABEL_SIZE;
 export const WIDGET_HEIGHTS = [
     LABEL_SIZE,
-    totalHeight / 6,
-    totalHeight / 3,
-    totalHeight / 2,
+    totalHeight / 5,
+    totalHeight * 2/5,
+    totalHeight * 2/5,
 ];
 export const QUADRANT_ROWS = _.reduce(WIDGET_HEIGHTS, (arr, height, i) => {
     arr.push(arr[i] + height);
@@ -130,10 +130,11 @@ export function writeLines(container, lines, wrap) {
     let lineNumber = -1;
     function newline() {
         lineNumber++;
+        // how far each line is from the previous line
+        let dy = lineNumber === 0 ? 0 : 1.2;
         return container.append("tspan")
             .attr("x", container.attr("x"))
-            .attr("y", container.attr("y"))
-            .attr("dy", `${lineNumber}em`);
+            .attr("dy", `${dy}em`);
     }
 
     if (_.isUndefined(wrap)) {

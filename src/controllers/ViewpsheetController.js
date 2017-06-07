@@ -169,8 +169,9 @@ export default class ViewpsheetController extends ApplicationController {
      * @param {Dot} dot
      */
     _drawDotContinuities(quadrant, sheet, dot) {
+        let y = QUADRANT_ROWS[1] + WIDGET_MARGIN;
         let dotContinuities = quadrant.append("g")
-            .attr("transform", `translate(0, ${QUADRANT_ROWS[1] + WIDGET_MARGIN})`);
+            .attr("transform", `translate(0, ${y})`);
 
         dotContinuities.append("rect")
             .attr("x", 0)
@@ -211,11 +212,35 @@ export default class ViewpsheetController extends ApplicationController {
      * @param {Dot} dot
      */
     _drawIndividualContinuities(quadrant, sheet, dot) {
-        let individualContinuities = quadrant.append("rect")
+        let y = QUADRANT_ROWS[2] + WIDGET_MARGIN;
+        let individualContinuities = quadrant.append("g")
+            .attr("transform", `translate(0, ${y})`);
+
+        let boxWidth = QUADRANT_WIDTH / 2 - WIDGET_MARGIN;
+        let boxHeight = WIDGET_HEIGHTS[2] - 2 * WIDGET_MARGIN;
+        let fontSize = 14;
+
+        individualContinuities.append("rect")
             .attr("x", 0)
-            .attr("y", QUADRANT_ROWS[2] + WIDGET_MARGIN)
-            .attr("width", QUADRANT_WIDTH / 2 - WIDGET_MARGIN)
-            .attr("height", WIDGET_HEIGHTS[2] - 2 * WIDGET_MARGIN);
+            .attr("y", 0)
+            .attr("width", boxWidth)
+            .attr("height", boxHeight);
+
+        let movements = sheet.getDotInfo(dot).movements.map(movement => movement.getText());
+        let text = individualContinuities.append("text")
+            .attr("x", WIDGET_MARGIN)
+            .attr("y", WIDGET_MARGIN)
+            .attr("font-size", fontSize);
+        align(text, "top", "left");
+        writeLines(text, movements, boxWidth - 2 * WIDGET_MARGIN);
+
+        let duration = sheet.getDuration();
+        let totalBeats = individualContinuities.append("text")
+            .text(`${duration} beats total`)
+            .attr("x", boxWidth / 2)
+            .attr("y", boxHeight)
+            .attr("font-size", fontSize);
+        align(totalBeats, "bottom", "center");
     }
 
     /**
