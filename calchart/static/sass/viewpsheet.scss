@@ -29,6 +29,10 @@ body {
             line.page-divider {
                 stroke: $medium-gray;
             }
+            rect {
+                stroke: $black;
+                fill: none;
+            }
         }
     }
 }
