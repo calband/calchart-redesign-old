@@ -7,17 +7,21 @@ import HTMLBuilder from "utils/HTMLBuilder";
 import { update } from "utils/JSUtils";
 import {
     align,
+    dotTypeWidget,
     drawDot,
-    LABEL_SIZE,
+    EAST_LABEL_SIZE,
+    individualWidget,
     LEFT_RIGHT_QUADRANTS,
+    move,
+    movementWidget,
+    nearbyWidget,
     PAGE_HEIGHT,
     PAGE_WIDTH,
     QUADRANT_HEIGHT,
-    QUADRANT_ROWS,
     QUADRANT_WIDTH,
+    SHEET_LABEL_SIZE,
     TOP_BOTTOM_QUADRANTS,
     WIDGET_MARGIN,
-    WIDGET_HEIGHTS,
     writeLines,
 } from "utils/ViewpsheetUtils";
 
@@ -94,6 +98,8 @@ export default class ViewpsheetController extends ApplicationController {
 
                 if (quadrant === 0) {
                     page = this._addPage();
+
+                    // page dividers
                     page.append("line")
                         .classed("page-divider", true)
                         .attr("x1", PAGE_WIDTH / 2)
@@ -106,11 +112,19 @@ export default class ViewpsheetController extends ApplicationController {
                         .attr("y1", PAGE_HEIGHT / 2)
                         .attr("x2", PAGE_WIDTH)
                         .attr("y2", PAGE_HEIGHT / 2);
+
+                    // clip-path definitions for diagrams
+                    // (http://tutorials.jenkov.com/svg/clip-path.html)
+                    page.append("defs")
+                        .append("clipPath").attr("id", "clip-movement")
+                        .append("rect")
+                            .attr("width", movementWidget.width)
+                            .attr("height", movementWidget.height);
                 }
 
                 let $sheet = this._generateSheet(page, sheet, dot);
                 let position = quadrants[quadrant];
-                $sheet.attr("transform", `translate(${position.x}, ${position.y})`);
+                move($sheet, position);
             });
 
             this._addSummary(dot);
@@ -191,24 +205,19 @@ export default class ViewpsheetController extends ApplicationController {
      * @param {Dot} dot
      */
     _drawDotContinuities(quadrant, sheet, dot) {
-        let y = QUADRANT_ROWS[1] + WIDGET_MARGIN;
-        let dotContinuities = quadrant.append("g")
-            .attr("transform", `translate(0, ${y})`);
+        let dotContinuities = quadrant.append("g");
+        move(dotContinuities, dotTypeWidget);
 
-        let boxWidth = QUADRANT_WIDTH;
-        let boxHeight = WIDGET_HEIGHTS[1] - 2 * WIDGET_MARGIN;
         dotContinuities.append("rect")
-            .attr("x", 0)
-            .attr("y", 0)
-            .attr("width", boxWidth)
-            .attr("height", boxHeight);
+            .attr("width", dotTypeWidget.width)
+            .attr("height", dotTypeWidget.height);
 
         let dotType = sheet.getDotType(dot);
         let fontSize = 13;
 
         let dotRadius = fontSize * 0.4;
-        let $dot = dotContinuities.append("g")
-            .attr("transform", `translate(${WIDGET_MARGIN}, ${WIDGET_MARGIN})`);
+        let $dot = dotContinuities.append("g");
+        move($dot, WIDGET_MARGIN, WIDGET_MARGIN);
         drawDot($dot, dotRadius, dotType);
 
         let colonPosition = dotRadius * 2 + 3;
@@ -227,8 +236,8 @@ export default class ViewpsheetController extends ApplicationController {
         align(text, "top", "left");
         writeLines(text, continuities, {
             padding: WIDGET_MARGIN,
-            maxWidth: boxWidth,
-            maxHeight: boxHeight,
+            maxWidth: dotTypeWidget.width,
+            maxHeight: dotTypeWidget.height,
         });
     }
 
@@ -240,19 +249,14 @@ export default class ViewpsheetController extends ApplicationController {
      * @param {Dot} dot
      */
     _drawIndividualContinuities(quadrant, sheet, dot) {
-        let y = QUADRANT_ROWS[2] + WIDGET_MARGIN;
-        let individualContinuities = quadrant.append("g")
-            .attr("transform", `translate(0, ${y})`);
+        let individualContinuities = quadrant.append("g");
+        move(individualContinuities, individualWidget);
 
-        let boxWidth = QUADRANT_WIDTH / 2 - WIDGET_MARGIN;
-        let boxHeight = WIDGET_HEIGHTS[2] - 2 * WIDGET_MARGIN;
         let fontSize = 14;
 
         individualContinuities.append("rect")
-            .attr("x", 0)
-            .attr("y", 0)
-            .attr("width", boxWidth)
-            .attr("height", boxHeight);
+            .attr("width", individualWidget.width)
+            .attr("height", individualWidget.height);
 
         let movements = sheet.getDotInfo(dot).movements.map(movement => movement.getText());
         let text = individualContinuities.append("text")
@@ -262,15 +266,15 @@ export default class ViewpsheetController extends ApplicationController {
         align(text, "top", "left");
         writeLines(text, movements, {
             padding: WIDGET_MARGIN,
-            maxWidth: boxWidth,
-            maxHeight: boxHeight - fontSize,
+            maxWidth: individualWidget.width,
+            maxHeight: individualWidget.height - fontSize,
         });
 
         let duration = sheet.getDuration();
         let totalBeats = individualContinuities.append("text")
             .text(`${duration} beats total`)
-            .attr("x", boxWidth / 2)
-            .attr("y", boxHeight)
+            .attr("x", individualWidget.width / 2)
+            .attr("y", individualWidget.height)
             .attr("font-size", fontSize);
         align(totalBeats, "bottom", "center");
     }
@@ -283,37 +287,38 @@ export default class ViewpsheetController extends ApplicationController {
      * @param {Dot} dot
      */
     _drawMovementDiagram(quadrant, sheet, dot) {
-        let x = QUADRANT_WIDTH / 2 + WIDGET_MARGIN;
-        let y = QUADRANT_ROWS[2] + WIDGET_MARGIN;
-        let movementDiagram = quadrant.append("g")
-            .attr("transform", `translate(${x}, ${y})`);
+        let movementDiagram = quadrant.append("g");
+        move(movementDiagram, movementWidget);
 
         let eastLabel = movementDiagram.append("text")
             .classed("east-label", true)
             .text("Cal side")
+            .attr("x", movementWidget.width / 2)
+            .attr("font-size", EAST_LABEL_SIZE)
             .attr("textLength", 75);
         align(eastLabel, "top", "center");
 
-        let labelHeight = $.fromD3(eastLabel).getDimensions().height;
         let graphY = 0;
-        let graphWidth = QUADRANT_WIDTH / 2 - WIDGET_MARGIN;
-        let graphHeight = WIDGET_HEIGHTS[2] - 2 * WIDGET_MARGIN - labelHeight;
 
         let isEast = this._isEast(this._settings.pathOrientation, sheet);
         if (isEast) {
+            let labelHeight = $.fromD3(eastLabel).getDimensions().height;
             graphY = labelHeight;
             eastLabel.attr("y", 0);
         } else {
-            eastLabel.attr("y", graphHeight + WIDGET_MARGIN);
+            eastLabel.attr("y", movementWidget.height + WIDGET_MARGIN);
         }
 
-        eastLabel.attr("x", graphWidth / 2);
-
         let graph = movementDiagram.append("g")
-            .attr("transform", `translate(0, ${graphY})`)
-            .attr("width", graphWidth)
-            .attr("height", graphHeight);
+            .attr("width", movementWidget.width)
+            .attr("height", movementWidget.height)
+            .style("clip-path", "url(#clip-movement)");
+        move(graph, 0, graphY);
         new ViewpsheetGrapher(graph, sheet, dot, isEast).drawPath();
+
+        // TODO: make hashes 2 steps wide (up to 1 step out)
+        // TODO: add distance to E/W landmarks
+        // TODO: add yardline numbers
     }
 
     /**
@@ -324,11 +329,11 @@ export default class ViewpsheetController extends ApplicationController {
      * @param {Dot} dot
      */
     _drawNearbyDiagram(quadrant, sheet, dot) {
-        let nearbyDiagram = quadrant.append("rect")
-            .attr("x", 0)
-            .attr("y", QUADRANT_ROWS[3] + WIDGET_MARGIN)
-            .attr("width", QUADRANT_WIDTH)
-            .attr("height", WIDGET_HEIGHTS[3] - WIDGET_MARGIN);
+        // let nearbyDiagram = quadrant.append("rect")
+        //     .attr("x", 0)
+        //     .attr("y", QUADRANT_ROWS[3] + WIDGET_MARGIN)
+        //     .attr("width", QUADRANT_WIDTH)
+        //     .attr("height", WIDGET_HEIGHTS[3] - WIDGET_MARGIN);
     }
 
     /**
@@ -347,8 +352,8 @@ export default class ViewpsheetController extends ApplicationController {
         let label = quadrant.append("text")
             .text(`SS ${sheet.getLabel()}`)
             .attr("x", QUADRANT_WIDTH)
-            .attr("y", QUADRANT_ROWS[0])
-            .attr("font-size", LABEL_SIZE);
+            .attr("y", 0)
+            .attr("font-size", SHEET_LABEL_SIZE);
         align(label, "top", "right");
 
         this._drawDotContinuities(quadrant, sheet, dot);

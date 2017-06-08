@@ -36,6 +36,7 @@ export default class Grapher {
             draw4Step: false,
             drawYardlineNumbers: false,
             drawYardlines: true,
+            eastUp: false,
             expandField: false,
             fieldPadding: 30,
             labelLeft: true,
@@ -156,17 +157,12 @@ export default class Grapher {
             fieldType = this._show.getFieldType();
         }
 
-        let svgWidth = this._drawTarget.width() * this._options.zoom;
-        let svgHeight = this._drawTarget.height() * this._options.zoom;
+        this._svgWidth = this._drawTarget.width() * this._options.zoom;
+        this._svgHeight = this._drawTarget.height() * this._options.zoom;
 
-        this._svg.insert("g", ":first-child")
-            .classed(`field field-${fieldType}`, true);
-
-        let fieldGrapher = this._getFieldGrapher(fieldType, svgWidth, svgHeight);
+        let fieldGrapher = this._getFieldGrapher(fieldType);
         fieldGrapher.drawField();
         this._scale = fieldGrapher.getScale();
-        this._svgWidth = fieldGrapher.svgWidth;
-        this._svgHeight = fieldGrapher.svgHeight;
     }
 
     /**
@@ -333,6 +329,8 @@ export default class Grapher {
      *  - {boolean} [draw4Step=false] - If true, draws 4 step lines.
      *  - {boolean} [drawYardlineNumbers=false] - If true, draws yardline numbers.
      *  - {boolean} [drawYardlines=true] - If true, draw yardlines and hashes.
+     *  - {boolean} [eastUp=false] - If true, orient the field to have the east side be the top
+     *    edge. By default, draws the west side on top.
      *  - {boolean} [expandField=false] - If true, expand the boundaries of the field beyond the
      *    field (and fieldPadding).
      *  - {number} [fieldPadding=30] - The minimum amount of space between the field and the SVG,
@@ -432,14 +430,28 @@ export default class Grapher {
      * Get the FieldGrapher of the given type.
      *
      * @param {string} fieldType - The field type of the FieldGrapher to get.
-     * @param {number} svgWidth - The width of the SVG to pass to the FieldGrapher.
-     * @param {number} svgHeight - The height of the SVG to pass to the FieldGrapher.
      * @return {FieldGrapher}
      */
-    _getFieldGrapher(fieldType, svgWidth, svgHeight) {
+    _getFieldGrapher(fieldType) {
+        let field = this._svg.insert("g", ":first-child")
+            .classed(`field field-${fieldType}`, true);
+
+        let options = _.clone(this._options);
+
+        // expand field to a field and a half in each direction
+        if (options.expandField) {
+            options.fieldPadding += this._svgWidth * 1.5;
+            this._svgWidth *= 4;
+            this._svgHeight *= 4;
+        }
+
+        this._svg
+            .attr("width", this._svgWidth)
+            .attr("height", this._svgHeight);
+
         let FieldGrapher = FIELD_GRAPHERS[fieldType];
         if (FieldGrapher) {
-            return new FieldGrapher(this._svg, svgWidth, svgHeight, this._options);
+            return new FieldGrapher(field, this._svgWidth, this._svgHeight, options);
         } else {
             throw new Error(`No FieldGrapher of type: ${fieldType}`);
         }

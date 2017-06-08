@@ -27,8 +27,15 @@ body {
         .page {
             background: $white;
             margin-bottom: 20px;
-            line.page-divider {
-                stroke: $medium-gray;
+            line {
+                stroke: $black;
+                &.page-divider {
+                    stroke: $medium-gray;
+                }
+                &.four-step {
+                    stroke: $medium-gray;
+                    stroke-dasharray: 5;
+                }
             }
             path {
                 stroke: $black;
@@ -38,9 +45,10 @@ body {
                 stroke: $black;
                 fill: none;
             }
-            text.east-label {
-                text-transform: uppercase;
-                font-size: 10px;
+            text {
+                &.east-label {
+                    text-transform: uppercase;
+                }
             }
         }
     }

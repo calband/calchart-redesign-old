@@ -7,33 +7,19 @@ import { NotImplementedError } from "utils/errors";
  */
 export default class FieldGrapher {
     /**
-     * @param {D3} svg - The SVG element to draw the field in.
+     * @param {D3} field - The SVG element to draw the field in.
      * @param {number} svgWidth - The width of the svg.
      * @param {number} svgHeight - The height of the svg.
      * @param {Object} options - The options to customize drawing the field.
      *   See Grapher.setOption for a list of all available options.
      */
-    constructor(svg, svgWidth, svgHeight, options) {
-        this._svg = svg;
-        this._options = options;
+    constructor(field, svgWidth, svgHeight, options) {
+        this._field = field;
         this._svgWidth = svgWidth;
         this._svgHeight = svgHeight;
+        this._options = options;
 
-        let padding = options.fieldPadding;
-
-        // expand field to a field and a half in each direction
-        if (options.expandField) {
-            padding += this._svgWidth * 1.5;
-            this._svgWidth *= 4;
-            this._svgHeight *= 4;
-        }
-
-        this._svg
-            .attr("width", this._svgWidth)
-            .attr("height", this._svgHeight);
-
-        this._field = svg.select(".field");
-        this._scale = new GrapherScale(this, this._svgWidth, this._svgHeight, { padding });
+        this._scale = new GrapherScale(this, this._svgWidth, this._svgHeight, options);
     }
 
     /**
@@ -50,11 +36,8 @@ export default class FieldGrapher {
         throw new NotImplementedError(this);
     }
 
-    // get dimensions of the SVG
     get FIELD_HEIGHT() { return this.constructor.FIELD_HEIGHT; }
     get FIELD_WIDTH() { return this.constructor.FIELD_WIDTH; }
-    get svgWidth() { return this._svgWidth; }
-    get svgHeight() { return this._svgHeight; }
 
     /**
      * Draw the field.

@@ -10,13 +10,7 @@ export default class CollegeGrapher extends FieldGrapher {
     static get FIELD_WIDTH() { return 160; }
 
     drawField() {
-        // GrapherScale aliases
-        let xScale = this._scale.xScale;
-        let yScale = this._scale.yScale;
-        let EAST = this._scale.maxY;
-        let SOUTH = this._scale.minX;
-        let WEST = this._scale.minY;
-        let NORTH = this._scale.maxX;
+        let scale = this._scale;
 
         // field background
         this._field.append("rect")
@@ -27,13 +21,43 @@ export default class CollegeGrapher extends FieldGrapher {
         // sideline box/field border
         this._field.append("rect")
             .attr("class", "field-border")
-            .attr("width", this._scale.width)
-            .attr("height", this._scale.height)
-            .attr("x", SOUTH)
-            .attr("y", WEST);
+            .attr("width", scale.width)
+            .attr("height", scale.height)
+            .attr("x", scale.minX)
+            .attr("y", scale.minY);
 
         if (this._options.drawYardlines === false) {
             return;
+        }
+
+        if (this._options.draw4Step) {
+            this._field.selectAll("line.four-step")
+                .data(_.range(40)) // 20 horizontal, 20 vertical
+                .enter()
+                .append("line")
+                .classed("four-step", true)
+                .each(function(d) {
+                    let x1 = scale.minX;
+                    let x2 = scale.maxX;
+                    let y1 = scale.minY;
+                    let y2 = scale.maxY;
+
+                    if (d < 20) {
+                        // horizontal
+                        y1 = scale.yScale(d * 4 + 4);
+                        y2 = y1;
+                    } else {
+                        // vertical
+                        x1 = scale.xScale((d - 20) * 8 + 4);
+                        x2 = x1;
+                    }
+
+                    d3.select(this)
+                        .attr("x1", x1)
+                        .attr("y1", y1)
+                        .attr("x2", x2)
+                        .attr("y2", y2);
+                });
         }
 
         let yardlineSteps = _.range(8, 160, 8);
@@ -44,14 +68,14 @@ export default class CollegeGrapher extends FieldGrapher {
             .enter()
             .append("line")
             .classed("yardline", true)
-            .attr("x1", xScale)
-            .attr("y1", WEST)
-            .attr("x2", xScale)
-            .attr("y2", EAST);
+            .attr("x1", scale.xScale)
+            .attr("y1", scale.minY)
+            .attr("x2", scale.xScale)
+            .attr("y2", scale.maxY);
 
         // hash marks
         [true, false].forEach(isBack => {
-            let y = yScale(isBack ? 32 : 52);
+            let y = scale.yScale(isBack ? 32 : 52);
             let name = isBack ? "back-hash" : "front-hash";
 
             this._field.selectAll(`line.hash.${name}`)
@@ -62,7 +86,7 @@ export default class CollegeGrapher extends FieldGrapher {
                 .attr("y1", y)
                 .attr("y2", y)
                 .each(function(d) {
-                    let offsetX = xScale(d);
+                    let offsetX = scale.xScale(d);
                     d3.select(this)
                         .attr("x1", offsetX - HASH_WIDTH / 2)
                         .attr("x2", offsetX + HASH_WIDTH / 2);
@@ -70,7 +94,7 @@ export default class CollegeGrapher extends FieldGrapher {
         });
 
         if (this._options.drawYardlineNumbers) {
-            let fontSize = this._scale.toDistance(3);
+            let fontSize = scale.toDistance(3);
             this._field
                 .selectAll("text.yardline-label")
                 .data(_.range(0, 210, 5))
@@ -95,46 +119,16 @@ export default class CollegeGrapher extends FieldGrapher {
                     let y;
 
                     if (d > 100) {
-                        y = EAST + fontSize;
+                        y = scale.maxY + fontSize;
                         d -= 105;
                     } else {
-                        y = WEST - fontSize / 3;
+                        y = scale.minY - fontSize / 3;
                     }
 
                     let width = $.fromD3(label).getDimensions().width;
-                    let x = xScale(d * 8/5) - width/2;
+                    let x = scale.xScale(d * 8/5) - width/2;
 
                     label.attr("x", x).attr("y", y);
-                });
-        }
-
-        if (this._options.draw4Step) {
-            this._field.selectAll("line.four-step")
-                .data(_.range(40)) // 20 horizontal, 20 vertical
-                .enter()
-                .append("line")
-                .classed("four-step", true)
-                .each(function(d) {
-                    let x1 = SOUTH;
-                    let x2 = NORTH;
-                    let y1 = WEST;
-                    let y2 = EAST;
-
-                    if (d < 20) {
-                        // horizontal
-                        y1 = yScale(d * 4 + 4);
-                        y2 = y1;
-                    } else {
-                        // vertical
-                        x1 = xScale((d - 20) * 8 + 4);
-                        x2 = x1;
-                    }
-
-                    d3.select(this)
-                        .attr("x1", x1)
-                        .attr("y1", y1)
-                        .attr("x2", x2)
-                        .attr("y2", y2);
                 });
         }
     }

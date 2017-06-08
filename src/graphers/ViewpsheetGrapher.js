@@ -1,7 +1,9 @@
 import Coordinate from "calchart/Coordinate";
 import MovementCommandArc from "calchart/movements/MovementCommandArc";
+import FieldGrapher from "graphers/FieldGrapher";
 import { FIELD_GRAPHERS } from "graphers/Grapher";
-import GrapherScale from "graphers/GrapherScale";
+
+import { move } from "utils/ViewpsheetUtils";
 
 if (_.isUndefined(d3)) {
     console.error("D3 is not loaded!");
@@ -27,10 +29,11 @@ export default class ViewpsheetGrapher {
         this._isEast = isEast;
 
         let fieldType = this._sheet.getFieldType();
-        this._fieldGrapher = FIELD_GRAPHERS[fieldType];
-        this._fieldWidth = this._fieldGrapher.FIELD_WIDTH;
-        this._fieldHeight = this._fieldGrapher.FIELD_HEIGHT;
+        this._FieldGrapher = FIELD_GRAPHERS[fieldType];
+        this._fieldWidth = this._FieldGrapher.FIELD_WIDTH;
+        this._fieldHeight = this._FieldGrapher.FIELD_HEIGHT;
 
+        this._field = null;
         this._scale = null;
     }
 
@@ -52,6 +55,8 @@ export default class ViewpsheetGrapher {
             draw4Step: false,
             drawYardlineNumbers: false,
             drawYardlines: true,
+            eastUp: this._isEast,
+            fieldPadding: 0,
         });
 
         // width/height of field in steps
@@ -79,19 +84,28 @@ export default class ViewpsheetGrapher {
         let fieldWidth = this._width * this._fieldWidth / width;
         let fieldHeight = this._height * this._fieldHeight / height;
 
-        this._scale = new GrapherScale(this._fieldGrapher, fieldWidth, fieldHeight, {
-            keepRatio: false,
-        });
-        this._bounds = { minX, maxX, minY, maxY };
-
-        // border
+        // field border
         this._drawTarget.append("rect")
-            .attr("x", 0)
-            .attr("y", 0)
             .attr("width", this._width)
             .attr("height", this._height);
 
-        // TODO: draw field
+        this._field = this._drawTarget.append("g");
+
+        let fieldGrapher = new this._FieldGrapher(this._field, fieldWidth, fieldHeight, options);
+        fieldGrapher.drawField();
+        this._scale = fieldGrapher.getScale();
+
+        let offsetX, offsetY;
+        if (this._isEast) {
+            offsetX = maxX;
+            offsetY = maxY;
+        } else {
+            offsetX = minX;
+            offsetY = minY;
+        }
+        offsetX = this._scale.toDistanceX(offsetX);
+        offsetY = this._scale.toDistanceY(offsetY);
+        move(this._field, -offsetX, -offsetY);
     }
 
     // /**
@@ -158,50 +172,27 @@ export default class ViewpsheetGrapher {
         });
 
         // draw path
-        let position = this.toDistance(info.position);
+        let position = this._scale.toDistance(info.position);
         let pathDef = `M ${position.x} ${position.y}`;
         info.movements.forEach(movement => {
             if (movement instanceof MovementCommandArc) {
-                let arcPath = movement.getPathDef(this);
+                let arcPath = movement.getPathDef(this._scale);
                 pathDef += ` ${arcPath}`;
             } else {
-                let position = this.toDistance(movement.getEndPosition());
+                let position = this._scale.toDistance(movement.getEndPosition());
                 pathDef += ` L ${position.x} ${position.y}`;
             }
         });
 
         let dotRadius = this._scale.toDistance(0.75);
-        this._drawTarget.append("path")
+        this._field.append("path")
             .classed("path-movements", true)
             .attr("d", pathDef)
             .attr("stroke-width", dotRadius / 1.5);
-        this._drawTarget.append("circle")
+        this._field.append("circle")
             .classed("start-position", true)
             .attr("cx", position.x)
             .attr("cy", position.y)
             .attr("r", dotRadius * 1.25);
-    }
-
-    /**
-     * Convert the given parameter from steps into distance, taking into account
-     * the new bounds of the graph.
-     *
-     * @param {(number|Coordinate)} steps
-     * @return {(number|Coordinate)}
-     */
-    toDistance(steps) {
-        if (_.isNumber(steps)) {
-            return this._scale.toDistance(steps);
-        } else {
-            let { x, y } = steps;
-            if (this._isEast) {
-                x = this._bounds.maxX - x;
-                y = this._bounds.maxY - y;
-            } else {
-                x -= this._bounds.minX;
-                y -= this._bounds.minY;
-            }
-            return this._scale.toDistance({ x, y });
-        }
     }
 }
