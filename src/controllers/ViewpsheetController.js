@@ -13,6 +13,9 @@ import {
 } from "utils/SVGUtils";
 import {
     addEastLabel,
+    birdsEyePerColumn,
+    birdsEyeGraphs,
+    birdsEyeWidget,
     dotTypeWidget,
     EAST_LABEL_SIZE,
     individualWidget,
@@ -20,10 +23,12 @@ import {
     movementWidget,
     nearbyWidget,
     PAGE_HEIGHT,
+    PAGE_MARGIN,
     PAGE_WIDTH,
     QUADRANT_HEIGHT,
     QUADRANT_WIDTH,
     SHEET_LABEL_SIZE,
+    TITLE_LABEL_SIZE,
     TOP_BOTTOM_QUADRANTS,
     WIDGET_MARGIN,
 } from "utils/ViewpsheetUtils";
@@ -46,9 +51,9 @@ export default class ViewpsheetController extends ApplicationController {
         this._dots = dots.map(id => show.getDot(id));
         this._settings = _.defaults(settings, {
             // see CalchartUtils.ORIENTATION_OPTIONS
-            pathOrientation: "default",
-            nearbyOrientation: "default",
-            birdsEyeOrientation: "default",
+            pathOrientation: "west",
+            nearbyOrientation: "west",
+            birdsEyeOrientation: "west",
             // {boolean} if true, stuntsheets go left/right; else top/bottom
             layoutLeftRight: true,
         });
@@ -133,6 +138,11 @@ export default class ViewpsheetController extends ApplicationController {
                         .append("rect")
                             .attr("width", nearbyWidget.width)
                             .attr("height", nearbyWidget.height);
+                    page.append("defs")
+                        .append("clipPath").attr("id", "clip-birds-eye")
+                        .append("rect")
+                            .attr("width", birdsEyeWidget.width)
+                            .attr("height", birdsEyeWidget.height);
                 }
 
                 let $sheet = this._generateSheet(page, sheet, dot);
@@ -185,8 +195,43 @@ export default class ViewpsheetController extends ApplicationController {
      * @param {Dot} dot
      */
     _addBirdsEye(dot) {
-        // TODO
-        // let page = this._addPage()
+        let columnXs = [0, PAGE_WIDTH/2];
+        let page;
+        this.show.getSheets().forEach((sheet, i) => {
+            let pageI = i % (birdsEyePerColumn * 2);
+            if (pageI === 0) {
+                page = this._addPage();
+                let title = page.append("text")
+                    .text(`${this.show.name}: Dot ${dot.label}`)
+                    .attr("font-size", TITLE_LABEL_SIZE);
+                align(title, "top", "center");
+                move(title, PAGE_WIDTH/2, PAGE_MARGIN);
+            }
+
+            let x = columnXs[Math.floor(pageI / birdsEyePerColumn)] + PAGE_MARGIN;
+            let y = birdsEyeGraphs.height * (pageI % birdsEyePerColumn) + TITLE_LABEL_SIZE + PAGE_MARGIN;
+            let $sheet = page.append("g");
+            move($sheet, x, y);
+
+            let label = $sheet.append("text")
+                .text(sheet.getIndex())
+                .attr("font-size", SHEET_LABEL_SIZE)
+                .attr("y", birdsEyeGraphs.height/2);
+            align(label, "center", "left");
+
+            let birdsEye = $sheet.append("g");
+            move(birdsEye, birdsEyeWidget);
+
+            let isEast = this._isEast(this._settings.birdsEyeOrientation, sheet);
+            let graphY = addEastLabel(birdsEye, birdsEyeWidget, isEast);
+
+            let graph = birdsEye.append("g")
+                .attr("width", birdsEyeWidget.width)
+                .attr("height", birdsEyeWidget.height)
+                .style("clip-path", "url(#clip-birds-eye)");
+            move(graph, 0, graphY);
+            new ViewpsheetGrapher(graph, sheet, dot, isEast).drawBirdsEye();
+        });
     }
 
     /**
@@ -315,6 +360,12 @@ export default class ViewpsheetController extends ApplicationController {
             .attr("height", movementWidget.height)
             .style("clip-path", "url(#clip-movement)");
         move(graph, 0, graphY);
+
+        // field border
+        graph.append("rect")
+            .attr("width", movementWidget.width)
+            .attr("height", movementWidget.height);
+
         new ViewpsheetGrapher(graph, sheet, dot, isEast).drawPath();
 
         // TODO: make interactive
@@ -339,6 +390,12 @@ export default class ViewpsheetController extends ApplicationController {
             .attr("height", nearbyWidget.height)
             .style("clip-path", "url(#clip-nearby)");
         move(graph, 0, graphY);
+
+        // field border
+        graph.append("rect")
+            .attr("width", nearbyWidget.width)
+            .attr("height", nearbyWidget.height);
+
         new ViewpsheetGrapher(graph, sheet, dot, isEast).drawNearby();
 
         // TODO: make interactive

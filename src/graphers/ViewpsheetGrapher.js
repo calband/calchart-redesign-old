@@ -85,15 +85,11 @@ export default class ViewpsheetGrapher {
         let fieldWidth = this._width * this._fieldWidth / width;
         let fieldHeight = this._height * this._fieldHeight / height;
 
-        // field border
-        this._drawTarget.append("rect")
-            .attr("width", this._width)
-            .attr("height", this._height);
-
         this._field = this._drawTarget.append("g");
 
         let fieldGrapher = new this._FieldGrapher(this._field, fieldWidth, fieldHeight, options);
         fieldGrapher.drawField();
+        this._field.select(".field-background").remove();
         this._scale = fieldGrapher.getScale();
 
         // convert to distance
@@ -128,6 +124,53 @@ export default class ViewpsheetGrapher {
         yardlineLabels
             .attr("letter-spacing", 3)
             .attr("font-size", this._scale.toDistance(2));
+    }
+
+    /**** VIEWPSHEET METHODS ****/
+
+    /**
+     * Draw the birds eye view of the sheet, highlighting the current dot.
+     */
+    drawBirdsEye() {
+        this.drawField(0, this._fieldWidth, 0, this._fieldHeight, {
+            drawYardlines: false,
+        });
+
+        // draw some guide lines
+        let fifty = this._scale.toDistanceX(50 * 8/5);
+        this._field.append("line")
+            .classed("birds-eye-guides", true)
+            .attr("x1", fifty)
+            .attr("y1", this._scale.minY)
+            .attr("x2", fifty)
+            .attr("y2", this._scale.maxY);
+        let eastHash = this._scale.toDistanceY(32);
+        this._field.append("line")
+            .classed("birds-eye-guides", true)
+            .attr("x1", this._scale.minX)
+            .attr("y1", eastHash)
+            .attr("x2", this._scale.maxX)
+            .attr("y2", eastHash);
+        let westHash = this._scale.toDistanceY(52);
+        this._field.append("line")
+            .classed("birds-eye-guides", true)
+            .attr("x1", this._scale.minX)
+            .attr("y1", westHash)
+            .attr("x2", this._scale.maxX)
+            .attr("y2", westHash);
+
+        let dotRadius = this._scale.toDistance(1);
+        this._sheet.show.getDots().forEach(dot => {
+            let info = this._sheet.getDotInfo(dot);
+            let position = this._scale.toDistance(info.position);
+
+            let $dot = this._field.append("circle")
+                .classed("birds-eye-dot", true)
+                .classed("curr-dot", dot === this._dot)
+                .attr("cx", position.x)
+                .attr("cy", position.y)
+                .attr("r", dotRadius);
+        });
     }
 
     /**

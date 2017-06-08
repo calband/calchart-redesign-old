@@ -7,11 +7,12 @@
  * <text> elements are aligned on the bottom-right corner.
  *
  * @param {D3} text
- * @param {string} vertical - top|bottom
+ * @param {string} vertical - top|center|bottom
  * @param {string} horizontal - left|center|right
  */
 let alignVertical = {
     top: "text-before-edge",
+    center: "middle",
     bottom: "text-after-edge",
 };
 let alignHorizontal = {

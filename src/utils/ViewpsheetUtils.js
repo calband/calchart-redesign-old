@@ -10,7 +10,7 @@ export const PAGE_HEIGHT = PAGE_WIDTH * 11 / 8.5;
 
 // .25" margin for 8.5x11 page
 export const PAGE_MARGIN = PAGE_WIDTH / 34;
-export const WIDGET_MARGIN = 7;
+export const WIDGET_MARGIN = 5;
 
 // each quadrant corresponds with a stuntsheet
 export const QUADRANT_HEIGHT = PAGE_HEIGHT / 2 - PAGE_MARGIN * 2;
@@ -37,8 +37,10 @@ export const LEFT_RIGHT_QUADRANTS = [
 ];
 export const TOP_BOTTOM_QUADRANTS = [0, 2, 1, 3].map(i => LEFT_RIGHT_QUADRANTS[i]);
 
+// font size of viewpsheet title
+export const TITLE_LABEL_SIZE = 24;
 // font size of sheet label
-export const SHEET_LABEL_SIZE = 36;
+export const SHEET_LABEL_SIZE = 24;
 // font size of east sideline label
 export const EAST_LABEL_SIZE = 10;
 
@@ -52,6 +54,19 @@ let widgetHeights = [
     totalHeight * 2/5,
 ];
 
+// information for the birds eye graphs
+export const birdsEyePerColumn = 6;
+export const birdsEyeGraphs = {
+    width: QUADRANT_WIDTH,
+    height: (PAGE_HEIGHT - 2 * PAGE_MARGIN - TITLE_LABEL_SIZE) / birdsEyePerColumn,
+};
+export const birdsEyeWidget = {
+    x: SHEET_LABEL_SIZE,
+    y: WIDGET_MARGIN,
+    width: birdsEyeGraphs.width - SHEET_LABEL_SIZE,
+    height: birdsEyeGraphs.height - 2 * WIDGET_MARGIN - EAST_LABEL_SIZE,
+};
+
 // information for the dot continuities widget
 export const dotTypeWidget = {
     x: 0,
@@ -63,14 +78,14 @@ export const dotTypeWidget = {
 // information for the individual continuities widget
 export const individualWidget = {
     x: 0,
-    y: dotTypeWidget.y + dotTypeWidget.height + WIDGET_MARGIN,
-    width: QUADRANT_WIDTH / 2 - WIDGET_MARGIN / 2,
+    y: widgetHeights[0] + widgetHeights[1] + WIDGET_MARGIN,
+    width: QUADRANT_WIDTH / 2 - WIDGET_MARGIN,
     height: widgetHeights[2] - 2 * WIDGET_MARGIN,
 };
 
 // information for the movement diagram widget
 export const movementWidget = _.extend({}, individualWidget, {
-    x: QUADRANT_WIDTH / 2 + WIDGET_MARGIN / 2,
+    x: QUADRANT_WIDTH / 2 + WIDGET_MARGIN,
     // account for east label
     height: individualWidget.height - EAST_LABEL_SIZE - 2,
 });
@@ -78,7 +93,7 @@ export const movementWidget = _.extend({}, individualWidget, {
 // information for the nearby dots widget
 export const nearbyWidget = {
     x: 0,
-    y: individualWidget.y + individualWidget.height + WIDGET_MARGIN,
+    y: widgetHeights[0] + widgetHeights[1] + widgetHeights[2] + WIDGET_MARGIN,
     width: QUADRANT_WIDTH,
     height: widgetHeights[3] - WIDGET_MARGIN - EAST_LABEL_SIZE - 2,
 };
@@ -106,13 +121,14 @@ export function addEastLabel(container, widget, isEast) {
         .attr("x", widget.width / 2)
         .attr("font-size", EAST_LABEL_SIZE)
         .attr("textLength", 75);
-    align(eastLabel, "top", "center");
 
     if (isEast) {
         eastLabel.attr("y", 0);
+        align(eastLabel, "top", "center");
         return $.fromD3(eastLabel).getDimensions().height;
     } else {
-        eastLabel.attr("y", movementWidget.height + WIDGET_MARGIN);
+        eastLabel.attr("y", widget.height + EAST_LABEL_SIZE + 5);
+        align(eastLabel, "bottom", "center");
         return 0;
     }
 }

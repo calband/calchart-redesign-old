@@ -27,14 +27,26 @@ body {
         .page {
             background: $white;
             margin-bottom: 20px;
+            circle {
+                &.birds-eye-dot {
+                    fill: lighten($black, 60);
+                    &.curr-dot {
+                        fill: $black;
+                    }
+                }
+            }
             line {
                 stroke: $black;
-                &.page-divider {
-                    stroke: $medium-gray;
+                &.birds-eye-guides {
+                    stroke: $semilight-gray;
+                    stroke-dasharray: 5;
                 }
                 &.four-step {
                     stroke: $medium-gray;
                     stroke-dasharray: 5;
+                }
+                &.page-divider {
+                    stroke: $medium-gray;
                 }
             }
             path {
