@@ -56,8 +56,8 @@ export const QUADRANT_ROWS = _.reduce(WIDGET_HEIGHTS, (arr, height, i) => {
 
 export const ORIENTATIONS = {
     default: "Default",
-    east: "Always East",
-    west: "Always West",
+    east: "Always East Up",
+    west: "Always West Up",
 };
 
 /**

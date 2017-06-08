@@ -291,19 +291,29 @@ export default class ViewpsheetController extends ApplicationController {
         let eastLabel = movementDiagram.append("text")
             .classed("east-label", true)
             .text("Cal side")
-            .attr("y", 0)
             .attr("textLength", 75);
         align(eastLabel, "top", "center");
 
-        let graphY = $.fromD3(eastLabel).getDimensions().height;
+        let labelHeight = $.fromD3(eastLabel).getDimensions().height;
+        let graphY = 0;
         let graphWidth = QUADRANT_WIDTH / 2 - WIDGET_MARGIN;
-        let graphHeight = WIDGET_HEIGHTS[2] - 2 * WIDGET_MARGIN - graphY;
+        let graphHeight = WIDGET_HEIGHTS[2] - 2 * WIDGET_MARGIN - labelHeight;
+
+        let isEast = this._isEast(this._settings.pathOrientation, sheet);
+        if (isEast) {
+            graphY = labelHeight;
+            eastLabel.attr("y", 0);
+        } else {
+            eastLabel.attr("y", graphHeight + WIDGET_MARGIN);
+        }
 
         eastLabel.attr("x", graphWidth / 2);
 
         let graph = movementDiagram.append("g")
-            .attr("transform", `translate(0, ${graphY})`);
-        new ViewpsheetGrapher(graph, graphWidth, graphHeight, sheet, dot).drawPath();
+            .attr("transform", `translate(0, ${graphY})`)
+            .attr("width", graphWidth)
+            .attr("height", graphHeight);
+        new ViewpsheetGrapher(graph, sheet, dot, isEast).drawPath();
     }
 
     /**
@@ -347,5 +357,24 @@ export default class ViewpsheetController extends ApplicationController {
         this._drawNearbyDiagram(quadrant, sheet, dot);
 
         return quadrant;
+    }
+
+    /**
+     * Check if the given option is set to "east", or if "default", if the
+     * given Sheet resolves to east.
+     *
+     * @param {string} option
+     * @param {Sheet} sheet
+     * @return {boolean}
+     */
+    _isEast(option, sheet) {
+        switch (option) {
+            case "east":
+                return true;
+            case "west":
+                return false;
+            case "default":
+                return sheet.getOrientationDegrees() === 0;
+        }
     }
 }

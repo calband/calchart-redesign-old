@@ -19,13 +19,11 @@ export default class FieldGrapher {
         this._svgWidth = svgWidth;
         this._svgHeight = svgHeight;
 
-        let paddingWidth = options.fieldPadding;
-        let paddingHeight = options.fieldPadding;
+        let padding = options.fieldPadding;
 
         // expand field to a field and a half in each direction
         if (options.expandField) {
-            paddingWidth += this._svgWidth * 1.5;
-            paddingHeight += this._svgHeight * 1.5;
+            padding += this._svgWidth * 1.5;
             this._svgWidth *= 4;
             this._svgHeight *= 4;
         }
@@ -35,7 +33,7 @@ export default class FieldGrapher {
             .attr("height", this._svgHeight);
 
         this._field = svg.select(".field");
-        this._scale = new GrapherScale(this, this._svgWidth, this._svgHeight, paddingWidth, paddingHeight);
+        this._scale = new GrapherScale(this, this._svgWidth, this._svgHeight, { padding });
     }
 
     /**

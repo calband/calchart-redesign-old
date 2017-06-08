@@ -13,17 +13,18 @@ if (_.isUndefined(d3)) {
 export default class ViewpsheetGrapher {
     /**
      * @param {D3} drawTarget - The <g> element to draw the graph within.
-     * @param {number} width - The width of the grapher
-     * @param {number} height - The height of the grapher
      * @param {Sheet} sheet - The sheet being generated in the viewpsheet
      * @param {Dot} dot - The dot whose viewpsheet is being generated
+     * @param {boolean} isEast - if true, draw the graph with the east
+     *   sideline facing up.
      */
-    constructor(drawTarget, width, height, sheet, dot, options) {
+    constructor(drawTarget, sheet, dot, isEast) {
         this._drawTarget = drawTarget;
-        this._width = width;
-        this._height = height;
+        this._width = drawTarget.attr("width");
+        this._height = drawTarget.attr("height");
         this._sheet = sheet;
         this._dot = dot;
+        this._isEast = isEast;
 
         let fieldType = this._sheet.getFieldType();
         this._fieldGrapher = FIELD_GRAPHERS[fieldType];
@@ -66,9 +67,11 @@ export default class ViewpsheetGrapher {
         // keep y-bounds in view
         if (height > newHeight) {
             minX = minX + width / 2 - newWidth / 2;
+            maxX = maxX - width / 2 + newWidth / 2;
             width = newWidth;
         } else {
             minY = minY + height / 2 - newHeight / 2;
+            maxY = maxY - height / 2 + newHeight / 2;
             height = newHeight;
         }
 
@@ -76,11 +79,10 @@ export default class ViewpsheetGrapher {
         let fieldWidth = this._width * this._fieldWidth / width;
         let fieldHeight = this._height * this._fieldHeight / height;
 
-        this._scale = new GrapherScale(this._fieldGrapher, fieldWidth, fieldHeight, 0, 0);
-        this._bounds = {
-            minX: this._scale.toDistance(minX),
-            minY: this._scale.toDistance(minY),
-        };
+        this._scale = new GrapherScale(this._fieldGrapher, fieldWidth, fieldHeight, {
+            keepRatio: false,
+        });
+        this._bounds = { minX, maxX, minY, maxY };
 
         // border
         this._drawTarget.append("rect")
@@ -191,9 +193,15 @@ export default class ViewpsheetGrapher {
         if (_.isNumber(steps)) {
             return this._scale.toDistance(steps);
         } else {
-            let x = this._scale.toDistanceX(steps.x) - this._bounds.minX;
-            let y = this._scale.toDistanceY(steps.y) - this._bounds.minY;
-            return new Coordinate(x, y);
+            let { x, y } = steps;
+            if (this._isEast) {
+                x = this._bounds.maxX - x;
+                y = this._bounds.maxY - y;
+            } else {
+                x -= this._bounds.minX;
+                y -= this._bounds.minY;
+            }
+            return this._scale.toDistance({ x, y });
         }
     }
 }
