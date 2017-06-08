@@ -3,7 +3,7 @@ import MovementCommandArc from "calchart/movements/MovementCommandArc";
 import FieldGrapher from "graphers/FieldGrapher";
 import { FIELD_GRAPHERS } from "graphers/Grapher";
 
-import { align, move } from "utils/SvgUtils";
+import { align, move } from "utils/SVGUtils";
 
 if (_.isUndefined(d3)) {
     console.error("D3 is not loaded!");

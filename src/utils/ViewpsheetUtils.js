@@ -2,6 +2,8 @@
  * @file A collection of utility functions related to generating viewpsheets
  */
 
+import { align } from "utils/SVGUtils";
+
 // in pixels, will be scaled when printing
 export const PAGE_WIDTH = 800;
 export const PAGE_HEIGHT = PAGE_WIDTH * 11 / 8.5;
@@ -78,7 +80,7 @@ export const nearbyWidget = {
     x: 0,
     y: individualWidget.y + individualWidget.height + WIDGET_MARGIN,
     width: QUADRANT_WIDTH,
-    height: widgetHeights[3] - WIDGET_MARGIN,
+    height: widgetHeights[3] - WIDGET_MARGIN - EAST_LABEL_SIZE - 2,
 };
 
 export const ORIENTATIONS = {
@@ -86,3 +88,31 @@ export const ORIENTATIONS = {
     east: "Always East Up",
     west: "Always West Up",
 };
+
+/**
+ * Add the east label to the given container, as an indicator of the
+ * east sideline in an adjacent graph.
+ *
+ * @param {D3} container
+ * @param {object} widget - Information about a widget.
+ * @param {boolean} isEast - true if east is up for widget.
+ * @return {number} The offset from the top of the container to draw
+ *   the graph.
+ */
+export function addEastLabel(container, widget, isEast) {
+    let eastLabel = container.append("text")
+        .classed("east-label", true)
+        .text("Cal side")
+        .attr("x", widget.width / 2)
+        .attr("font-size", EAST_LABEL_SIZE)
+        .attr("textLength", 75);
+    align(eastLabel, "top", "center");
+
+    if (isEast) {
+        eastLabel.attr("y", 0);
+        return $.fromD3(eastLabel).getDimensions().height;
+    } else {
+        eastLabel.attr("y", movementWidget.height + WIDGET_MARGIN);
+        return 0;
+    }
+}

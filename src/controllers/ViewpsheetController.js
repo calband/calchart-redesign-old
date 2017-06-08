@@ -10,8 +10,9 @@ import {
     drawDot,
     move,
     writeLines,
-} from "utils/SvgUtils";
+} from "utils/SVGUtils";
 import {
+    addEastLabel,
     dotTypeWidget,
     EAST_LABEL_SIZE,
     individualWidget,
@@ -122,6 +123,11 @@ export default class ViewpsheetController extends ApplicationController {
                         .append("rect")
                             .attr("width", movementWidget.width)
                             .attr("height", movementWidget.height);
+                    page.append("defs")
+                        .append("clipPath").attr("id", "clip-nearby")
+                        .append("rect")
+                            .attr("width", nearbyWidget.width)
+                            .attr("height", nearbyWidget.height);
                 }
 
                 let $sheet = this._generateSheet(page, sheet, dot);
@@ -292,24 +298,8 @@ export default class ViewpsheetController extends ApplicationController {
         let movementDiagram = quadrant.append("g");
         move(movementDiagram, movementWidget);
 
-        let eastLabel = movementDiagram.append("text")
-            .classed("east-label", true)
-            .text("Cal side")
-            .attr("x", movementWidget.width / 2)
-            .attr("font-size", EAST_LABEL_SIZE)
-            .attr("textLength", 75);
-        align(eastLabel, "top", "center");
-
-        let graphY = 0;
-
         let isEast = this._isEast(this._settings.pathOrientation, sheet);
-        if (isEast) {
-            let labelHeight = $.fromD3(eastLabel).getDimensions().height;
-            graphY = labelHeight;
-            eastLabel.attr("y", 0);
-        } else {
-            eastLabel.attr("y", movementWidget.height + WIDGET_MARGIN);
-        }
+        let graphY = addEastLabel(movementDiagram, movementWidget, isEast);
 
         let graph = movementDiagram.append("g")
             .attr("width", movementWidget.width)
@@ -329,11 +319,18 @@ export default class ViewpsheetController extends ApplicationController {
      * @param {Dot} dot
      */
     _drawNearbyDiagram(quadrant, sheet, dot) {
-        // let nearbyDiagram = quadrant.append("rect")
-        //     .attr("x", 0)
-        //     .attr("y", QUADRANT_ROWS[3] + WIDGET_MARGIN)
-        //     .attr("width", QUADRANT_WIDTH)
-        //     .attr("height", WIDGET_HEIGHTS[3] - WIDGET_MARGIN);
+        let nearbyDiagram = quadrant.append("g");
+        move(nearbyDiagram, nearbyWidget);
+
+        let isEast = this._isEast(this._settings.nearbyOrientation, sheet);
+        let graphY = addEastLabel(nearbyDiagram, nearbyWidget, isEast);
+
+        let graph = nearbyDiagram.append("g")
+            .attr("width", nearbyWidget.width)
+            .attr("height", nearbyWidget.height)
+            .style("clip-path", "url(#clip-nearby)");
+        move(graph, 0, graphY);
+        // new ViewpsheetGrapher(graph, sheet, dot, isEast).drawPath();
     }
 
     /**

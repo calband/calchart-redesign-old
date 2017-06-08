@@ -1,6 +1,6 @@
 import FieldGrapher from "graphers/FieldGrapher";
 
-import { align } from "utils/SvgUtils";
+import { align } from "utils/SVGUtils";
 
 /**
  * A FieldGrapher that can draw a representation of a college football field.
