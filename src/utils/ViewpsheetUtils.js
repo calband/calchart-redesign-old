@@ -10,7 +10,7 @@ export const PAGE_HEIGHT = PAGE_WIDTH * 11 / 8.5;
 
 // .25" margin for 8.5x11 page
 export const PAGE_MARGIN = PAGE_WIDTH / 34;
-export const WIDGET_MARGIN = 5;
+export const WIDGET_MARGIN = 7;
 
 // each quadrant corresponds with a stuntsheet
 export const QUADRANT_HEIGHT = PAGE_HEIGHT / 2 - PAGE_MARGIN * 2;
@@ -64,13 +64,13 @@ export const dotTypeWidget = {
 export const individualWidget = {
     x: 0,
     y: dotTypeWidget.y + dotTypeWidget.height + WIDGET_MARGIN,
-    width: QUADRANT_WIDTH / 2 - WIDGET_MARGIN,
+    width: QUADRANT_WIDTH / 2 - WIDGET_MARGIN / 2,
     height: widgetHeights[2] - 2 * WIDGET_MARGIN,
 };
 
 // information for the movement diagram widget
 export const movementWidget = _.extend({}, individualWidget, {
-    x: QUADRANT_WIDTH / 2 + WIDGET_MARGIN,
+    x: QUADRANT_WIDTH / 2 + WIDGET_MARGIN / 2,
     // account for east label
     height: individualWidget.height - EAST_LABEL_SIZE - 2,
 });

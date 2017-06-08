@@ -52,6 +52,10 @@ body {
                 &.yardline-label {
                     fill: $medium-gray;
                 }
+                &.position-info {
+                    fill: $dark-gray;
+                    font-size: 12px;
+                }
             }
         }
     }

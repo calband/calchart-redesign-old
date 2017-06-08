@@ -89,6 +89,11 @@ export default class ViewpsheetController extends ApplicationController {
         }
 
         this._dots.forEach(dot => {
+            if (dot === undefined) {
+                console.error(`Dot does not exist: ${dot}`);
+                return;
+            }
+
             this._addBirdsEye(dot);
 
             let quadrants = this._settings.layoutLeftRight
@@ -180,6 +185,7 @@ export default class ViewpsheetController extends ApplicationController {
      * @param {Dot} dot
      */
     _addBirdsEye(dot) {
+        // TODO
         // let page = this._addPage()
     }
 
@@ -202,6 +208,7 @@ export default class ViewpsheetController extends ApplicationController {
      * @param {Dot} dot
      */
     _addSummary(dot) {
+        // TODO
         // let page = this._addPage()
     }
 
@@ -308,7 +315,7 @@ export default class ViewpsheetController extends ApplicationController {
         move(graph, 0, graphY);
         new ViewpsheetGrapher(graph, sheet, dot, isEast).drawPath();
 
-        // TODO: add distance to E/W landmarks
+        // TODO: make interactive
     }
 
     /**
@@ -331,6 +338,8 @@ export default class ViewpsheetController extends ApplicationController {
             .style("clip-path", "url(#clip-nearby)");
         move(graph, 0, graphY);
         // new ViewpsheetGrapher(graph, sheet, dot, isEast).drawPath();
+
+        // TODO: draw
     }
 
     /**

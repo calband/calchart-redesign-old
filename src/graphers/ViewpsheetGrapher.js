@@ -3,6 +3,7 @@ import MovementCommandArc from "calchart/movements/MovementCommandArc";
 import FieldGrapher from "graphers/FieldGrapher";
 import { FIELD_GRAPHERS } from "graphers/Grapher";
 
+import { getYCoordinateText } from "utils/CalchartUtils";
 import { align, move } from "utils/SVGUtils";
 
 if (_.isUndefined(d3)) {
@@ -22,8 +23,8 @@ export default class ViewpsheetGrapher {
      */
     constructor(drawTarget, sheet, dot, isEast) {
         this._drawTarget = drawTarget;
-        this._width = drawTarget.attr("width");
-        this._height = drawTarget.attr("height");
+        this._width = parseFloat(drawTarget.attr("width"));
+        this._height = parseFloat(drawTarget.attr("height"));
         this._sheet = sheet;
         this._dot = dot;
         this._isEast = isEast;
@@ -95,25 +96,34 @@ export default class ViewpsheetGrapher {
         fieldGrapher.drawField();
         this._scale = fieldGrapher.getScale();
 
-        let left = minX;
-        let right = maxX;
-        let top = minY;
-        let bottom = maxY;
+        // convert to distance
+        minX = this._scale.toDistanceX(minX);
+        maxX = this._scale.toDistanceX(maxX);
+        minY = this._scale.toDistanceY(minY);
+        maxY = this._scale.toDistanceY(maxY);
+
+        // remember the bounds of the viewport
         if (this._isEast) {
-            left = maxX;
-            right = minX;
-            top = maxY;
-            bottom = minY;
+            this._bounds = {
+                left: maxX,
+                right: minX,
+                top: maxY,
+                bottom: minY,
+            };
+        } else {
+            this._bounds = {
+                left: minX,
+                right: maxX,
+                top: minY,
+                bottom: maxY,
+            };
         }
 
-        let offsetX = this._scale.toDistanceX(left);
-        let offsetY = this._scale.toDistanceY(top);
-        move(this._field, -offsetX, -offsetY);
+        move(this._field, -this._bounds.left, -this._bounds.top);
 
         // push west yardline numbers down to bottom of box
         let yardlineLabels = this._field.selectAll(".yardline-label");
-        let yardlineOffset = this._scale.toDistanceY(bottom);
-        move(yardlineLabels, 0, yardlineOffset);
+        move(yardlineLabels, 0, this._bounds.bottom);
         align(yardlineLabels, "bottom", "center");
         yardlineLabels
             .attr("letter-spacing", 3)
@@ -186,13 +196,15 @@ export default class ViewpsheetGrapher {
         // draw path
         let position = this._scale.toDistance(info.position);
         let pathDef = `M ${position.x} ${position.y}`;
+
+        let lastPosition = position;
         info.movements.forEach(movement => {
             if (movement instanceof MovementCommandArc) {
                 let arcPath = movement.getPathDef(this._scale);
                 pathDef += ` ${arcPath}`;
             } else {
-                let position = this._scale.toDistance(movement.getEndPosition());
-                pathDef += ` L ${position.x} ${position.y}`;
+                lastPosition = this._scale.toDistance(movement.getEndPosition());
+                pathDef += ` L ${lastPosition.x} ${lastPosition.y}`;
             }
         });
 
@@ -206,5 +218,21 @@ export default class ViewpsheetGrapher {
             .attr("cx", position.x)
             .attr("cy", position.y)
             .attr("r", dotRadius);
+
+        // check if dot is on the left side of the viewport
+        let dotOnLeft = position.x <= this._bounds.left + this._width / 2;
+
+        // add y-position info
+        let positionInfo = this._field.append("text")
+            .classed("position-info", true)
+            .text(getYCoordinateText(info.position.y))
+            .attr("y", position.y);
+        if (dotOnLeft) {
+            positionInfo.attr("x", this._bounds.right - 3);
+            align(positionInfo, "bottom", "right");
+        } else {
+            positionInfo.attr("x", this._bounds.left + 3);
+            align(positionInfo, "bottom", "left");
+        }
     }
 }
