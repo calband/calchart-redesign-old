@@ -23,7 +23,7 @@ export default class FieldGrapher {
         let paddingHeight = options.fieldPadding;
 
         // expand field to a field and a half in each direction
-        if (this._options.expandField) {
+        if (options.expandField) {
             paddingWidth += this._svgWidth * 1.5;
             paddingHeight += this._svgHeight * 1.5;
             this._svgWidth *= 4;

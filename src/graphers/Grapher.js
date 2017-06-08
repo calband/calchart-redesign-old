@@ -1,7 +1,6 @@
 import AnimationState from "calchart/AnimationState";
 import Coordinate from "calchart/Coordinate";
 import Dot from "calchart/Dot";
-import MovementCommandArc from "calchart/movements/MovementCommandArc";
 import CollegeGrapher from "graphers/CollegeGrapher";
 
 import { getNearestOrientation } from "utils/CalchartUtils";

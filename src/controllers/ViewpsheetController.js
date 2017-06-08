@@ -1,5 +1,6 @@
 import SaveViewpSettingsAction from "actions/SaveViewpSettingsAction";
 import ApplicationController from "controllers/ApplicationController";
+import ViewpsheetGrapher from "graphers/ViewpsheetGrapher";
 import ViewpsheetSettingsPopup from "popups/ViewpsheetSettingsPopup";
 
 import HTMLBuilder from "utils/HTMLBuilder";
@@ -294,15 +295,15 @@ export default class ViewpsheetController extends ApplicationController {
             .attr("textLength", 75);
         align(eastLabel, "top", "center");
 
-        let boxY = $.fromD3(eastLabel).getDimensions().height;
-        let boxWidth = QUADRANT_WIDTH / 2 - WIDGET_MARGIN;
-        let boxHeight = WIDGET_HEIGHTS[2] - 2 * WIDGET_MARGIN - boxY;
-        eastLabel.attr("x", boxWidth / 2);
-        movementDiagram.append("rect")
-            .attr("x", 0)
-            .attr("y", boxY)
-            .attr("width", boxWidth)
-            .attr("height", boxHeight);
+        let graphY = $.fromD3(eastLabel).getDimensions().height;
+        let graphWidth = QUADRANT_WIDTH / 2 - WIDGET_MARGIN;
+        let graphHeight = WIDGET_HEIGHTS[2] - 2 * WIDGET_MARGIN - graphY;
+
+        eastLabel.attr("x", graphWidth / 2);
+
+        let graph = movementDiagram.append("g")
+            .attr("transform", `translate(0, ${graphY})`);
+        new ViewpsheetGrapher(graph, graphWidth, graphHeight, sheet, dot).drawPath();
     }
 
     /**

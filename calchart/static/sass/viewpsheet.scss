@@ -30,6 +30,10 @@ body {
             line.page-divider {
                 stroke: $medium-gray;
             }
+            path {
+                stroke: $black;
+                fill: none;
+            }
             rect {
                 stroke: $black;
                 fill: none;

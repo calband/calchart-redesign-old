@@ -83,14 +83,14 @@ export default class MovementCommandArc extends BaseMovementCommand {
     /**
      * Get the "d" attribute for this arc in a <path> element.
      *
-     * @param {GrapherScale} scale
+     * @param {ViewpsheetGrapher} grapher
      * @return {string}
      */
-    getPathDef(scale) {
-        let r = scale.toDistance(this._radius);
+    getPathDef(grapher) {
+        let r = grapher.toDistance(this._radius);
         let largeArc = Math.abs(this._degrees) < 180 ? 0 : 1;
         let sweepFlag = this._degrees < 0 ? 0 : 1;
-        let { x, y } = scale.toDistance(this.getEndPosition());
+        let { x, y } = grapher.toDistance(this.getEndPosition());
         return `A ${r} ${r} 0 ${largeArc} ${sweepFlag} ${x} ${y}`;
     }
 
