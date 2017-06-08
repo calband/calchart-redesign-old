@@ -7,12 +7,15 @@ import HTMLBuilder from "utils/HTMLBuilder";
 import { update } from "utils/JSUtils";
 import {
     align,
-    dotTypeWidget,
     drawDot,
+    move,
+    writeLines,
+} from "utils/SvgUtils";
+import {
+    dotTypeWidget,
     EAST_LABEL_SIZE,
     individualWidget,
     LEFT_RIGHT_QUADRANTS,
-    move,
     movementWidget,
     nearbyWidget,
     PAGE_HEIGHT,
@@ -22,7 +25,6 @@ import {
     SHEET_LABEL_SIZE,
     TOP_BOTTOM_QUADRANTS,
     WIDGET_MARGIN,
-    writeLines,
 } from "utils/ViewpsheetUtils";
 
 /**
@@ -316,9 +318,7 @@ export default class ViewpsheetController extends ApplicationController {
         move(graph, 0, graphY);
         new ViewpsheetGrapher(graph, sheet, dot, isEast).drawPath();
 
-        // TODO: make hashes 2 steps wide (up to 1 step out)
         // TODO: add distance to E/W landmarks
-        // TODO: add yardline numbers
     }
 
     /**

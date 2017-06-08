@@ -49,6 +49,9 @@ body {
                 &.east-label {
                     text-transform: uppercase;
                 }
+                &.yardline-label {
+                    fill: $medium-gray;
+                }
             }
         }
     }

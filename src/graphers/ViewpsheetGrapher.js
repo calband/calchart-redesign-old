@@ -3,7 +3,7 @@ import MovementCommandArc from "calchart/movements/MovementCommandArc";
 import FieldGrapher from "graphers/FieldGrapher";
 import { FIELD_GRAPHERS } from "graphers/Grapher";
 
-import { move } from "utils/ViewpsheetUtils";
+import { align, move } from "utils/SvgUtils";
 
 if (_.isUndefined(d3)) {
     console.error("D3 is not loaded!");
@@ -95,17 +95,29 @@ export default class ViewpsheetGrapher {
         fieldGrapher.drawField();
         this._scale = fieldGrapher.getScale();
 
-        let offsetX, offsetY;
+        let left = minX;
+        let right = maxX;
+        let top = minY;
+        let bottom = maxY;
         if (this._isEast) {
-            offsetX = maxX;
-            offsetY = maxY;
-        } else {
-            offsetX = minX;
-            offsetY = minY;
+            left = maxX;
+            right = minX;
+            top = maxY;
+            bottom = minY;
         }
-        offsetX = this._scale.toDistanceX(offsetX);
-        offsetY = this._scale.toDistanceY(offsetY);
+
+        let offsetX = this._scale.toDistanceX(left);
+        let offsetY = this._scale.toDistanceY(top);
         move(this._field, -offsetX, -offsetY);
+
+        // push west yardline numbers down to bottom of box
+        let yardlineLabels = this._field.selectAll(".yardline-label");
+        let yardlineOffset = this._scale.toDistanceY(bottom);
+        move(yardlineLabels, 0, yardlineOffset);
+        align(yardlineLabels, "bottom", "center");
+        yardlineLabels
+            .attr("letter-spacing", 3)
+            .attr("font-size", this._scale.toDistance(2));
     }
 
     // /**

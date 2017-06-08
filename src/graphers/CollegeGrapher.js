@@ -1,5 +1,7 @@
 import FieldGrapher from "graphers/FieldGrapher";
 
+import { align } from "utils/SvgUtils";
+
 /**
  * A FieldGrapher that can draw a representation of a college football field.
  */
@@ -100,7 +102,7 @@ export default class CollegeGrapher extends FieldGrapher {
                 .enter()
                 .append("text")
                 .classed("yardline-label", true)
-                .style("font-size", fontSize)
+                .attr("font-size", fontSize)
                 .text(function(d) {
                     // numbers 105-210 are on the bottom of the field
                     if (d > 100) {
@@ -118,15 +120,15 @@ export default class CollegeGrapher extends FieldGrapher {
                     let y;
 
                     if (d > 100) {
-                        y = scale.maxY + fontSize;
+                        y = scale.maxY + fontSize / 5;
                         d -= 105;
+                        align(label, "top", "center");
                     } else {
-                        y = scale.minY - fontSize / 3;
+                        y = scale.minY;
+                        align(label, "bottom", "center");
                     }
 
-                    let width = $.fromD3(label).getDimensions().width;
-                    let x = scale.xScale(d * 8/5) - width/2;
-
+                    let x = scale.xScale(d * 8/5);
                     label.attr("x", x).attr("y", y);
                 });
         }
