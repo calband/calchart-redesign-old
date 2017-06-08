@@ -98,6 +98,24 @@ export const nearbyWidget = {
     height: widgetHeights[3] - WIDGET_MARGIN - EAST_LABEL_SIZE - 2,
 };
 
+// information for the summary sheet
+export const summarySheets = {
+    minHeight: (PAGE_HEIGHT - 2 * PAGE_MARGIN) / 10,
+};
+let summaryWidth = QUADRANT_WIDTH - SHEET_LABEL_SIZE;
+export const summaryContinuities = {
+    x: SHEET_LABEL_SIZE,
+    y: WIDGET_MARGIN,
+    width: summaryWidth * 2/3 - WIDGET_MARGIN,
+    height: summarySheets.minHeight - 2 * WIDGET_MARGIN,
+};
+export const summaryMovement = {
+    x: summaryContinuities.x + summaryContinuities.width + 2 * WIDGET_MARGIN,
+    y: summaryContinuities.y,
+    width: summaryWidth / 3 - WIDGET_MARGIN,
+    height: summarySheets.minHeight - 2 * WIDGET_MARGIN - EAST_LABEL_SIZE - 2,
+};
+
 export const ORIENTATIONS = {
     default: "Same as stuntsheet",
     east: "Always East Up",

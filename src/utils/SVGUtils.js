@@ -134,7 +134,7 @@ export function writeLines(container, lines, options={}) {
                 let word = words[i];
                 buffer.push(word);
                 line.text(buffer.join(" "));
-                if (line.node().getComputedTextLength() > maxWidth) {
+                if (line.node().getComputedTextLength() > maxWidth && buffer.length > 1) {
                     buffer.pop();
                     line.text(buffer.join(" "));
                     line = newline();

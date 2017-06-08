@@ -28,6 +28,9 @@ import {
     QUADRANT_HEIGHT,
     QUADRANT_WIDTH,
     SHEET_LABEL_SIZE,
+    summaryContinuities,
+    summaryMovement,
+    summarySheets,
     TITLE_LABEL_SIZE,
     TOP_BOTTOM_QUADRANTS,
     WIDGET_MARGIN,
@@ -128,21 +131,27 @@ export default class ViewpsheetController extends ApplicationController {
 
                     // clip-path definitions for diagrams
                     // (http://tutorials.jenkov.com/svg/clip-path.html)
-                    page.append("defs")
-                        .append("clipPath").attr("id", "clip-movement")
+                    let defs = page.append("defs");
+                    defs.append("clipPath")
+                        .attr("id", "clip-movement")
                         .append("rect")
                             .attr("width", movementWidget.width)
                             .attr("height", movementWidget.height);
-                    page.append("defs")
-                        .append("clipPath").attr("id", "clip-nearby")
+                    defs.append("clipPath")
+                        .attr("id", "clip-nearby")
                         .append("rect")
                             .attr("width", nearbyWidget.width)
                             .attr("height", nearbyWidget.height);
-                    page.append("defs")
-                        .append("clipPath").attr("id", "clip-birds-eye")
+                    defs.append("clipPath")
+                        .attr("id", "clip-birds-eye")
                         .append("rect")
                             .attr("width", birdsEyeWidget.width)
                             .attr("height", birdsEyeWidget.height);
+                    defs.append("clipPath")
+                        .attr("id", "clip-summary")
+                        .append("rect")
+                            .attr("width", summaryMovement.width)
+                            .attr("height", summaryMovement.height);
                 }
 
                 let $sheet = this._generateSheet(page, sheet, dot);
@@ -248,13 +257,96 @@ export default class ViewpsheetController extends ApplicationController {
     }
 
     /**
-     * Add the summary sheet to the viewpsheet for the given dot.
+     * Add the summary sheets to the viewpsheet for the given dot.
      *
      * @param {Dot} dot
      */
     _addSummary(dot) {
-        // TODO
-        // let page = this._addPage()
+        let page = this._addPage();
+        let currX = 0;
+        let currY = PAGE_MARGIN;
+        let maxHeight = PAGE_HEIGHT - PAGE_MARGIN;
+        let fontSize = 14;
+
+        this.show.getSheets().forEach((sheet, i) => {
+            let $sheet = page.append("g");
+
+            let individualBox = _.clone(summaryContinuities);
+
+            // write continuities first to get possibly extended height
+            let movements = sheet.getDotInfo(dot).movements.map(movement => movement.getText());
+            let text = $sheet.append("text")
+                .attr("x", individualBox.x + WIDGET_MARGIN)
+                .attr("y", individualBox.y + WIDGET_MARGIN)
+                .attr("font-size", fontSize);
+            align(text, "top", "left");
+            writeLines(text, movements, {
+                padding: WIDGET_MARGIN,
+                maxWidth: individualBox.width,
+            });
+
+            let textHeight = $.fromD3(text).getDimensions().height;
+            // possibly stretched height, taking into account continuities and total beats label
+            let stretchedHeight = textHeight + 2 * WIDGET_MARGIN + fontSize + 2;
+            let diffHeight = Math.max(stretchedHeight - individualBox.height, 0);
+            individualBox.height = Math.max(individualBox.height, stretchedHeight);
+
+            // go to next column if needed
+            let nextY = currY + individualBox.height + 2 * WIDGET_MARGIN;
+            if (nextY > maxHeight) {
+                currX = currX === 0 ? PAGE_WIDTH/2 : 0;
+                currY = PAGE_MARGIN;
+            }
+            move($sheet, currX + PAGE_MARGIN, currY);
+            currY = nextY;
+
+            // total beats
+            let duration = sheet.getDuration();
+            let totalBeats = $sheet.append("text")
+                .text(`${duration} beats total`)
+                .attr("x", individualBox.x + individualBox.width / 2)
+                .attr("y", individualBox.y + individualBox.height)
+                .attr("font-size", fontSize);
+            align(totalBeats, "bottom", "center");
+
+            // sheet label
+            let label = $sheet.append("text")
+                .text(sheet.getIndex())
+                .attr("font-size", SHEET_LABEL_SIZE)
+                .attr("y", individualBox.y + individualBox.height/2);
+            align(label, "center", "left");
+
+            // continuities box
+            $sheet.append("rect")
+                .attr("x", individualBox.x)
+                .attr("y", individualBox.y)
+                .attr("width", individualBox.width)
+                .attr("height", individualBox.height);
+
+            // movement diagram
+            let movementBox = _.extend({}, summaryMovement, {
+                y: WIDGET_MARGIN + diffHeight / 2,
+            });
+
+            let movementDiagram = $sheet.append("g");
+            move(movementDiagram, movementBox);
+
+            let isEast = this._isEast(this._settings.pathOrientation, sheet);
+            let graphY = addEastLabel(movementDiagram, movementBox, isEast);
+
+            let graph = movementDiagram.append("g")
+                .attr("width", movementBox.width)
+                .attr("height", movementBox.height)
+                .style("clip-path", "url(#clip-summary)");
+            move(graph, 0, graphY);
+
+            // field border
+            graph.append("rect")
+                .attr("width", movementBox.width)
+                .attr("height", movementBox.height);
+
+            new ViewpsheetGrapher(graph, sheet, dot, isEast).drawPath();
+        });
     }
 
     /**
