@@ -1,7 +1,5 @@
 import FieldGrapher from "graphers/FieldGrapher";
 
-let HASH_WIDTH = 10;
-
 /**
  * A FieldGrapher that can draw a representation of a college football field.
  */
@@ -73,7 +71,8 @@ export default class CollegeGrapher extends FieldGrapher {
             .attr("x2", scale.xScale)
             .attr("y2", scale.maxY);
 
-        // hash marks
+        // hash marks, hashes 2 steps wide
+        let hashWidth = scale.toDistance(2);
         [true, false].forEach(isBack => {
             let y = scale.yScale(isBack ? 32 : 52);
             let name = isBack ? "back-hash" : "front-hash";
@@ -88,8 +87,8 @@ export default class CollegeGrapher extends FieldGrapher {
                 .each(function(d) {
                     let offsetX = scale.xScale(d);
                     d3.select(this)
-                        .attr("x1", offsetX - HASH_WIDTH / 2)
-                        .attr("x2", offsetX + HASH_WIDTH / 2);
+                        .attr("x1", offsetX - hashWidth / 2)
+                        .attr("x2", offsetX + hashWidth / 2);
                 });
         });
 

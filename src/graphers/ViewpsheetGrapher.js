@@ -188,11 +188,11 @@ export default class ViewpsheetGrapher {
         this._field.append("path")
             .classed("path-movements", true)
             .attr("d", pathDef)
-            .attr("stroke-width", dotRadius / 1.5);
+            .attr("stroke-width", dotRadius / 2);
         this._field.append("circle")
             .classed("start-position", true)
             .attr("cx", position.x)
             .attr("cy", position.y)
-            .attr("r", dotRadius * 1.25);
+            .attr("r", dotRadius);
     }
 }
