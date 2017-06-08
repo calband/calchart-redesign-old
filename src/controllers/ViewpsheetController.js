@@ -233,7 +233,9 @@ export default class ViewpsheetController extends ApplicationController {
         let dotRadius = fontSize * 0.4;
         let $dot = dotContinuities.append("g");
         move($dot, WIDGET_MARGIN, WIDGET_MARGIN);
-        drawDot($dot, dotRadius, dotType);
+        drawDot($dot, dotRadius, dotType, {
+            drawCenter: false,
+        });
 
         let colonPosition = dotRadius * 2 + 3;
         let colon = $dot.append("text")
@@ -337,9 +339,9 @@ export default class ViewpsheetController extends ApplicationController {
             .attr("height", nearbyWidget.height)
             .style("clip-path", "url(#clip-nearby)");
         move(graph, 0, graphY);
-        // new ViewpsheetGrapher(graph, sheet, dot, isEast).drawPath();
+        new ViewpsheetGrapher(graph, sheet, dot, isEast).drawNearby();
 
-        // TODO: draw
+        // TODO: make interactive
     }
 
     /**

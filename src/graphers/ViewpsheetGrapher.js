@@ -4,7 +4,7 @@ import FieldGrapher from "graphers/FieldGrapher";
 import { FIELD_GRAPHERS } from "graphers/Grapher";
 
 import { getYCoordinateText } from "utils/CalchartUtils";
-import { align, move } from "utils/SVGUtils";
+import { align, drawDot, move } from "utils/SVGUtils";
 
 if (_.isUndefined(d3)) {
     console.error("D3 is not loaded!");
@@ -130,31 +130,46 @@ export default class ViewpsheetGrapher {
             .attr("font-size", this._scale.toDistance(2));
     }
 
-    // /**
-    //  * Draw the given sheet, zooming into the given dot and its neighbors.
-    //  *
-    //  * @param {Sheet} sheet
-    //  * @param {Dot} dot
-    //  */
-    // drawNearby(sheet, dot) {
-    //     let targetWidth = this._drawTarget.width();
+    /**
+     * Draw the dot and its neighbors in the sheet.
+     */
+    drawNearby() {
+        let info = this._sheet.getDotInfo(this._dot);
+        let width = 32;
+        let minX = info.position.x - width/2;
+        let maxX = info.position.x + width/2;
+        let minY = info.position.y;
+        let maxY = info.position.y;
+        this.drawField(minX, maxX, minY, maxY, {
+            draw4Step: true,
+            drawYardlineNumbers: true,
+        });
 
-    //     let FieldGrapher = FIELD_GRAPHERS[sheet.getFieldType()];
+        let dots = this._field.append("g");
+        let labels = this._field.append("g");
+        let dotRadius = this._scale.toDistance(0.5);
 
-    //     // width of field (8 steps) in pixels
-    //     let fieldWidth = targetWidth / 8 * FieldGrapher.FIELD_WIDTH;
-    //     this._options.zoom = (fieldWidth + this._options.fieldPadding * 2) / targetWidth;
+        this._sheet.show.getDots().forEach(dot => {
+            let info = this._sheet.getDotInfo(dot);
+            let position = this._scale.toDistance(info.position);
 
-    //     this.clearField();
-    //     this.draw(sheet);
-    //     this._redrawDots();
+            let $dot = dots.append("g");
+            move($dot, position);
+            drawDot($dot, dotRadius, info.type);
 
-    //     let info = sheet.getDotInfo(dot);
-    //     let position = this._scale.toDistance(info.position);
-    //     let fourStep = this._scale.toDistance(4);
-    //     this._drawTarget.scrollLeft(position.x - fourStep);
-    //     this._drawTarget.scrollTop(position.y - fourStep);
-    // }
+            let label = labels.append("text")
+                .classed("dot-label", true)
+                .attr("font-size", dotRadius * 2)
+                .attr("dx", -dotRadius/3)
+                .attr("dy", -3)
+                .text(dot.label);
+            move(label, position);
+            align(label, "bottom", "right");
+            if (dot === this._dot) {
+                label.classed("curr-label", true);
+            }
+        });
+    }
 
     /**
      * Draw the movements of the dot in the sheet.

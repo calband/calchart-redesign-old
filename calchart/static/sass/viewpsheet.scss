@@ -46,15 +46,22 @@ body {
                 fill: none;
             }
             text {
+                &.dot-label {
+                    fill: $medium-gray;
+                    &.curr-label {
+                        fill: $black;
+                        font-weight: bold;
+                    }
+                }
                 &.east-label {
                     text-transform: uppercase;
-                }
-                &.yardline-label {
-                    fill: $medium-gray;
                 }
                 &.position-info {
                     fill: $dark-gray;
                     font-size: 12px;
+                }
+                &.yardline-label {
+                    fill: $medium-gray;
                 }
             }
         }

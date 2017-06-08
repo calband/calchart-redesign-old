@@ -31,11 +31,22 @@ export function align(text, vertical, horizontal) {
  * @param {D3} container - The <g> element to draw the dot in.
  * @param {number} dotRadius
  * @param {DotType} dotType
+ * @param {object} options - Possible options include:
+ *   - {boolean} [drawCenter=true] - If false, shift the dot
+ *     so that the top-left corner of the dot is in the top-left
+ *     corner of the container. If true, keep the center of the dot
+ *     in the top-left corner of the container.
  */
-export function drawDot(container, dotRadius, dotType) {
+export function drawDot(container, dotRadius, dotType, options={}) {
+    options = _.defaults({}, options, {
+        drawCenter: true,
+    });
+
+    let offset = options.drawCenter ? 0 : dotRadius;
+
     let dot = container.append("circle")
-        .attr("cx", dotRadius)
-        .attr("cy", dotRadius)
+        .attr("cx", offset)
+        .attr("cy", offset)
         .attr("r", dotRadius);
     if (dotType.match(/plain/)) {
         dot.attr("fill", "none");
@@ -44,18 +55,18 @@ export function drawDot(container, dotRadius, dotType) {
     if (dotType.match(/forwardslash|x/)) {
         container.append("line")
             .attr("stroke", "black")
-            .attr("x1", 0)
-            .attr("y1", dotRadius * 2)
-            .attr("x2", dotRadius * 2)
-            .attr("y2", 0);
+            .attr("x1", offset - dotRadius)
+            .attr("y1", offset + dotRadius)
+            .attr("x2", offset + dotRadius)
+            .attr("y2", offset - dotRadius);
     }
     if (dotType.match(/backslash|x/)) {
         container.append("line")
             .attr("stroke", "black")
-            .attr("x1", 0)
-            .attr("y1", 0)
-            .attr("x2", dotRadius * 2)
-            .attr("y2", dotRadius * 2);
+            .attr("x1", offset - dotRadius)
+            .attr("y1", offset - dotRadius)
+            .attr("x2", offset + dotRadius)
+            .attr("y2", offset + dotRadius);
     }
 }
 

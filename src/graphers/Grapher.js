@@ -4,6 +4,7 @@ import Dot from "calchart/Dot";
 import CollegeGrapher from "graphers/CollegeGrapher";
 
 import { getNearestOrientation } from "utils/CalchartUtils";
+import { align } from "utils/SVGUtils";
 
 if (_.isUndefined(d3)) {
     console.error("D3 is not loaded!");
@@ -417,9 +418,10 @@ export default class Grapher {
             }
             dotGroup.append("circle").classed("dot-marker", true);
 
-            labelsGroup.append("text")
+            let label = labelsGroup.append("text")
                 .classed(`dot-label dot-label-${dot.id}`, true)
                 .text(dot.label);
+            align(label, "bottom", this._options.labelLeft ? "right" : "left");
 
             // save dot in jQuery data
             $.fromD3(dotGroup).data("dot", dot);
@@ -480,21 +482,11 @@ export default class Grapher {
             .attr("x2", end)
             .attr("y2", end);
 
+        let factor = this._options.labelLeft ? 1 : -1;
         this._svg.selectAll(".dot-label")
-            .attr("font-size", dotRadius * 2);
-
-        let dotLabels = this.getGraph().find(".dot-label");
-        _.each(dotLabels, dotLabel => {
-            let width = $(dotLabel).getDimensions().width;
-            let offsetX = 1.25 * width;
-            let offsetY = -1.25 * dotRadius;
-            if (this._options.labelLeft) {
-                offsetX *= -1;
-            }
-            $(dotLabel)
-                .attr("x", offsetX)
-                .attr("y", offsetY);
-        });
+            .attr("font-size", dotRadius * 2)
+            .attr("x", factor * (-dotRadius / 2))
+            .attr("y", -dotRadius / 2);
     }
 
     /**
