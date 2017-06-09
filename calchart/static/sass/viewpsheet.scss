@@ -24,20 +24,6 @@ body {
             padding: 15px 20px;
             font-size: 1.2em;
         }
-        div.loading-screen {
-            @include vertically-center;
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(255,255,255,0.9);
-            p {
-                font-size: 36px;
-                letter-spacing: 3px;
-                text-transform: uppercase;
-            }
-        }
     }
 }
 
@@ -94,6 +80,22 @@ svg.page {
         &.yardline-label {
             fill: $medium-gray;
         }
+    }
+}
+
+.loading-screen {
+    @include vertically-center;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255,255,255,0.8);
+    text-align: center;
+    p {
+        font-size: 36px;
+        letter-spacing: 3px;
+        text-transform: uppercase;
     }
 }
 

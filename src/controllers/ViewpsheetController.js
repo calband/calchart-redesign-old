@@ -52,6 +52,7 @@ export default class ViewpsheetController extends ApplicationController {
     constructor(show, dots, settings) {
         super(show);
 
+        // TODO: only one dot for now
         this._dots = dots.map(id => show.getDot(id));
         this._settings = _.defaults(settings, {
             // see CalchartUtils.ORIENTATION_OPTIONS
@@ -106,23 +107,21 @@ export default class ViewpsheetController extends ApplicationController {
             return;
         }
 
-        let loadingScreen = HTMLBuilder.div("loading-screen");
+        let loadingScreen = HTMLBuilder.div("loading-screen")
+            .appendTo("body");
         HTMLBuilder.make("p", "Loading...")
             .appendTo(loadingScreen);
-        this.viewpsheet
-            .append(loadingScreen)
-            .lockScroll();
+        this.viewpsheet.lockScroll();
 
         runAsync(() => {
             this._dots.forEach(dot => {
                 this.generateDot(dot);
             });
-            loadingScreen.remove();
-            this.viewpsheet.unlockScroll();
-        }).then(() => {
             generatePDF(this.viewpsheet.children(), pdf => {
                 this._pdf = pdf;
                 $(".buttons .download").removeClass("disabled");
+                loadingScreen.remove();
+                this.viewpsheet.unlockScroll();
             });
         });
     }
@@ -248,7 +247,7 @@ export default class ViewpsheetController extends ApplicationController {
             move($sheet, x, y);
 
             let label = $sheet.append("text")
-                .text(sheet.getIndex())
+                .text(sheet.getIndex() + 1)
                 .attr("font-size", SHEET_LABEL_SIZE)
                 .attr("y", birdsEyeGraphs.height/2);
             align(label, "center", "left");
@@ -327,20 +326,6 @@ export default class ViewpsheetController extends ApplicationController {
             let diffHeight = Math.max(stretchedHeight - individualBox.height, 0);
             individualBox.height = Math.max(individualBox.height, stretchedHeight);
 
-            // go to next column if needed
-            let nextY = currY + individualBox.height + 2 * WIDGET_MARGIN;
-            if (nextY > maxHeight) {
-                if (currX === 0) {
-                    currX = PAGE_WIDTH / 2;
-                } else {
-                    currX = 0;
-                    page = newPage();
-                }
-                currY = PAGE_MARGIN;
-            }
-            move($sheet, currX + PAGE_MARGIN, currY);
-            currY = nextY;
-
             // total beats
             let duration = sheet.getDuration();
             let totalBeats = $sheet.append("text")
@@ -352,7 +337,7 @@ export default class ViewpsheetController extends ApplicationController {
 
             // sheet label
             let label = $sheet.append("text")
-                .text(sheet.getIndex())
+                .text(sheet.getIndex() + 1)
                 .attr("font-size", SHEET_LABEL_SIZE)
                 .attr("y", individualBox.y + individualBox.height/2);
             align(label, "center", "left");
@@ -387,6 +372,23 @@ export default class ViewpsheetController extends ApplicationController {
                 .attr("height", movementBox.height);
 
             new ViewpsheetGrapher(graph, sheet, dot, isEast).drawPath();
+
+            // wrap to next column if needed
+            let nextY = currY + individualBox.height + 2 * WIDGET_MARGIN;
+            if (nextY > maxHeight) {
+                if (currX === 0) {
+                    currX = PAGE_WIDTH / 2;
+                } else {
+                    currX = 0;
+                    page = newPage();
+                    $sheet.remove();
+                    page.append(() => $sheet.node());
+                }
+                currY = PAGE_MARGIN;
+                nextY = currY + individualBox.height + 2 * WIDGET_MARGIN;
+            }
+            move($sheet, currX + PAGE_MARGIN, currY);
+            currY = nextY;
         });
     }
 

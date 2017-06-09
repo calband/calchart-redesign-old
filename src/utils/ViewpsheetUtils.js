@@ -102,9 +102,10 @@ export const nearbyWidget = {
 export const summarySheets = {
     minHeight: (PAGE_HEIGHT - 2 * PAGE_MARGIN) / 10,
 };
-let summaryWidth = QUADRANT_WIDTH - SHEET_LABEL_SIZE;
+let summaryLabelSize = SHEET_LABEL_SIZE + 10;
+let summaryWidth = QUADRANT_WIDTH - summaryLabelSize;
 export const summaryContinuities = {
-    x: SHEET_LABEL_SIZE,
+    x: summaryLabelSize,
     y: WIDGET_MARGIN,
     width: summaryWidth * 2/3 - WIDGET_MARGIN,
     height: summarySheets.minHeight - 2 * WIDGET_MARGIN,
