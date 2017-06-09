@@ -150,3 +150,38 @@ export function addEastLabel(container, widget, isEast) {
         return 0;
     }
 }
+
+if (_.isUndefined(jsPDF)) {
+    console.error("jsPDF is not loaded!");
+    if (_.isUndefined(saveSvgAsPng)) {
+        console.error("saveSvgAsPng is not loaded!");
+    }
+}
+
+/**
+ * Download the given viewpsheet as a PDF.
+ *
+ * @param {jQuery} pages - The collection of svg.page elements
+ * @param {function} callback
+ */
+export function generatePDF(pages, callback) {
+    let doc = new jsPDF({
+        unit: "in",
+        format: "letter",
+    });
+    let images = {};
+    _.each(pages, (page, i) => {
+        let imgData = svgAsPngUri(page, {}, uri => {
+            images[i] = uri;
+            if (_.size(images) === pages.length) {
+                _.range(pages.length).forEach(i => {
+                    if (i > 0) {
+                        doc.addPage();
+                    }
+                    doc.addImage(images[i], "png", 0, 0, 8.5, 11);
+                });
+                callback(doc);
+            }
+        });
+    });
+}

@@ -224,7 +224,9 @@ export function runAsync(callback) {
         queue = $.Deferred();
         queue.resolve(); // automatically triggers any subsequent callbacks
     }
-    return queue.then(callback).promise();
+    return queue.then(() => {
+        setTimeout(callback, 1);
+    }).promise();
 }
 
 /**

@@ -24,58 +24,75 @@ body {
             padding: 15px 20px;
             font-size: 1.2em;
         }
-        .page {
-            background: $white;
-            margin-bottom: 20px;
-            circle {
-                &.birds-eye-dot {
-                    fill: lighten($black, 60);
-                    &.curr-dot {
-                        fill: $black;
-                    }
-                }
+        div.loading-screen {
+            @include vertically-center;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255,255,255,0.9);
+            p {
+                font-size: 36px;
+                letter-spacing: 3px;
+                text-transform: uppercase;
             }
-            line {
-                stroke: $black;
-                &.birds-eye-guides {
-                    stroke: $semilight-gray;
-                    stroke-dasharray: 5;
-                }
-                &.four-step {
-                    stroke: $medium-gray;
-                    stroke-dasharray: 5;
-                }
-                &.page-divider {
-                    stroke: $medium-gray;
-                }
+        }
+    }
+}
+
+svg.page {
+    background: $white;
+    margin-bottom: 20px;
+    circle {
+        &.birds-eye-dot {
+            fill: lighten($black, 60);
+            &.curr-dot {
+                fill: $black;
             }
-            path {
-                stroke: $black;
-                fill: none;
+        }
+    }
+    line {
+        stroke: $black;
+        &.birds-eye-guides {
+            stroke: $semilight-gray;
+            stroke-dasharray: 5;
+        }
+        &.four-step {
+            stroke: $medium-gray;
+            stroke-dasharray: 5;
+        }
+        &.page-divider {
+            stroke: $medium-gray;
+        }
+    }
+    path {
+        stroke: $black;
+        fill: none;
+    }
+    rect {
+        stroke: $black;
+        fill: none;
+    }
+    text {
+        // copying for converting SVG to PDF
+        font-family: sans-serif("DIN Next");
+        &.dot-label {
+            fill: $medium-gray;
+            &.curr-label {
+                fill: $black;
+                font-weight: bold;
             }
-            rect {
-                stroke: $black;
-                fill: none;
-            }
-            text {
-                &.dot-label {
-                    fill: $medium-gray;
-                    &.curr-label {
-                        fill: $black;
-                        font-weight: bold;
-                    }
-                }
-                &.east-label {
-                    text-transform: uppercase;
-                }
-                &.position-info {
-                    fill: $dark-gray;
-                    font-size: 12px;
-                }
-                &.yardline-label {
-                    fill: $medium-gray;
-                }
-            }
+        }
+        &.east-label {
+            text-transform: uppercase;
+        }
+        &.position-info {
+            fill: $dark-gray;
+            font-size: 12px;
+        }
+        &.yardline-label {
+            fill: $medium-gray;
         }
     }
 }

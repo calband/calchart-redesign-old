@@ -4,7 +4,7 @@ import ViewpsheetGrapher from "graphers/ViewpsheetGrapher";
 import ViewpsheetSettingsPopup from "popups/ViewpsheetSettingsPopup";
 
 import HTMLBuilder from "utils/HTMLBuilder";
-import { update } from "utils/JSUtils";
+import { runAsync, update } from "utils/JSUtils";
 import {
     align,
     drawDot,
@@ -18,6 +18,7 @@ import {
     birdsEyeWidget,
     dotTypeWidget,
     EAST_LABEL_SIZE,
+    generatePDF,
     individualWidget,
     LEFT_RIGHT_QUADRANTS,
     movementWidget,
@@ -60,6 +61,9 @@ export default class ViewpsheetController extends ApplicationController {
             // {boolean} if true, stuntsheets go left/right; else top/bottom
             layoutLeftRight: true,
         });
+
+        // {jsPDF}
+        this._pdf = null;
     }
 
     get viewpsheet() {
@@ -76,7 +80,9 @@ export default class ViewpsheetController extends ApplicationController {
         });
 
         $(".buttons .download").click(e => {
-            // TODO
+            if (!$(e.currentTarget).hasClass("disabled")) {
+                this._pdf.save(`${this.show.name}.pdf`);
+            }
         });
     }
 
@@ -88,7 +94,11 @@ export default class ViewpsheetController extends ApplicationController {
      * to PDFs to be downloaded.
      */
     generate() {
-        this.viewpsheet.empty();
+        $(".buttons .download").addClass("disabled");
+        this._pdf = null;
+        this.viewpsheet
+            .scrollTop(0) // in case user has already scrolled down
+            .empty();
 
         if (this._dots.length === 0) {
             HTMLBuilder.make("p.no-dots-message", "No dots selected")
@@ -96,71 +106,86 @@ export default class ViewpsheetController extends ApplicationController {
             return;
         }
 
-        this._dots.forEach(dot => {
-            if (dot === undefined) {
-                console.error(`Dot does not exist: ${dot}`);
-                return;
+        let loadingScreen = HTMLBuilder.div("loading-screen");
+        HTMLBuilder.make("p", "Loading...")
+            .appendTo(loadingScreen);
+        this.viewpsheet
+            .append(loadingScreen)
+            .lockScroll();
+
+        runAsync(() => {
+            this._dots.forEach(dot => {
+                this.generateDot(dot);
+            });
+            loadingScreen.remove();
+            this.viewpsheet.unlockScroll();
+        }).then(() => {
+            generatePDF(this.viewpsheet.children(), pdf => {
+                this._pdf = pdf;
+                $(".buttons .download").removeClass("disabled");
+            });
+        });
+    }
+
+    /**
+     * Generate the PDF for a dot.
+     *
+     * @param {Dot} dot
+     */
+    generateDot(dot) {
+        if (dot === undefined) {
+            console.error(`Dot does not exist: ${dot}`);
+            return;
+        }
+
+        this._addBirdsEye(dot);
+
+        let quadrants = this._settings.layoutLeftRight
+            ? LEFT_RIGHT_QUADRANTS
+            : TOP_BOTTOM_QUADRANTS;
+
+        let page;
+        this.show.getSheets().forEach((sheet, i) => {
+            let quadrant = i % 4;
+
+            if (quadrant === 0) {
+                page = this._addPage();
+
+                // page dividers
+                page.append("line")
+                    .classed("page-divider", true)
+                    .attr("x1", PAGE_WIDTH / 2)
+                    .attr("y1", 0)
+                    .attr("x2", PAGE_WIDTH / 2)
+                    .attr("y2", PAGE_HEIGHT);
+                page.append("line")
+                    .classed("page-divider", true)
+                    .attr("x1", 0)
+                    .attr("y1", PAGE_HEIGHT / 2)
+                    .attr("x2", PAGE_WIDTH)
+                    .attr("y2", PAGE_HEIGHT / 2);
+
+                // clip-path definitions for diagrams
+                // (http://tutorials.jenkov.com/svg/clip-path.html)
+                let defs = page.append("defs");
+                defs.append("clipPath")
+                    .attr("id", "clip-movement")
+                    .append("rect")
+                        .attr("width", movementWidget.width)
+                        .attr("height", movementWidget.height);
+                defs.append("clipPath")
+                    .attr("id", "clip-nearby")
+                    .append("rect")
+                        .attr("width", nearbyWidget.width)
+                        .attr("height", nearbyWidget.height);
             }
 
-            this._addBirdsEye(dot);
-
-            let quadrants = this._settings.layoutLeftRight
-                ? LEFT_RIGHT_QUADRANTS
-                : TOP_BOTTOM_QUADRANTS;
-
-            let page;
-            this.show.getSheets().forEach((sheet, i) => {
-                let quadrant = i % 4;
-
-                if (quadrant === 0) {
-                    page = this._addPage();
-
-                    // page dividers
-                    page.append("line")
-                        .classed("page-divider", true)
-                        .attr("x1", PAGE_WIDTH / 2)
-                        .attr("y1", 0)
-                        .attr("x2", PAGE_WIDTH / 2)
-                        .attr("y2", PAGE_HEIGHT);
-                    page.append("line")
-                        .classed("page-divider", true)
-                        .attr("x1", 0)
-                        .attr("y1", PAGE_HEIGHT / 2)
-                        .attr("x2", PAGE_WIDTH)
-                        .attr("y2", PAGE_HEIGHT / 2);
-
-                    // clip-path definitions for diagrams
-                    // (http://tutorials.jenkov.com/svg/clip-path.html)
-                    let defs = page.append("defs");
-                    defs.append("clipPath")
-                        .attr("id", "clip-movement")
-                        .append("rect")
-                            .attr("width", movementWidget.width)
-                            .attr("height", movementWidget.height);
-                    defs.append("clipPath")
-                        .attr("id", "clip-nearby")
-                        .append("rect")
-                            .attr("width", nearbyWidget.width)
-                            .attr("height", nearbyWidget.height);
-                    defs.append("clipPath")
-                        .attr("id", "clip-birds-eye")
-                        .append("rect")
-                            .attr("width", birdsEyeWidget.width)
-                            .attr("height", birdsEyeWidget.height);
-                    defs.append("clipPath")
-                        .attr("id", "clip-summary")
-                        .append("rect")
-                            .attr("width", summaryMovement.width)
-                            .attr("height", summaryMovement.height);
-                }
-
-                let $sheet = this._generateSheet(page, sheet, dot);
-                let position = quadrants[quadrant];
-                move($sheet, position);
-            });
-
-            this._addSummary(dot);
+            let $sheet = this._generateSheet(page, sheet, dot);
+            let position = quadrants[quadrant];
+            move($sheet, position);
         });
+
+        this._addSummary(dot);
     }
 
     /**
@@ -262,7 +287,18 @@ export default class ViewpsheetController extends ApplicationController {
      * @param {Dot} dot
      */
     _addSummary(dot) {
-        let page = this._addPage();
+        let newPage = () => {
+            let page = this._addPage();
+            let defs = page.append("defs");
+            defs.append("clipPath")
+                .attr("id", "clip-summary")
+                .append("rect")
+                    .attr("width", summaryMovement.width)
+                    .attr("height", summaryMovement.height);
+            return page;
+        };
+
+        let page = newPage();
         let currX = 0;
         let currY = PAGE_MARGIN;
         let maxHeight = PAGE_HEIGHT - PAGE_MARGIN;
@@ -294,7 +330,12 @@ export default class ViewpsheetController extends ApplicationController {
             // go to next column if needed
             let nextY = currY + individualBox.height + 2 * WIDGET_MARGIN;
             if (nextY > maxHeight) {
-                currX = currX === 0 ? PAGE_WIDTH/2 : 0;
+                if (currX === 0) {
+                    currX = PAGE_WIDTH / 2;
+                } else {
+                    currX = 0;
+                    page = newPage();
+                }
                 currY = PAGE_MARGIN;
             }
             move($sheet, currX + PAGE_MARGIN, currY);
@@ -459,8 +500,6 @@ export default class ViewpsheetController extends ApplicationController {
             .attr("height", movementWidget.height);
 
         new ViewpsheetGrapher(graph, sheet, dot, isEast).drawPath();
-
-        // TODO: make interactive
     }
 
     /**
@@ -489,8 +528,6 @@ export default class ViewpsheetController extends ApplicationController {
             .attr("height", nearbyWidget.height);
 
         new ViewpsheetGrapher(graph, sheet, dot, isEast).drawNearby();
-
-        // TODO: make interactive
     }
 
     /**
