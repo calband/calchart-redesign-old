@@ -201,7 +201,7 @@ export default class ViewpsheetController extends ApplicationController {
      * @param {object} settings
      */
     saveSettings(settings) {
-        let oldDot = this._dot.id;
+        let oldDot = this._dot ? this._dot.id : null;
         let id = settings.dot;
         this._dot = this.show.getDot(id);
         delete settings.dot;
