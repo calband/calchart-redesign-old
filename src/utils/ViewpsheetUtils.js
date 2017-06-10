@@ -154,8 +154,8 @@ export function addEastLabel(container, widget, isEast) {
 
 if (_.isUndefined(jsPDF)) {
     console.error("jsPDF is not loaded!");
-    if (_.isUndefined(saveSvgAsPng)) {
-        console.error("saveSvgAsPng is not loaded!");
+    if (_.isUndefined(svgAsPngUri)) {
+        console.error("svgAsPngUri is not loaded!");
     }
 }
 
@@ -172,7 +172,7 @@ export function generatePDF(pages, callback) {
     });
     let images = {};
     _.each(pages, (page, i) => {
-        let imgData = svgAsPngUri(page, {}, uri => {
+        svgAsPngUri(page, {}, uri => {
             images[i] = uri;
             if (_.size(images) === pages.length) {
                 _.range(pages.length).forEach(i => {

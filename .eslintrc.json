@@ -6,7 +6,9 @@
     },
     "globals": {
         "_": true,
-        "d3": true
+        "d3": true,
+        "jsPDF": true,
+        "svgAsPngUri": true
     },
     "extends": "eslint:recommended",
     "parserOptions": {

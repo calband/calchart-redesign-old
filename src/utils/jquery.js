@@ -71,7 +71,7 @@ $.fn.containScroll = function() {
         if (e.originalEvent !== undefined) {
             var delta = e.originalEvent.deltaY || -e.originalEvent.wheelDelta || e.originalEvent.detail;
             e.preventDefault();
-            if (e.type === 'DOMMouseScroll') {
+            if (e.type === "DOMMouseScroll") {
                 delta = delta * 40;
             }
             $(this).scrollTop(delta + $(this).scrollTop());

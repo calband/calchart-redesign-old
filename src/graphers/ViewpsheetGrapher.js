@@ -1,6 +1,4 @@
-import Coordinate from "calchart/Coordinate";
 import MovementCommandArc from "calchart/movements/MovementCommandArc";
-import FieldGrapher from "graphers/FieldGrapher";
 import { FIELD_GRAPHERS } from "graphers/Grapher";
 
 import { getYCoordinateText } from "utils/CalchartUtils";
@@ -164,7 +162,7 @@ export default class ViewpsheetGrapher {
             let info = this._sheet.getDotInfo(dot);
             let position = this._scale.toDistance(info.position);
 
-            let $dot = this._field.append("circle")
+            this._field.append("circle")
                 .classed("birds-eye-dot", true)
                 .classed("curr-dot", dot === this._dot)
                 .attr("cx", position.x)
