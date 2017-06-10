@@ -46,14 +46,13 @@ import {
 export default class ViewpsheetController extends ApplicationController {
     /**
      * @param {Show} show - The show being viewed in the application.
-     * @param {int[]} dots - Dot IDs to generate viewpsheets for.
+     * @param {int} dot - The dot ID to generate viewpsheets for when the page loads.
      * @param {object} settings - User settings for generating viewpsheets.
      */
-    constructor(show, dots, settings) {
+    constructor(show, dot, settings) {
         super(show);
 
-        // TODO: only one dot for now
-        this._dots = dots.map(id => show.getDot(id));
+        this._dot = show.getDot(dot);
         this._settings = _.defaults(settings, {
             // see CalchartUtils.ORIENTATION_OPTIONS
             pathOrientation: "west",
@@ -101,7 +100,7 @@ export default class ViewpsheetController extends ApplicationController {
             .scrollTop(0) // in case user has already scrolled down
             .empty();
 
-        if (this._dots.length === 0) {
+        if (_.isUndefined(this._dot)) {
             HTMLBuilder.make("p.no-dots-message", "No dots selected")
                 .appendTo(this.viewpsheet);
             return;
@@ -114,9 +113,7 @@ export default class ViewpsheetController extends ApplicationController {
         this.viewpsheet.lockScroll();
 
         runAsync(() => {
-            this._dots.forEach(dot => {
-                this.generateDot(dot);
-            });
+            this.generateDot(this._dot);
             generatePDF(this.viewpsheet.children(), pdf => {
                 this._pdf = pdf;
                 $(".buttons .download").removeClass("disabled");
@@ -188,10 +185,10 @@ export default class ViewpsheetController extends ApplicationController {
     }
 
     /**
-     * @return {Dot[]}
+     * @return {Dot}
      */
-    getDots() {
-        return this._dots;
+    getDot() {
+        return this._dot;
     }
 
     /**
@@ -207,17 +204,22 @@ export default class ViewpsheetController extends ApplicationController {
      * @param {object} settings
      */
     saveSettings(settings) {
-        let ids = settings.dots;
-        this._dots = ids.map(id => this.show.getDot(id));
-        delete settings.dots;
+        let oldDot = this._dot.id;
+        let id = settings.dot;
+        this._dot = this.show.getDot(id);
+        delete settings.dot;
 
-        update(this._settings, settings);
-        window.history.replaceState(null, "", `?dots=${ids.join(",")}`);
+        let changed = update(this._settings, settings);
 
         // save to server
-        new SaveViewpSettingsAction().send(this._settings);
+        if (_.size(changed) > 0) {
+            new SaveViewpSettingsAction().send(this._settings);
+        }
 
-        this.generate();
+        if (id !== oldDot) {
+            window.history.replaceState(null, "", `?dot=${id}`);
+            this.generate();
+        }
     }
 
     /**** HELPERS ****/

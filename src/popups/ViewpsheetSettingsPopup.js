@@ -33,6 +33,11 @@ export default class ViewpsheetSettingsPopup extends FormPopup {
             allDots[dot.id] = dot.label;
         });
 
+        let dot = this._controller.getDot();
+        if (dot) {
+            dot = dot.id;
+        }
+
         return [
             new ChoiceField("pathOrientation", ORIENTATIONS, {
                 label: "Individual path orientation",
@@ -50,11 +55,10 @@ export default class ViewpsheetSettingsPopup extends FormPopup {
                 label: "Layout order",
                 initial: this._settings.layoutLeftRight ? "leftRight" : "topBottom",
             }),
-            new ChoiceField("dots", allDots, {
-                initial: this._controller.getDots().map(dot => dot.id),
-                multiple: true,
+            new ChoiceField("dot", allDots, {
+                initial: dot,
                 dropdown: {
-                    placeholder_text_multiple: "Select some dots...",
+                    placeholder_text_multiple: "Choose a dot...",
                 },
             }),
         ];
@@ -62,6 +66,7 @@ export default class ViewpsheetSettingsPopup extends FormPopup {
 
     onSave(data) {
         data.layoutLeftRight = data.layoutLeftRight === "leftRight";
+        data.dot = parseInt(data.dot);
         this._controller.saveSettings(data);
     }
 }

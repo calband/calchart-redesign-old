@@ -38,7 +38,7 @@ class Field {
     }
 
     /**
-     * @return {jQuery} The rendered form field.
+     * @return {jQuery} The rendered <div> container for a form field.
      */
     render() {
         let field = HTMLBuilder.make(`div.field.${this._name}`);
@@ -48,6 +48,7 @@ class Field {
             .attr("for", this._name)
             .appendTo(field);
 
+        // store the actual form field in this._field
         this._field = this.renderField()
             .attr("id", this._name)
             .attr("name", this._name)
@@ -144,6 +145,15 @@ export class ChoiceField extends Field {
         this._choices = choices;
         this._multiple = options.multiple;
         this._dropdown = options.dropdown;
+    }
+
+    render() {
+        let field = super.render();
+
+        // handle checking required in clean()
+        this._field.prop("required", false);
+
+        return field;
     }
 
     renderField() {

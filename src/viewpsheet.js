@@ -8,7 +8,7 @@ $(function() {
         return;
     }
 
-    let controller = ViewpsheetController.init(window.show, window.dots, window.settings);
+    let controller = ViewpsheetController.init(window.show, window.dot, window.settings);
     controller.generate();
 });
 

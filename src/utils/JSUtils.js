@@ -162,7 +162,7 @@ export function update(obj, data) {
 
     _.each(data, function(value, key) {
         let old = obj[key];
-        if (old !== key) {
+        if (old !== value) {
             changed[key] = old;
             obj[key] = parseNumber(value);
         }

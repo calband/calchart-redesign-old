@@ -10,15 +10,12 @@
     {% add_script "vendor/jspdf.min.js" "vendor/saveSvgAsPng.js" "viewpsheet.js" %}
     <script>
         window.settings = {{ request.user.viewpsheet_settings|safe }};
+        window.dot = {{ dot|default:"null" }};
+
         {% if show.viewer %}
             window.show = {{ show.viewer|asjson|safe }};
         {% else %}
             window.show = null;
-        {% endif %}
-        {% if dots %}
-            window.dots = "{{ dots }}".split(",").map(i => parseInt(i));
-        {% else %}
-            window.dots = [];
         {% endif %}
     </script>
 {% endblock %}
