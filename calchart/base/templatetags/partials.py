@@ -16,11 +16,11 @@ def add_style(*paths):
     {% add_style 'base/page_modify.css' %}
 
     to:
-    <link rel="stylesheet" type="text/css" href="{% static 'css/base/page_modify.css' %}>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/base/page_modify.css' %} crossorigin="anonymous">
     """
     return format_html_join(
         '',
-        '<link rel="stylesheet" type="text/css" href="{}">',
+        '<link rel="stylesheet" type="text/css" href="{}" crossorigin="anonymous">',
         [(get_static_path('css/%s' % path),) for path in paths]
     )
 
