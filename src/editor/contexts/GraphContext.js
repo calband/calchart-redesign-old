@@ -20,6 +20,7 @@ import { showError, showMessage } from "utils/UIUtils";
 
 let GraphState = {
     grapher: null,
+    activeContext: null,
     activeSheet: null,
     selectedDots: $(),
     isInitialized: false,
@@ -80,6 +81,9 @@ export default class GraphContext extends BaseContext {
             drawYardlineNumbers: true,
             draw4Step: true,
             expandField: true,
+            onZoom: grapher => {
+                GraphState.activeContext.refresh("grapher");
+            },
             showLabels: true,
             zoomable: true,
         });
@@ -92,13 +96,11 @@ export default class GraphContext extends BaseContext {
     }
 
     load(options) {
+        GraphState.activeContext = this;
+
         super.load(options);
 
         $(".graph-content").show();
-
-        GraphState.grapher.setOption("onZoom", grapher => {
-            this.refresh("grapher");
-        });
 
         this._addEvents(this.sidebar, {
             contextmenu: e => {
