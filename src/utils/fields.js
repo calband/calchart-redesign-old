@@ -38,7 +38,7 @@ class Field {
     }
 
     /**
-     * @return {jQuery} The rendered form field.
+     * @return {jQuery} The rendered <div> container for a form field.
      */
     render() {
         let field = HTMLBuilder.make(`div.field.${this._name}`);
@@ -48,6 +48,7 @@ class Field {
             .attr("for", this._name)
             .appendTo(field);
 
+        // store the actual form field in this._field
         this._field = this.renderField()
             .attr("id", this._name)
             .attr("name", this._name)
@@ -83,12 +84,20 @@ class Field {
         return value;
     }
 
+    /**
+     * @return {jQuery}
+     */
     getField() {
         if (_.isNull(this._field)) {
             this.render();
         }
         return this._field;
     }
+
+    /**
+     * Any actions to run after the popup has been shown.
+     */
+    onShow() {}
 }
 
 export class BooleanField extends Field {
@@ -120,21 +129,45 @@ export class ChoiceField extends Field {
      * @param {string} name
      * @param {object} choices - The options to add to the <select>, mapping
      *   the value of the option to the human-readable name.
-     * @param {object} [options]
+     * @param {object} [options] - See Field options. Can also include:
+     *   - {boolean} [multiple=false] - If true, allow multiple options to be
+     *     chosen.
+     *   - {object} [dropdown] - Any options to pass to the dropdown() call.
      */
     constructor(name, choices, options) {
         super(name, options);
 
+        options = _.defaults({}, options, {
+            multiple: false,
+            dropdown: {},
+        });
+
         this._choices = choices;
+        this._multiple = options.multiple;
+        this._dropdown = options.dropdown;
+    }
+
+    render() {
+        let field = super.render();
+
+        // handle checking required in clean()
+        this._field.prop("required", false);
+
+        return field;
     }
 
     renderField() {
-        let select = HTMLBuilder.select(this._choices);
+        let select = HTMLBuilder.select(this._choices)
+            .prop("multiple", this._multiple);
 
         // add an empty option to the beginning
         HTMLBuilder.make("option").prependTo(select);
 
         return select;
+    }
+
+    onShow() {
+        this._field.dropdown(this._dropdown);
     }
 }
 

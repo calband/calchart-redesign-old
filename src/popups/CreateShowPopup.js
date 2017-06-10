@@ -1,5 +1,5 @@
 import CreateShowAction from "actions/CreateShowAction";
-import BasePopup from "popups/BasePopup";
+import FormPopup from "popups/FormPopup";
 
 import { IS_STUNT } from "utils/env";
 import { BooleanField, CharField, FileField } from "utils/fields";
@@ -7,7 +7,7 @@ import { BooleanField, CharField, FileField } from "utils/fields";
 /**
  * The popup to create a show.
  */
-export default class CreateShowPopup extends BasePopup {
+export default class CreateShowPopup extends FormPopup {
     get info() {
         return {
             name: "create-show",

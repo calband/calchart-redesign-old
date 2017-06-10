@@ -1,11 +1,13 @@
 @import "partials/vars", "partials/mixins", "partials/functions";
 
+$content-width: 700px;
+
 body {
-    min-width: 1000px;
+    min-width: $content-width + 40px;
 }
 
 .content {
-    width: 900px;
+    width: $content-width;
     margin: 0 auto;
     text-align: center;
     .details {
@@ -23,7 +25,7 @@ body {
         }
     }
     .viewer {
-        height: 475px;
+        height: $content-width * 0.6;
         .dot {
             cursor: pointer;
         }
@@ -52,7 +54,7 @@ body {
     }
     .controls {
         @include unselectable;
-        margin-top: 20px;
+        margin: 20px 0;
         i {
             cursor: pointer;
             font-size: 24px;

@@ -1,4 +1,4 @@
-import BasePopup from "popups/BasePopup";
+import FormPopup from "popups/FormPopup";
 
 import {
     DEFAULT_CUSTOM,
@@ -18,7 +18,7 @@ import {
 /**
  * The superclass for the popups that edit continuities.
  */
-class EditContinuityPopup extends BasePopup {
+class EditContinuityPopup extends FormPopup {
     /**
      * @param {EditorController} controller
      * @param {Continuity} continuity

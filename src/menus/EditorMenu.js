@@ -91,12 +91,12 @@ export default class EditorMenu extends Menu {
         let zooms = [
             {
                 label: "Zoom in",
-                action: "zoom(0.1)",
+                action: "zoomBy(0.1)",
                 icon: "search-plus",
             },
             {
                 label: "Zoom out",
-                action: "zoom(-0.1)",
+                action: "zoomBy(-0.1)",
                 icon: "search-minus",
             },
             this.DIVIDER,

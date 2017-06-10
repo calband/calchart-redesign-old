@@ -32,6 +32,6 @@ export default class CreateShowAction extends ServerAction {
     }
 
     handleSuccess(data) {
-        location.href = data.url;
+        window.location.href = data.url;
     }
 }

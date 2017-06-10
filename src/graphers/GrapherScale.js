@@ -8,21 +8,23 @@ export default class GrapherScale {
      * @param {FieldGrapher} grapher - The grapher to get the scale of.
      * @param {number} svgWidth - The width of the svg.
      * @param {number} svgHeight - The height of the svg.
-     * @param {number} paddingWidth - The minimum amount of space between
-     *   the sides of the field and the SVG.
-     * @param {number} paddingHeight - The minimum amount of space between
-     *   the top and bottom of the field and the SVG.
+     * @param {Object} options - The options to customize drawing the field.
+     *   See Grapher.setOption for a list of all available options.
      */
-    constructor(grapher, svgWidth, svgHeight, paddingWidth, paddingHeight) {
+    constructor(grapher, svgWidth, svgHeight, options) {
         // the width/height of the field
-        this._width = svgWidth - 2 * paddingWidth;
+        this._width = svgWidth - 2 * options.fieldPadding;
         this._height = this._width * grapher.FIELD_HEIGHT / grapher.FIELD_WIDTH;
 
         // keep aspect ratio of width/height
         if (this._height > svgHeight) {
-            this._height = svgHeight - 2 * paddingHeight;
+            this._height = svgHeight - 2 * options.fieldPadding;
             this._width = this._height * grapher.FIELD_WIDTH / grapher.FIELD_HEIGHT;
         }
+
+        // just in case
+        this._width = Math.max(this._width, 0);
+        this._height = Math.max(this._height, 0);
 
         // pixels to the edges of the field
         this._minX = (svgWidth - this._width) / 2;
@@ -33,23 +35,28 @@ export default class GrapherScale {
         // function that maps steps to distance
         this._xScale = d3.scaleLinear()
             .domain([0, grapher.FIELD_WIDTH])
-            .range([this.minX, this.maxX]);
+            .range([this._minX, this._maxX]);
 
         // function that maps steps to distance
         this._yScale = d3.scaleLinear()
             .domain([0, grapher.FIELD_HEIGHT])
-            .range([this.minY, this.maxY]);
+            .range([this._minY, this._maxY]);
 
         // conversion ratio distance per step; ratio same for x and y axes
         this._ratio = this.xScale(1) - this.xScale(0);
+
+        // true if east up
+        this._eastUp = options.eastUp;
     }
 
     get width() { return this._width; }
     get height() { return this._height; }
+
     get minX() { return this._minX; }
     get maxX() { return this._maxX; }
     get minY() { return this._minY; }
     get maxY() { return this._maxY; }
+
     get xScale() { return this._xScale; }
     get yScale() { return this._yScale; }
 
@@ -79,7 +86,12 @@ export default class GrapherScale {
      * @return {number}
      */
     toDistanceX(steps) {
-        return this.toDistance(steps) + this.minX;
+        let distance = this.toDistance(steps);
+        if (this._eastUp) {
+            return this.maxX - distance;
+        } else {
+            return this.minX + distance;
+        }
     }
 
     /**
@@ -89,7 +101,12 @@ export default class GrapherScale {
      * @return {number}
      */
     toDistanceY(steps) {
-        return this.toDistance(steps) + this.minY;
+        let distance = this.toDistance(steps);
+        if (this._eastUp) {
+            return this.maxY - distance;
+        } else {
+            return this.minY + distance;
+        }
     }
 
     /**
@@ -117,7 +134,12 @@ export default class GrapherScale {
      * @return {number}
      */
     toStepsX(distance) {
-        return this.toSteps(distance - this.minX);
+        if (this._eastUp) {
+            distance = distance + this.maxX;
+        } else {
+            distance = distance - this.minX;
+        }
+        return this.toSteps(distance);
     }
 
     /**
@@ -127,6 +149,11 @@ export default class GrapherScale {
      * @return {number}
      */
     toStepsY(distance) {
-        return this.toSteps(distance - this.minY);
+        if (this._eastUp) {
+            distance = distance + this.maxY;
+        } else {
+            distance = distance - this.minY;
+        }
+        return this.toSteps(distance);
     }
 }

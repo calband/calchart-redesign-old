@@ -1,4 +1,4 @@
-import BasePopup from "popups/BasePopup";
+import FormPopup from "popups/FormPopup";
 
 import {
     SHOW_FIELD_TYPES,
@@ -11,7 +11,7 @@ import { BooleanField, ChoiceField, NumberField } from "utils/fields";
 /**
  * The popup to edit a show.
  */
-export default class EditShowPopup extends BasePopup {
+export default class EditShowPopup extends FormPopup {
     /**
      * @param {EditorController} controller
      */

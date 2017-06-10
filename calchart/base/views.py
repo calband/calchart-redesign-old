@@ -10,6 +10,7 @@ from django.shortcuts import get_object_or_404, redirect
 from django.views.generic import TemplateView, RedirectView, CreateView
 from django.utils import timezone
 
+import json
 from datetime import timedelta
 
 from base.forms import *
@@ -247,3 +248,33 @@ class ViewerView(CalchartMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         context['show'] = self.show
         return context
+
+class ViewpsheetView(CalchartMixin, TemplateView):
+    """
+    The view that generates viewpsheets for a show. Can also pass in
+    a dot ID in the GET parameters to initialize the dot to generate
+    viewpsheets for.
+    """
+    template_name = 'viewpsheet.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        self.show = get_object_or_404(Show, slug=kwargs['slug'])
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['show'] = self.show
+        context['dot'] = self.request.GET.get('dot')
+        return context
+
+    def save_settings(self):
+        """
+        A POST action that saves a user's viewpsheet settings.
+        """
+        settings = {
+            key: self.request.POST[key]
+            for key in ['pathOrientation', 'nearbyOrientation', 'birdsEyeOrientation', 'layoutLeftRight']
+        }
+        settings['layoutLeftRight'] = settings['layoutLeftRight'] == 'true'
+        self.request.user.viewpsheet_settings = json.dumps(settings)
+        self.request.user.save()

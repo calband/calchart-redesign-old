@@ -10,7 +10,7 @@ import {
     roundSmall,
     wrap,
 } from "utils/MathUtils";
- 
+
 /**
  * A MovementCommand which represents a circular movement around an origin.
  */
@@ -24,7 +24,7 @@ export default class MovementCommandArc extends BaseMovementCommand {
      * @param {int} duration - The duration of the movement, in beats.
      * @param {object} [options] - Options for the movement, including:
      *   - {int} [beatsPerStep=1]
-     */ 
+     */
     constructor(startX, startY, origin, degrees, duration, options) {
         super(startX, startY, null, null, duration, options);
 
@@ -81,12 +81,26 @@ export default class MovementCommandArc extends BaseMovementCommand {
     }
 
     /**
+     * Get the "d" attribute for this arc in a <path> element.
+     *
+     * @param {GrapherScale} scale
+     * @return {string}
+     */
+    getPathDef(scale) {
+        let r = scale.toDistance(this._radius);
+        let largeArc = Math.abs(this._degrees) < 180 ? 0 : 1;
+        let sweepFlag = this._degrees < 0 ? 0 : 1;
+        let { x, y } = scale.toDistance(this.getEndPosition());
+        return `A ${r} ${r} 0 ${largeArc} ${sweepFlag} ${x} ${y}`;
+    }
+
+    /**
      * @return {string} The continuity text in the form "GT CW 90 deg. (16 steps)".
      */
-    getContinuityText() {
+    getText() {
         let direction = this._degrees > 0 ? "CW" : "CCW";
         let degrees = Math.abs(this._degrees);
-        let steps = this._duration / this.getBeatsPerStep();
+        let steps = this._duration / this._beatsPerStep;
         return `GT ${direction} ${degrees} deg. (${steps} steps)`;
     }
 }

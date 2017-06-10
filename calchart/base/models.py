@@ -22,6 +22,9 @@ class User(AbstractUser):
     api_token = models.CharField(max_length=40)
     api_token_expiry = models.DateTimeField(null=True)
 
+    # preferences
+    viewpsheet_settings = models.TextField(default='{}')
+
     def get_username(self):
         if self.is_superuser or not self.is_members_only_user():
             return self.username

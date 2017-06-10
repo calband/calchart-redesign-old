@@ -1,11 +1,11 @@
-import BasePopup from "popups/BasePopup";
+import FormPopup from "popups/FormPopup";
 
 import { NumberField } from "utils/fields";
 
 /**
  * The popup to add a sheet.
  */
-export default class AddSheetPopup extends BasePopup {
+export default class AddSheetPopup extends FormPopup {
     /**
      * @param {EditorController} controller
      */

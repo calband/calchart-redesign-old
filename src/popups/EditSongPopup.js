@@ -1,4 +1,4 @@
-import BasePopup from "popups/BasePopup";
+import FormPopup from "popups/FormPopup";
 
 import { DEFAULT_CUSTOM, FIELD_TYPES, ORIENTATIONS, STEP_TYPES } from "utils/CalchartUtils";
 import { CharField, ChoiceField, ChoiceOrNumberField } from "utils/fields";
@@ -6,7 +6,7 @@ import { CharField, ChoiceField, ChoiceOrNumberField } from "utils/fields";
 /**
  * The popup to add a song.
  */
-export default class EditSongPopup extends BasePopup {
+export default class EditSongPopup extends FormPopup {
     /**
      * @param {EditorController} controller
      * @param {Song} song

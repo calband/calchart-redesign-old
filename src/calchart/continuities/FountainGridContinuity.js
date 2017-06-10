@@ -47,6 +47,12 @@ export default class FountainGridContinuity extends ToEndContinuity {
 
     /**** METHODS ****/
 
+    getContinuityText() {
+        let directions = this._isEWNS ? "EW/NS" : "NS/EW";
+        let end = this._getEndText();
+        return `FM${this.getStepType()} ${directions} ${end}`;
+    }
+
     getMovements(dot, data) {
         let start = data.position;
         let end = this._getNextPosition(dot);

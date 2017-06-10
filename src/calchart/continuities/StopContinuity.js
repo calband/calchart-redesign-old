@@ -58,6 +58,22 @@ export default class StopContinuity extends BaseContinuity {
         }
     }
 
+    /**** METHODS ****/
+
+    getContinuityText() {
+        let orientation = this.getOrientation();
+        if (!this._marktime) {
+            return `Close ${orientation}`;
+        }
+
+        if (_.isNull(this._duration)) {
+            return `MT${this.getStepType()} ${orientation}`;
+        } else {
+            let duration = this._duration * this.getBeatsPerStep();
+            return `MT${this.getStepType()} ${duration} ${orientation}`;
+        }
+    }
+
     /**
      * @return {?int}
      */

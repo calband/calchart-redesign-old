@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% load partials utils %}
+
+{% block title %}
+    Calchart Viewpsheet - {{ show.name }}
+{% endblock %}
+
+{% block head %}
+    {% add_style "viewpsheet.css" %}
+    {% add_script "vendor/jspdf.min.js" "vendor/saveSvgAsPng.js" "viewpsheet.js" %}
+    <script>
+        window.settings = {{ request.user.viewpsheet_settings|safe }};
+        window.dot = {{ dot|default:"null" }};
+
+        {% if show.viewer %}
+            window.show = {{ show.viewer|asjson|safe }};
+        {% else %}
+            window.show = null;
+        {% endif %}
+    </script>
+{% endblock %}
+
+{% block body %}
+    <div class="content">
+        <h1>{{ show.name }}</h1>
+        <p><a href="{% url 'viewer' show.slug %}">Back to viewer</a></p>
+        <div class="buttons">
+            <button class="open-settings">Settings</button>
+            <button class="download disabled">Download</button>
+        </div>
+        <div class="viewpsheet"></div>
+    </div>
+{% endblock %}

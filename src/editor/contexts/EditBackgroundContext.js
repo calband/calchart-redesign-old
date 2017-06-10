@@ -38,8 +38,6 @@ export default class EditBackgroundContext extends HiddenGraphContext {
     load(options) {
         super.load(options);
 
-        this._image = this.grapher.getGraph().find("image.background-image");
-
         this._session++;
         this._previousContext = options.previousContext;
         this.grapher.setOptions({
@@ -81,6 +79,7 @@ export default class EditBackgroundContext extends HiddenGraphContext {
     refreshGrapher() {
         super.refreshGrapher();
 
+        this._image = this.grapher.getGraph().find("image.background-image");
         let dimensions = this._image.getDimensions();
 
         this._handles.css({

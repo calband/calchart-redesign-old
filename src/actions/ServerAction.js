@@ -92,6 +92,5 @@ export default class ServerAction {
      * @param {object} data - The JSON data returned from the server.
      */
     handleSuccess(data) {
-        throw new NotImplementedError(this);
     }
 }

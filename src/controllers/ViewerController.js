@@ -1,5 +1,5 @@
-import Grapher from "calchart/Grapher";
 import ApplicationController from "controllers/ApplicationController";
+import Grapher from "graphers/Grapher";
 
 import HTMLBuilder from "utils/HTMLBuilder";
 import { round, roundSmall } from "utils/MathUtils";
@@ -33,13 +33,18 @@ export default class ViewerController extends ApplicationController {
     }
 
     static get shortcuts() {
-        return EditorShortcuts;
+        return ViewerShortcuts;
     }
 
     init() {
         super.init();
 
-        this._grapher = new Grapher(this._show, $(".viewer"));
+        this._grapher = new Grapher(this._show, $(".viewer"), {
+            onZoom: grapher => {
+                this.refresh();
+            },
+            zoomable: true,
+        });
         this.refresh();
 
         this._setupSeek();
@@ -50,6 +55,12 @@ export default class ViewerController extends ApplicationController {
         $(".controls .toggle-play").click(e => this.togglePlay());
         $(".controls .next-beat").click(e => this.nextBeat());
         $(".controls .next-sheet").click(e => this.nextSheet());
+
+        // buttons
+        $(".buttons .open-viewpsheet").click(e => {
+            let dot = this._currDot ? this._currDot.data("dot").id : "";
+            window.location.href = `/viewpsheet/${this.show.slug}/?dot=${dot}`;
+        });
 
         // select dot
         let dots = $(".select-dot");
@@ -65,10 +76,9 @@ export default class ViewerController extends ApplicationController {
                 allow_single_deselect: true,
             })
             .change(e => {
-                let dot = dots.find("option:selected");
-                if (dot.exists()) {
-                    let $dot = this._grapher.getDot(dot.data("dot"));
-                    this._currDot = $dot;
+                let dot = dots.find("option:selected").data("dot");
+                if (dot) {
+                    this._currDot = this._grapher.getDot(dot);
                 } else {
                     this._currDot = null;
                 }
@@ -92,7 +102,10 @@ export default class ViewerController extends ApplicationController {
         }
 
         this._grapher.draw(this._currSheet, this._currBeat);
-        this._grapher.selectDots(this._currDot);
+
+        if (this._currDot) {
+            this._grapher.selectDots(this._currDot);
+        }
 
         $(".details .sheet").text(this._currSheet.getLabel());
         let beatNum = this._currBeat === 0 ? "Hup" : this._currBeat;
@@ -103,6 +116,15 @@ export default class ViewerController extends ApplicationController {
         let beat = this._getCumulativeBeat();
         let position = $(".seek").width() / this._totalBeats * beat;
         $(".seek .marker").css("transform", `translateX(${position}px)`);
+    }
+
+    /**** METHODS ****/
+
+    /**
+     * @return {Dot} The currently selected dot.
+     */
+    getDot() {
+        return this._currDot.data("dot");
     }
 
     /**** ANIMATION ****/
@@ -220,6 +242,8 @@ export default class ViewerController extends ApplicationController {
         this._isPlaying = !this._isPlaying;
     }
 
+    /**** HELPERS ****/
+
     /**
      * Get the cumulative number of beats for the current sheet and beat
      *
@@ -287,7 +311,7 @@ export default class ViewerController extends ApplicationController {
     }
 }
 
-let EditorShortcuts = {
+let ViewerShortcuts = {
     "left": "prevBeat",
     "right": "nextBeat",
     "shift+left": "prevSheet",

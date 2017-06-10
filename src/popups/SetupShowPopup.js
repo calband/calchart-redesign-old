@@ -1,6 +1,6 @@
 import Show from "calchart/Show";
 import EditorController from "controllers/EditorController";
-import BasePopup from "popups/BasePopup";
+import FormPopup from "popups/FormPopup";
 
 import { DOT_FORMATS, SHOW_FIELD_TYPES } from "utils/CalchartUtils";
 import { ChoiceField, NumberField } from "utils/fields";
@@ -8,7 +8,7 @@ import { ChoiceField, NumberField } from "utils/fields";
 /**
  * The popup to setup a show when first opening it in the editor.
  */
-export default class SetupShowPopup extends BasePopup {
+export default class SetupShowPopup extends FormPopup {
     /**
      * @param {string} name - The name of the show.
      * @param {string} slug - The slug of the show.

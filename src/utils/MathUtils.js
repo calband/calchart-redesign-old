@@ -3,7 +3,7 @@
  * useful in mathematical calculations. For explanations on the coordinate
  * system, see docs/Coordinate_System.md
  */
- 
+
 /** @const {float} */
 export const PI_OVER_TWO = Math.PI / 2;
 

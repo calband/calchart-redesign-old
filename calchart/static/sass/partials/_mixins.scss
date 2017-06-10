@@ -18,6 +18,9 @@
     &:hover {
         background: lighten($primary-color, 5);
     }
+    &.disabled {
+        background: $medium-gray;
+    }
 }
 
 // any menu that hovers over content
@@ -41,6 +44,7 @@
         }
         &.has-submenu:after {
             @include vertically-center-self;
+            position: absolute;
             content: "\5c";
             font-family: "icons";
             font-size: 0.9em;
@@ -85,6 +89,7 @@
         }
         .close-message {
             @include vertically-center-self;
+            position: absolute;
             right: 10px;
             color: $gold;
             cursor: pointer;
@@ -138,7 +143,6 @@
 
 // make this element vertically centered
 @mixin vertically-center-self {
-    position: absolute;
     top: 50%;
     transform: translateY(-50%);
 }

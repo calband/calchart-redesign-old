@@ -92,7 +92,7 @@ export default class ContinuityPanel extends BasePanel {
             });
 
         _.each(CONTINUITIES, (continuities, group) => {
-            let options = _.map(continuities,(label, value) => 
+            let options = _.map(continuities,(label, value) =>
                 HTMLBuilder.make("option", label).attr("value", value)
             );
 

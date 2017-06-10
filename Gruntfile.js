@@ -2,7 +2,7 @@ var path = require("path");
 var eslint = require("eslint");
 
 var entryPoints = {};
-var entryFiles = ["home", "editor", "viewer", "wiki"].map(function(file) {
+var entryFiles = ["home", "editor", "viewer", "viewpsheet", "wiki"].map(function(file) {
     var filepath = "./src/" + file + ".js";
     entryPoints[file] = filepath;
     return filepath;
@@ -38,12 +38,19 @@ module.exports = function(grunt) {
                                 loader: "babel-loader",
                                 options: {
                                     presets: [
-                                        // converts ES6 to ES5
-                                        "es2015",
+                                        // converts ES6 to ES5: http://javascriptplayground.com/blog/2016/10/moving-to-webpack-2/#stop-babel-from-compiling-es2015-modules
+                                        ["es2015", {
+                                            modules: false,
+                                        }],
                                     ],
+                                    // TODO: uncomment after https://github.com/webpack-contrib/grunt-webpack/pull/141
                                     plugins: [
-                                        // allows ES6 primitives such as Set
-                                        require("babel-plugin-transform-runtime"),
+                                        // // allows ES6 primitives such as Set
+                                        // "babel-plugin-transform-runtime",
+                                        // // allows correct behavior for `extends Error`
+                                        // ["babel-plugin-transform-builtin-extend", {
+                                        //     globals: ["Error"],
+                                        // }],
                                     ],
                                     minified: true,
                                     comments: false,

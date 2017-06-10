@@ -43,6 +43,17 @@ export default class EvenContinuity extends BaseContinuity {
 
     /**** METHODS ****/
 
+    getContinuityText() {
+        let label = this.sheet.getNextSheet().getLabel();
+        let step = this.getStepType();
+        let orientation = this.getOrientation();
+        if (_.isUndefined(orientation)) {
+            return `EVEN ${step} TO SS ${label}`;
+        } else {
+            return `${step}F${orientation} TO SS ${label}`;
+        }
+    }
+
     getMovements(dot, data) {
         let start = data.position;
         let end = this._getNextPosition(dot);

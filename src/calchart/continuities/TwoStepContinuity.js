@@ -92,6 +92,15 @@ export default class TwoStepContinuity extends OrderedDotsContinuity {
         return this._continuities;
     }
 
+    getContinuityText() {
+        let beats = this.getBeatsPerStep() * 2;
+        let stop = this._isMarktime ? `MT${this.getStepType()}` : "Close";
+        let orientation = this.getOrientation();
+        let continuities = this._continuities.map(continuity => continuity.getText()).join("\n");
+
+        return `Step ${beats} drill [${stop} ${orientation} before]:\n${continuities}`;
+    }
+
     /**
      * @return {boolean}
      */
@@ -122,18 +131,6 @@ export default class TwoStepContinuity extends OrderedDotsContinuity {
         return [stop].concat(movements);
     }
 
-    /**
-     * Move the continuity at the given index in the step-two drill
-     * to the specified index.
-     *
-     * @param {int} from
-     * @param {int} to
-     */
-    moveContinuity(from, to) {
-        moveElem(this._continuities, from, to);
-        this.sheet.updateMovements(this.dotType);
-    }
-
     getPanel(context) {
         let panel = super.getPanel(context);
 
@@ -145,6 +142,18 @@ export default class TwoStepContinuity extends OrderedDotsContinuity {
         setupTooltip(editContinuities, "Continuities");
 
         return _.concat(panel, editContinuities);
+    }
+
+    /**
+     * Move the continuity at the given index in the step-two drill
+     * to the specified index.
+     *
+     * @param {int} from
+     * @param {int} to
+     */
+    moveContinuity(from, to) {
+        moveElem(this._continuities, from, to);
+        this.sheet.updateMovements(this.dotType);
     }
 
     /**

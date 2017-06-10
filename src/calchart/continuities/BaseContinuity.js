@@ -17,6 +17,8 @@ export default class BaseContinuity {
      *   - {int} beatsPerStep - The number of beats per each step of the movement.
      *   - {string} orientation - Orientation, as either east or west. The meaning for
      *     this option is different for each continuity.
+     *   - {string} customText - Custom continuity text to override the default
+     *     text that should be shown for the continuity.
      */
     constructor(sheet, dotType, options={}) {
         this._sheet = sheet;
@@ -77,7 +79,7 @@ export default class BaseContinuity {
      * @param {Continuity[]} continuities
      * @param {Dot} dot
      * @param {Coordinate} start - The starting position of the dot.
-     * @param {int} duration - The number of beats to use for the movements. 
+     * @param {int} duration - The number of beats to use for the movements.
      */
     static buildMovements(continuities, dot, start, duration) {
         // getMovements() can modify anything passed in
@@ -153,6 +155,14 @@ export default class BaseContinuity {
     }
 
     /**
+     * @return {string} The continuity text to be displayed for this continuity, assuming
+     *   this is a sheet after this sheet.
+     */
+    getContinuityText() {
+        throw new NotImplementedError(this);
+    }
+
+    /**
      * @return {string}
      */
     getCustomText() {
@@ -171,6 +181,22 @@ export default class BaseContinuity {
      */
     getMovements(dot, data) {
         throw new NotImplementedError(this);
+    }
+
+    /**
+     * Get this continuity's orientation, resolving any defaults.
+     *
+     * @return {string}
+     */
+    getOrientation() {
+        switch(this.getOrientationDegrees()) {
+            case 0:
+                return "E";
+            case 180:
+                return "W";
+            default:
+                return undefined;
+        }
     }
 
     /**
@@ -210,6 +236,17 @@ export default class BaseContinuity {
      */
     getStepType() {
         return this._stepType === "default" ? this.sheet.getStepType() : this._stepType;
+    }
+
+    /**
+     * @return {string} The continuity text to be displayed for this continuity.
+     */
+    getText() {
+        if (this._customText.length === 0 && !this.sheet.isLastSheet()) {
+            return this.getContinuityText();
+        } else {
+            return this.getCustomText();
+        }
     }
 
     /**

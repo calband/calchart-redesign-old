@@ -99,12 +99,12 @@ $editor-header-height: 95px;
             display: inline-block;
             height: 100%;
             vertical-align: top;
-            overflow: auto;
         }
         .sidebar {
             width: $sidebar-width;
             padding: 20px;
             border-right: 3px double $medium-gray;
+            overflow: auto;
             .stuntsheet {
                 margin-bottom: 10px;
                 height: $sidebar-width * 0.6;
