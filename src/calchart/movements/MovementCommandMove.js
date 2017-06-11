@@ -76,13 +76,13 @@ export default class MovementCommandMove extends BaseMovementCommand {
      * @return {string} The continuity text in the form "Move 4 E".
      */
     getText() {
-        let deltaX = this._endX - this._startX;
-        let deltaY = this._endY - this._startY;
+        let deltaX = roundSmall(this._endX - this._startX);
+        let deltaY = roundSmall(this._endY - this._startY);
         let dirX = (deltaX < 0) ? "S" : "N";
         let dirY = (deltaY < 0) ? "W" : "E";
 
-        // This movement can only move in one direction
-        if (deltaX === 0) {
+        // this movement stays on the grid
+        if (this._direction % 180 === 0) {
             return `Move ${Math.abs(deltaY)} ${dirY}`;
         } else {
             return `Move ${Math.abs(deltaX)} ${dirX}`;

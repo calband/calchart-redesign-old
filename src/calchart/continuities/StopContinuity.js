@@ -4,6 +4,7 @@ import { StopContinuityPopup } from "popups/ContinuityPopups";
 
 import HTMLBuilder from "utils/HTMLBuilder";
 import { validatePositive } from "utils/JSUtils";
+import { roundSmall } from "utils/MathUtils";
 
 /**
  * A continuity that does not move
@@ -69,7 +70,7 @@ export default class StopContinuity extends BaseContinuity {
         if (_.isNull(this._duration)) {
             return `MT${this.getStepType()} ${orientation}`;
         } else {
-            let duration = this._duration * this.getBeatsPerStep();
+            let duration = roundSmall(this._duration * this.getBeatsPerStep());
             return `MT${this.getStepType()} ${duration} ${orientation}`;
         }
     }
