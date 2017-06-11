@@ -1,6 +1,8 @@
 import ToEndContinuity from "calchart/continuities/ToEndContinuity";
 import MovementCommandMove from "calchart/movements/MovementCommandMove";
 
+import { roundSmall } from "utils/MathUtils";
+
 /**
  * An EWNS or NSEW continuity, where dots move as far EW or NS as possible,
  * then move NS or EW to get to their next position.
@@ -60,8 +62,8 @@ export default class FountainGridContinuity extends ToEndContinuity {
             return [];
         }
 
-        let deltaX = end.x - start.x;
-        let deltaY = end.y - start.y;
+        let deltaX = roundSmall(end.x - start.x);
+        let deltaY = roundSmall(end.y - start.y);
         let dirX = this.constructor.getXAngle(deltaX);
         let dirY = this.constructor.getYAngle(deltaY);
 
