@@ -75,8 +75,6 @@ class Show(models.Model):
     viewer_file = models.FileField(upload_to='viewer')
     # the json file that dictates the number of milliseconds per beat
     beats_file = models.FileField(upload_to='beats')
-    # the audio file to animate the show
-    audio_file = models.FileField(upload_to='audio')
 
     def __str__(self):
         return self.name

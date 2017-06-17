@@ -1,3 +1,4 @@
+import UploadAudioAction from "actions/UploadAudioAction";
 import Song from "calchart/Song";
 import BaseContext from "editor/contexts/BaseContext";
 import Grapher from "graphers/Grapher";
@@ -5,8 +6,10 @@ import { MusicContextMenus as menus } from "menus/EditorContextMenus";
 import AddSongPopup from "popups/AddSongPopup";
 import EditSongPopup from "popups/EditSongPopup";
 
+import { AUDIO_EXTENSIONS } from "utils/CalchartUtils";
 import HTMLBuilder from "utils/HTMLBuilder";
-import { underscoreKeys, update } from "utils/JSUtils";
+import { runAsync, underscoreKeys, update } from "utils/JSUtils";
+import { promptFile, showError } from "utils/UIUtils";
 
 /**
  * The Context that allows a user to edit the songs, audio, and music
@@ -50,6 +53,8 @@ export default class MusicContext extends BaseContext {
     load(options) {
         super.load(options);
 
+        // panel events
+
         this._addEvents(this.songPanel, ".song", {
             click: e => {
                 if ($(e.target).notIn(".actions")) {
@@ -85,6 +90,51 @@ export default class MusicContext extends BaseContext {
                 } else {
                     this.controller.doAction("addSheetToSong", [sheet]);
                 }
+            },
+        });
+
+        // workspace events
+
+        this._addEvents(this.workspace, ".show-audio .edit-link", {
+            click: e => {
+                promptFile(file => {
+                    let extension = _.last(file.name.split("."));
+                    if (!_.includes(AUDIO_EXTENSIONS, extension)) {
+                        showError(`Invalid extension: ${extension}`);
+                        return;
+                    }
+
+                    new UploadAudioAction(this).send({
+                        audio: file,
+                    });
+                });
+            },
+        });
+
+        this._addEvents(this.workspace, ".show-audio .delete-link", {
+            click: e => {
+                this.controller.doAction("setAudioUrl", [null]);
+            },
+        });
+
+        this._addEvents(this.workspace, ".upload-beats-audio", {
+            click: e => {
+                promptFile(file => {
+                    let extension = _.last(file.name.split("."));
+                    if (!_.includes(AUDIO_EXTENSIONS, extension)) {
+                        showError(`Invalid extension: ${extension}`);
+                        return;
+                    }
+
+                    let text = $(e.target).text();
+                    $(e.target).text("Analyzing...").prop("disabled", true);
+
+                    runAsync(() => {
+                        // TODO: analyze beats audio (#161)
+
+                        $(e.target).text(text).prop("disabled", false);
+                    });
+                });
             },
         });
 
@@ -150,7 +200,22 @@ export default class MusicContext extends BaseContext {
      * Refresh the beats editor.
      */
     refreshWorkspace() {
-        // TODO: implement (#160)
+        let url = this.show.getAudioUrl();
+        let deleteIcon = this.workspace.find(".show-audio .delete-link");
+        let label = this.workspace.find(".show-audio label");
+        label.next(".url").remove();
+
+        if (url) {
+            HTMLBuilder.make("a.url", url)
+                .attr("href", url)
+                .text(url)
+                .insertAfter(label);
+            deleteIcon.show();
+        } else {
+            HTMLBuilder.span("None uploaded", "url")
+                .insertAfter(label);
+            deleteIcon.hide();
+        }
     }
 
     /**** METHODS ****/
@@ -306,6 +371,27 @@ class ContextActions {
                 update(song, changed);
                 song.updateMovements();
                 this.refresh("panels");
+            },
+        };
+    }
+
+    /**
+     * Set the audio URL for the show.
+     *
+     * @param {string} url
+     */
+    static setAudioUrl(url) {
+        let old = this.show.getAudioUrl();
+        this.show.setAudioUrl(url);
+        this.refresh("workspace");
+
+        let label = _.isNull(url) ? "Remove audio url" : "Set audio url";
+
+        return {
+            label: label,
+            undo: function() {
+                this.show.setAudioUrl(old);
+                this.refresh("workspace");
             },
         };
     }

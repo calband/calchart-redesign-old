@@ -10,7 +10,7 @@ from django.shortcuts import get_object_or_404, redirect
 from django.views.generic import TemplateView, RedirectView, CreateView
 from django.utils import timezone
 
-import json
+import json, os
 from datetime import timedelta
 
 from base.forms import *
@@ -218,6 +218,21 @@ class EditorView(CalchartMixin, TemplateView):
         """
         self.show.viewer = self.request.POST['viewer']
         self.show.save()
+
+    def upload_audio(self):
+        """
+        A POST action that uploads an audio file for the show.
+        """
+        audio = self.request.FILES['audio']
+        ext = os.path.splitext(audio.name)[1]
+        filename = f'audio/{self.show.slug}{ext}'
+        if default_storage.exists(filename):
+            default_storage.delete(filename)
+        filename = default_storage.save(filename, audio)
+
+        return JsonResponse({
+            'url': settings.MEDIA_URL + filename,
+        })
 
     def upload_sheet_image(self):
         """
