@@ -1,6 +1,7 @@
 import CreateShowAction from "actions/CreateShowAction";
 import FormPopup from "popups/FormPopup";
 
+import { AUDIO_EXTENSIONS } from "utils/CalchartUtils";
 import { IS_STUNT } from "utils/env";
 import { BooleanField, CharField, FileField } from "utils/fields";
 
@@ -22,7 +23,7 @@ export default class CreateShowPopup extends FormPopup {
             }),
             new FileField("audio", {
                 label: "Audio file (opt.)",
-                extensions: ["ogg"],
+                extensions: AUDIO_EXTENSIONS,
                 required: false,
             }),
         ];

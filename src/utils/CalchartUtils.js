@@ -4,6 +4,9 @@
 
 import { round } from "utils/MathUtils";
 
+/** @const {string[]} */
+export const AUDIO_EXTENSIONS = ["ogg"];
+
 /** @const {Object} */
 export const CONTINUITIES = {
     "Simple": {

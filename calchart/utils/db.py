@@ -22,14 +22,12 @@ class UpdateShowVersion(Operation):
             if not show.viewer_file:
                 continue
 
-            data = json.loads(show.viewer)
+            data = show.viewer_json
 
             if data['version'] < self.version:
                 self.update(data)
                 data['version'] = self.version
-
-            show.viewer = json.dumps(data)
-            show.save()
+                show.save_viewer_json()
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         pass

@@ -16,7 +16,7 @@ import { moveElem } from "utils/JSUtils";
  * After incrementing this variable, add a migration to update all Shows in
  * the database. See docs/Versioning.md for more details on this variable.
  */
-const VERSION = 5;
+const VERSION = 6;
 
 /**
  * A Show represents a Calchart show, containing the following information:
@@ -54,6 +54,7 @@ export default class Show {
         this._slug = metadata.slug;
         this._isBand = metadata.isBand;
         this._published = metadata.published;
+        this._audio = metadata.audio;
         this._dotFormat = metadata.dotFormat;
         this._version = metadata.version;
 
@@ -96,6 +97,7 @@ export default class Show {
             slug: slug,
             isBand: isBand,
             published: false,
+            audio: null,
             dotFormat: data.dotFormat,
             version: VERSION,
         };
@@ -124,6 +126,7 @@ export default class Show {
             slug: this._slug,
             isBand: this._isBand,
             published: this._published,
+            audio: this._audio,
             dotFormat: this._dotFormat,
             version: this._version,
             fieldType: this._fieldType,
@@ -380,5 +383,24 @@ export default class Show {
         });
 
         _.pull(this._songs, song);
+    }
+
+    /**** AUDIO ****/
+
+    /**
+     * @return {string}
+     */
+    getAudioUrl() {
+        return this._audio;
+    }
+
+    /**
+     * Set the audio file URL for the show. To remove an audio file,
+     * pass in null.
+     *
+     * @param {?string} url
+     */
+    setAudioUrl(url) {
+        this._audio = url;
     }
 }

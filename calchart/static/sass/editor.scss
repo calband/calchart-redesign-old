@@ -597,6 +597,40 @@ body.context-gate-reference .workspace .graph {
     }
 }
 
+/** MUSIC CONTEXT **/
+
+body.context-music .workspace {
+    text-align: center;
+    padding: 10px;
+    .show-audio {
+        display: inline-block;
+        label {
+            margin-right: 5px;
+        }
+        .icons {
+            display: inline-block;
+            margin-left: 10px;
+            vertical-align: middle;
+            i {
+                cursor: pointer;
+                &.delete-link {
+                    color: $red;
+                }
+            }
+        }
+    }
+    .beats-editor {
+        @include remove-children-space;
+        table {
+            width: 50%;
+        }
+        .viewer-preview {
+            display: inline-block;
+            width: 50%;
+        }
+    }
+}
+
 /** TWO STEP CONTEXT **/
 
 .panel.two-step {
