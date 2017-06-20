@@ -213,9 +213,7 @@ export default class EditorController extends ApplicationController {
      */
     saveShow() {
         let data = JSON.stringify(this.show.serialize());
-        new SaveShowAction(this).send({
-            viewer: data,
-        });
+        new SaveShowAction(this).send({ data });
     }
 
     /**

@@ -19,15 +19,15 @@ class UpdateShowVersion(Operation):
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         for show in Show.objects.all():
-            if not show.viewer_file:
+            if not show.data_file:
                 continue
 
-            data = show.viewer_json
+            data = show.get_data()
 
             if data['version'] < self.version:
                 self.update(data)
                 data['version'] = self.version
-                show.save_viewer_json()
+                show.save_data(data)
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         pass

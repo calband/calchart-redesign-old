@@ -16,7 +16,7 @@ import { moveElem } from "utils/JSUtils";
  * After incrementing this variable, add a migration to update all Shows in
  * the database. See docs/Versioning.md for more details on this variable.
  */
-const VERSION = 6;
+const VERSION = 7;
 
 /**
  * A Show represents a Calchart show, containing the following information:
@@ -54,13 +54,15 @@ export default class Show {
         this._slug = metadata.slug;
         this._isBand = metadata.isBand;
         this._published = metadata.published;
-        this._audio = metadata.audio;
         this._dotFormat = metadata.dotFormat;
         this._version = metadata.version;
 
         if (this._version < VERSION) {
             alert("WARNING: You are running an outdated version of a Calchart show!");
         }
+
+        this._beats = metadata.beats;
+        this._audio = metadata.audio;
 
         this._dots = dots.map(data => Dot.deserialize(data));
         this._sheets = sheets.map(data => Sheet.deserialize(this, data));
@@ -97,9 +99,10 @@ export default class Show {
             slug: slug,
             isBand: isBand,
             published: false,
-            audio: null,
             dotFormat: data.dotFormat,
             version: VERSION,
+            beats: [],
+            audio: null,
         };
 
         return new Show(metadata, dots, [], [], data.fieldType);
@@ -126,9 +129,10 @@ export default class Show {
             slug: this._slug,
             isBand: this._isBand,
             published: this._published,
-            audio: this._audio,
             dotFormat: this._dotFormat,
             version: this._version,
+            beats: this._beats,
+            audio: this._audio,
             fieldType: this._fieldType,
             beatsPerStep: this._beatsPerStep,
             stepType: this._stepType,

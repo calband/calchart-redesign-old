@@ -17,7 +17,13 @@ class LoginRequiredMixin(AccessMixin):
             login_url = get_login_url(self.request)
             return redirect(login_url)
 
+        self.post_auth(request, *args, **kwargs)
+
         return super(LoginRequiredMixin, self).dispatch(request, *args, **kwargs)
+
+    def post_auth(self, request, *args, **kwargs):
+        """A hook for actions after user is authenticated."""
+        pass
 
 class ActionsMixin(object):
     """

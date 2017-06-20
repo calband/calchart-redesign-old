@@ -9,8 +9,8 @@
     {% add_style "viewer.css" %}
     {% add_script "viewer.js" %}
     <script>
-        {% if show.viewer %}
-            window.show = {{ show.viewer|asjson|safe }};
+        {% if show.data_file %}
+            window.show = {{ show.get_data|safe }};
         {% else %}
             window.show = null;
         {% endif %}

@@ -12,8 +12,8 @@
         window.settings = {{ request.user.viewpsheet_settings|safe }};
         window.dot = {{ dot|default:"null" }};
 
-        {% if show.viewer %}
-            window.show = {{ show.viewer|asjson|safe }};
+        {% if show.data_file %}
+            window.show = {{ show.get_data|safe }};
         {% else %}
             window.show = null;
         {% endif %}

@@ -25,7 +25,7 @@ def export(request, slug):
     Return a JSON file to be downloaded automatically.
     """
     show = Show.objects.get(slug=slug)
-    response = HttpResponse(show.viewer)
+    response = HttpResponse(show.data_file.read())
     response['Content-Disposition'] = f'attachment; filename={slug}.json'
 
     return response
@@ -186,12 +186,9 @@ class HomeView(CalchartMixin, TemplateView):
         slug = self.request.POST['slug']
 
         show = Show.objects.get(slug=slug)
-        show.published = published
-        show.save()
-
-        if show.viewer_json:
-            show.viewer_json['published'] = published
-            show.save_viewer_json()
+        data = show.get_data()
+        data['published'] = published
+        show.save_data(data)
 
 class EditorView(CalchartMixin, TemplateView):
     """
@@ -199,13 +196,11 @@ class EditorView(CalchartMixin, TemplateView):
     """
     template_name = 'editor.html'
 
-    def dispatch(self, request, *args, **kwargs):
+    def post_auth(self, request, *args, **kwargs):
         self.show = get_object_or_404(Show, slug=kwargs['slug'])
 
         if self.show.is_band and not self.request.user.has_committee('STUNT'):
             raise PermissionDenied
-
-        return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -216,8 +211,7 @@ class EditorView(CalchartMixin, TemplateView):
         """
         A POST action that saves a show's JSON data.
         """
-        self.show.viewer = self.request.POST['viewer']
-        self.show.save()
+        self.show.save_data(self.request.POST['data'])
 
     def upload_audio(self):
         """

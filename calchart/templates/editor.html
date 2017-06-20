@@ -9,8 +9,8 @@
     {% add_style "editor.css" %}
     {% add_script "editor.js" %}
     <script>
-        {% if show.viewer %}
-            window.show = {{ show.viewer|safe }};
+        {% if show.data_file %}
+            window.show = {{ show.get_data|asjson|safe }};
         {% else %}
             window.showName = "{{ show.name }}";
             window.showSlug = "{{ show.slug }}";
