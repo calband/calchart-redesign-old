@@ -119,6 +119,7 @@ export default class MusicContext extends BaseContext {
 
         this._addEvents(this.workspace, ".upload-beats-audio", {
             click: e => {
+                let button = $(e.target);
                 promptFile(file => {
                     let extension = _.last(file.name.split("."));
                     if (!_.includes(AUDIO_EXTENSIONS, extension)) {
@@ -126,14 +127,45 @@ export default class MusicContext extends BaseContext {
                         return;
                     }
 
-                    let text = $(e.target).text();
-                    $(e.target).text("Analyzing...").prop("disabled", true);
+                    let text = button.text();
+                    button.text("Analyzing...").prop("disabled", true);
 
-                    runAsync(() => {
-                        // TODO: analyze beats audio (#161)
+                    let audioCtx = new AudioContext();
+                    let reader = new FileReader();
+                    reader.onload = e => {
+                        audioCtx.decodeAudioData(reader.result, buffer => {
+                            let context = new OfflineAudioContext(2, buffer.length, 44100);
+                            let source = context.createBufferSource();
+                            source.buffer = buffer;
 
-                        $(e.target).text(text).prop("disabled", false);
-                    });
+                            let gainNode = context.createGain();
+                            gainNode.gain.value = 1e3;
+
+                            let filter = context.createBiquadFilter();
+                            filter.type = "highpass";
+                            filter.frequency.value = 220;
+                            filter.Q.value = 0.5;
+
+                            source.connect(gainNode);
+                            gainNode.connect(filter);
+                            filter.connect(context.destination);
+
+                            source.onended = e => {
+                                source.disconnect(gainNode);
+                                gainNode.disconnect(filter);
+                                filter.disconnect(context.destination);
+                            };
+                            source.start();
+
+                            context.startRendering().then(buffer => {
+                                // TODO: Fix
+                                window.buffer = buffer;
+
+                                button.text(text).prop("disabled", false);
+                            });
+                        });
+                    };
+                    reader.readAsArrayBuffer(file);
                 });
             },
         });

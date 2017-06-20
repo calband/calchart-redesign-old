@@ -10,7 +10,7 @@
     {% add_script "viewer.js" %}
     <script>
         {% if show.data_file %}
-            window.show = {{ show.get_data|safe }};
+            window.show = {{ show.get_data|asjson|safe }};
         {% else %}
             window.show = null;
         {% endif %}
