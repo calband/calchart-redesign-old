@@ -5,6 +5,7 @@ import Grapher from "graphers/Grapher";
 import { MusicContextMenus as menus } from "menus/EditorContextMenus";
 import AddSongPopup from "popups/AddSongPopup";
 import EditSongPopup from "popups/EditSongPopup";
+import ParseBeatsPopup from "popups/ParseBeatsPopup";
 
 import { AUDIO_EXTENSIONS } from "utils/CalchartUtils";
 import HTMLBuilder from "utils/HTMLBuilder";
@@ -127,45 +128,7 @@ export default class MusicContext extends BaseContext {
                         return;
                     }
 
-                    let text = button.text();
-                    button.text("Analyzing...").prop("disabled", true);
-
-                    let audioCtx = new AudioContext();
-                    let reader = new FileReader();
-                    reader.onload = e => {
-                        audioCtx.decodeAudioData(reader.result, buffer => {
-                            let context = new OfflineAudioContext(2, buffer.length, 44100);
-                            let source = context.createBufferSource();
-                            source.buffer = buffer;
-
-                            let gainNode = context.createGain();
-                            gainNode.gain.value = 1e3;
-
-                            let filter = context.createBiquadFilter();
-                            filter.type = "highpass";
-                            filter.frequency.value = 220;
-                            filter.Q.value = 0.5;
-
-                            source.connect(gainNode);
-                            gainNode.connect(filter);
-                            filter.connect(context.destination);
-
-                            source.onended = e => {
-                                source.disconnect(gainNode);
-                                gainNode.disconnect(filter);
-                                filter.disconnect(context.destination);
-                            };
-                            source.start();
-
-                            context.startRendering().then(buffer => {
-                                // TODO: Fix
-                                window.buffer = buffer;
-
-                                button.text(text).prop("disabled", false);
-                            });
-                        });
-                    };
-                    reader.readAsArrayBuffer(file);
+                    new ParseBeatsPopup(file).show();
                 });
             },
         });
