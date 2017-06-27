@@ -211,6 +211,20 @@ export default class MusicContext extends BaseContext {
                 .insertAfter(label);
             deleteIcon.hide();
         }
+
+        let table = this.workspace.find("table").empty();
+        this.show.getBeats().forEach((beat, i) => {
+            let row = HTMLBuilder.make("tr").appendTo(table);
+            HTMLBuilder.make("td", i).appendTo(row);
+            let cell = HTMLBuilder.make("td").appendTo(row);
+            HTMLBuilder.input({
+                type: "number",
+                change: e => {
+                    let beats = this.show.getBeats();
+                    beats[i] = beat;
+                },
+            }).appendTo(cell);
+        });
     }
 
     /**** METHODS ****/

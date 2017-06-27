@@ -131,7 +131,8 @@ export default class ParseBeatsPopup extends BasePopup {
         this._status.text("Analyzing...");
 
         let i = 0;
-        this._beats = [];
+        let beats = [];
+        let cumulative = 0;
 
         // if a beat is detected at sample X, the next beat will be at
         // at least X + samplesPerBeat.
@@ -140,13 +141,19 @@ export default class ParseBeatsPopup extends BasePopup {
         while (i < data.length) {
             let sample = data[i];
             if (Math.abs(sample) > this._threshold) {
-                this._beats.push(i);
+                // milliseconds from previous beat to this beat
+                let ms = (i / SAMPLE_RATE * 1000) - cumulative;
+                // round to nearest millisecond
+                ms = Math.round(ms);
+                beats.push(ms);
+                cumulative += ms;
                 i += samplesPerBeat;
             } else {
                 i++;
             }
         }
 
-        this._status.text(`Done: ${this._beats.length} beats detected.`);
+        this._beats = beats;
+        this._status.text(`Done: ${beats.length} beats detected.`);
     }
 }
