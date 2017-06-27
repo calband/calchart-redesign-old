@@ -128,7 +128,7 @@ export default class MusicContext extends BaseContext {
                         return;
                     }
 
-                    new ParseBeatsPopup(file).show();
+                    new ParseBeatsPopup(this, file).show();
                 });
             },
         });
@@ -346,6 +346,24 @@ class ContextActions {
                 this.show.addSong(song);
                 this.loadSong(song);
                 this.refresh("panels");
+            },
+        };
+    }
+
+    /**
+     * Save the given beats to the Show.
+     *
+     * @param {number[]} beats
+     */
+    static saveBeats(beats) {
+        let old = this.show.getBeats();
+        this.show.setBeats(beats);
+        this.refresh("workspace");
+
+        return {
+            undo: function() {
+                this.show.setBeats(old);
+                this.refresh("workspace");
             },
         };
     }

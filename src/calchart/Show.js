@@ -35,8 +35,13 @@ export default class Show {
      * @param {Object} metadata - Any relevant metadata about a Show including:
      *   - {string} name - The name of the show.
      *   - {string} slug - The slug of the show.
+     *   - {boolean} isBand - Whether the show is for the Band.
+     *   - {boolean} published - Whether the show is published for the band.
      *   - {string} dotFormat - The format used to label the dots.
      *   - {int} version - The version of the Show.
+     *   - {number[]} beats - The beats in the Show, where each number is the number
+     *     of milliseconds between each beat.
+     *   - {string} audio - The URL of the audio file.
      * @param {Object[]} dots - The serialized data for every Dot marching in the Show.
      * @param {Object[]} sheets - The serialized data for every Sheet contained in the Show.
      * @param {Object[]} songs - The serialized data for every Song in the Show.
@@ -399,6 +404,13 @@ export default class Show {
     }
 
     /**
+     * @return {number[]}
+     */
+    getBeats() {
+        return this._beats;
+    }
+
+    /**
      * Set the audio file URL for the show. To remove an audio file,
      * pass in null.
      *
@@ -406,5 +418,12 @@ export default class Show {
      */
     setAudioUrl(url) {
         this._audio = url;
+    }
+
+    /**
+     * @param {number[]} beats
+     */
+    setBeats(beats) {
+        this._beats = beats;
     }
 }

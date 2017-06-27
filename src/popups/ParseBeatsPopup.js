@@ -13,18 +13,20 @@ const SAMPLE_RATE = 44100;
  */
 export default class ParseBeatsPopup extends BasePopup {
     /**
+     * @param {MusicContext} context
      * @param {File} file - The beats audio file.
      */
-    constructor(file) {
+    constructor(context, file) {
         super();
 
+        this._controller = context.controller;
         this._file = file;
+
+        // {number[]}
+        this._beats = null;
 
         // {jQuery}
         this._status = null;
-
-        // {OfflineAudioContext}
-        this._context = null;
 
         // {AudioBuffer}
         this._buffer = null;
@@ -73,7 +75,12 @@ export default class ParseBeatsPopup extends BasePopup {
         });
         setupTooltip(maxBpm.find("label"), "The max BPM in the show");
 
-        return [title, this._status, threshold, maxBpm];
+        let button = HTMLBuilder.make("button", "Save").click(e => {
+            this._controller.doAction("saveBeats", [this._beats]);
+            this.hide();
+        });
+
+        return [title, this._status, threshold, maxBpm, button];
     }
 
     onInit() {
@@ -81,9 +88,7 @@ export default class ParseBeatsPopup extends BasePopup {
         let reader = new FileReader();
         reader.onload = e => {
             audioCtx.decodeAudioData(reader.result, buffer => {
-                this._context = new OfflineAudioContext(2, buffer.length, SAMPLE_RATE);
                 this._buffer = buffer;
-
                 this.startAnalyzing();
             });
         };
@@ -100,16 +105,16 @@ export default class ParseBeatsPopup extends BasePopup {
             return;
         }
 
-        // TODO: fix analyzing again
-        let source = this._context.createBufferSource();
+        let context = new OfflineAudioContext(2, this._buffer.length, SAMPLE_RATE);
+        let source = context.createBufferSource();
         source.buffer = this._buffer;
-        source.connect(this._context.destination);
+        source.connect(context.destination);
         source.onended = e => {
-            source.disconnect(this._context.destination);
+            source.disconnect(context.destination);
         };
         source.start();
 
-        this._context.startRendering().then(buffer => {
+        context.startRendering().then(buffer => {
             let data = buffer.getChannelData(0);
             this._parseBeats(data);
         });
@@ -126,7 +131,7 @@ export default class ParseBeatsPopup extends BasePopup {
         this._status.text("Analyzing...");
 
         let i = 0;
-        let beats = [];
+        this._beats = [];
 
         // if a beat is detected at sample X, the next beat will be at
         // at least X + samplesPerBeat.
@@ -135,14 +140,13 @@ export default class ParseBeatsPopup extends BasePopup {
         while (i < data.length) {
             let sample = data[i];
             if (Math.abs(sample) > this._threshold) {
-                beats.push(i);
+                this._beats.push(i);
                 i += samplesPerBeat;
             } else {
                 i++;
             }
         }
 
-        console.log(beats);
-        this._status.text(`Done: ${beats.length} beats detected.`);
+        this._status.text(`Done: ${this._beats.length} beats detected.`);
     }
 }
