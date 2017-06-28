@@ -621,12 +621,40 @@ body.context-music .workspace {
     }
     .beats-editor {
         @include remove-children-space;
+        $col-width: 130px;
         table {
-            width: 50%;
+            display: inline-block;
+            thead {
+                display: block;
+                th {
+                    font-size: 1.1em;
+                    font-weight: bold;
+                    padding-top: 7px;
+                }
+            }
+            tbody {
+                max-height: 325px;
+                overflow: auto;
+                display: block;
+                td.millisecond {
+                    padding: 0;
+                    input {
+                        border: 0;
+                        box-shadow: none;
+                        width: 100%;
+                        padding: 5px;
+                        padding-top: 7px;
+                    }
+                }
+            }
+            td, th {
+                width: $col-width;
+                text-align: center;
+            }
         }
         .viewer-preview {
             display: inline-block;
-            width: 50%;
+            width: calc(100% - #{$col-width * 2 + 10px});
         }
     }
 }

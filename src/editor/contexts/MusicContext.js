@@ -9,7 +9,7 @@ import ParseBeatsPopup from "popups/ParseBeatsPopup";
 
 import { AUDIO_EXTENSIONS } from "utils/CalchartUtils";
 import HTMLBuilder from "utils/HTMLBuilder";
-import { runAsync, underscoreKeys, update } from "utils/JSUtils";
+import { underscoreKeys, update } from "utils/JSUtils";
 import { promptFile, showError } from "utils/UIUtils";
 
 /**
@@ -120,7 +120,6 @@ export default class MusicContext extends BaseContext {
 
         this._addEvents(this.workspace, ".upload-beats-audio", {
             click: e => {
-                let button = $(e.target);
                 promptFile(file => {
                     let extension = _.last(file.name.split("."));
                     if (!_.includes(AUDIO_EXTENSIONS, extension)) {
@@ -212,18 +211,25 @@ export default class MusicContext extends BaseContext {
             deleteIcon.hide();
         }
 
-        let table = this.workspace.find("table").empty();
+        let table = this.workspace.find("table tbody").empty();
         this.show.getBeats().forEach((beat, i) => {
             let row = HTMLBuilder.make("tr").appendTo(table);
-            HTMLBuilder.make("td", i).appendTo(row);
-            let cell = HTMLBuilder.make("td").appendTo(row);
-            HTMLBuilder.input({
+
+            HTMLBuilder.make("td", i + 1).appendTo(row);
+            let cell = HTMLBuilder.make("td.millisecond").appendTo(row);
+            let input = HTMLBuilder.input({
                 type: "number",
+                initial: beat,
                 change: e => {
                     let beats = this.show.getBeats();
                     beats[i] = beat;
                 },
-            }).appendTo(cell);
+            });
+            input
+                .appendTo(cell)
+                .on("mousewheel", e => {
+                    $(e.target).blur();
+                });
         });
     }
 
