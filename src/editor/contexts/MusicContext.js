@@ -231,6 +231,8 @@ export default class MusicContext extends BaseContext {
                     $(e.target).blur();
                 });
         });
+
+        // TODO: viewer graph, seek bar, play button
     }
 
     /**** METHODS ****/
