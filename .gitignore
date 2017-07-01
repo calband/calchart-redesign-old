@@ -1,10 +1,13 @@
 .DS_Store
 *.pyc
-node_modules/
 files/
 .vagrant/
 *.map
 .env
+
+# Node
+node_modules/
+package-lock.json
 
 # SASS
 .sass-cache
