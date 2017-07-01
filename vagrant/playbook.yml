@@ -48,4 +48,4 @@
     # DJANGO
 
     - name: run django setup actions
-      script: "{{ ROOT_DIR }}/vagrant/django_setup.sh"
+      script: django_setup.sh
