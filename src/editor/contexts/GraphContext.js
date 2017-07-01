@@ -49,7 +49,7 @@ export default class GraphContext extends BaseContext {
     }
 
     static get refreshTargets() {
-        return _.concat(super.refreshTargets, "grapher");
+        return _.concat(super.refreshTargets, "grapher", "toolbar");
     }
 
     get grapher() {
@@ -443,14 +443,16 @@ class GraphActions {
      * @param {int} numBeats - The number of beats for the stuntsheet.
      */
     static addSheet(numBeats) {
-        let other = sheet.getAdjacentSheet();
+        let other = this.activeSheet;
         let sheet = this.show.addSheet(numBeats);
         this.loadSheet(sheet);
 
         return {
             undo: function() {
                 this.show.removeSheet(sheet);
-                this.loadSheet(other);
+                if (other) {
+                    this.loadSheet(other);
+                }
             },
         };
     }

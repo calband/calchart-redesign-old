@@ -24,6 +24,7 @@ export default class AddSheetPopup extends FormPopup {
     getFields() {
         return [
             new NumberField("numBeats", {
+                label: "Number of beats",
                 positive: true,
             }),
         ];
