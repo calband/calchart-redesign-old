@@ -48,4 +48,4 @@
     # DJANGO
 
     - name: run django setup actions
-      script: django_setup.sh
+      script: vagrant/django_setup.sh
