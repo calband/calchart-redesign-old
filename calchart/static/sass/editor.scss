@@ -28,25 +28,7 @@ $editor-header-height: 95px;
     .toolbar {
         padding-left: 10px;
         .continuity-context .seek {
-            @include vertically-center;
-            $marker-size: 16px;
-            height: $marker-size;
-            padding: 0 #{$marker-size/2};
-            cursor: pointer;
-            .marker {
-                position: absolute;
-                width: $marker-size;
-                height: $marker-size;
-                top: 0;
-                left: 0;
-                border-radius: 50%;
-                background: $blue;
-            }
-            .bar {
-                width: 150px;
-                height: 3px;
-                background: $medium-gray;
-            }
+            @include seek-bar;
         }
         .snap-to {
             margin: 0 5px;
@@ -655,6 +637,25 @@ body.context-music .workspace {
         .viewer-preview {
             display: inline-block;
             width: calc(100% - #{$col-width * 2 + 10px});
+            height: 350px;
+            vertical-align: top;
+            padding: 20px;
+            .preview-graph {
+                display: inline-block;
+                margin: 10px;
+                height: 75%;
+                width: 75%;
+            }
+            .controls {
+                .seek {
+                    @include seek-bar;
+                    margin-top: 0;
+                }
+                .toggle-play {
+                    cursor: pointer;
+                    font-size: 1.2em;
+                }
+            }
         }
     }
 }

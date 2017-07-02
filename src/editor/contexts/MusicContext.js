@@ -10,6 +10,7 @@ import ParseBeatsPopup from "popups/ParseBeatsPopup";
 import { AUDIO_EXTENSIONS } from "utils/CalchartUtils";
 import HTMLBuilder from "utils/HTMLBuilder";
 import { underscoreKeys, update } from "utils/JSUtils";
+import { round, roundSmall } from "utils/MathUtils";
 import { promptFile, showError } from "utils/UIUtils";
 
 /**
@@ -21,6 +22,15 @@ export default class MusicContext extends BaseContext {
         super(controller);
 
         this._activeSong = _.first(this.show.getSongs());
+
+        this._grapher = null;
+        this._grapherState = {
+            sheet: _.first(this.show.getSheets()),
+            beat: 0,
+        };
+        this._isPlaying = false;
+        this._cumBeats = [];
+        this._totalBeats = null;
     }
 
     static get shortcuts() {
@@ -36,7 +46,7 @@ export default class MusicContext extends BaseContext {
     }
 
     static get refreshTargets() {
-        return _.concat(super.refreshTargets, "panels", "workspace");
+        return _.concat(super.refreshTargets, "panels", "preview", "workspace");
     }
 
     get songPanel() {
@@ -133,6 +143,28 @@ export default class MusicContext extends BaseContext {
         });
 
         $(".music-content").show();
+
+        // beats editor
+
+        if (_.isNull(this._grapher)) {
+            let drawTarget = this.workspace.find(".preview-graph")
+            this._grapher = new Grapher(this.show, drawTarget, {
+                fieldPadding: 5,
+                drawYardlines: false,
+            });
+        }
+
+        // cache the cumulative beats for each sheet; i.e. the number of beats
+        // until that sheet
+        let totalBeats = 0;
+        this._cumBeats = this.show.getSheets().map(sheet => {
+            let curr = totalBeats;
+            totalBeats += sheet.getDuration();
+            return curr;
+        });
+        this._totalBeats = totalBeats;
+
+        this._setupControls();
     }
 
     unload() {
@@ -191,6 +223,20 @@ export default class MusicContext extends BaseContext {
     }
 
     /**
+     * Refresh the beats editor preview.
+     */
+    refreshPreview() {
+        let state = this._grapherState;
+        this._grapher.draw(state.sheet, state.beat);
+
+        // refresh seek
+        let seek = this.workspace.find(".seek");
+        let beat = this._getCumulativeBeat();
+        let position = seek.width() / this._totalBeats * beat;
+        seek.find(".marker").css("transform", `translateX(${position}px)`);
+    }
+
+    /**
      * Refresh the beats editor.
      */
     refreshWorkspace() {
@@ -231,8 +277,6 @@ export default class MusicContext extends BaseContext {
                     $(e.target).blur();
                 });
         });
-
-        // TODO: viewer graph, seek bar, play button
     }
 
     /**** METHODS ****/
@@ -245,6 +289,18 @@ export default class MusicContext extends BaseContext {
     loadSong(song) {
         this._activeSong = song;
         this.refresh("panels");
+    }
+
+    /**
+     * Start animating the preview.
+     */
+    play() {
+        this._isPlaying = true;
+        this.workspace.find(".toggle-play")
+            .removeClass("icon-play")
+            .addClass("icon-pause");
+
+        // TODO: play music and animate
     }
 
     /**
@@ -262,6 +318,102 @@ export default class MusicContext extends BaseContext {
     showEditSong(index) {
         let song = this.show.getSong(index);
         new EditSongPopup(this.controller, song).show();
+    }
+
+    /**
+     * Stop animating the preview.
+     */
+    stop() {
+        this._isPlaying = false;
+        this.workspace.find(".toggle-play")
+            .removeClass("icon-pause")
+            .addClass("icon-play");
+
+        // TODO: stop music and animation
+    }
+
+    /**** HELPERS ****/
+
+    /**
+     * Get the cumulative number of beats for the current sheet and beat
+     *
+     * @return {number}
+     */
+    _getCumulativeBeat() {
+        let index = this._grapherState.sheet.getIndex();
+        return this._cumBeats[index] + this._grapherState.beat;
+    }
+
+    /**
+     * Get the sheet and beat for the given cumulative beat number.
+     *
+     * @param {number} beat - The cumulative number of beats
+     * @return {[Sheet, number]}
+     */
+    _getSheetAndBeat(beat) {
+        let sheet = this.show.getSheet(0);
+
+        while (beat > sheet.getDuration()) {
+            beat -= sheet.getDuration();
+            sheet = sheet.getNextSheet();
+        }
+
+        return [sheet, beat];
+    }
+
+    /**
+     * Set up the seek and play button for the preview.
+     */
+    _setupControls() {
+        let seek = this.workspace.find(".seek");
+        let marker = seek.find(".marker");
+        let markerRadius = marker.width() / 2;
+        let seekLeft = seek.offset().left;
+        let seekWidth = seek.width();
+        let interval = seekWidth / this._totalBeats;
+
+        let updateSeek = e => {
+            let prev = marker.offset().left;
+
+            // snap to beat
+            let x = _.clamp(e.pageX - seekLeft - markerRadius, 0, seekWidth);
+            let cumBeat = roundSmall(round(x, interval) / interval);
+
+            // don't redraw screen if the beat didn't change
+            if (x !== prev) {
+                let [sheet, beat] = this._getSheetAndBeat(cumBeat);
+                this._grapherState.sheet = sheet;
+                this._grapherState.beat = beat;
+                this.refresh("preview");
+            }
+        };
+
+        this._addEvents(seek, {
+            mousedown: e => {
+                // prevent text highlight
+                e.preventDefault();
+
+                this.stop();
+                updateSeek(e);
+
+                $(document).on({
+                    "mousemove.seek": updateSeek,
+                    "mouseup.seek": e => {
+                        $(document).off(".seek");
+                    },
+                });
+            },
+        });
+
+        this._addEvents(this.workspace.find(".toggle-play"), {
+            click: e => {
+                if (this._isPlaying) {
+                    this.stop();
+                } else {
+                    this.play();
+                }
+            }
+        });
     }
 }
 
