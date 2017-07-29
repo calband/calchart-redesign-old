@@ -25,7 +25,9 @@ body {
         }
     }
     .viewer {
-        height: $content-width * 0.6;
+        .animated-grapher {
+            height: $content-width * 0.6;
+        }
         .dot {
             cursor: pointer;
         }

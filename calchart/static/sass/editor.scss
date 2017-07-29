@@ -640,20 +640,23 @@ body.context-music .workspace {
             height: 350px;
             vertical-align: top;
             padding: 20px;
-            .preview-graph {
+            .animated-grapher {
                 display: inline-block;
                 margin: 10px;
                 height: 75%;
                 width: 75%;
             }
+            .seek {
+                @include seek-bar;
+                margin-top: 0;
+            }
             .controls {
-                .seek {
-                    @include seek-bar;
-                    margin-top: 0;
-                }
-                .toggle-play {
+                @include unselectable;
+                margin: 20px 0;
+                i {
                     cursor: pointer;
-                    font-size: 1.2em;
+                    font-size: 24px;
+                    margin: 0 10px;
                 }
             }
         }
