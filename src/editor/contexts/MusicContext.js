@@ -1,6 +1,6 @@
 import UploadAudioAction from "actions/UploadAudioAction";
+import AnimatedShowComponent from "animation/AnimatedShowComponent";
 import Song from "calchart/Song";
-import AnimatedShowComponent from "components/AnimatedShowComponent";
 import BaseContext from "editor/contexts/BaseContext";
 import Grapher from "graphers/Grapher";
 import { MusicContextMenus as menus } from "menus/EditorContextMenus";

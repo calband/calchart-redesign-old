@@ -7,7 +7,7 @@
 
 {% block head %}
     {% add_style "viewer.css" %}
-    {% add_script "viewer.js" %}
+    {% add_script "vendor/soundmanager2.min.js" "viewer.js" %}
     <script>
         {% if show.data_file %}
             window.show = {{ show.get_data|asjson|safe }};

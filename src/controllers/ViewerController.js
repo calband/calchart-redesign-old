@@ -1,4 +1,4 @@
-import AnimatedShowComponent from "components/AnimatedShowComponent";
+import AnimatedShowComponent from "animation/AnimatedShowComponent";
 import ApplicationController from "controllers/ApplicationController";
 
 import HTMLBuilder from "utils/HTMLBuilder";

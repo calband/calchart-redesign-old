@@ -1,3 +1,4 @@
+import Sound from "animation/Sound";
 import Grapher from "graphers/Grapher";
 
 import HTMLBuilder from "utils/HTMLBuilder";
@@ -21,8 +22,7 @@ export default class AnimatedShowComponent {
         this._refresh = refresh;
 
         this._grapher = null;
-        this._audio = null;
-        this.updateAudioUrl();
+        this._sound = null;
 
         this._currSheet = show.getSheet(0);
         this._currBeat = 0;
@@ -72,8 +72,12 @@ export default class AnimatedShowComponent {
         let prevBeat = HTMLBuilder.icon("step-backward", "prev-beat")
             .click(e => this.prevBeat());
         setupTooltip(prevBeat, "Previous Beat");
-        let play = HTMLBuilder.icon("play", "toggle-play")
-            .click(e => this.togglePlay());
+        let play = HTMLBuilder.icon("play", "toggle-play disabled")
+            .click(e => {
+                if (!$(e.target).hasClass("disabled")) {
+                    this.togglePlay();
+                }
+            });
         setupTooltip(play, "Animate");
         let nextBeat = HTMLBuilder.icon("step-forward", "next-beat")
             .click(e => this.nextBeat());
@@ -82,9 +86,10 @@ export default class AnimatedShowComponent {
             .click(e => this.nextSheet());
         setupTooltip(nextSheet, "Next Sheet");
 
-        let controls = HTMLBuilder.div("controls", [prevSheet, prevBeat, play, nextBeat, nextSheet])
+        HTMLBuilder.div("controls", [prevSheet, prevBeat, play, nextBeat, nextSheet])
             .appendTo(this._target);
 
+        this.loadSound();
         this.refresh();
     }
 
@@ -133,10 +138,35 @@ export default class AnimatedShowComponent {
     }
 
     /**
-     * Update the audio URL to the show's audio URL.
+     * Load the show's beats data into the sound..
      */
-    updateAudioUrl() {
-        this._audio = this._show.getAudioUrl();
+    loadBeats() {
+        this._sound.loadBeats(this._show.getBeats());
+    }
+
+    /**
+     * Load a sound object according to the show's audio URL.
+     */
+    loadSound() {
+        if (this._sound) {
+            this._sound.destruct();
+        }
+        let playButton = this._target.find(".toggle-play");
+        playButton.addClass("disabled");
+
+        let audio = this._show.getAudioUrl();
+        this._sound = new Sound(audio, {
+            onload: () => {
+                playButton.removeClass("disabled");
+            },
+            nextBeat: () => {
+                this.nextBeat();
+            },
+            finished: () => {
+                this.stop();
+            },
+        });
+        this.loadBeats();
     }
 
     /**** CONTROLS ****/
@@ -225,18 +255,18 @@ export default class AnimatedShowComponent {
      * start the animation.
      */
     togglePlay() {
-        let icon = this._target.find(".controls .toggle-play")
-            .removeClassRegex(/icon-*/);
-
-        if (this._isPlaying) {
-            icon.addClass("icon-play");
-            this.stop();
-        } else {
-            icon.addClass("icon-pause");
-            this.play();
+        let playButton = this._target.find(".toggle-play");
+        if (playButton.hasClass("disabled")) {
+            return;
         }
 
-        this._isPlaying = !this._isPlaying;
+        playButton.removeClassRegex(/icon-*/);
+
+        if (this._isPlaying) {
+            this.stop();
+        } else {
+            this.play();
+        }
     }
 
     /**** ANIMATION ****/
@@ -245,16 +275,36 @@ export default class AnimatedShowComponent {
      * Starts animating the show.
      */
     play() {
-        // TODO
-        console.error("play is not defined");
+        let beatTime = 0;
+        let beat = 0;
+        let beats = this._show.getBeats();
+
+        if (this._currBeat >= beats.length) {
+            this.stop();
+            return;
+        }
+
+        while (beat < this._currBeat) {
+            beatTime += beats[beat];
+            beat++;
+        }
+
+        this._sound.play(beatTime);
+
+        // make paused icon
+        this._target.find(".toggle-play").addClass("icon-pause");
+        this._isPlaying = true;
     }
 
     /**
      * Stops animating the show.
      */
     stop() {
-        // TODO
-        console.error("stop is not defined");
+        this._sound.stop();
+
+        // make play icon
+        this._target.find(".toggle-play").addClass("icon-play");
+        this._isPlaying = false;
     }
 
     /**** HELPERS ****/
@@ -335,4 +385,4 @@ let ComponentShortcuts = {
     "shift+left": "doAnimate(prevSheet)",
     "shift+right": "doAnimate(nextSheet)",
     "space": "doAnimate(togglePlay)",
-}
+};

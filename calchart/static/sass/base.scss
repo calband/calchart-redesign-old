@@ -60,6 +60,9 @@ a {
 // icons
 i {
     display: inline-block;
+    &.disabled {
+        color: $medium-gray;
+    }
 }
 
 span {
