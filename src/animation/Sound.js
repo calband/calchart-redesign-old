@@ -3,6 +3,8 @@ if (_.isUndefined(soundManager)) {
 }
 soundManager.setup({
     // debugMode: false,
+    html5PollingInterval: 20,
+    flashPollingInterval: 20,
 });
 
 /**
@@ -17,20 +19,12 @@ export default class Sound {
      */
     constructor(audio, events) {
         this._events = events;
+        this._sound = null;
 
         if (audio) {
-            this._sound = soundManager.createSound({
-                url: audio,
-                onload: () => {
-                    this.runEvent("onload");
-                },
-                onfinish: () => {
-                    this.runEvent("finished");
-                },
-            });
-            this._sound.load();
-        } else {
-            this._sound = null;
+            // TODO: Not working, specifically starting to play in the middle of the audio.
+            // Possible bug: https://github.com/scottschiller/SoundManager2/issues/169
+            this.loadSound(audio);
         }
     }
 
@@ -54,6 +48,24 @@ export default class Sound {
                 this.runEvent("nextBeat");
             });
         });
+    }
+
+    /**
+     * Load the given sound
+     *
+     * @param {string} audio - The URL of the audio file.
+     */
+    loadSound(audio) {
+        this._sound = soundManager.createSound({
+            url: audio,
+            onload: () => {
+                this.runEvent("onload");
+            },
+            onfinish: () => {
+                this.runEvent("finished");
+            },
+        });
+        this._sound.load();
     }
 
     /**

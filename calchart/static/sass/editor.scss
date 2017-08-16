@@ -29,6 +29,8 @@ $editor-header-height: 95px;
         padding-left: 10px;
         .continuity-context .seek {
             @include seek-bar;
+            margin: 0;
+            width: 150px;
         }
         .snap-to {
             margin: 0 5px;

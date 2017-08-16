@@ -255,12 +255,9 @@ export default class AnimatedShowComponent {
      * start the animation.
      */
     togglePlay() {
-        let playButton = this._target.find(".toggle-play");
-        if (playButton.hasClass("disabled")) {
+        if (this._target.find(".toggle-play").hasClass("disabled")) {
             return;
         }
-
-        playButton.removeClassRegex(/icon-*/);
 
         if (this._isPlaying) {
             this.stop();
@@ -289,10 +286,14 @@ export default class AnimatedShowComponent {
             beat++;
         }
 
-        this._sound.play(beatTime);
+        this._sound.play({
+            position: beatTime,
+        });
 
         // make paused icon
-        this._target.find(".toggle-play").addClass("icon-pause");
+        this._target.find(".toggle-play")
+            .removeClass("icon-play")
+            .addClass("icon-pause");
         this._isPlaying = true;
     }
 
@@ -303,7 +304,9 @@ export default class AnimatedShowComponent {
         this._sound.stop();
 
         // make play icon
-        this._target.find(".toggle-play").addClass("icon-play");
+        this._target.find(".toggle-play")
+            .removeClass("icon-pause")
+            .addClass("icon-play");
         this._isPlaying = false;
     }
 
