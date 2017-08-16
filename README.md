@@ -15,7 +15,7 @@ Setup:
 1. Install Virtualbox and Vagrant
 1. Clone the repo
 1. `vagrant up`: This will setup a VM that will be installed with all dependencies needed for this project
-1. `python vgrunt.py`: This will build all of the SASS and Javascript files and watch for changes to rebuild
+1. `python vgrunt.py build`: This will build all of the SASS and Javascript files and watch for changes to rebuild
 1. Run `python vmanage.py runserver`
 1. Go to `http://localhost:5000`. The development login is member/calbandgreat.
 

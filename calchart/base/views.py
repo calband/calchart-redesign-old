@@ -159,7 +159,7 @@ class HomeView(CalchartMixin, TemplateView):
 
     def create_show(self):
         """
-        A POST action that creates a show with a name and audio file
+        A POST action that creates a show with the given name.
         """
         if self.request.user.has_committee('STUNT'):
             is_band = self.request.POST['is_band'] == 'true'
@@ -170,7 +170,6 @@ class HomeView(CalchartMixin, TemplateView):
             'name': self.request.POST['name'],
             'owner': self.request.user,
             'is_band': is_band,
-            'audio_file': self.request.FILES.get('audio'),
         }
         show = Show.objects.create(**kwargs)
 

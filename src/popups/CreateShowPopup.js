@@ -21,11 +21,6 @@ export default class CreateShowPopup extends FormPopup {
             new BooleanField("isBand", {
                 label: "For Cal Band",
             }),
-            new FileField("audio", {
-                label: "Audio file (opt.)",
-                extensions: AUDIO_EXTENSIONS,
-                required: false,
-            }),
         ];
 
         if (!IS_STUNT) {
@@ -38,7 +33,6 @@ export default class CreateShowPopup extends FormPopup {
     onSave(data) {
         new CreateShowAction(this._popup).send({
             name: data.name,
-            audio: data.audio,
             is_band: data.isBand,
         });
         return false;

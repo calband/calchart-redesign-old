@@ -3,8 +3,8 @@
 
 Vagrant.configure("2") do |config|
     # Base box to build off, and download URL for when it doesn't exist on the user's system already
-    config.vm.box = "calband/django"
-    config.vm.box_url = "https://s3-us-west-1.amazonaws.com/calband-virtualboxes/calband_django.box"
+    config.vm.box = "calband/django-calchart"
+    config.vm.box_url = "https://s3-us-west-1.amazonaws.com/calband-virtualboxes/calband_django_calchart.box"
     
     # Forward a port from the guest to the host, which allows us to access the ports
     # exposed by the VM from our local machine.
