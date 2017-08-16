@@ -16,7 +16,7 @@ import { moveElem } from "utils/JSUtils";
  * After incrementing this variable, add a migration to update all Shows in
  * the database. See docs/Versioning.md for more details on this variable.
  */
-const VERSION = 6;
+const VERSION = 7;
 
 /**
  * A Show represents a Calchart show, containing the following information:
@@ -35,8 +35,13 @@ export default class Show {
      * @param {Object} metadata - Any relevant metadata about a Show including:
      *   - {string} name - The name of the show.
      *   - {string} slug - The slug of the show.
+     *   - {boolean} isBand - Whether the show is for the Band.
+     *   - {boolean} published - Whether the show is published for the band.
      *   - {string} dotFormat - The format used to label the dots.
      *   - {int} version - The version of the Show.
+     *   - {number[]} beats - The beats in the Show, where each number is the number
+     *     of milliseconds between each beat.
+     *   - {string} audio - The URL of the audio file.
      * @param {Object[]} dots - The serialized data for every Dot marching in the Show.
      * @param {Object[]} sheets - The serialized data for every Sheet contained in the Show.
      * @param {Object[]} songs - The serialized data for every Song in the Show.
@@ -54,13 +59,15 @@ export default class Show {
         this._slug = metadata.slug;
         this._isBand = metadata.isBand;
         this._published = metadata.published;
-        this._audio = metadata.audio;
         this._dotFormat = metadata.dotFormat;
         this._version = metadata.version;
 
         if (this._version < VERSION) {
             alert("WARNING: You are running an outdated version of a Calchart show!");
         }
+
+        this._beats = metadata.beats;
+        this._audio = metadata.audio;
 
         this._dots = dots.map(data => Dot.deserialize(data));
         this._sheets = sheets.map(data => Sheet.deserialize(this, data));
@@ -97,9 +104,10 @@ export default class Show {
             slug: slug,
             isBand: isBand,
             published: false,
-            audio: null,
             dotFormat: data.dotFormat,
             version: VERSION,
+            beats: [],
+            audio: null,
         };
 
         return new Show(metadata, dots, [], [], data.fieldType);
@@ -126,9 +134,10 @@ export default class Show {
             slug: this._slug,
             isBand: this._isBand,
             published: this._published,
-            audio: this._audio,
             dotFormat: this._dotFormat,
             version: this._version,
+            beats: this._beats,
+            audio: this._audio,
             fieldType: this._fieldType,
             beatsPerStep: this._beatsPerStep,
             stepType: this._stepType,
@@ -395,6 +404,13 @@ export default class Show {
     }
 
     /**
+     * @return {number[]}
+     */
+    getBeats() {
+        return this._beats;
+    }
+
+    /**
      * Set the audio file URL for the show. To remove an audio file,
      * pass in null.
      *
@@ -402,5 +418,12 @@ export default class Show {
      */
     setAudioUrl(url) {
         this._audio = url;
+    }
+
+    /**
+     * @param {number[]} beats
+     */
+    setBeats(beats) {
+        this._beats = beats;
     }
 }

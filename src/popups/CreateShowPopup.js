@@ -1,9 +1,8 @@
 import CreateShowAction from "actions/CreateShowAction";
 import FormPopup from "popups/FormPopup";
 
-import { AUDIO_EXTENSIONS } from "utils/CalchartUtils";
 import { IS_STUNT } from "utils/env";
-import { BooleanField, CharField, FileField } from "utils/fields";
+import { BooleanField, CharField } from "utils/fields";
 
 /**
  * The popup to create a show.

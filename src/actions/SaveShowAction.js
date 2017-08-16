@@ -30,6 +30,6 @@ export default class SaveShowAction extends ServerAction {
 
     handleSuccess(data) {
         this._message.text("Saved!").delayHide();
-        this._controller.updateSavedShow(this._data.viewer);
+        this._controller.updateSavedShow(this._data.data);
     }
 }

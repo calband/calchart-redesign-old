@@ -7,10 +7,10 @@
 
 {% block head %}
     {% add_style "viewer.css" %}
-    {% add_script "viewer.js" %}
+    {% add_script "vendor/soundmanager2.min.js" "viewer.js" %}
     <script>
-        {% if show.viewer %}
-            window.show = {{ show.viewer|asjson|safe }};
+        {% if show.data_file %}
+            window.show = {{ show.get_data|asjson|safe }};
         {% else %}
             window.show = null;
         {% endif %}
@@ -26,17 +26,6 @@
             <p>Dot: <select class="select-dot"><option></option></select></p>
         </div>
         <div class="viewer"></div>
-        <div class="seek">
-            <span class="bar"></span>
-            <span class="marker"></span>
-        </div>
-        <div class="controls">
-            <i class="prev-sheet icon-fast-backward" data-tooltip="Previous Sheet"></i>
-            <i class="prev-beat icon-step-backward" data-tooltip="Previous Beat"></i>
-            <i class="toggle-play icon-play" data-tooltip="Animate"></i>
-            <i class="next-beat icon-step-forward" data-tooltip="Next Beat"></i>
-            <i class="next-sheet icon-fast-forward" data-tooltip="Next Sheet"></i>
-        </div>
         <div class="buttons">
             <button class="open-viewpsheet">Open Viewpsheet Generator</button>
         </div>

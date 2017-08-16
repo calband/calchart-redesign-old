@@ -28,25 +28,9 @@ $editor-header-height: 95px;
     .toolbar {
         padding-left: 10px;
         .continuity-context .seek {
-            @include vertically-center;
-            $marker-size: 16px;
-            height: $marker-size;
-            padding: 0 #{$marker-size/2};
-            cursor: pointer;
-            .marker {
-                position: absolute;
-                width: $marker-size;
-                height: $marker-size;
-                top: 0;
-                left: 0;
-                border-radius: 50%;
-                background: $blue;
-            }
-            .bar {
-                width: 150px;
-                height: 3px;
-                background: $medium-gray;
-            }
+            @include seek-bar;
+            margin: 0;
+            width: 150px;
         }
         .snap-to {
             margin: 0 5px;
@@ -621,12 +605,62 @@ body.context-music .workspace {
     }
     .beats-editor {
         @include remove-children-space;
+        $col-width: 130px;
         table {
-            width: 50%;
+            display: inline-block;
+            thead {
+                display: block;
+                th {
+                    font-size: 1.1em;
+                    font-weight: bold;
+                    padding-top: 7px;
+                }
+            }
+            tbody {
+                max-height: 325px;
+                overflow: auto;
+                display: block;
+                td.millisecond {
+                    padding: 0;
+                    input {
+                        border: 0;
+                        box-shadow: none;
+                        width: 100%;
+                        padding: 5px;
+                        padding-top: 7px;
+                    }
+                }
+            }
+            td, th {
+                width: $col-width;
+                text-align: center;
+            }
         }
         .viewer-preview {
             display: inline-block;
-            width: 50%;
+            width: calc(100% - #{$col-width * 2 + 10px});
+            height: 350px;
+            vertical-align: top;
+            padding: 20px;
+            .animated-grapher {
+                display: inline-block;
+                margin: 10px;
+                height: 75%;
+                width: 75%;
+            }
+            .seek {
+                @include seek-bar;
+                margin-top: 0;
+            }
+            .controls {
+                @include unselectable;
+                margin: 20px 0;
+                i {
+                    cursor: pointer;
+                    font-size: 24px;
+                    margin: 0 10px;
+                }
+            }
         }
     }
 }

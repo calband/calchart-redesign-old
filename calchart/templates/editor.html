@@ -7,10 +7,10 @@
 
 {% block head %}
     {% add_style "editor.css" %}
-    {% add_script "editor.js" %}
+    {% add_script "vendor/soundmanager2.min.js" "editor.js" %}
     <script>
-        {% if show.viewer %}
-            window.show = {{ show.viewer|safe }};
+        {% if show.data_file %}
+            window.show = {{ show.get_data|asjson|safe }};
         {% else %}
             window.showName = "{{ show.name }}";
             window.showSlug = "{{ show.slug }}";
@@ -44,7 +44,13 @@
             </div>
             <button class="upload-beats-audio">Upload Beats Audio</button>
             <div class="beats-editor">
-                <table></table>
+                <table>
+                    <thead>
+                        <th>Beat</th>
+                        <th>Milliseconds</th>
+                    </thead>
+                    <tbody></tbody>
+                </table>
                 <div class="viewer-preview"></div>
             </div>
         </div>

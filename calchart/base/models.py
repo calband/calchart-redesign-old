@@ -71,66 +71,38 @@ class Show(models.Model):
     date_added = models.DateTimeField(auto_now_add=True)
     is_band = models.BooleanField(default=False)
 
-    # the json file that dictates all the movements of a show
-    viewer_file = models.FileField(upload_to='viewer')
-    # the json file that dictates the number of milliseconds per beat
-    beats_file = models.FileField(upload_to='beats')
+    # the json file that contains the serialized Javascript Show
+    data_file = models.FileField(upload_to='shows')
 
     def __str__(self):
         return self.name
 
-    @property
-    def viewer(self):
-        if not hasattr(self, '_viewer'):
-            if self.viewer_file:
-                self._viewer = self.viewer_file.read()
-            else:
-                self._viewer = None
+    def get_data(self):
+        """Get the Show as a JSON object."""
+        return json.loads(self.data_file.read())
 
-        return self._viewer
+    def save_data(self, data):
+        """Save the given JSON object as the Show data."""
+        if isinstance(data, str):
+            data_str = data
+            data = json.loads(data)
+        else:
+            data_str = json.dumps(data)
 
-    @viewer.setter
-    def viewer(self, viewer):
-        # overwrite any existing viewer file
-        self.viewer_file.delete()
-        self.viewer_file.save(f'{self.slug}.viewer', ContentFile(viewer))
-        self._viewer = viewer
+        # update model according to data file
+        self.slug = data['slug']
+        self.name = data['name']
+        self.is_band = data['isBand']
+        self.published = data['published']
 
-        if hasattr(self, '_viewer_json'):
-            delattr(self, '_viewer_json')
+        # overwrite any existing data file
+        self.data_file.delete()
+        self.data_file.save(f'{self.slug}.show', ContentFile(data_str))
 
-        # update model according to viewer file
-        self.name = self.viewer_json['name']
-        self.is_band = self.viewer_json['isBand']
-        self.published = self.viewer_json['published']
-
-    @property
-    def viewer_json(self):
-        if not hasattr(self, '_viewer_json'):
-            if self.viewer:
-                self._viewer_json = json.loads(self.viewer)
-            else:
-                self._viewer_json = None
-
-        return self._viewer_json
-
-    @property
-    def beats(self):
-        if not hasattr(self, '_beats'):
-            if self.beats_file:
-                self._beats = self.beats_file.read()
-            else:
-                self._beats = None
-        return self._beats
-
-    @beats.setter
-    def beats(self, beats):
-        # overwrite any existing beats file
-        self.beats_file.delete()
-        self.beats_file.save(f'{self.slug}.beats', ContentFile(beats))
-        self._beats = beats
+        self.save()
 
     def save(self, *args, **kwargs):
+        """If a slug is not set, generate a unique slug before saving."""
         if not self.slug:
             slug = slugify(self.name)
             i = 0
@@ -140,10 +112,3 @@ class Show(models.Model):
                 self.slug = f'{slug}-{i}'
 
         return super().save(*args, **kwargs)
-
-    def save_viewer_json(self):
-        """
-        Save the contents of viewer_json
-        """
-        self.viewer = json.dumps(self.viewer_json)
-        self.save()

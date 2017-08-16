@@ -1,14 +1,16 @@
 import UploadAudioAction from "actions/UploadAudioAction";
+import AnimatedShowComponent from "animation/AnimatedShowComponent";
 import Song from "calchart/Song";
 import BaseContext from "editor/contexts/BaseContext";
 import Grapher from "graphers/Grapher";
 import { MusicContextMenus as menus } from "menus/EditorContextMenus";
 import AddSongPopup from "popups/AddSongPopup";
 import EditSongPopup from "popups/EditSongPopup";
+import ParseBeatsPopup from "popups/ParseBeatsPopup";
 
 import { AUDIO_EXTENSIONS } from "utils/CalchartUtils";
 import HTMLBuilder from "utils/HTMLBuilder";
-import { runAsync, underscoreKeys, update } from "utils/JSUtils";
+import { underscoreKeys, update } from "utils/JSUtils";
 import { promptFile, showError } from "utils/UIUtils";
 
 /**
@@ -20,10 +22,11 @@ export default class MusicContext extends BaseContext {
         super(controller);
 
         this._activeSong = _.first(this.show.getSongs());
+        this._animator = null;
     }
 
     static get shortcuts() {
-        return ContextShortcuts;
+        return _.extend({}, ContextShortcuts, AnimatedShowComponent.shortcuts);
     }
 
     static get actions() {
@@ -126,19 +129,19 @@ export default class MusicContext extends BaseContext {
                         return;
                     }
 
-                    let text = $(e.target).text();
-                    $(e.target).text("Analyzing...").prop("disabled", true);
-
-                    runAsync(() => {
-                        // TODO: analyze beats audio (#161)
-
-                        $(e.target).text(text).prop("disabled", false);
-                    });
+                    new ParseBeatsPopup(this, file).show();
                 });
             },
         });
 
         $(".music-content").show();
+
+        // viewer preview
+
+        if (_.isNull(this._animator)) {
+            this._animator = new AnimatedShowComponent(this.show, $(".viewer-preview"));
+            this._animator.init();
+        }
     }
 
     unload() {
@@ -216,9 +219,37 @@ export default class MusicContext extends BaseContext {
                 .insertAfter(label);
             deleteIcon.hide();
         }
+
+        let table = this.workspace.find("table tbody").empty();
+        this.show.getBeats().forEach((beat, i) => {
+            let row = HTMLBuilder.make("tr").appendTo(table);
+
+            HTMLBuilder.make("td", i + 1).appendTo(row);
+            let cell = HTMLBuilder.make("td.millisecond").appendTo(row);
+            let input = HTMLBuilder.input({
+                type: "number",
+                initial: beat,
+                change: e => {
+                    let beats = this.show.getBeats();
+                    beats[i] = beat;
+                },
+            });
+            input
+                .appendTo(cell)
+                .on("mousewheel", e => {
+                    $(e.target).blur();
+                });
+        });
     }
 
     /**** METHODS ****/
+
+    /**
+     * Run the given animation action.
+     */
+    doAnimate(action) {
+        this._animator[action]();
+    }
 
     /**
      * Load the given song.
@@ -351,6 +382,24 @@ class ContextActions {
                 this.show.addSong(song);
                 this.loadSong(song);
                 this.refresh("panels");
+            },
+        };
+    }
+
+    /**
+     * Save the given beats to the Show.
+     *
+     * @param {number[]} beats
+     */
+    static saveBeats(beats) {
+        let old = this.show.getBeats();
+        this.show.setBeats(beats);
+        this.refresh("workspace");
+
+        return {
+            undo: function() {
+                this.show.setBeats(old);
+                this.refresh("workspace");
             },
         };
     }
