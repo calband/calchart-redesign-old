@@ -193,7 +193,7 @@ class EditorView(CalchartMixin, TemplateView):
     """
     The editor view that can edit shows
     """
-    template_name = 'editor.html'
+    template_name = 'editor2.html'
 
     def post_auth(self, request, *args, **kwargs):
         self.show = get_object_or_404(Show, slug=kwargs['slug'])

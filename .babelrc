@@ -1,0 +1,19 @@
+{
+      // presets: [
+      //     // converts ES6 to ES5: http://javascriptplayground.com/blog/2016/10/moving-to-webpack-2/#stop-babel-from-compiling-es2015-modules
+      //     ["es2015", {
+      //         modules: false,
+      //     }],
+      // ],
+      // plugins: [
+      //     // allows ES6 primitives such as Set
+      //     "babel-plugin-transform-runtime",
+      //     // allows correct behavior for `extends Error`
+      //     ["babel-plugin-transform-builtin-extend", {
+      //         globals: ["Error"],
+      //     }],
+      // ],
+      plugins: [
+            "transform-object-rest-spread",
+      ],
+}

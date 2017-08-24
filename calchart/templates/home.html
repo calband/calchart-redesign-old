@@ -6,8 +6,6 @@
 {% endblock %}
 
 {% block head %}
-    {% add_style "home.css" %}
-    {% add_script "home.js" %}
     <script>
         window.tabs = {{ tabs|asjson|safe }};
     </script>
@@ -15,13 +13,6 @@
 
 {% block body %}
     {% get_feedback %}
-    <div class="main-buttons">
-        <button class="new-show">New Show</button>
-    </div>
-    <div class="content">
-        <ul class="tabs"></ul>
-        <div class="shows">
-            <p class="loading">Loading...</p>
-        </div>
-    </div>
+    <div id="content"></div>
+    {% add_script "home.js" %}
 {% endblock %}

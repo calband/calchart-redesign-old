@@ -2,8 +2,8 @@ var path = require("path");
 var eslint = require("eslint");
 
 var entryPoints = {};
-var entryFiles = ["home", "editor", "viewer", "viewpsheet", "wiki"].map(function(file) {
-    var filepath = "./src/" + file + ".js";
+var entryFiles = ["home", "editor"].map(function(file) {
+    var filepath = "./vue_src/" + file + ".js";
     entryPoints[file] = filepath;
     return filepath;
 });
@@ -22,36 +22,30 @@ module.exports = function(grunt) {
                     filename: "[name].js",
                 },
                 resolve: {
+                    alias: {
+                        "vue": "vue/dist/vue.esm.js",
+                        "partials": path.resolve(__dirname, "calchart/static/sass/partials"),
+                    },
                     modules: [
-                        // set import paths relative to src/ directory
-                        path.resolve("./src"),
-                        // needed for babel-runtime
-                        path.resolve("./node_modules"),
+                        path.resolve(__dirname, "vue_src"),
+                        path.resolve(__dirname, "node_modules"),
                     ],
                 },
                 module: {
                     rules: [
+                        {
+                            test: /\.vue$/,
+                            use: {
+                                loader: "vue-loader",
+                                // https://vue-loader.vuejs.org/en/configurations/extract-css.html
+                            },
+                        },
                         {
                             test: /\.js$/,
                             exclude: /node_modules/,
                             use: {
                                 loader: "babel-loader",
                                 options: {
-                                    presets: [
-                                        // converts ES6 to ES5: http://javascriptplayground.com/blog/2016/10/moving-to-webpack-2/#stop-babel-from-compiling-es2015-modules
-                                        ["es2015", {
-                                            modules: false,
-                                        }],
-                                    ],
-                                    // TODO: uncomment after https://github.com/webpack-contrib/grunt-webpack/pull/141
-                                    plugins: [
-                                        // // allows ES6 primitives such as Set
-                                        // "babel-plugin-transform-runtime",
-                                        // // allows correct behavior for `extends Error`
-                                        // ["babel-plugin-transform-builtin-extend", {
-                                        //     globals: ["Error"],
-                                        // }],
-                                    ],
                                     minified: true,
                                     comments: false,
                                     // faster compilation
@@ -75,19 +69,24 @@ module.exports = function(grunt) {
                 files: [{
                     expand: true,
                     cwd: "calchart/static/sass",
-                    src: "**/*.scss",
+                    src: "*.scss",
                     dest: "calchart/static/css",
                     ext: ".css",
                 }],
             },
         },
         watch: {
+            // for non-Vue SASS files
             sass: {
-                files: "calchart/static/sass/**/*.scss",
+                files: "calchart/static/sass/*.scss",
                 tasks: "sass",
             },
+            sass_partials: {
+                files: "calchart/static/sass/partials/*.scss",
+                tasks: "build",
+            },
             js: {
-                files: ["src/**/*.js"],
+                files: ["vue_src/**/*.js", "vue_src/**/*.vue"],
                 tasks: "webpack:build",
             },
         },
