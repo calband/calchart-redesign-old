@@ -3,8 +3,6 @@ from django.db.migrations.operations.base import Operation
 
 import json
 
-from base.models import Show
-
 class UpdateShowVersion(Operation):
     """
     Update Show viewer files from version X to version X + 1. See
@@ -18,6 +16,7 @@ class UpdateShowVersion(Operation):
         pass
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
+        Show = from_state.apps.get_model('base.Show')
         for show in Show.objects.all():
             if not show.data_file:
                 continue

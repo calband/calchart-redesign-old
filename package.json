@@ -3,7 +3,7 @@
   "author": "Cal Band Computer Committee",
   "version": "0.0.1",
   "private": true,
-  "dependencies": {
+  "devDependencies": {
     "babel-core": "^6.24.1",
     "babel-loader": "^7.0.0",
     "babel-plugin-transform-builtin-extend": "^1.1.2",
