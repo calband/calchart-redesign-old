@@ -10,14 +10,11 @@ A list of shows for a tab.
 
 <script>
 export default {
+    props: ["shows"],
 };
 </script>
 
 <style lang="scss" scoped>
-    @import "~partials/_vars.scss";
-    @import "~partials/_mixins.scss";
-    @import "~partials/_functions.scss";
-
     .show-list {
         margin: 5px;
         background: $white;

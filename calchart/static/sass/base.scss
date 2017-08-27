@@ -6,7 +6,11 @@
  * - Other UI components
  */
 
-@import "partials/vars", "partials/mixins", "partials/fonts", "partials/functions";
+@import "partials/vars";
+@import "partials/mixins";
+@import "partials/components";
+@import "partials/fonts";
+@import "partials/functions";
 
 /**** HTML ELEMENTS ****/
 

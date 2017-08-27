@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% load partials utils %}
+
+{% block head %}
+    <script>
+        window.tabs = {{ tabs|asjson|safe }};
+    </script>
+{% endblock %}
+
+{% block body %}
+    <div id="app"></div>
+    {% add_script "calchart.js" %}
+{% endblock %}

@@ -1,4 +1,35 @@
-@import "components", "vars";
+// messages that should hover at the top
+@mixin hover-messages {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 10px;
+    z-index: z-index(messages);
+    li.message {
+        background: $light-gray;
+        padding: 10px 30px;
+        border-radius: 4px;
+        text-align: center;
+        color: $blue;
+        &:not(:last-child) {
+            margin-bottom: 5px;
+        }
+        &:hover {
+            background: $light-gray;
+        }
+        &.error {
+            color: $red;
+        }
+        .close-message {
+            @include vertically-center-self;
+            position: absolute;
+            right: 10px;
+            color: $gold;
+            cursor: pointer;
+        }
+    }
+}
 
 // Set the max width for a span element, with any overflow ending in ellipses
 @mixin max-text-width($width) {

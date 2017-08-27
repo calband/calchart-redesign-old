@@ -84,14 +84,15 @@ class CreateUserView(CreateView):
         messages.success(self.request, 'User successfully created.')
         return redirect('login')
 
-### CALCHART PAGES ###
+### CALCHART PAGE ###
 
-class HomeView(CalchartMixin, TemplateView):
+class CalchartView(CalchartMixin, TemplateView):
     """
-    The home page that lists all shows created by the user and shared
-    by the STUNT committee in a Google Drive-like format.
+    The single page application for all Calchart pages. Each page renders
+    the same HTML file, but Vue will route to the appropriate page. See
+    router.js.
     """
-    template_name = 'home.html'
+    template_name = 'calchart.html'
 
     def get(self, request, *args, **kwargs):
         """
@@ -157,132 +158,203 @@ class HomeView(CalchartMixin, TemplateView):
         if tab == 'owned':
             return Show.objects.filter(owner=self.request.user, is_band=False)
 
-    def create_show(self):
-        """
-        A POST action that creates a show with the given name.
-        """
-        if self.request.user.has_committee('STUNT'):
-            is_band = self.request.POST['is_band'] == 'true'
-        else:
-            is_band = False
+# class HomeView(CalchartMixin, TemplateView):
+#     """
+#     The home page that lists all shows created by the user and shared
+#     by the STUNT committee in a Google Drive-like format.
+#     """
+#     template_name = 'home.html'
 
-        kwargs = {
-            'name': self.request.POST['name'],
-            'owner': self.request.user,
-            'is_band': is_band,
-        }
-        show = Show.objects.create(**kwargs)
+#     def get(self, request, *args, **kwargs):
+#         """
+#         Tabs are loaded with AJAX requests that contain the "tab" key
+#         in the query string
+#         """
+#         if 'tab' in request.GET:
+#             shows = self.get_tab(request.GET['tab'])
+#             return JsonResponse({
+#                 'shows': [
+#                     {
+#                         'slug': show.slug,
+#                         'name': show.name,
+#                         'published': show.published,
+#                     }
+#                     for show in shows
+#                 ],
+#             })
+#         else:
+#             return super().get(request, *args, **kwargs)
 
-        return {
-            'url': reverse('editor', kwargs={'slug': show.slug}),
-        }
+#     def get_context_data(self, **kwargs):
+#         context = super().get_context_data(**kwargs)
+#         context['tabs'] = self.get_tabs()
+#         return context
 
-    def publish_show(self):
-        """
-        A POST action that publishes or unpublishes a show
-        """
-        published = self.request.POST['publish'] == 'true'
-        slug = self.request.POST['slug']
+#     def get_tabs(self):
+#         """
+#         Get all available tabs for the current user. Available tabs are:
+#         - band: Shows created by STUNT for this year
+#         - created: Shows created by the current user
 
-        show = Show.objects.get(slug=slug)
-        data = show.get_data()
-        data['published'] = published
-        show.save_data(data)
+#         Returns tabs in a tuple of the form (id, display_name). The first
+#         tab in the list is the first tab.
+#         """
+#         if self.request.user.is_members_only_user():
+#             year = timezone.now().year
+#             return [
+#                 ('band', f'{year} Shows'),
+#                 ('owned', 'My Shows'),
+#             ]
+#         else:
+#             return [
+#                 ('owned', 'My Shows'),
+#             ]
 
-class EditorView(CalchartMixin, TemplateView):
-    """
-    The editor view that can edit shows
-    """
-    template_name = 'editor2.html'
+#     def get_tab(self, tab):
+#         """
+#         Get Shows for the given tab (see get_tabs).
+#         """
+#         if tab == 'band':
+#             if not self.request.user.is_members_only_user():
+#                 raise PermissionDenied
+#             kwargs = {
+#                 'is_band': True,
+#                 'date_added__year': timezone.now().year,
+#             }
+#             if not self.request.user.has_committee('STUNT'):
+#                 kwargs['published'] = True
 
-    def post_auth(self, request, *args, **kwargs):
-        self.show = get_object_or_404(Show, slug=kwargs['slug'])
+#             return Show.objects.filter(**kwargs)
 
-        if self.show.is_band and not self.request.user.has_committee('STUNT'):
-            raise PermissionDenied
+#         if tab == 'owned':
+#             return Show.objects.filter(owner=self.request.user, is_band=False)
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['show'] = self.show
-        return context
+#     def create_show(self):
+#         """
+#         A POST action that creates a show with the given name.
+#         """
+#         if self.request.user.has_committee('STUNT'):
+#             is_band = self.request.POST['is_band'] == 'true'
+#         else:
+#             is_band = False
 
-    def save_show(self):
-        """
-        A POST action that saves a show's JSON data.
-        """
-        self.show.save_data(self.request.POST['data'])
+#         kwargs = {
+#             'name': self.request.POST['name'],
+#             'owner': self.request.user,
+#             'is_band': is_band,
+#         }
+#         show = Show.objects.create(**kwargs)
 
-    def upload_audio(self):
-        """
-        A POST action that uploads an audio file for the show.
-        """
-        audio = self.request.FILES['audio']
-        ext = os.path.splitext(audio.name)[1]
-        filename = f'audio/{self.show.slug}{ext}'
-        if default_storage.exists(filename):
-            default_storage.delete(filename)
-        filename = default_storage.save(filename, audio)
+#         return {
+#             'url': reverse('editor', kwargs={'slug': show.slug}),
+#         }
 
-        return JsonResponse({
-            'url': settings.MEDIA_URL + filename,
-        })
+#     def publish_show(self):
+#         """
+#         A POST action that publishes or unpublishes a show
+#         """
+#         published = self.request.POST['publish'] == 'true'
+#         slug = self.request.POST['slug']
 
-    def upload_sheet_image(self):
-        """
-        A POST action that uploads an image for a given sheet in the show.
-        """
-        sheet = self.request.POST['sheet']
-        image = self.request.FILES['image']
-        filename = f'backgrounds/{self.show.slug}/{image.name}'
-        if default_storage.exists(filename):
-            default_storage.delete(filename)
-        filename = default_storage.save(filename, image)
+#         show = Show.objects.get(slug=slug)
+#         data = show.get_data()
+#         data['published'] = published
+#         show.save_data(data)
 
-        return JsonResponse({
-            'url': settings.MEDIA_URL + filename,
-        })
+# class EditorView(CalchartMixin, TemplateView):
+#     """
+#     The editor view that can edit shows
+#     """
+#     template_name = 'editor2.html'
 
-class ViewerView(CalchartMixin, TemplateView):
-    """
-    The view that can view shows
-    """
-    template_name = 'viewer.html'
+#     def post_auth(self, request, *args, **kwargs):
+#         self.show = get_object_or_404(Show, slug=kwargs['slug'])
 
-    def dispatch(self, request, *args, **kwargs):
-        self.show = get_object_or_404(Show, slug=kwargs['slug'])
-        return super().dispatch(request, *args, **kwargs)
+#         if self.show.is_band and not self.request.user.has_committee('STUNT'):
+#             raise PermissionDenied
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['show'] = self.show
-        return context
+#     def get_context_data(self, **kwargs):
+#         context = super().get_context_data(**kwargs)
+#         context['show'] = self.show
+#         return context
 
-class ViewpsheetView(CalchartMixin, TemplateView):
-    """
-    The view that generates viewpsheets for a show. Can also pass in
-    a dot ID in the GET parameters to initialize the dot to generate
-    viewpsheets for.
-    """
-    template_name = 'viewpsheet.html'
+#     def save_show(self):
+#         """
+#         A POST action that saves a show's JSON data.
+#         """
+#         self.show.save_data(self.request.POST['data'])
 
-    def dispatch(self, request, *args, **kwargs):
-        self.show = get_object_or_404(Show, slug=kwargs['slug'])
-        return super().dispatch(request, *args, **kwargs)
+#     def upload_audio(self):
+#         """
+#         A POST action that uploads an audio file for the show.
+#         """
+#         audio = self.request.FILES['audio']
+#         ext = os.path.splitext(audio.name)[1]
+#         filename = f'audio/{self.show.slug}{ext}'
+#         if default_storage.exists(filename):
+#             default_storage.delete(filename)
+#         filename = default_storage.save(filename, audio)
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['show'] = self.show
-        context['dot'] = self.request.GET.get('dot')
-        return context
+#         return JsonResponse({
+#             'url': settings.MEDIA_URL + filename,
+#         })
 
-    def save_settings(self):
-        """
-        A POST action that saves a user's viewpsheet settings.
-        """
-        settings = {
-            key: self.request.POST[key]
-            for key in ['pathOrientation', 'nearbyOrientation', 'birdsEyeOrientation', 'layoutLeftRight']
-        }
-        settings['layoutLeftRight'] = settings['layoutLeftRight'] == 'true'
-        self.request.user.viewpsheet_settings = json.dumps(settings)
-        self.request.user.save()
+#     def upload_sheet_image(self):
+#         """
+#         A POST action that uploads an image for a given sheet in the show.
+#         """
+#         sheet = self.request.POST['sheet']
+#         image = self.request.FILES['image']
+#         filename = f'backgrounds/{self.show.slug}/{image.name}'
+#         if default_storage.exists(filename):
+#             default_storage.delete(filename)
+#         filename = default_storage.save(filename, image)
+
+#         return JsonResponse({
+#             'url': settings.MEDIA_URL + filename,
+#         })
+
+# class ViewerView(CalchartMixin, TemplateView):
+#     """
+#     The view that can view shows
+#     """
+#     template_name = 'viewer.html'
+
+#     def dispatch(self, request, *args, **kwargs):
+#         self.show = get_object_or_404(Show, slug=kwargs['slug'])
+#         return super().dispatch(request, *args, **kwargs)
+
+#     def get_context_data(self, **kwargs):
+#         context = super().get_context_data(**kwargs)
+#         context['show'] = self.show
+#         return context
+
+# class ViewpsheetView(CalchartMixin, TemplateView):
+#     """
+#     The view that generates viewpsheets for a show. Can also pass in
+#     a dot ID in the GET parameters to initialize the dot to generate
+#     viewpsheets for.
+#     """
+#     template_name = 'viewpsheet.html'
+
+#     def dispatch(self, request, *args, **kwargs):
+#         self.show = get_object_or_404(Show, slug=kwargs['slug'])
+#         return super().dispatch(request, *args, **kwargs)
+
+#     def get_context_data(self, **kwargs):
+#         context = super().get_context_data(**kwargs)
+#         context['show'] = self.show
+#         context['dot'] = self.request.GET.get('dot')
+#         return context
+
+#     def save_settings(self):
+#         """
+#         A POST action that saves a user's viewpsheet settings.
+#         """
+#         settings = {
+#             key: self.request.POST[key]
+#             for key in ['pathOrientation', 'nearbyOrientation', 'birdsEyeOrientation', 'layoutLeftRight']
+#         }
+#         settings['layoutLeftRight'] = settings['layoutLeftRight'] == 'true'
+#         self.request.user.viewpsheet_settings = json.dumps(settings)
+#         self.request.user.save()

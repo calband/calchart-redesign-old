@@ -6,10 +6,10 @@ from django.contrib.auth.views import LogoutView
 from base.views import *
 
 urlpatterns = [
-    url(r'^$', HomeView.as_view(), name='home'),
-    url(r'^editor/(?P<slug>.+)/$', EditorView.as_view(), name='editor'),
-    url(r'^viewer/(?P<slug>.+)/$', ViewerView.as_view(), name='viewer'),
-    url(r'^viewpsheet/(?P<slug>.+)/$', ViewpsheetView.as_view(), name='viewpsheet'),
+    url(r'^$', CalchartView.as_view(), name='home'),
+    url(r'^editor/(?P<slug>.+)/$', CalchartView.as_view()),
+    url(r'^viewer/(?P<slug>.+)/$', CalchartView.as_view()),
+    url(r'^viewpsheet/(?P<slug>.+)/$', CalchartView.as_view()),
     url(r'^help/', include('wiki.urls', namespace='wiki')),
 
     # authentication

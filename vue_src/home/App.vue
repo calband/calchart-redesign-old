@@ -3,68 +3,84 @@ The entry point for the home page.
 </docs>
 
 <template>
-    <div id="content">
+    <div>
         <div class="home-buttons">
             <button>New Show</button>
         </div>
         <div class="home-content">
             <ul class="tabs" ref="tabs">
-                <li
-                    v-for="tab in tabs"
-                    @click="loadTab(name)"
-                >
-                    {{ tab.label }}
-                </li>
+                <template v-for="tab in tabs">
+                    <li @click="loadTab(tab.name)">{{ tab.label }}</li>
+                </template>
             </ul>
             <p v-if="isLoading" class="loading">Loading...</p>
-            <template v-if="activeTab == 'band' && isStunt">
+            <template v-if="showPublished">
                 <h2 class="unpublished">Unpublished</h2>
                 <show-list></show-list>
                 <h2 class="published">Published</h2>
                 <show-list></show-list>
             </template>
             <template v-else>
-                <show-list v-bind:shows="$store.state.shows"></show-list>
+                <show-list v-bind:shows="shows"></show-list>
             </template>
         </div>
     </div>
 </template>
 
 <script>
-import { mapState, mapGetters, mapActions } from "vuex";
-
 import ShowList from "home/ShowList.vue";
+
+import { IS_STUNT } from "utils/env";
+
+// Convert tabs from an array of tuples into an object
+const tabs = {};
+window.tabs.forEach(([name, label]) => {
+    tabs[name] = {
+        label,
+        shows: null, // to be set with loadTab
+    };
+});
 
 export default {
     components: {
         "show-list": ShowList,
     },
-    data: {
-        isLoading: true,
+    data() {
+        return {
+            isLoading: true,
+            tabs,
+            activeTab: window.tabs[0][0],
+        };
     },
     computed: {
-        ...mapState([
-            "activeTab",
-            "isStunt",
-        ]),
-        ...mapGetters([
-            "shows",
-        ]),
+        shows() {
+            return this.tabs[this.activeTab].shows;
+        },
+        showPublished() {
+            return this.activeTab == "band" && IS_STUNT;
+        },
     },
     methods: {
-        ...mapActions([
-            "loadTab",
-        ]),
+        loadTab(tab) {
+            console.log(tab);
+            return $.ajax({
+                data: { tab },
+                dataType: "json",
+                success: data => {
+                    // if band and is stunt, split shows into unpublished/published
+                    this.tabs[tab].shows = data.shows;
+                    this.isLoading = false;
+                },
+            });
+        },
     },
-    created() {
+    mounted() {
         $(this.$refs.tabs).children("li:first").click();
     },
 };
 </script>
 
 <style lang="scss">
-    @import "~partials/_mixins.scss";
-
     body {
         padding: 0;
         padding-top: 20px;
@@ -80,10 +96,6 @@ export default {
 </style>
 
 <style lang="scss" scoped>
-    @import "~partials/_vars.scss";
-    @import "~partials/_mixins.scss";
-    @import "~partials/_functions.scss";
-
     $buttons-height: 60px;
 
     .home-buttons {

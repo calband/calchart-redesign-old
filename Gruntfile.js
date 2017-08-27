@@ -1,12 +1,26 @@
 var path = require("path");
 var eslint = require("eslint");
 
-var entryPoints = {};
-var entryFiles = ["home", "editor"].map(function(file) {
-    var filepath = "./vue_src/" + file + ".js";
-    entryPoints[file] = filepath;
-    return filepath;
-});
+// https://vue-loader.vuejs.org/en/configurations/advanced.html
+var vueLoaderOptions = {
+    // TODO: https://vue-loader.vuejs.org/en/configurations/extract-css.html
+    loaders: {
+        scss: [
+            "vue-style-loader",
+            "css-loader",
+            "sass-loader",
+            {
+                loader: "sass-resources-loader",
+                options: {
+                    resources: [
+                        path.resolve(__dirname, 'calchart/static/sass/partials/_vars.scss'),
+                        path.resolve(__dirname, 'calchart/static/sass/partials/_mixins.scss'),
+                    ],
+                },
+            },
+        ],
+    },
+};
 
 module.exports = function(grunt) {
     grunt.loadNpmTasks("grunt-webpack");
@@ -16,7 +30,9 @@ module.exports = function(grunt) {
     grunt.initConfig({
         webpack: {
             build: {
-                entry: entryPoints,
+                entry: {
+                    calchart: "calchart.js",
+                },
                 output: {
                     path: path.resolve("calchart/static/js/"),
                     filename: "[name].js",
@@ -24,7 +40,6 @@ module.exports = function(grunt) {
                 resolve: {
                     alias: {
                         "vue": "vue/dist/vue.esm.js",
-                        "partials": path.resolve(__dirname, "calchart/static/sass/partials"),
                     },
                     modules: [
                         path.resolve(__dirname, "vue_src"),
@@ -37,7 +52,7 @@ module.exports = function(grunt) {
                             test: /\.vue$/,
                             use: {
                                 loader: "vue-loader",
-                                // https://vue-loader.vuejs.org/en/configurations/extract-css.html
+                                options: vueLoaderOptions,
                             },
                         },
                         {
@@ -95,18 +110,18 @@ module.exports = function(grunt) {
     grunt.registerTask("build", ["sass", "webpack:build"]);
     grunt.registerTask("default", ["build", "watch"]);
 
-    // our custom task for linting
-    grunt.registerTask("lint", "Run the ESLint linter.", function() {
-        var engine = new eslint.CLIEngine();
-        var report = engine.executeOnFiles(["src/"]);
-        var formatter = engine.getFormatter();
-        var output = formatter(report.results);
+    // // our custom task for linting
+    // grunt.registerTask("lint", "Run the ESLint linter.", function() {
+    //     var engine = new eslint.CLIEngine();
+    //     var report = engine.executeOnFiles(["src/"]);
+    //     var formatter = engine.getFormatter();
+    //     var output = formatter(report.results);
 
-        if (report.errorCount + report.warningCount > 0) {
-            grunt.log.writeln(output);
-            grunt.fail.warn("Linting failed.");
-        } else {
-            grunt.log.writeln("No linting errors.");
-        }
-    });
+    //     if (report.errorCount + report.warningCount > 0) {
+    //         grunt.log.writeln(output);
+    //         grunt.fail.warn("Linting failed.");
+    //     } else {
+    //         grunt.log.writeln("No linting errors.");
+    //     }
+    // });
 };
