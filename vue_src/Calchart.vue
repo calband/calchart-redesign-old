@@ -5,11 +5,42 @@ page according to the URL.
 
 <template>
     <div id="app">
+        <ul v-for="message in messages">
+            <li>{{ message.text }}</li>
+        </ul>
         <router-view></router-view>
     </div>
 </template>
 
 <script>
 export default {
+    data: {
+        messageId: 0,
+        messages: [],
+    },
+    methods: {
+        /**
+         * Shows a message on the page.
+         *
+         * @param {String} message
+         * @param {boolean} error - true to style the message as an error
+         */
+        showMessage(message, error=false) {
+            this.messages.push({
+                id: this.messageId,
+                text: message,
+            });
+            this.messageId++;
+            // TODO: remove after time
+        },
+        /**
+         * Shows an error message on the page.
+         *
+         * @param {String} message
+         */
+        showError(message) {
+            this.showMessage(message, true);
+        }
+    },
 };
 </script>

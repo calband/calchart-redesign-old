@@ -158,6 +158,18 @@ class CalchartView(CalchartMixin, TemplateView):
         if tab == 'owned':
             return Show.objects.filter(owner=self.request.user, is_band=False)
 
+    def publish_show(self):
+        """
+        A POST action that publishes or unpublishes a show
+        """
+        published = self.request.POST['publish'] == 'true'
+        slug = self.request.POST['slug']
+
+        show = Show.objects.get(slug=slug)
+        data = show.get_data()
+        data['published'] = published
+        show.save_data(data)
+
 # class HomeView(CalchartMixin, TemplateView):
 #     """
 #     The home page that lists all shows created by the user and shared
@@ -248,18 +260,6 @@ class CalchartView(CalchartMixin, TemplateView):
 #         return {
 #             'url': reverse('editor', kwargs={'slug': show.slug}),
 #         }
-
-#     def publish_show(self):
-#         """
-#         A POST action that publishes or unpublishes a show
-#         """
-#         published = self.request.POST['publish'] == 'true'
-#         slug = self.request.POST['slug']
-
-#         show = Show.objects.get(slug=slug)
-#         data = show.get_data()
-#         data['published'] = published
-#         show.save_data(data)
 
 # class EditorView(CalchartMixin, TemplateView):
 #     """

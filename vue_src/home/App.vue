@@ -37,6 +37,7 @@ import ShowList from "home/ShowList.vue";
 
 import _ from "lodash";
 import { IS_STUNT } from "utils/env";
+import ServerAction from "utils/ServerAction";
 
 // Convert tabs from an array of tuples into an object
 const tabs = {};
@@ -48,9 +49,7 @@ window.tabs.forEach(([name, label]) => {
 });
 
 export default {
-    components: {
-        "show-list": ShowList,
-    },
+    components: { ShowList },
     data() {
         return {
             isLoading: true,
@@ -59,9 +58,16 @@ export default {
         };
     },
     computed: {
+        /**
+         * @return {Object[]} The shows in the currently active tab
+         */
         shows() {
             return this.tabs[this.activeTab].shows;
         },
+        /**
+         * @return {boolean} true to display shows as published or
+         *   unpublished
+         */
         showPublished() {
             return this.activeTab == "band" && IS_STUNT;
         },
@@ -105,22 +111,26 @@ export default {
             }
         },
         /**
-         * Open the given show in the given app.
+         * Toggle the published status of the given show. Should only
+         * be called on Cal Band shows.
          *
-         * @param {string} app - The application to load; "viewer" or "editor"
-         * @param {string} slug - The slug of the show to open
-         * @param {boolean} [newTab=false] - true to open the show in a new tab
+         * @param {Object} show
          */
-        openShow(app, slug, newTab=false) {
-            if (newTab) {
-                let url = `/${app}/${slug}`;
-                window.open(url, "_blank");
-            } else {
-                this.$router.push({
-                    name: app,
-                    params: { slug },
-                });
-            }
+        togglePublished(show) {
+            let data = {
+                publish: show.published,
+                slug: show.slug,
+            };
+            ServerAction(this, "publish_show").send(data, {
+                success: () => {
+                    _.remove(
+                        this.tabs.band.shows,
+                        _.matchesProperty("slug", show.slug),
+                    );
+                    this.tabs.band.shows.push(show);
+                    show.published = !show.published;
+                },
+            });
         },
     },
     mounted() {
@@ -196,6 +206,7 @@ export default {
         height: 100%;
         overflow-y: auto;
         p.loading {
+            margin-top: 15px;
             text-align: center;
         }
         h2.published {

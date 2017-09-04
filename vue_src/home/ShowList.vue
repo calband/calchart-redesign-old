@@ -7,19 +7,62 @@ A list of shows for a tab.
         <li
             v-for="show in shows"
             v-bind:class="show.slug"
-            @click="openShow($event, show)"
+            @click.left="openDefaultShow($event, show)"
+            @contextmenu="openContextMenu($event, show)"
         >{{ show.name }}</li>
     </ul>
 </template>
 
+<context-menu ref="contextMenu">
+    <li
+        v-if="isOwned"
+        @click="openShow("editor", activeShow.slug)"
+    >Open in editor</li>
+    <li
+        @click="openShow("viewer", activeShow.slug)"
+    >Open in viewer</li>
+    <li
+        v-if="$parent.showPublished"
+        @click="$parent.togglePublished(activeShow)"
+    >{{ activeShow.published|publLabel }}</li>
+</context-menu>
+
 <script>
+import ContextMenu from "vue-context-menu";
+
 import { IS_STUNT } from "utils/env";
 
 export default {
     props: ["shows"],
+    components: { ContextMenu },
+    data() {
+        return {
+            activeShow: null, // set when opening context menu
+        };
+    },
+    computed: {
+        /**
+         * @return {boolean} true if the current show list is a list
+         *   of shows that are owned by the user.
+         */
+        isOwned() {
+            return this.$parent.activeTab === "owned" || IS_STUNT;
+        }
+    },
     methods: {
         /**
-         * Open the given show.
+         * Open a context menu for the given show.
+         *
+         * @param {Event} e
+         * @param {Object} show
+         */
+        openContextMenu(e, show) {
+            // TODO: keep show `.active`
+            this.activeShow = show;
+            this.$refs.contextMenu.open(e);
+        },
+        /**
+         * Open the given show with default options.
          *
          * @param {Event} e - The click event. If ctrl or the meta key was
          *   pressed, opens the show in a new tab.
@@ -27,11 +70,35 @@ export default {
          *   by the current user or the current user is on STUNT, opens the
          *   show in the editor app. Otherwise, opens in the viewer app.
          */
-        openShow(e, show) {
-            let app = this.$parent.activeTab === "owned" || IS_STUNT
-                ? "editor"
-                : "viewer";
+        openDefaultShow(e, show) {
+            let app = this.isOwned ? "editor" : "viewer";
             this.$parent.openShow(app, show.slug, e.ctrlKey || e.metaKey);
+        },
+        /**
+         * Open the given show in the given app.
+         *
+         * @param {string} app - The application to load; "viewer" or "editor"
+         * @param {string} slug - The slug of the show to open
+         * @param {boolean} [newTab=false] - true to open the show in a new tab
+         */
+        openShow(app, slug, newTab=false) {
+            if (newTab) {
+                let url = `/${app}/${slug}`;
+                window.open(url, "_blank");
+            } else {
+                this.$router.push({
+                    name: app,
+                    params: { slug },
+                });
+            }
+        },
+    },
+    filters: {
+        /**
+         * @return {string}
+         */
+        publLabel(isPublished) {
+            return isPublished ? "publish" : "unpublish";
         },
     },
 };
