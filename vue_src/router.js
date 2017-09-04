@@ -12,11 +12,27 @@ import Home from "home/App.vue";
 Vue.use(VueRouter);
 
 export default new VueRouter({
+    mode: "history",
     routes: [
         {
             path: "/",
-            name: "Home",
+            name: "home",
             component: Home,
+        },
+        {
+            path: "/editor/:slug/",
+            name: "editor",
+            component: Home, // TODO
+        },
+        {
+            path: "/viewer/:slug/",
+            name: "viewer",
+            component: Home, // TODO
+        },
+        {
+            path: "/viewpsheet/:slug/",
+            name: "viewpsheet",
+            component: Home, // TODO
         },
     ],
 });

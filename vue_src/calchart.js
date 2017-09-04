@@ -8,4 +8,3 @@ new Vue({
     router,
     render: h => h(Calchart),
 });
-

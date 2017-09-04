@@ -11,7 +11,10 @@
         "svgAsPngUri": true,
         "soundManager": true
     },
-    "extends": "eslint:recommended",
+    "extends": [
+        "eslint:recommended",
+        "eslint:vue/recommended"
+    ],
     "parserOptions": {
         "sourceType": "module"
     },
@@ -21,6 +24,7 @@
             "SwitchCase": 1
         }],
         "linebreak-style": ["error", "unix"],
+        "max-len": ["error", 80],
         "no-console": ["error", {
             "allow": ["error"]
         }],

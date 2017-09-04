@@ -7,9 +7,9 @@ from base.views import *
 
 urlpatterns = [
     url(r'^$', CalchartView.as_view(), name='home'),
-    url(r'^editor/(?P<slug>.+)/$', CalchartView.as_view()),
-    url(r'^viewer/(?P<slug>.+)/$', CalchartView.as_view()),
-    url(r'^viewpsheet/(?P<slug>.+)/$', CalchartView.as_view()),
+    url(r'^editor/.+/$', CalchartView.as_view()),
+    url(r'^viewer/.+/$', CalchartView.as_view()),
+    url(r'^viewpsheet/.+/$', CalchartView.as_view()),
     url(r'^help/', include('wiki.urls', namespace='wiki')),
 
     # authentication

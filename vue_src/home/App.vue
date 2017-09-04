@@ -9,20 +9,25 @@ The entry point for the home page.
         </div>
         <div class="home-content">
             <ul class="tabs" ref="tabs">
-                <template v-for="tab in tabs">
-                    <li @click="loadTab(tab.name)">{{ tab.label }}</li>
-                </template>
+                <li
+                    v-for="(tab, name) in tabs"
+                    @click="loadTab(name)"
+                >{{ tab.label }}</li>
             </ul>
-            <p v-if="isLoading" class="loading">Loading...</p>
-            <template v-if="showPublished">
-                <h2 class="unpublished">Unpublished</h2>
-                <show-list></show-list>
-                <h2 class="published">Published</h2>
-                <show-list></show-list>
-            </template>
-            <template v-else>
-                <show-list v-bind:shows="shows"></show-list>
-            </template>
+            <div class="shows">
+                <template v-if="isLoading">
+                    <p class="loading">Loading...</p>
+                </template>
+                <template v-else-if="showPublished">
+                    <h2 class="unpublished">Unpublished</h2>
+                    <show-list v-bind:shows="shows.unpublished"></show-list>
+                    <h2 class="published">Published</h2>
+                    <show-list v-bind:shows="shows.published"></show-list>
+                </template>
+                <template v-else>
+                    <show-list v-bind:shows="shows"></show-list>
+                </template>
+            </div>
         </div>
     </div>
 </template>
@@ -30,6 +35,7 @@ The entry point for the home page.
 <script>
 import ShowList from "home/ShowList.vue";
 
+import _ from "lodash";
 import { IS_STUNT } from "utils/env";
 
 // Convert tabs from an array of tuples into an object
@@ -61,17 +67,60 @@ export default {
         },
     },
     methods: {
+        /**
+         * Display the shows for the given tab, populating shows
+         * from the server if not already loaded.
+         *
+         * @param {string} tab - The slug of the tab to load
+         */
         loadTab(tab) {
-            console.log(tab);
-            return $.ajax({
-                data: { tab },
-                dataType: "json",
-                success: data => {
-                    // if band and is stunt, split shows into unpublished/published
-                    this.tabs[tab].shows = data.shows;
-                    this.isLoading = false;
-                },
-            });
+            if (_.isNull(this.tabs[tab].shows)) {
+                $.ajax({
+                    data: { tab },
+                    dataType: "json",
+                    success: data => {
+                        if (tab === "band" && IS_STUNT) {
+                            let shows = {
+                                unpublished: [],
+                                published: [],
+                            };
+                            data.shows.forEach(show => {
+                                if (show.published) {
+                                    shows.published.push(show);
+                                } else {
+                                    shows.unpublished.push(show);
+                                }
+                            });
+                            this.tabs[tab].shows = shows;
+                        } else {
+                            this.tabs[tab].shows = data.shows;
+                        }
+
+                        this.isLoading = false;
+                        this.activeTab = tab;
+                    },
+                });
+            } else {
+                this.activeTab = tab;
+            }
+        },
+        /**
+         * Open the given show in the given app.
+         *
+         * @param {string} app - The application to load; "viewer" or "editor"
+         * @param {string} slug - The slug of the show to open
+         * @param {boolean} [newTab=false] - true to open the show in a new tab
+         */
+        openShow(app, slug, newTab=false) {
+            if (newTab) {
+                let url = `/${app}/${slug}`;
+                window.open(url, "_blank");
+            } else {
+                this.$router.push({
+                    name: app,
+                    params: { slug },
+                });
+            }
         },
     },
     mounted() {
@@ -122,24 +171,22 @@ export default {
         @include unselectable;
         display: inline-block;
         vertical-align: top;
-        li {
-            padding: 15px 20px 10px;
-            cursor: pointer;
-            &:hover {
-                background: $light-gray;
-            }
-        }
     }
 
     .tabs {
         width: $tabs-width;
         margin-right: 50px;
         li {
+            padding: 15px 20px 10px;
+            cursor: pointer;
             &.active {
                 background: darken($light-gray, 10);
             }
-            &:hover:not(.active) {
-                background: $semilight-gray;
+            &:hover {
+                background: $light-gray;
+                &:not(.active) {
+                    background: $semilight-gray;
+                }
             }
         }
     }
@@ -148,14 +195,11 @@ export default {
         width: calc(100% - #{$tabs-width + 70px});
         height: 100%;
         overflow-y: auto;
-        h2.unpublished {
-            margin-top: 0;
+        p.loading {
+            text-align: center;
         }
         h2.published {
             margin-top: 20px;
-        }
-        p.loading {
-            text-align: center;
         }
     }
 </style>
