@@ -8,24 +8,23 @@ A list of shows for a tab.
             v-for="show in shows"
             v-bind:class="show.slug"
             @click.left="openDefaultShow($event, show)"
-            @contextmenu="openContextMenu($event, show)"
+            @contextmenu="openContextMenu"
         >{{ show.name }}</li>
+        <context-menu id="context-menu" ref="ctx">
+            <li
+                v-if="isOwned"
+                @click="openShow("editor", activeShow.slug)"
+            >Open in editor</li>
+            <li
+                @click="openShow("viewer", activeShow.slug)"
+            >Open in viewer</li>
+            <li
+                v-if="$parent.showPublished"
+                @click="$parent.togglePublished(activeShow)"
+            >{{ activeShow.published|publLabel }}</li>
+        </context-menu>
     </ul>
 </template>
-
-<context-menu ref="contextMenu">
-    <li
-        v-if="isOwned"
-        @click="openShow("editor", activeShow.slug)"
-    >Open in editor</li>
-    <li
-        @click="openShow("viewer", activeShow.slug)"
-    >Open in viewer</li>
-    <li
-        v-if="$parent.showPublished"
-        @click="$parent.togglePublished(activeShow)"
-    >{{ activeShow.published|publLabel }}</li>
-</context-menu>
 
 <script>
 import ContextMenu from "vue-context-menu";
@@ -36,8 +35,9 @@ export default {
     props: ["shows"],
     components: { ContextMenu },
     data() {
+        console.log(this.$refs);
         return {
-            activeShow: null, // set when opening context menu
+            activeShow: null, // TODO: set when opening context menu
         };
     },
     computed: {

@@ -45,6 +45,9 @@
     - name: install npm packages
       command: npm install {{ ROOT_DIR }} --no-bin-links
 
+    - name: install node commands
+      command: npm install -g webpack@2.4.0 webpack-dev-server@2.4.5 # TODO: remove versions
+
     # DJANGO
 
     - name: run django setup actions

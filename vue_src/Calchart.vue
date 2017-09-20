@@ -14,9 +14,11 @@ page according to the URL.
 
 <script>
 export default {
-    data: {
-        messageId: 0,
-        messages: [],
+    data() {
+        return {
+            messageId: 0,
+            messages: [],
+        };
     },
     methods: {
         /**
