@@ -4,19 +4,6 @@ A list of shows for a tab.
 
 <template>
     <ul class="show-list">
-        <context-menu id="context-menu" ref="contextMenu">
-            <li
-                v-if="isOwned"
-                @click="openShow('editor', activeShow.slug)"
-            >Open in editor</li>
-            <li
-                @click="openShow('viewer', activeShow.slug)"
-            >Open in viewer</li>
-            <li
-                v-if="$parent.showPublished"
-                @click="$parent.togglePublished(activeShow)"
-            >{{ activeShow.published|publLabel }}</li>
-        </context-menu>
         <li
             v-for="show in shows"
             v-bind:class="show.slug"
@@ -26,10 +13,24 @@ A list of shows for a tab.
     </ul>
 </template>
 
+<context-menu>
+    <li
+        v-if="isOwned"
+        @click="openShow('editor', activeShow.slug)"
+    >Open in editor</li>
+    <li
+        @click="openShow('viewer', activeShow.slug)"
+    >Open in viewer</li>
+    <li
+        v-if="$parent.showPublished"
+        @click="$parent.togglePublished(activeShow)"
+    >{{ activeShow.published|togglePublishedLabel }}</li>
+</context-menu>
 
 <script>
 import ContextMenu from "vue-context-menu";
 
+import _ from "lodash";
 import { IS_STUNT } from "utils/env";
 
 export default {
@@ -37,7 +38,7 @@ export default {
     components: { ContextMenu },
     data() {
         return {
-            activeShow: this.shows[0], // TODO: set when opening context menu
+            _activeShow: null,
         };
     },
     computed: {
@@ -47,7 +48,13 @@ export default {
          */
         isOwned() {
             return this.$parent.activeTab === "owned" || IS_STUNT;
-        }
+        },
+        /**
+         * @return {Object}
+         */
+        activeShow() {
+            return _.isNull(this._activeShow) ? {} : this._activeShow;
+        },
     },
     methods: {
         /**
@@ -58,8 +65,8 @@ export default {
          */
         openContextMenu(e, show) {
             // TODO: keep show `.active`
-            this.activeShow = show;
-            this.$refs.contextMenu.open(e);
+            this._activeShow = show;
+            this.contextMenu.open(e);
         },
         /**
          * Open the given show with default options.
@@ -72,7 +79,7 @@ export default {
          */
         openDefaultShow(e, show) {
             let app = this.isOwned ? "editor" : "viewer";
-            this.$parent.openShow(app, show.slug, e.ctrlKey || e.metaKey);
+            this.openShow(app, show.slug, e.ctrlKey || e.metaKey);
         },
         /**
          * Open the given show in the given app.
@@ -95,10 +102,11 @@ export default {
     },
     filters: {
         /**
-         * @return {string}
+         * @return {string} If the show is published, display "Unpublish",
+         *   otherwise display "Publish".
          */
-        publLabel(isPublished) {
-            return isPublished ? "publish" : "unpublish";
+        togglePublishedLabel(isPublished) {
+            return isPublished ? "Unpublish" : "Publish";
         },
     },
 };

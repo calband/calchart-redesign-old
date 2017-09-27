@@ -3,8 +3,8 @@ import Vue from "vue";
 import Calchart from "Calchart.vue";
 import router from "router.js";
 
-new Vue({
+let App = Vue.extend(Calchart);
+new App({
     el: "#app",
     router,
-    render: h => h(Calchart),
 });

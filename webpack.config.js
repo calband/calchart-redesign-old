@@ -1,4 +1,7 @@
+// project paths
 const path = require("path");
+const src = path.resolve(__dirname, "vue_src");
+const static = path.resolve(__dirname, "calchart", "static");
 
 const babelLoaderOptions = {
     minified: true,
@@ -7,10 +10,11 @@ const babelLoaderOptions = {
     cacheDirectory: true,
 };
 
+const partials = path.resolve(static, "sass", "partials");
 const sassResourcesLoaderOptions = {
     resources: [
-        path.resolve(__dirname, 'calchart/static/sass/partials/_vars.scss'),
-        path.resolve(__dirname, 'calchart/static/sass/partials/_mixins.scss'),
+        path.resolve(partials, "_vars.scss"),
+        path.resolve(partials, "_mixins.scss"),
     ],
 };
 
@@ -33,6 +37,8 @@ const vueLoaderOptions = {
                 options: sassResourcesLoaderOptions,
             },
         ],
+        // our custom context-menu section
+        "context-menu": path.resolve(src, "loaders", "context-menu-loader.js"),
     },
 };
 
@@ -49,7 +55,7 @@ module.exports = {
             "vue": "vue/dist/vue.esm.js",
         },
         modules: [
-            path.resolve(__dirname, "vue_src"),
+            src,
             path.resolve(__dirname, "node_modules"),
         ],
     },

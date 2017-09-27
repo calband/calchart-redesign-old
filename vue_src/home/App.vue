@@ -121,7 +121,7 @@ export default {
                 publish: show.published,
                 slug: show.slug,
             };
-            ServerAction(this, "publish_show").send(data, {
+            new ServerAction(this, "publish_show").send(data, {
                 success: () => {
                     _.remove(
                         this.tabs.band.shows,
