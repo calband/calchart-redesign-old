@@ -143,6 +143,7 @@ export default {
     body {
         padding: 0;
         padding-top: 20px;
+        min-width: 700px;
     }
 
     header {
@@ -169,7 +170,7 @@ export default {
     }
 
     $tabs-width: 200px;
-    $height-offset: $header-height + $buttons-height + 20px;
+    $height-offset: $header-height + $buttons-height;
 
     .home-content {
         background: $light-gray;

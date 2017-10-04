@@ -15,6 +15,7 @@ const sassResourcesLoaderOptions = {
     resources: [
         path.resolve(partials, "_vars.scss"),
         path.resolve(partials, "_mixins.scss"),
+        path.resolve(partials, "_functions.scss"),
     ],
 };
 

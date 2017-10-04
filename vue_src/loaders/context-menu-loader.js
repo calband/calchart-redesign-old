@@ -1,36 +1,41 @@
+var compiler = require("vue-template-compiler");
+
 /**
- * A loader for injecting a <context-menu> section into a Vue component. See:
- * https://vue-loader.vuejs.org/en/configurations/custom-blocks.html#runtime-available-docs
- *
- * A component can only have one context menu. The context menu is added to the
- * template and can be opened with `this.contextMenu.open(event)`.
+ * A loader for injecting a <context-menu> section into a Vue component.
+ * See utils/ContextMenu.vue.
  */
 function getContextMenuLoader(source) {
+    // Note: this function will be converted into a string and used directly in the
+    // generated JS file. Use ES5.
     var _cmLoader = function(Component) {
         var mixin = {
             created: function() {
-                this.contextMenu = {
-                    open: e => {
-                        this._cmHide = false;
-                    },
-                    hide: () => {
-                        this._cmHide = true;
-                    },
-                };
+                this.contextMenu = null;
             },
-            data: function() {
-                return {
-                    _cmHide: true,
-                };
+            mounted: function() {
+                this.contextMenu = this.$children.find(function(child) {
+                    return child.$options.name === "ContextMenu";
+                });
             },
-            // template: "<ul v-if='_cmHide'>__TEMPLATE__</ul>",
         };
 
         Component.options.mixins = [mixin].concat(Component.options.mixins || []);
+
+        var oldRender = Component.options.render;
+        Component.options.render = function(createElement) {
+            function getContents() {
+                // RENDER CODE
+            }
+            var contents = getContents.call(this);
+            return createElement("div", [
+                createElement("context-menu", contents.children),
+                oldRender.call(this, createElement),
+            ]);
+        };
     };
 
-    var template = source.replace(/\n/g, "").replace(/"/g, "\\\"");
-    return _cmLoader.toString().replace("__TEMPLATE__", template);
+    var renderCode = compiler.compile("<ul>" + source + "</ul>");
+    return _cmLoader.toString().replace("// RENDER CODE", renderCode.render);
 }
 
 module.exports = function(source, map) {

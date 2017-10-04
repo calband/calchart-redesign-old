@@ -28,9 +28,8 @@ A list of shows for a tab.
 </context-menu>
 
 <script>
-import ContextMenu from "vue-context-menu";
-
 import _ from "lodash";
+import ContextMenu from "utils/ContextMenu.vue";
 import { IS_STUNT } from "utils/env";
 
 export default {
@@ -53,7 +52,7 @@ export default {
          * @return {Object}
          */
         activeShow() {
-            return _.isNull(this._activeShow) ? {} : this._activeShow;
+            return _.isNull(this.$data._activeShow) ? {} : this.$data._activeShow;
         },
     },
     methods: {
@@ -65,7 +64,7 @@ export default {
          */
         openContextMenu(e, show) {
             // TODO: keep show `.active`
-            this._activeShow = show;
+            this.$data._activeShow = show;
             this.contextMenu.open(e);
         },
         /**
