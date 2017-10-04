@@ -34,7 +34,11 @@ Usage:
 </docs>
 
 <template>
-    <ul class="context-menu" v-if="!cmHide">
+    <ul
+        v-if="!cmHide"
+        class="context-menu"
+        :style="position"
+    >
         <slot></slot>
     </ul>
 </template>
@@ -42,16 +46,24 @@ Usage:
 <script>
 export default {
     name: "ContextMenu",
-    data: function() {
+    data() {
         return {
             cmHide: true,
+            position: {
+                left: null,
+                top: null,
+            },
         };
     },
     methods: {
-        open: function(e) {
+        open(e) {
             this.cmHide = false;
+            // left/top relative to parent
+            let offset = $(this.$parent.$el).offset();
+            this.position.left = e.pageX - offset.left;
+            this.position.top = e.pageY - offset.top;
         },
-        hide: function() {
+        hide() {
             this.cmHide = true;
         },
     },

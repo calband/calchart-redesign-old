@@ -16,11 +16,8 @@ def get_static_path(path, filename):
     a file that is built by webpack, the file is located in the base path;
     otherwise, the file is located at the normal path.
     """
-    if settings.IS_LOCAL:
-        if filename in WEBPACK_FILES:
-            path = filename
-        else:
-            path = 'static/%s/%s' % (path, filename)
+    if settings.IS_LOCAL and filename in WEBPACK_FILES:
+        path = filename
     else:
         path = '%s/%s' % (path, filename)
     return _get_static_path(path)
