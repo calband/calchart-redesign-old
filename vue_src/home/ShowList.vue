@@ -6,7 +6,8 @@ A list of shows for a tab.
     <ul class="show-list">
         <li
             v-for="show in shows"
-            v-bind:class="show.slug"
+            :class="show.slug"
+            :key="show.slug"
             @click.left="openDefaultShow($event, show)"
             @contextmenu.prevent="openContextMenu($event, show)"
         >{{ show.name }}</li>
@@ -29,12 +30,16 @@ A list of shows for a tab.
 
 <script>
 import _ from "lodash";
-import ContextMenu from "utils/ContextMenu.vue";
 import { IS_STUNT } from "utils/env";
+import { validateList, validateObject } from "utils/validators";
 
 export default {
-    props: ["shows"],
-    components: { ContextMenu },
+    props: {
+        shows: {
+            type: Array,
+            validator: validateList(validateObject("slug", "name", "published")),
+        },
+    },
     data() {
         return {
             _activeShow: null,

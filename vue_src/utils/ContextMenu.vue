@@ -17,9 +17,7 @@ Usage:
     </context-menu>
 
     <script>
-    import ContextMenu from "utils/ContextMenu.vue";
     export default {
-        components: { ContextMenu },
         data: { foo: true },
         methods: {
             doFoo: function() {
