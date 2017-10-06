@@ -5,7 +5,11 @@ page according to the URL.
 
 <template>
     <div id="app">
-        <ul v-for="message in messages">
+        <ul
+            v-if="messages.length > 0"
+            v-for="message in messages"
+            class="messages"
+        >
             <li>{{ message.text }}</li>
         </ul>
         <router-view></router-view>
@@ -46,3 +50,9 @@ export default {
     },
 };
 </script>
+
+<style lang="scss" scoped>
+    .messages {
+        @include hover-messages;
+    }
+</style>

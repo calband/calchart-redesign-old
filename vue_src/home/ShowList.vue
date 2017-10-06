@@ -6,7 +6,7 @@ A list of shows for a tab.
     <ul class="show-list">
         <li
             v-for="show in shows"
-            :class="show.slug"
+            :class="[show.slug, getActiveClass(show)]"
             :key="show.slug"
             @click.left="openDefaultShow($event, show)"
             @contextmenu.prevent="openContextMenu($event, show)"
@@ -61,6 +61,24 @@ export default {
         },
     },
     methods: {
+        /**
+         * Return a class Object that adds the "active" class if the given show
+         * is the active show.
+         *
+         * @param {Object} show
+         * @return {Object}
+         */
+        getActiveClass(show) {
+            return {
+                active: this.$data._activeShow === show,
+            };
+        },
+        /**
+         * Hook that runs when the context menu is hidden.
+         */
+        onContextMenuHide() {
+            this.$data._activeShow = null;
+        },
         /**
          * Open a context menu for the given show.
          *

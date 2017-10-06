@@ -34,6 +34,7 @@ Usage:
 <template>
     <ul
         v-if="!cmHide"
+        v-on-click-outside="hide"
         class="context-menu"
         :style="position"
     >
@@ -43,9 +44,25 @@ Usage:
 
 <script>
 export default {
-    name: "ContextMenu",
+    _isContextMenu: true,
+    updated() {
+        if (!this._initClick) {
+            // Whenever <li> is clicked, hide context menu
+            let menuItems = _.filter(this.$slots.default, ["tag", "li"]);
+            _.each(menuItems, node => {
+                let callbacks = node.data.on.click.fns;
+                if (!_.isArray(callbacks)) {
+                    callbacks = [callbacks];
+                    node.data.on.click.fns = callbacks;
+                }
+                callbacks.push($event => this.hide());
+            });
+            this._initClick = true;
+        }
+    },
     data() {
         return {
+            _initClick: false,
             cmHide: true,
             position: {
                 left: null,
@@ -60,9 +77,16 @@ export default {
             let offset = $(this.$parent.$el).offset();
             this.position.left = e.pageX - offset.left;
             this.position.top = e.pageY - offset.top;
+
+            // TODO: smart position
         },
         hide() {
             this.cmHide = true;
+
+            let hideCallback = this.$parent.$options.methods.onContextMenuHide;
+            if (hideCallback) {
+                hideCallback.call(this.$parent);
+            }
         },
     },
 };
@@ -70,12 +94,7 @@ export default {
 
 <style lang="scss" scoped>
     .context-menu {
-        position: absolute;
-        background: $white;
-        list-style: none;
+        @include hover-menu;
         z-index: z-index(context-menu);
-        li {
-            cursor: pointer;
-        }
     }
 </style>

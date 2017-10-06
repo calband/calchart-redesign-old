@@ -14,7 +14,7 @@ function getContextMenuLoader(source) {
             },
             mounted: function() {
                 this.contextMenu = this.$children.find(function(child) {
-                    return child.$options.name === "ContextMenu";
+                    return child.$options._isContextMenu;
                 });
             },
         };
@@ -39,5 +39,5 @@ function getContextMenuLoader(source) {
 }
 
 module.exports = function(source, map) {
-    this.callback(null, "module.exports =" + getContextMenuLoader.call(this, source), map);
+    this.callback(null, "module.exports = " + getContextMenuLoader.call(this, source), map);
 };

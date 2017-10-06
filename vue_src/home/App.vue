@@ -5,12 +5,14 @@ The entry point for the home page.
 <template>
     <div>
         <div class="home-buttons">
+            <!-- TODO: make this work -->
             <button>New Show</button>
         </div>
         <div class="home-content">
             <ul class="tabs" ref="tabs">
                 <li
                     v-for="(tab, name) in tabs"
+                    :class="getActiveClass(name)"
                     @click="loadTab(name)"
                 >{{ tab.label }}</li>
             </ul>
@@ -48,6 +50,9 @@ window.tabs.forEach(([name, label]) => {
     };
 });
 
+// TODO: move tabs to above home-content (rename home-buttons)
+// TODO: have shows display as a box preview
+
 export default {
     components: { ShowList },
     data() {
@@ -73,6 +78,18 @@ export default {
         },
     },
     methods: {
+        /**
+         * Return a class Object that adds the "active" class if the given tab
+         * is the active tab.
+         *
+         * @param {String} tab
+         * @return {Object}
+         */
+        getActiveClass(tab) {
+            return {
+                active: this.activeTab === tab,
+            };
+        },
         /**
          * Display the shows for the given tab, populating shows
          * from the server if not already loaded.
@@ -121,6 +138,7 @@ export default {
                 publish: show.published,
                 slug: show.slug,
             };
+            // TODO: make this work
             new ServerAction(this, "publish_show").send(data, {
                 success: () => {
                     _.remove(
@@ -148,10 +166,6 @@ export default {
 
     header {
         margin: 0 20px;
-    }
-
-    .messages {
-        @include hover-messages;
     }
 </style>
 
@@ -193,11 +207,8 @@ export default {
             &.active {
                 background: darken($light-gray, 10);
             }
-            &:hover {
-                background: $light-gray;
-                &:not(.active) {
-                    background: $semilight-gray;
-                }
+            &:hover:not(.active) {
+                background: $semilight-gray;
             }
         }
     }
