@@ -2,7 +2,7 @@ var compiler = require("vue-template-compiler");
 
 /**
  * A loader for injecting a <context-menu> section into a Vue component.
- * See utils/ContextMenu.vue.
+ * See utils/ContextMenu.
  */
 function getContextMenuLoader(source) {
     // Note: this function will be converted into a string and used directly in the

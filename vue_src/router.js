@@ -7,7 +7,7 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
 
-import Home from "home/App.vue";
+import Home from "home/App";
 
 Vue.use(VueRouter);
 

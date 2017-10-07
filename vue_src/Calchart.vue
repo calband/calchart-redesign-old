@@ -4,7 +4,11 @@ page according to the URL.
 </docs>
 
 <template>
-    <div id="app">
+    <div>
+        <header>
+            <h1><a href="{% url 'home' %}">Calchart</a></h1>
+            <p class="logout-link"><a href="{% url 'logout' %}">Logout</a></p>
+        </header>
         <ul
             v-if="messages.length > 0"
             v-for="message in messages"

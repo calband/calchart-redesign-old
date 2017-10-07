@@ -5,8 +5,7 @@ The entry point for the home page.
 <template>
     <div>
         <div class="home-buttons">
-            <!-- TODO: make this work -->
-            <button>New Show</button>
+            <button @click="">New Show</button>
         </div>
         <div class="home-content">
             <ul class="tabs" ref="tabs">
@@ -35,11 +34,13 @@ The entry point for the home page.
 </template>
 
 <script>
-import ShowList from "home/ShowList.vue";
-
 import _ from "lodash";
+
 import { IS_STUNT } from "utils/env";
 import ServerAction from "utils/ServerAction";
+
+import ShowList from "home/ShowList";
+import CreateShowPopup from "popups/CreateShowPopup";
 
 // Convert tabs from an array of tuples into an object
 const tabs = {};
