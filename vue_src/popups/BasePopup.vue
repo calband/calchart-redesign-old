@@ -11,6 +11,8 @@ The base component for a generic popup.
 </template>
 
 <script>
+import $ from "jquery";
+
 export default {
     data() {
         return {

@@ -2,6 +2,8 @@
  * @file Utility functions for popup components.
  */
 
+import $ from "jquery";
+
 /**
  * Mount and display the given popup.
  *

@@ -34,6 +34,7 @@ The entry point for the home page.
 </template>
 
 <script>
+import $ from "jquery";
 import _ from "lodash";
 
 import { IS_STUNT } from "utils/env";

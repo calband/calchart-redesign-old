@@ -61,6 +61,10 @@ module.exports = {
             path.resolve(__dirname, "node_modules"),
         ],
     },
+    externals: {
+        // import $ from "jquery"
+        jquery: "jQuery",
+    },
     module: {
         rules: [
             {
