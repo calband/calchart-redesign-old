@@ -22,6 +22,7 @@ page according to the URL.
 
 <script>
 export default {
+    name: "Calchart",
     data() {
         return {
             messageId: 0,

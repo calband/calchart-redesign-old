@@ -3,6 +3,7 @@
  */
 
 import $ from "jquery";
+import Vue from "vue";
 
 /**
  * Mount and display the given popup.
@@ -10,6 +11,7 @@ import $ from "jquery";
  * @param {BasePopup} Popup
  */
 export function showPopup(Popup) {
-    let popup = new Popup().$mount();
-    $("body").append(popup.$el);
+    let PopupComponent = Vue.extend(Popup);
+    let popup = new PopupComponent().$mount();
+    popup.open();
 }

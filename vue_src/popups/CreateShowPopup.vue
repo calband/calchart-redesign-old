@@ -9,10 +9,11 @@ A popup for creating a new show.
 </template>
 
 <script>
+import BasePopup from "popups/BasePopup";
 import FormPopup from "popups/FormPopup";
 
 export default {
     components: { FormPopup },
-    extends: FormPopup,
+    extends: BasePopup,
 };
 </script>

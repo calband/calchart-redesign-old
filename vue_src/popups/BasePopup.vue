@@ -3,7 +3,7 @@ The base component for a generic popup.
 </doc>
 
 <template>
-    <div v-if="visible" class="popup-wrapper">
+    <div class="popup-wrapper">
         <div v-on-click-outside="hide" class="popup">
             <slot></slot>
         </div>
@@ -14,15 +14,9 @@ The base component for a generic popup.
 import $ from "jquery";
 
 export default {
-    data() {
-        return {
-            visible: false,
-        };
-    },
     methods: {
         open() {
-            this.visible = true;
-
+            $("body").append(this.$el);
             // ESC closes popup
             $(window).on("keyup.popup", e => {
                 if (e.which === 27) {
@@ -31,9 +25,8 @@ export default {
             });
         },
         hide() {
-            this.visible = false;
-
             $(window).off(".popup");
+            $(this.$el).remove();
         },
     },
 };

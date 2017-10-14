@@ -1,3 +1,26 @@
+// create a nice visual button
+@mixin display-button($primary-color: $blue) {
+    $secondary-color: #fff;
+
+    margin: 5px 10px;
+    padding: 0.75em 2.5em 0.65em;
+    line-height: 1em;
+    font-family: sans-serif("DIN Next");
+    font-size: inherit;
+    text-transform: uppercase;
+    cursor: pointer;
+    background: $primary-color;
+    color: $secondary-color;
+    border: 0;
+    outline: 0;
+    &:hover {
+        background: lighten($primary-color, 5);
+    }
+    &.disabled {
+        background: $medium-gray;
+    }
+}
+
 // any menu that hovers over content
 @mixin hover-menu {
     @include unselectable;

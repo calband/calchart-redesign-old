@@ -17,3 +17,12 @@ $z-layers: (
     @warn "Unknown `#{$key} in $z-layers.";
     @return null;
 }
+
+/**
+ * Add a series of sans-serif fonts as backups for the given font. Usage:
+ *      font-family: sans-serif("DIN Next");
+ *    Outputs: font-family: "DIN Next", Helvetica, Arial, sans-serif
+ */
+@function sans-serif($font-families...) {
+    @return $font-families, Helvetica, Arial, sans-serif;
+}

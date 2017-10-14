@@ -5,7 +5,7 @@ The entry point for the home page.
 <template>
     <div>
         <div class="home-buttons">
-            <button @click="">New Show</button>
+            <button @click="showPopupCreateShow">New Show</button>
         </div>
         <div class="home-content">
             <ul class="tabs" ref="tabs">
@@ -42,6 +42,7 @@ import ServerAction from "utils/ServerAction";
 
 import ShowList from "home/ShowList";
 import CreateShowPopup from "popups/CreateShowPopup";
+import { showPopup } from "popups/utils";
 
 // Convert tabs from an array of tuples into an object
 const tabs = {};
@@ -56,6 +57,7 @@ window.tabs.forEach(([name, label]) => {
 // TODO: have shows display as a box preview
 
 export default {
+    name: "Home",
     components: { ShowList },
     data() {
         return {
@@ -128,6 +130,12 @@ export default {
             } else {
                 this.activeTab = tab;
             }
+        },
+        /**
+         * Display the CreateShowPopup.
+         */
+        showPopupCreateShow() {
+            showPopup(CreateShowPopup);
         },
         /**
          * Toggle the published status of the given show. Should only
