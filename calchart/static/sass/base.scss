@@ -326,17 +326,17 @@ header {
 //     display: none;
 // }
 
-// .field {
-//     margin: 10px 0;
-// }
+.field {
+    margin: 10px 0;
+}
 
-// ul.messages {
-//     li {
-//         &.error {
-//             color: $red;
-//         }
-//     }
-// }
+ul.messages {
+    li {
+        &.error {
+            color: $red;
+        }
+    }
+}
 
 // .chosen-container {
 //     .chosen-single {

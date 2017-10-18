@@ -26,6 +26,7 @@ export default {
         },
         hide() {
             $(window).off(".popup");
+            this.$destroy();
             $(this.$el).remove();
         },
     },

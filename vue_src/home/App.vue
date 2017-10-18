@@ -37,12 +37,12 @@ The entry point for the home page.
 import $ from "jquery";
 import _ from "lodash";
 
+import ShowList from "./ShowList";
+
+import CreateShowPopup from "popups/CreateShowPopup";
+import { showPopup } from "popups/lib";
 import { IS_STUNT } from "utils/env";
 import ServerAction from "utils/ServerAction";
-
-import ShowList from "home/ShowList";
-import CreateShowPopup from "popups/CreateShowPopup";
-import { showPopup } from "popups/utils";
 
 // Convert tabs from an array of tuples into an object
 const tabs = {};
@@ -149,7 +149,7 @@ export default {
                 slug: show.slug,
             };
             // TODO: make this work
-            new ServerAction(this, "publish_show").send(data, {
+            new ServerAction("publish_show").send(data, {
                 success: () => {
                     _.remove(
                         this.tabs.band.shows,

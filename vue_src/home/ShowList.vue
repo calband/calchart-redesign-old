@@ -39,6 +39,7 @@ export default {
         shows: {
             type: Array,
             validator: validateList(validateObject("slug", "name", "published")),
+            required: true,
         },
     },
     data() {

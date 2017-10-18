@@ -11,10 +11,12 @@ page according to the URL.
         </header>
         <ul
             v-if="messages.length > 0"
-            v-for="message in messages"
             class="messages"
         >
-            <li>{{ message.text }}</li>
+            <li
+                v-for="message in messages"
+                :class="{ message: true, error: message.error }"
+            >{{ message.text }}</li>
         </ul>
         <router-view></router-view>
     </div>
@@ -25,7 +27,6 @@ export default {
     name: "Calchart",
     data() {
         return {
-            messageId: 0,
             messages: [],
         };
     },
@@ -38,10 +39,9 @@ export default {
          */
         showMessage(message, error=false) {
             this.messages.push({
-                id: this.messageId,
                 text: message,
+                error: error,
             });
-            this.messageId++;
             // TODO: remove after time
         },
         /**

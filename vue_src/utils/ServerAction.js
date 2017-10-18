@@ -2,18 +2,17 @@ import $ from "jquery";
 import _ from "lodash";
 
 import { CSRF_TOKEN } from "utils/env";
+import { $vms } from "utils/vue";
 
 /**
  * A helper class that sends POST requests to the server.
  */
 export default class ServerAction {
     /**
-     * @param {Vue} vm - The Vue instance running the server action.
      * @param {String} [action] - The action to send to the server, if
      *   the static action variable is not set.
      */
-    constructor(vm, action) {
-        this._vm = vm;
+    constructor(action) {
         this._action = this.constructor.action || action;
     }
 
@@ -75,6 +74,6 @@ export default class ServerAction {
             }
         }
 
-        this._vm.$root.showError(message);
+        $vms.root.showError(message);
     }
 }
