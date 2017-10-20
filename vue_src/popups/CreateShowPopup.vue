@@ -4,16 +4,7 @@ A popup for creating a new show.
 
 <template>
     <FormPopup title="Create Show" @submit="createShow">
-        <CharField
-            :required="true"
-            name="name"
-        />
-        <BooleanField
-            v-if="IS_STUNT"
-            :initial="true"
-            name="isBand"
-            label="For Cal Band"
-        />
+        <formly-form :form="form" :model="model" :fields="fields"></formly-form>
     </FormPopup>
 </template>
 
@@ -22,15 +13,33 @@ import _ from "lodash";
 
 import { BasePopup, FormPopup } from "./lib";
 
-import { BooleanField, CharField, cleanFields } from "forms/lib";
 import { IS_STUNT } from "utils/env";
 
 export default {
-    components: { FormPopup, BooleanField, CharField },
+    components: { FormPopup },
     extends: BasePopup,
     data() {
         return {
-            IS_STUNT,
+            form: {},
+            model: {
+                name: "",
+                isBand: IS_STUNT,
+            },
+            fields: [
+                {
+                    key: "name",
+                    type: "text",
+                    required: true,
+                },
+                {
+                    key: "isBand",
+                    type: "checkbox",
+                    display: () => IS_STUNT,
+                    templateOptions: {
+                        label: "For Cal Band",
+                    },
+                },
+            ],
         };
     },
     methods: {

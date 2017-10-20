@@ -5,7 +5,8 @@
 import _ from "lodash";
 
 /**
- * @type {Object} An object of Vue instances that can be 
+ * @type {Object} An object that the application can register Vue
+ *   instances to.
  */
 let $vms = window.$vms = {};
 export { $vms };
@@ -18,5 +19,5 @@ export { $vms };
  * @return {Object}
  */
 export function allProps() {
-    return _.extend({}, this.$props);
+    return _.clone(this.$props);
 }

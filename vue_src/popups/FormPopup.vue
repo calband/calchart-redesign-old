@@ -51,6 +51,7 @@ export default {
             let values = {};
             let hasError = false;
 
+            // TODO: fix validation
             _.each(fields, field => {
                 field.clearErrors();
                 try {
