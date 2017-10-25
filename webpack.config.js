@@ -38,8 +38,7 @@ const vueLoaderOptions = {
                 options: sassResourcesLoaderOptions,
             },
         ],
-        // our custom context-menu section
-        "context-menu": path.resolve(src, "loaders", "context-menu-loader.js"),
+        "context-menu": require.resolve("vue-ctxmenu/loader"),
     },
 };
 
