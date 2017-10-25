@@ -3,9 +3,12 @@ A popup for creating a new show.
 </doc>
 
 <template>
-    <FormPopup title="Create Show" @submit="createShow">
-        <formly-form :form="form" :model="model" :fields="fields"></formly-form>
-    </FormPopup>
+    <FormPopup
+        title="Create Show"
+        :model="model"
+        :fields="fields"
+        @submit="createShow"
+    />
 </template>
 
 <script>
@@ -20,7 +23,6 @@ export default {
     extends: BasePopup,
     data() {
         return {
-            form: {},
             model: {
                 name: "",
                 isBand: IS_STUNT,
@@ -46,14 +48,15 @@ export default {
         /**
          * Create a show with the given form values.
          */
-        createShow(values) {
+        createShow() {
             // TODO:
             // new CreateShowAction(this._popup).send({
             //     name: data.name,
             //     is_band: data.isBand,
             // });
-            // dont hide popup
-            console.log(values);
+            // // dont hide popup
+            console.log(this.model.name);
+            console.log(this.model.isBand);
         },
     },
 };

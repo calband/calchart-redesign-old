@@ -23,3 +23,12 @@ export default {
     },
 };
 </script>
+
+<style lang="scss" scoped>
+    // error-display
+    span.text-danger {
+        display: block;
+        color: $red;
+        margin: 5px 0;
+    }
+</style>

@@ -6,7 +6,12 @@ A popup that contains a form to be submitted or modified.
     <BasePopup>
         <h1 class="title">{{ title }}</h1>
         <form class="form-popup" @submit.prevent="submit">
-            <slot></slot>
+            <formly-form
+                ref="form"
+                :form="form"
+                :model="model"
+                :fields="fields"
+            ></formly-form>
             <div class="buttons">
                 <button>Save</button>
                 <button
@@ -21,9 +26,10 @@ A popup that contains a form to be submitted or modified.
 </template>
 
 <script>
-import BasePopup from "./BasePopup";
-
 import { ValidationError } from "utils/errors";
+import { $vms } from "utils/vue";
+
+import BasePopup from "./BasePopup";
 
 export default {
     components: { BasePopup },
@@ -41,57 +47,48 @@ export default {
             type: Boolean,
             default: true,
         },
+        // Need following for vue-formly
+        model: {
+            type: null,
+            required: true,
+        },
+        fields: {
+            type: null,
+            required: true,
+        },
+    },
+    data() {
+        return {
+            form: {},
+        };
     },
     methods: {
         /**
          * Submit the form.
          */
         submit() {
-            let fields = this.$children[0].$children;
-            let values = {};
-            let hasError = false;
-
-            // TODO: fix validation
-            _.each(fields, field => {
-                field.clearErrors();
-                try {
-                    values[field.name] = field.clean();
-                } catch (ex) {
-                    if (ex instanceof ValidationError) {
-                        hasError = true;
-                        field.showError(ex.message);
+            this.$refs.form.validate()
+                .then(() => {
+                    if (!this.form.$valid) {
+                        return;
                     }
-                }
-            });
 
-            if (hasError) {
-                return;
-            }
+                    this.$emit("submit");
 
-            this.$emit("submit", values);
-
-            if (this.hideOnSubmit) {
-                this.hide();
-            }
+                    if (this.hideOnSubmit) {
+                        this.hide();
+                    }
+                })
+                .catch(e => {
+                    $vms.root.showError(e.message);
+                });
         },
     },
 };
 </script>
 
-<style lang="scss">
-// non-scoped since elements in <slot> tags are scoped to the children
-form.form-popup {
-    .form-group {
-        margin: 10px 0;
-    }
-    .field-wrap {
-        display: inline-block;
-    }
-}
-</style>
-
 <style lang="scss" scoped>
-button.cancel {
-    @include display-button($red);
-}
+    button.cancel {
+        @include display-button($red);
+    }
 </style>
