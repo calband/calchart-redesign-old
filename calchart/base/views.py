@@ -6,6 +6,7 @@ from django.core.exceptions import PermissionDenied
 from django.core.files.storage import default_storage
 from django.core.urlresolvers import reverse
 from django.http.response import HttpResponse, JsonResponse
+from django.middleware.csrf import get_token
 from django.shortcuts import get_object_or_404, redirect
 from django.views.generic import TemplateView, RedirectView, CreateView
 from django.utils import timezone
@@ -13,8 +14,9 @@ from django.utils import timezone
 import json, os
 from datetime import timedelta
 
+import base.actions as actions
 from base.forms import *
-from base.mixins import CalchartMixin
+from base.mixins import LoginRequiredMixin
 from base.models import User, Show
 from utils.api import get_login_url
 
@@ -86,7 +88,7 @@ class CreateUserView(CreateView):
 
 ### CALCHART PAGE ###
 
-class CalchartView(CalchartMixin, TemplateView):
+class CalchartView(LoginRequiredMixin, TemplateView):
     """
     The single page application for all Calchart pages. Each page renders
     the same HTML file, but Vue will route to the appropriate page. See
@@ -114,9 +116,48 @@ class CalchartView(CalchartMixin, TemplateView):
         else:
             return super().get(request, *args, **kwargs)
 
+    def post(self, request, *args, **kwargs):
+        """Handle POST actions from ServerAction."""
+        try:
+            action = request.POST['action']
+        except KeyError:
+            return super().post(request, *args, **kwargs)
+
+        try:
+            data = json.loads(request.POST['data'])
+            response = getattr(actions, action)(
+                data=data,
+                user=request.user,
+                request=request,
+            )
+        except Exception as e:
+            if isinstance(e, AttributeError):
+                message = f'Action does not exist: {action}'
+            else:
+                message = str(e)
+
+            data = {
+                'message': message,
+            }
+            return JsonResponse(data, status=500)
+
+        if response is None:
+            return JsonResponse({})
+        else:
+            return JsonResponse(response)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
+        context['env'] = {
+            'csrf_token': get_token(self.request),
+            'static_path': settings.STATIC_URL[:-1],
+            'is_stunt': self.request.user.has_committee('STUNT'),
+            'is_local': settings.IS_LOCAL,
+        }
+
         context['tabs'] = self.get_tabs()
+
         return context
 
     def get_tabs(self):
@@ -157,18 +198,6 @@ class CalchartView(CalchartMixin, TemplateView):
 
         if tab == 'owned':
             return Show.objects.filter(owner=self.request.user, is_band=False)
-
-    def publish_show(self):
-        """
-        A POST action that publishes or unpublishes a show
-        """
-        published = self.request.POST['publish'] == 'true'
-        slug = self.request.POST['slug']
-
-        show = Show.objects.get(slug=slug)
-        data = show.get_data()
-        data['published'] = published
-        show.save_data(data)
 
 # class HomeView(CalchartMixin, TemplateView):
 #     """
@@ -240,26 +269,6 @@ class CalchartView(CalchartMixin, TemplateView):
 
 #         if tab == 'owned':
 #             return Show.objects.filter(owner=self.request.user, is_band=False)
-
-#     def create_show(self):
-#         """
-#         A POST action that creates a show with the given name.
-#         """
-#         if self.request.user.has_committee('STUNT'):
-#             is_band = self.request.POST['is_band'] == 'true'
-#         else:
-#             is_band = False
-
-#         kwargs = {
-#             'name': self.request.POST['name'],
-#             'owner': self.request.user,
-#             'is_band': is_band,
-#         }
-#         show = Show.objects.create(**kwargs)
-
-#         return {
-#             'url': reverse('editor', kwargs={'slug': show.slug}),
-#         }
 
 # class EditorView(CalchartMixin, TemplateView):
 #     """

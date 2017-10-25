@@ -26,6 +26,8 @@ A popup that contains a form to be submitted or modified.
 </template>
 
 <script>
+import _ from "lodash";
+
 import { ValidationError } from "utils/errors";
 import { $vms } from "utils/vue";
 
@@ -36,23 +38,29 @@ export default {
     extends: BasePopup,
     props: {
         title: {
+            // Title at top of popup
             type: String,
             required: true,
         },
+        onSubmit: {
+            // Callback to run when form submits. Takes in
+            // the model data. Return false to disable hiding
+            // the popup automatically.
+            type: Function,
+            required: true,
+        },
         allowCancel: {
+            // Show the cancel button
             type: Boolean,
             default: true,
         },
-        hideOnSubmit: {
-            type: Boolean,
-            default: true,
-        },
-        // Need following for vue-formly
         model: {
+            // Model for vue-formly
             type: null,
             required: true,
         },
         fields: {
+            // Field definitions for vue-formly
             type: null,
             required: true,
         },
@@ -73,9 +81,11 @@ export default {
                         return;
                     }
 
-                    this.$emit("submit");
-
-                    if (this.hideOnSubmit) {
+                    // this.model is a Vue proxy, need to force
+                    // out data
+                    let data = _.fromPairs(_.toPairs(this.model));
+                    let result = this.onSubmit(data);
+                    if (result !== false) {
                         this.hide();
                     }
                 })

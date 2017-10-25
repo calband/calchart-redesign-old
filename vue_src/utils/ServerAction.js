@@ -13,14 +13,7 @@ export default class ServerAction {
      *   the static action variable is not set.
      */
     constructor(action) {
-        this._action = this.constructor.action || action;
-    }
-
-    /**
-     * @return {String} The name of the action to send to the server.
-     */
-    static get action() {
-        return null;
+        this._action = action;
     }
 
     /**
@@ -34,9 +27,17 @@ export default class ServerAction {
         let formData = new FormData();
         formData.append("csrfmiddlewaretoken", CSRF_TOKEN);
         formData.append("action", this._action);
+
+        let nonFileData = {};
         _.each(data, (val, name) => {
-            formData.append(name, val);
+            if (val instanceof File) {
+                formData.append(name, val);
+            } else {
+                nonFileData[name] = val;
+            }
         });
+
+        formData.append("data", JSON.stringify(nonFileData));
 
         $.ajax("", _.defaults(options, {
             method: "POST",
@@ -46,7 +47,7 @@ export default class ServerAction {
             contentType: false,
             processData: false,
             error: xhr => {
-                this.handleError(xhr);
+                this.constructor.handleError(xhr);
             },
         }));
     }
@@ -58,7 +59,7 @@ export default class ServerAction {
      *
      * @param {jqXHR} xhr
      */
-    handleError(xhr) {
+    static handleError(xhr) {
         console.error(xhr);
 
         let message;

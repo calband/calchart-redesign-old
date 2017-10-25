@@ -5,9 +5,10 @@ A popup for creating a new show.
 <template>
     <FormPopup
         title="Create Show"
+        :hideOnSubmit="false"
         :model="model"
         :fields="fields"
-        @submit="createShow"
+        :onSubmit="createShow"
     />
 </template>
 
@@ -17,6 +18,7 @@ import _ from "lodash";
 import { BasePopup, FormPopup } from "./lib";
 
 import { IS_STUNT } from "utils/env";
+import ServerAction from "utils/ServerAction";
 
 export default {
     components: { FormPopup },
@@ -48,15 +50,23 @@ export default {
         /**
          * Create a show with the given form values.
          */
-        createShow() {
-            // TODO:
-            // new CreateShowAction(this._popup).send({
-            //     name: data.name,
-            //     is_band: data.isBand,
-            // });
-            // // dont hide popup
-            console.log(this.model.name);
-            console.log(this.model.isBand);
+        createShow(data) {
+            // TODO: hide buttons
+
+            new ServerAction("create_show").send(data, {
+                success: data => {
+                    this.hide();
+                    // TODO: redirect to editor
+                    console.log(data.slug);
+                },
+                error: xhr => {
+                    ServerAction.error(xhr);
+
+                    // TODO: show buttons again
+                },
+            });
+
+            return false;
         },
     },
 };
