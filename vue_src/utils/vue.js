@@ -5,11 +5,17 @@
 import _ from 'lodash';
 
 /**
- * @type {Object} An object that the application can register Vue
- *   instances to.
+ * @type {Proxy<Vue>} A proxy to the root Vue instance.
  */
-let $vms = {};
-export { $vms };
+export let $root = new Proxy({ vm: null }, {
+    get: (target, name) => {
+        if (_.isNull(target.vm)) {
+            throw new Error('Root Vue instance not initialized yet.');
+        } else {
+            return target.vm[name];
+        }
+    },
+});
 
 /**
  * Register the given Vue instance under the given name.
@@ -17,8 +23,8 @@ export { $vms };
  * @param {String} name - The name of the vue instance
  * @param {Vue} vm
  */
-export function registerVM(name, vm) {
-    $vms[name] = vm;
+export function setRoot(vm) {
+    $root.vm = vm;
 }
 
 /**

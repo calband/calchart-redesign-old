@@ -2,7 +2,7 @@ import $ from 'jquery';
 import _ from 'lodash';
 
 import { CSRF_TOKEN } from 'utils/env';
-import { $vms } from 'utils/vue';
+import { $root } from 'utils/vue';
 
 /**
  * A helper class that sends POST requests to the server.
@@ -75,6 +75,6 @@ export default class ServerAction {
             }
         }
 
-        $vms.root.showError(message);
+        $root.showError(message);
     }
 }

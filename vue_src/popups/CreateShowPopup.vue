@@ -22,7 +22,7 @@ import { BasePopup, FormPopup } from './lib';
 
 import { IS_STUNT } from 'utils/env';
 import ServerAction from 'utils/ServerAction';
-import { $vms } from 'utils/vue';
+import { $root } from 'utils/vue';
 
 export default {
     components: { FormPopup },
@@ -61,7 +61,7 @@ export default {
             new ServerAction('create_show').send(data, {
                 success: data => {
                     this.hide();
-                    $vms.router.push({
+                    $root.$router.push({
                         name: 'editor',
                         params: {
                             slug: data.slug,

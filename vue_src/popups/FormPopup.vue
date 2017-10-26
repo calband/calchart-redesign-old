@@ -31,7 +31,7 @@ A popup that contains a form to be submitted or modified.
 import _ from 'lodash';
 
 import { ValidationError } from 'utils/errors';
-import { $vms } from 'utils/vue';
+import { $root } from 'utils/vue';
 
 import BasePopup from './BasePopup';
 
@@ -92,7 +92,7 @@ export default {
                     }
                 })
                 .catch(e => {
-                    $vms.root.showError(e.message);
+                    $root.showError(e.message);
                 });
         },
     },
