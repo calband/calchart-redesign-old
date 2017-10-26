@@ -13,13 +13,15 @@ A popup that contains a form to be submitted or modified.
                 :fields="fields"
             ></formly-form>
             <div class="buttons">
-                <button>Save</button>
-                <button
-                    v-if="allowCancel"
-                    @click="hide"
-                    class="cancel"
-                    type="button"
-                >Cancel</button>
+                <slot name="buttons">
+                    <button>Save</button>
+                    <button
+                        v-if="allowCancel"
+                        @click="hide"
+                        class="cancel"
+                        type="button"
+                    >Cancel</button>
+                </slot>
             </div>
         </form>
     </BasePopup>
