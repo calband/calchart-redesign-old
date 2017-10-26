@@ -17,7 +17,7 @@ export const IS_LOCAL = window.env.is_local;
  * https://css-tricks.com/snippets/javascript/test-mac-pc-javascript/
  * @const {boolean}
  */
-export const IS_MAC = navigator.userAgent.includes("Mac OS X");
+export const IS_MAC = navigator.userAgent.includes('Mac OS X');
 
 /**
  * @const {boolean} true if the current user is on Stunt

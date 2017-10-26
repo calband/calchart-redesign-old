@@ -1,8 +1,8 @@
-import $ from "jquery";
-import _ from "lodash";
+import $ from 'jquery';
+import _ from 'lodash';
 
-import { CSRF_TOKEN } from "utils/env";
-import { $vms } from "utils/vue";
+import { CSRF_TOKEN } from 'utils/env';
+import { $vms } from 'utils/vue';
 
 /**
  * A helper class that sends POST requests to the server.
@@ -25,8 +25,8 @@ export default class ServerAction {
     send(data, options) {
         // http://www.mattlunn.me.uk/blog/2012/05/sending-formdata-with-jquery-ajax/
         let formData = new FormData();
-        formData.append("csrfmiddlewaretoken", CSRF_TOKEN);
-        formData.append("action", this._action);
+        formData.append('csrfmiddlewaretoken', CSRF_TOKEN);
+        formData.append('action', this._action);
 
         let nonFileData = {};
         _.each(data, (val, name) => {
@@ -37,12 +37,12 @@ export default class ServerAction {
             }
         });
 
-        formData.append("data", JSON.stringify(nonFileData));
+        formData.append('data', JSON.stringify(nonFileData));
 
-        $.ajax("", _.defaults(options, {
-            method: "POST",
+        $.ajax('', _.defaults(options, {
+            method: 'POST',
             data: formData,
-            dataType: "json",
+            dataType: 'json',
             cache: false,
             contentType: false,
             processData: false,
@@ -68,10 +68,10 @@ export default class ServerAction {
         } else {
             switch (xhr.status) {
                 case 403:
-                    message = "Invalid permissions. Please refresh the page.";
+                    message = 'Invalid permissions. Please refresh the page.';
                     break;
                 default:
-                    message = "An error occurred.";
+                    message = 'An error occurred.';
             }
         }
 

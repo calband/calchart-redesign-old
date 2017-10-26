@@ -2,11 +2,11 @@
  * @file The entrypoint for the forms package.
  */
 
-import _ from "lodash";
-import VueFormly from "vue-formly";
+import _ from 'lodash';
+import VueFormly from 'vue-formly';
 
-import CheckboxField from "./CheckboxField";
-import InputField from "./InputField";
+import CheckboxField from './CheckboxField';
+import InputField from './InputField';
 
 let FIELD_TYPES = {
     text: InputField,
@@ -14,7 +14,7 @@ let FIELD_TYPES = {
 };
 
 let MESSAGES = {
-    required: "This field is required.",
+    required: 'This field is required.',
 };
 
 let FormsPlugin = {

@@ -11,8 +11,8 @@ The base component for a form field.
 </template>
 
 <script>
-import _ from "lodash";
-import baseField from "vue-formly-bootstrap/src/fields/baseField";
+import _ from 'lodash';
+import baseField from 'vue-formly-bootstrap/src/fields/baseField';
 
 export default {
     mixins: [baseField],

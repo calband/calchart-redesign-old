@@ -29,16 +29,16 @@ A list of shows for a tab.
 </context-menu>
 
 <script>
-import _ from "lodash";
+import _ from 'lodash';
 
-import { IS_STUNT } from "utils/env";
-import { validateList, validateObject } from "utils/validators";
+import { IS_STUNT } from 'utils/env';
+import { validateList, validateObject } from 'utils/validators';
 
 export default {
     props: {
         shows: {
             type: Array,
-            validator: validateList(validateObject("slug", "name", "published")),
+            validator: validateList(validateObject('slug', 'name', 'published')),
             required: true,
         },
     },
@@ -53,7 +53,7 @@ export default {
          *   of shows that are owned by the user.
          */
         isOwned() {
-            return this.$parent.activeTab === "owned" || IS_STUNT;
+            return this.$parent.activeTab === 'owned' || IS_STUNT;
         },
         /**
          * @return {Object}
@@ -64,7 +64,7 @@ export default {
     },
     methods: {
         /**
-         * Return a class Object that adds the "active" class if the given show
+         * Return a class Object that adds the 'active' class if the given show
          * is the active show.
          *
          * @param {Object} show
@@ -102,20 +102,21 @@ export default {
          *   show in the editor app. Otherwise, opens in the viewer app.
          */
         openDefaultShow(e, show) {
-            let app = this.isOwned ? "editor" : "viewer";
+            let app = this.isOwned ? 'editor' : 'viewer';
             this.openShow(app, show.slug, e.ctrlKey || e.metaKey);
         },
         /**
          * Open the given show in the given app.
          *
-         * @param {string} app - The application to load; "viewer" or "editor"
+         * @param {string} app - The application to load; 'viewer' or 'editor'
          * @param {string} slug - The slug of the show to open
          * @param {boolean} [newTab=false] - true to open the show in a new tab
          */
         openShow(app, slug, newTab=false) {
             if (newTab) {
+                // TODO: use router
                 let url = `/${app}/${slug}`;
-                window.open(url, "_blank");
+                window.open(url, '_blank');
             } else {
                 this.$router.push({
                     name: app,
@@ -126,11 +127,11 @@ export default {
     },
     filters: {
         /**
-         * @return {string} If the show is published, display "Unpublish",
-         *   otherwise display "Publish".
+         * @return {string} If the show is published, display 'Unpublish',
+         *   otherwise display 'Publish'.
          */
         togglePublishedLabel(isPublished) {
-            return isPublished ? "Unpublish" : "Publish";
+            return isPublished ? 'Unpublish' : 'Publish';
         },
     },
 };

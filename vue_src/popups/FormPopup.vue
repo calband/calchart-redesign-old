@@ -28,12 +28,12 @@ A popup that contains a form to be submitted or modified.
 </template>
 
 <script>
-import _ from "lodash";
+import _ from 'lodash';
 
-import { ValidationError } from "utils/errors";
-import { $vms } from "utils/vue";
+import { ValidationError } from 'utils/errors';
+import { $vms } from 'utils/vue';
 
-import BasePopup from "./BasePopup";
+import BasePopup from './BasePopup';
 
 export default {
     components: { BasePopup },

@@ -34,15 +34,15 @@ The entry point for the home page.
 </template>
 
 <script>
-import $ from "jquery";
-import _ from "lodash";
+import $ from 'jquery';
+import _ from 'lodash';
 
-import ShowList from "./ShowList";
+import ShowList from './ShowList';
 
-import CreateShowPopup from "popups/CreateShowPopup";
-import { showPopup } from "popups/lib";
-import { IS_STUNT } from "utils/env";
-import ServerAction from "utils/ServerAction";
+import CreateShowPopup from 'popups/CreateShowPopup';
+import { showPopup } from 'popups/lib';
+import { IS_STUNT } from 'utils/env';
+import ServerAction from 'utils/ServerAction';
 
 // Convert tabs from an array of tuples into an object
 const tabs = {};
@@ -57,7 +57,7 @@ window.tabs.forEach(([name, label]) => {
 // TODO: have shows display as a box preview
 
 export default {
-    name: "Home",
+    name: 'Home',
     components: { ShowList },
     data() {
         return {
@@ -78,12 +78,12 @@ export default {
          *   unpublished
          */
         showPublished() {
-            return this.activeTab == "band" && IS_STUNT;
+            return this.activeTab == 'band' && IS_STUNT;
         },
     },
     methods: {
         /**
-         * Return a class Object that adds the "active" class if the given tab
+         * Return a class Object that adds the 'active' class if the given tab
          * is the active tab.
          *
          * @param {String} tab
@@ -104,9 +104,9 @@ export default {
             if (_.isNull(this.tabs[tab].shows)) {
                 $.ajax({
                     data: { tab },
-                    dataType: "json",
+                    dataType: 'json',
                     success: data => {
-                        if (tab === "band" && IS_STUNT) {
+                        if (tab === 'band' && IS_STUNT) {
                             let shows = {
                                 unpublished: [],
                                 published: [],
@@ -149,11 +149,11 @@ export default {
                 slug: show.slug,
             };
             // TODO: make this work
-            new ServerAction("publish_show").send(data, {
+            new ServerAction('publish_show').send(data, {
                 success: () => {
                     _.remove(
                         this.tabs.band.shows,
-                        _.matchesProperty("slug", show.slug),
+                        _.matchesProperty('slug', show.slug),
                     );
                     this.tabs.band.shows.push(show);
                     show.published = !show.published;
@@ -162,7 +162,7 @@ export default {
         },
     },
     mounted() {
-        $(this.$refs.tabs).children("li:first").click();
+        $(this.$refs.tabs).children('li:first').click();
     },
 };
 </script>

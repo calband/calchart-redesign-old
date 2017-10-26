@@ -4,34 +4,34 @@
  * to the URL goes to the proper place.
  */
 
-import Vue from "vue";
-import VueRouter from "vue-router";
+import Vue from 'vue';
+import VueRouter from 'vue-router';
 
-import Home from "home/App";
+import Home from 'home/App';
 
 Vue.use(VueRouter);
 
 export default new VueRouter({
-    mode: "history",
+    mode: 'history',
     routes: [
         {
-            path: "/",
-            name: "home",
+            path: '/',
+            name: 'home',
             component: Home,
         },
         {
-            path: "/editor/:slug/",
-            name: "editor",
+            path: '/editor/:slug/',
+            name: 'editor',
             component: Home, // TODO
         },
         {
-            path: "/viewer/:slug/",
-            name: "viewer",
+            path: '/viewer/:slug/',
+            name: 'viewer',
             component: Home, // TODO
         },
         {
-            path: "/viewpsheet/:slug/",
-            name: "viewpsheet",
+            path: '/viewpsheet/:slug/',
+            name: 'viewpsheet',
             component: Home, // TODO
         },
     ],

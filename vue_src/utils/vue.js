@@ -2,7 +2,7 @@
  * @file Utility and helper functions for Vue components.
  */
 
-import _ from "lodash";
+import _ from 'lodash';
 
 /**
  * @type {Object} An object that the application can register Vue

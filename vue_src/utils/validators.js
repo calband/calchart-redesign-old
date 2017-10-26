@@ -2,7 +2,7 @@
  * @file A collection of functions that validate data or types.
  */
 
-import _ from "lodash";
+import _ from 'lodash';
 
 /**
  * Return a validator for a list whose elements satisfy the provided

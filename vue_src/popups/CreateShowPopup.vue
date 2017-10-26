@@ -16,13 +16,13 @@ A popup for creating a new show.
 </template>
 
 <script>
-import _ from "lodash";
+import _ from 'lodash';
 
-import { BasePopup, FormPopup } from "./lib";
+import { BasePopup, FormPopup } from './lib';
 
-import { IS_STUNT } from "utils/env";
-import ServerAction from "utils/ServerAction";
-import { $vms } from "utils/vue";
+import { IS_STUNT } from 'utils/env';
+import ServerAction from 'utils/ServerAction';
+import { $vms } from 'utils/vue';
 
 export default {
     components: { FormPopup },
@@ -31,21 +31,21 @@ export default {
         return {
             isSaving: false,
             model: {
-                name: "",
+                name: '',
                 isBand: IS_STUNT,
             },
             fields: [
                 {
-                    key: "name",
-                    type: "text",
+                    key: 'name',
+                    type: 'text',
                     required: true,
                 },
                 {
-                    key: "isBand",
-                    type: "checkbox",
+                    key: 'isBand',
+                    type: 'checkbox',
                     display: () => IS_STUNT,
                     templateOptions: {
-                        label: "For Cal Band",
+                        label: 'For Cal Band',
                     },
                 },
             ],
@@ -58,11 +58,11 @@ export default {
         createShow(data) {
             this.isSaving = true;
 
-            new ServerAction("create_show").send(data, {
+            new ServerAction('create_show').send(data, {
                 success: data => {
                     this.hide();
                     $vms.router.push({
-                        name: "editor",
+                        name: 'editor',
                         params: {
                             slug: data.slug,
                         },

@@ -13,7 +13,7 @@ A form field that renders a simple text input.
 </template>
 
 <script>
-import BaseField from "./BaseField";
+import BaseField from './BaseField';
 
 export default {
     mixins: [BaseField],

@@ -7,6 +7,7 @@ page according to the URL.
     <div>
         <header>
             <h1><a href="{% url 'home' %}">Calchart</a></h1>
+            <!-- TODO: FIX URL -->
             <p class="logout-link"><a href="{% url 'logout' %}">Logout</a></p>
         </header>
         <ul
@@ -24,7 +25,7 @@ page according to the URL.
 
 <script>
 export default {
-    name: "Calchart",
+    name: 'Calchart',
     data() {
         return {
             messages: [],

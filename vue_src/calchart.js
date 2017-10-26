@@ -1,21 +1,21 @@
-import Vue from "vue";
-import VueContextMenu from "vue-ctxmenu";
-import { directive as onClickOutside } from "vue-on-click-outside";
+import Vue from 'vue';
+import VueContextMenu from 'vue-ctxmenu';
+import { directive as onClickOutside } from 'vue-on-click-outside';
 
-import App from "App";
-import FormsPlugin from "forms";
-import router from "router";
-import { registerVM } from "utils/vue";
+import App from 'App';
+import FormsPlugin from 'forms';
+import router from 'router';
+import { registerVM } from 'utils/vue';
 
 Vue.use(FormsPlugin);
 Vue.use(VueContextMenu);
 
-Vue.directive("on-click-outside", onClickOutside);
+Vue.directive('on-click-outside', onClickOutside);
 
 let CalchartApp = Vue.extend(App);
 let vm = new CalchartApp({
-    el: "#app",
+    el: '#app',
     router,
 });
-registerVM("root", vm);
-registerVM("router", vm.$router);
+registerVM('root', vm);
+registerVM('router', vm.$router);

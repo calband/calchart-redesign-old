@@ -2,40 +2,40 @@
  * @file A collection of Javascript utility/helper functions.
  */
 
-import { IS_MAC } from "utils/env";
+import { IS_MAC } from 'utils/env';
 
 let shortcutMap, shortcutSep;
 if (IS_MAC) {
     // HTML codes: http://apple.stackexchange.com/a/55729
     shortcutMap = {
-        ctrl: "&#8984;",
-        alt: "&#8997;",
-        shift: "&#8679;",
-        backspace: "&#9003;",
-        tab: "&#8677;",
-        enter: "&crarr;",
-        left: "&larr;",
-        up: "&uarr;",
-        right: "&rarr;",
-        down: "&darr;",
-        delete: "&#8998;",
+        ctrl: '&#8984;',
+        alt: '&#8997;',
+        shift: '&#8679;',
+        backspace: '&#9003;',
+        tab: '&#8677;',
+        enter: '&crarr;',
+        left: '&larr;',
+        up: '&uarr;',
+        right: '&rarr;',
+        down: '&darr;',
+        delete: '&#8998;',
     };
-    shortcutSep = "";
+    shortcutSep = '';
 } else {
     shortcutMap = {
-        ctrl: "Ctrl",
-        alt: "Alt",
-        shift: "Shift",
-        backspace: "Backspace",
-        tab: "Tab",
-        enter: "Enter",
-        left: "Left",
-        up: "Up",
-        right: "Right",
-        down: "Down",
-        delete: "Del",
+        ctrl: 'Ctrl',
+        alt: 'Alt',
+        shift: 'Shift',
+        backspace: 'Backspace',
+        tab: 'Tab',
+        enter: 'Enter',
+        left: 'Left',
+        up: 'Up',
+        right: 'Right',
+        down: 'Down',
+        delete: 'Del',
     };
-    shortcutSep = "+";
+    shortcutSep = '+';
 }
 
 /**
@@ -89,11 +89,11 @@ export function attempt(func, errors=null) {
 /**
  * Convert the given shortcut key binding to a human readable hint.
  *
- * @param {string} shortcut - The shortcut key binding, e.g. "ctrl+s".
+ * @param {string} shortcut - The shortcut key binding, e.g. 'ctrl+s'.
  * @return {string} The human readable shortcut hint.
  */
 export function convertShortcut(shortcut) {
-    return shortcut.split("+").map(key => {
+    return shortcut.split('+').map(key => {
         return _.defaultTo(shortcutMap[key], key.toUpperCase());
     }).join(shortcutSep);
 }

@@ -11,21 +11,21 @@ The base component for a generic popup.
 </template>
 
 <script>
-import $ from "jquery";
+import $ from 'jquery';
 
 export default {
     methods: {
         open() {
-            $("body").append(this.$el);
+            $('body').append(this.$el);
             // ESC closes popup
-            $(window).on("keyup.popup", e => {
+            $(window).on('keyup.popup', e => {
                 if (e.which === 27) {
                     this.hide();
                 }
             });
         },
         hide() {
-            $(window).off(".popup");
+            $(window).off('.popup');
             this.$destroy();
             $(this.$el).remove();
         },

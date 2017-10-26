@@ -2,11 +2,11 @@
  * @file The entrypoint for the popups package.
  */
 
-import $ from "jquery";
-import Vue from "vue";
+import $ from 'jquery';
+import Vue from 'vue';
 
-export { default as BasePopup } from "./BasePopup";
-export { default as FormPopup } from "./FormPopup";
+export { default as BasePopup } from './BasePopup';
+export { default as FormPopup } from './FormPopup';
 
 /**
  * Mount and display the given popup.

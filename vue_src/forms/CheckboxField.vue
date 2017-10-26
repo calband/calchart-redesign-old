@@ -14,7 +14,7 @@ A form field that renders a checkbox.
 </template>
 
 <script>
-import BaseField from "./BaseField";
+import BaseField from './BaseField';
 
 export default {
     mixins: [BaseField],
