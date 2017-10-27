@@ -6,9 +6,8 @@ page according to the URL.
 <template>
     <div>
         <header>
-            <h1><a href="{% url 'home' %}">Calchart</a></h1>
-            <!-- TODO: FIX URL -->
-            <p class="logout-link"><a href="{% url 'logout' %}">Logout</a></p>
+            <h1><router-link :to="{ name: 'home' }">Calchart</router-link></h1>
+            <p class="logout-link"><a href="/logout">Logout</a></p>
         </header>
         <ul
             v-if="messages.length > 0"
