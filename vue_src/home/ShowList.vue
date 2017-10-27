@@ -47,6 +47,11 @@ export default {
             _activeShow: null,
         };
     },
+    mounted() {
+        this.contextMenu.$on('hide', () => {
+            this.$data._activeShow = null;
+        });
+    },
     computed: {
         /**
          * @return {boolean} true if the current show list is a list
@@ -76,19 +81,12 @@ export default {
             };
         },
         /**
-         * Hook that runs when the context menu is hidden.
-         */
-        onContextMenuHide() {
-            this.$data._activeShow = null;
-        },
-        /**
          * Open a context menu for the given show.
          *
          * @param {Event} e
          * @param {Object} show
          */
         openContextMenu(e, show) {
-            // TODO: keep show `.active`
             this.$data._activeShow = show;
             this.contextMenu.open(e);
         },
