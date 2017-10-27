@@ -114,7 +114,6 @@ export default {
          */
         openShow(app, slug, newTab=false) {
             if (newTab) {
-                // TODO: use router
                 let url = `/${app}/${slug}`;
                 window.open(url, '_blank');
             } else {

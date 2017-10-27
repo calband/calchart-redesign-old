@@ -13,6 +13,8 @@ The base component for a generic popup.
 <script>
 import $ from 'jquery';
 
+import { $root } from 'utils/vue';
+
 export default {
     methods: {
         open() {
@@ -28,6 +30,11 @@ export default {
             $(window).off('.popup');
             this.$destroy();
             $(this.$el).remove();
+        },
+    },
+    computed: {
+        $router() {
+            return $root.$router;
         },
     },
 };
