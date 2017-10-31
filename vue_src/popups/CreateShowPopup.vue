@@ -20,8 +20,8 @@ import _ from 'lodash';
 
 import { BasePopup, FormPopup } from './lib';
 
+import sendAction, { handleError } from 'utils/actions';
 import { IS_STUNT } from 'utils/env';
-import ServerAction from 'utils/ServerAction';
 
 export default {
     components: { FormPopup },
@@ -57,7 +57,7 @@ export default {
         createShow(data) {
             this.isSaving = true;
 
-            new ServerAction('create_show').send(data, {
+            send_action('create_show', data, {
                 success: data => {
                     this.hide();
                     this.$router.push({
@@ -68,7 +68,7 @@ export default {
                     });
                 },
                 error: xhr => {
-                    ServerAction.error(xhr);
+                    handleError(xhr);
                     this.isSaving = false;
                 },
             });

@@ -117,7 +117,7 @@ class CalchartView(LoginRequiredMixin, TemplateView):
             return super().get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
-        """Handle POST actions from ServerAction."""
+        """Handle POST actions from sendAction."""
         try:
             action = request.POST['action']
         except KeyError:

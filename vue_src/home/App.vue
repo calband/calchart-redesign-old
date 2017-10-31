@@ -41,8 +41,8 @@ import ShowList from './ShowList';
 
 import CreateShowPopup from 'popups/CreateShowPopup';
 import { showPopup } from 'popups/lib';
+import sendAction from 'utils/actions';
 import { IS_STUNT } from 'utils/env';
-import ServerAction from 'utils/ServerAction';
 
 // Convert tabs from an array of tuples into an object
 const tabs = {};
@@ -59,6 +59,9 @@ window.tabs.forEach(([name, label]) => {
 export default {
     name: 'Home',
     components: { ShowList },
+    mounted() {
+        $(this.$refs.tabs).children('li:first').click();
+    },
     data() {
         return {
             isLoading: true,
@@ -148,9 +151,9 @@ export default {
                 publish: show.published,
                 slug: show.slug,
             };
-            // TODO: make this work
-            new ServerAction('publish_show').send(data, {
+            sendAction('publish_show', data, {
                 success: () => {
+                    // TODO: test
                     _.remove(
                         this.tabs.band.shows,
                         _.matchesProperty('slug', show.slug),
@@ -160,9 +163,6 @@ export default {
                 },
             });
         },
-    },
-    mounted() {
-        $(this.$refs.tabs).children('li:first').click();
     },
 };
 </script>

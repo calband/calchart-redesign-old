@@ -1,5 +1,5 @@
 """
-This package organizes actions that can be sent from ServerAction
+This package organizes actions that can be sent from sendAction
 on each page. Each action needs to have the following declaration:
 
 def action_name(data, **kwargs):
