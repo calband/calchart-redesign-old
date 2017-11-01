@@ -15,19 +15,28 @@ page according to the URL.
         >
             <li
                 v-for="message in messages"
-                :class="{ message: true, error: message.error }"
-            >{{ message.text }}</li>
+                :class="['message', { error: message.error }]"
+            >{{ message.text }}
+                <i
+                    v-if="!message.autohide"
+                    @click="hideMessage(message.id)"
+                    class="icon-times close-message"
+                ></i>
+            </li>
         </ul>
         <router-view></router-view>
     </div>
 </template>
 
 <script>
+import _ from 'lodash';
+
 export default {
     name: 'Calchart',
     data() {
         return {
             messages: [],
+            messageId: 0,
         };
     },
     methods: {
@@ -35,23 +44,46 @@ export default {
          * Shows a message on the page.
          *
          * @param {String} message
+         * @param {Object} [options] - Options to customize the message:
+         *   - {boolean} [error=false] - true if message is an error message
+         *   - {boolean} [autohide=!isError] - Automatically hide the message after
+         *     a given time.
          * @param {boolean} error - true to style the message as an error
          */
-        showMessage(message, error=false) {
-            this.messages.push({
-                text: message,
-                error: error,
-            });
-            // TODO: remove after time
+        showMessage(message, options={}) {
+            _.defaults(options, {
+                error: false,
+            })
+            options.autohide = _.defaultTo(options.autohide, !options.error);
+            options.id = this.messageId++;
+            options.text = message;
+            this.messages.push(options);
+
+            if (options.autohide) {
+                setTimeout(() => {
+                    this.hideMessage(options.id);
+                }, 1000);
+            }
         },
         /**
          * Shows an error message on the page.
          *
          * @param {String} message
+         * @param {Object} [options]
          */
-        showError(message) {
-            this.showMessage(message, true);
-        }
+        showError(message, options={}) {
+            options.error = true;
+            this.showMessage(message, options);
+        },
+        /**
+         * Hide the message with the given id.
+         *
+         * @param {int} id
+         */
+        hideMessage(id) {
+            let index = _.findIndex(this.messages, ['id', id]);
+            this.messages.splice(index, 1);
+        },
     },
 };
 </script>
