@@ -31,6 +31,8 @@ page according to the URL.
 <script>
 import _ from 'lodash';
 
+import { findAndRemove } from 'utils/array';
+
 export default {
     name: 'Calchart',
     data() {
@@ -81,8 +83,7 @@ export default {
          * @param {int} id
          */
         hideMessage(id) {
-            let index = _.findIndex(this.messages, ['id', id]);
-            this.messages.splice(index, 1);
+            findAndRemove(this.messages, ['id', id]);
         },
     },
 };

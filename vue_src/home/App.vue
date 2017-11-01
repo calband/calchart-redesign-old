@@ -20,9 +20,9 @@ The entry point for the home page.
                     <p class="loading">Loading...</p>
                 </template>
                 <template v-else-if="showPublished">
-                    <h2 class="unpublished">Unpublished</h2>
+                    <h2 class="unpublished" v-if="shows.unpublished.length > 0">Unpublished</h2>
                     <show-list v-bind:shows="shows.unpublished"></show-list>
-                    <h2 class="published">Published</h2>
+                    <h2 class="published" v-if="shows.published.length > 0">Published</h2>
                     <show-list v-bind:shows="shows.published"></show-list>
                 </template>
                 <template v-else>
@@ -42,6 +42,7 @@ import ShowList from './ShowList';
 import CreateShowPopup from 'popups/CreateShowPopup';
 import { showPopup } from 'popups/lib';
 import sendAction from 'utils/actions';
+import { findAndRemove } from 'utils/array';
 import { IS_STUNT } from 'utils/env';
 
 // Convert tabs from an array of tuples into an object
@@ -148,17 +149,16 @@ export default {
          */
         togglePublished(show) {
             let data = {
-                publish: show.published,
+                publish: !show.published,
                 slug: show.slug,
             };
             sendAction('publish_show', data, {
                 success: () => {
-                    // TODO: test
-                    _.remove(
-                        this.tabs.band.shows,
-                        _.matchesProperty('slug', show.slug),
-                    );
-                    this.tabs.band.shows.push(show);
+                    let shows = this.tabs.band.shows;
+                    let toRemove = show.published ? shows.published : shows.unpublished;
+                    let toAdd = show.published ? shows.unpublished : shows.published;
+                    findAndRemove(toRemove, ['slug', show.slug]);
+                    toAdd.push(show);
                     show.published = !show.published;
                 },
             });
