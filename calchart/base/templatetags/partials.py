@@ -2,25 +2,11 @@ from django import template
 from django.conf import settings
 from django.contrib.messages import get_messages as django_get_messages
 from django.core.urlresolvers import reverse
-from django.templatetags.static import static as _get_static_path
+from django.templatetags.static import static as get_static_path
 from django.template.defaulttags import CsrfTokenNode
 from django.utils.html import format_html, format_html_join, mark_safe
 
 register = template.Library()
-
-WEBPACK_FILES = ['calchart.js']
-
-def get_static_path(path, filename):
-    """
-    Locally, staticfiles are served from webpack-dev-server. If the file is
-    a file that is built by webpack, the file is located in the base path;
-    otherwise, the file is located at the normal path.
-    """
-    if settings.IS_LOCAL and filename in WEBPACK_FILES:
-        path = filename
-    else:
-        path = '%s/%s' % (path, filename)
-    return _get_static_path(path)
 
 @register.simple_tag
 def add_style(*paths):
@@ -36,7 +22,7 @@ def add_style(*paths):
     return format_html_join(
         '',
         '<link rel="stylesheet" type="text/css" href="{}" crossorigin="anonymous">',
-        [(get_static_path('css', path),) for path in paths]
+        [(get_static_path(path),) for path in paths]
     )
 
 @register.simple_tag
@@ -53,7 +39,7 @@ def add_script(*paths):
     return format_html_join(
         '',
         '<script src="{}"></script>',
-        [(get_static_path('js', path),) for path in paths]
+        [(get_static_path(path),) for path in paths]
     )
 
 @register.simple_tag(takes_context=True)

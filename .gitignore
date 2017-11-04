@@ -12,10 +12,5 @@ package-lock.json
 # SASS
 .sass-cache
 
-# CSS
-calchart/static/css/**/*.css
-!calchart/static/css/vendor/**/*.css
-!calchart/static/css/fonts/**/*.css
-
-# JS
-calchart/static/js/*.js
+# staticfiles (will be regenerated from src/)
+calchart/static/

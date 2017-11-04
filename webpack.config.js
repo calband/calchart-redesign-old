@@ -1,7 +1,27 @@
-// project paths
-const path = require("path");
-const src = path.resolve(__dirname, "vue_src");
-const static = path.resolve(__dirname, "calchart", "static");
+const path = require('path');
+const fs = require('fs');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
+
+const src = path.resolve(__dirname, 'vue_src');
+const static = path.resolve(__dirname, 'calchart', 'static');
+
+/**** ENTRYPOINTS ****/
+
+var entryPoints = {
+    calchart: path.resolve(src, 'calchart.js'),
+};
+
+fs.readdirSync(path.resolve(src, 'scss'))
+    .filter(function(s) {
+        return s.endsWith('.scss');
+    })
+    .forEach(function(file) {
+        var name = path.basename(file, path.extname(file));
+        entryPoints[name] = path.resolve(src, 'scss', file);
+    });
+
+/**** LOADER OPTIONS ****/
 
 const babelLoaderOptions = {
     minified: true,
@@ -10,12 +30,12 @@ const babelLoaderOptions = {
     cacheDirectory: true,
 };
 
-const partials = path.resolve(static, "sass", "partials");
+const partials = path.resolve(src, 'scss', 'partials');
 const sassResourcesLoaderOptions = {
     resources: [
-        path.resolve(partials, "_vars.scss"),
-        path.resolve(partials, "_mixins.scss"),
-        path.resolve(partials, "_functions.scss"),
+        path.resolve(partials, '_vars.scss'),
+        path.resolve(partials, '_mixins.scss'),
+        path.resolve(partials, '_functions.scss'),
     ],
 };
 
@@ -24,52 +44,52 @@ const vueLoaderOptions = {
     loaders: {
         js: [
             {
-                loader: "babel-loader",
+                loader: 'babel-loader',
                 options: babelLoaderOptions,
             },
         ],
         // TODO: https://vue-loader.vuejs.org/en/configurations/extract-css.html
         scss: [
-            "vue-style-loader",
-            "css-loader",
-            "sass-loader",
+            'vue-style-loader',
+            'css-loader',
+            'sass-loader',
             {
-                loader: "sass-resources-loader",
+                loader: 'sass-resources-loader',
                 options: sassResourcesLoaderOptions,
             },
         ],
-        "context-menu": require.resolve("vue-ctxmenu/loader"),
+        'context-menu': require.resolve('vue-ctxmenu/loader'),
     },
 };
 
+/**** WEBPACK CONFIG ****/
+
 module.exports = {
-    entry: {
-        calchart: "calchart.js",
-    },
+    context: src,
+    entry: entryPoints,
     output: {
-        path: path.resolve("calchart/static/js/"),
-        filename: "[name].js",
+        path: static,
+        filename: '[name].js',
     },
     resolve: {
-        extensions: [".js", ".vue"],
+        extensions: ['.js', '.vue'],
         alias: {
-            "vue": "vue/dist/vue.esm.js",
+            'vue': 'vue/dist/vue.esm.js',
         },
         modules: [
             src,
-            path.resolve(__dirname, "node_modules"),
+            path.resolve(__dirname, 'node_modules'),
         ],
     },
     externals: {
-        // import $ from "jquery"
-        jquery: "jQuery",
+        jquery: 'jQuery',
     },
     module: {
         rules: [
             {
                 test: /\.vue$/,
                 use: {
-                    loader: "vue-loader",
+                    loader: 'vue-loader',
                     options: vueLoaderOptions
                 },
             },
@@ -77,20 +97,45 @@ module.exports = {
                 test: /\.js$/,
                 exclude: /node_modules/,
                 use: {
-                    loader: "babel-loader",
+                    loader: 'babel-loader',
                     options: babelLoaderOptions
                 },
             },
+            {
+                test: /\.scss$/,
+                exclude: /node_modules/,
+                use: ExtractTextPlugin.extract([
+                    {
+                        loader: 'css-loader',
+                        options: {
+                            url: false,
+                        },
+                    },
+                    'sass-loader',
+                ]),
+            },
         ],
     },
-    devtool: "source-map",
-    stats: "normal",
+    plugins: [
+        new CopyWebpackPlugin([
+            'static',
+        ], {
+            ignore: [
+                '.DS_Store',
+            ],
+        }),
+        new ExtractTextPlugin({
+            filename: '[name].css',
+            allChunks: true,
+        }),
+    ],
+    devtool: 'source-map',
+    stats: 'normal',
     devServer: {
-        host: "0.0.0.0",
+        host: '0.0.0.0',
         port: 4200,
-        contentBase: path.join(__dirname, "calchart", "static"),
         headers: {
-            "Access-Control-Allow-Origin": "*",
+            'Access-Control-Allow-Origin': '*',
         },
     },
 };
