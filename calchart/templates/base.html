@@ -5,7 +5,6 @@
         <title>{% block title %}Calchart{% endblock %}</title>
         <link rel="icon" type="image/png" href="{% static 'img/favicon.png' %}">
         {% add_style "vendor/reset.css" "vendor/icons.css" "base.css" %}
-        {% add_script "vendor/jquery-3.2.1.min.js" %}
         <script>
             window.env = {{ env|asjson|safe }};
         </script>

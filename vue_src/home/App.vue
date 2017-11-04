@@ -45,15 +45,6 @@ import sendAction from 'utils/actions';
 import { findAndRemove } from 'utils/array';
 import { IS_STUNT } from 'utils/env';
 
-// Convert tabs from an array of tuples into an object
-const tabs = {};
-window.tabs.forEach(([name, label]) => {
-    tabs[name] = {
-        label,
-        shows: null, // to be set with loadTab
-    };
-});
-
 // TODO: move tabs to above home-content (rename home-buttons)
 // TODO: have shows display as a box preview
 
@@ -64,6 +55,15 @@ export default {
         $(this.$refs.tabs).children('li:first').click();
     },
     data() {
+        // Convert tabs from an array of tuples into an object
+        let tabs = {};
+        window.tabs.forEach(([name, label]) => {
+            tabs[name] = {
+                label,
+                shows: null, // to be set with loadTab
+            };
+        });
+
         return {
             isLoading: true,
             tabs,

@@ -64,7 +64,7 @@ const vueLoaderOptions = {
 
 /**** WEBPACK CONFIG ****/
 
-module.exports = {
+webpackConfig = {
     context: src,
     entry: entryPoints,
     output: {
@@ -80,9 +80,6 @@ module.exports = {
             src,
             path.resolve(__dirname, 'node_modules'),
         ],
-    },
-    externals: {
-        jquery: 'jQuery',
     },
     module: {
         rules: [
@@ -139,3 +136,10 @@ module.exports = {
         },
     },
 };
+
+if (process.env.NODE_ENV === 'test') {
+    webpackConfig.externals = [require('webpack-node-externals')()];
+    webpackConfig.devtool = 'inline-cheap-module-source-map';
+}
+
+module.exports = webpackConfig;
