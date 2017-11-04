@@ -57,7 +57,7 @@ export default {
         createShow(data) {
             this.isSaving = true;
 
-            send_action('create_show', data, {
+            sendAction('create_show', data, {
                 success: data => {
                     this.hide();
                     this.$router.push({

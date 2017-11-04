@@ -38,19 +38,30 @@ export default {
     props: {
         shows: {
             type: Array,
-            validator: validateList(validateObject('slug', 'name', 'published')),
+            validator: validateList(
+                validateObject('slug', 'name', 'published')
+            ),
             required: true,
         },
     },
     data() {
         return {
-            _activeShow: null,
+            _activeShow: null, // eslint-disable-line vue/no-reserved-keys
         };
     },
     mounted() {
         this.contextMenu.$on('hide', () => {
             this.$data._activeShow = null;
         });
+    },
+    filters: {
+        /**
+         * @return {string} If the show is published, display 'Unpublish',
+         *   otherwise display 'Publish'.
+         */
+        togglePublishedLabel(isPublished) {
+            return isPublished ? 'Unpublish' : 'Publish';
+        },
     },
     computed: {
         /**
@@ -64,7 +75,9 @@ export default {
          * @return {Object}
          */
         activeShow() {
-            return _.isNull(this.$data._activeShow) ? {} : this.$data._activeShow;
+            return _.isNull(this.$data._activeShow)
+                ? {}
+                : this.$data._activeShow;
         },
     },
     methods: {
@@ -120,15 +133,6 @@ export default {
                     params: { slug },
                 });
             }
-        },
-    },
-    filters: {
-        /**
-         * @return {string} If the show is published, display 'Unpublish',
-         *   otherwise display 'Publish'.
-         */
-        togglePublishedLabel(isPublished) {
-            return isPublished ? 'Unpublish' : 'Publish';
         },
     },
 };

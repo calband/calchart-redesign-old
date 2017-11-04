@@ -16,6 +16,11 @@ import $ from 'jquery';
 import { $root } from 'utils/vue';
 
 export default {
+    computed: {
+        $router() {
+            return $root.$router;
+        },
+    },
     methods: {
         open() {
             $('body').append(this.$el);
@@ -30,11 +35,6 @@ export default {
             $(window).off('.popup');
             this.$destroy();
             $(this.$el).remove();
-        },
-    },
-    computed: {
-        $router() {
-            return $root.$router;
         },
     },
 };

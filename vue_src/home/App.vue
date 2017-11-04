@@ -12,6 +12,7 @@ The entry point for the home page.
                 <li
                     v-for="(tab, name) in tabs"
                     :class="getActiveClass(name)"
+                    :key="name"
                     @click="loadTab(name)"
                 >{{ tab.label }}</li>
             </ul>
@@ -20,13 +21,19 @@ The entry point for the home page.
                     <p class="loading">Loading...</p>
                 </template>
                 <template v-else-if="showPublished">
-                    <h2 class="unpublished" v-if="shows.unpublished.length > 0">Unpublished</h2>
-                    <show-list v-bind:shows="shows.unpublished"></show-list>
-                    <h2 class="published" v-if="shows.published.length > 0">Published</h2>
-                    <show-list v-bind:shows="shows.published"></show-list>
+                    <h2
+                        v-if="shows.unpublished.length > 0"
+                        class="unpublished"
+                    >Unpublished</h2>
+                    <ShowList :shows="shows.unpublished" />
+                    <h2
+                        class="published"
+                        v-if="shows.published.length > 0"
+                    >Published</h2>
+                    <ShowList :shows="shows.published" />
                 </template>
                 <template v-else>
-                    <show-list v-bind:shows="shows"></show-list>
+                    <ShowList :shows="shows" />
                 </template>
             </div>
         </div>
@@ -51,9 +58,6 @@ import { IS_STUNT } from 'utils/env';
 export default {
     name: 'Home',
     components: { ShowList },
-    mounted() {
-        $(this.$refs.tabs).children('li:first').click();
-    },
     data() {
         // Convert tabs from an array of tuples into an object
         let tabs = {};
@@ -69,6 +73,9 @@ export default {
             tabs,
             activeTab: window.tabs[0][0],
         };
+    },
+    mounted() {
+        $(this.$refs.tabs).children('li:first').click();
     },
     computed: {
         /**
@@ -155,8 +162,12 @@ export default {
             sendAction('publish_show', data, {
                 success: () => {
                     let shows = this.tabs.band.shows;
-                    let toRemove = show.published ? shows.published : shows.unpublished;
-                    let toAdd = show.published ? shows.unpublished : shows.published;
+                    let toRemove = show.published
+                        ? shows.published
+                        : shows.unpublished;
+                    let toAdd = show.published
+                        ? shows.unpublished
+                        : shows.published;
                     findAndRemove(toRemove, ['slug', show.slug]);
                     toAdd.push(show);
                     show.published = !show.published;

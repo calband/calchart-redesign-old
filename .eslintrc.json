@@ -1,6 +1,9 @@
 {
     "env": {
-        "browser": true
+        "amd": true,
+        "browser": true,
+        "jasmine": true,
+        "node": true
     },
     "extends": [
         "eslint:recommended",
@@ -26,7 +29,9 @@
         }],
         "quotes": ["error", "single"],
         "semi": "error",
-        "vue/html-end-tags": "error",
+        // "vue/html-indent": "error",
+        "vue/html-quotes": "error",
+        "vue/html-self-closing": "error",
         "vue/no-async-in-computed-properties": "error",
         "vue/no-dupe-keys": "error",
         "vue/no-duplicate-attributes": "error",
@@ -37,19 +42,21 @@
         "vue/order-in-components": ["error", {
             "order": [
                 "name",
+                "components",
                 ["parent", "mixins", "extends", "provide", "inject"],
-                ["components", "directives", "filters"],
                 "props",
                 "propsData",
                 ["el", "template", "render", "renderError"],
                 "data",
                 "LIFECYCLE_HOOKS",
-                "methods",
+                ["directives", "filters"],
                 "computed",
                 "watch",
+                "methods",
                 ["delimiters", "functional", "model"]
             ]
         }],
+        "vue/require-prop-types": "error",
         "vue/require-render-return": "error",
         "vue/require-valid-default-prop": "error",
         "vue/return-in-computed-property": "error",

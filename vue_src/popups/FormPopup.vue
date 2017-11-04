@@ -11,7 +11,7 @@ A popup that contains a form to be submitted or modified.
                 :form="form"
                 :model="model"
                 :fields="fields"
-            ></formly-form>
+            />
             <div class="buttons">
                 <slot name="buttons">
                     <button>Save</button>
@@ -30,7 +30,6 @@ A popup that contains a form to be submitted or modified.
 <script>
 import _ from 'lodash';
 
-import { ValidationError } from 'utils/errors';
 import { $root } from 'utils/vue';
 
 import BasePopup from './BasePopup';

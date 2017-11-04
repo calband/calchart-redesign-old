@@ -6,7 +6,7 @@ The base component for a form field.
     <div class="field">
         <label :for="field.key">{{ label }}:</label>
         <slot></slot>
-        <error-display :form="form" :field="field.key"></error-display>
+        <error-display :form="form" :field="field.key" />
     </div>
 </template>
 
@@ -18,7 +18,9 @@ export default {
     mixins: [baseField],
     computed: {
         label() {
-            return this.to.label ? this.to.label : _.capitalize(_.lowerCase(this.field.key));
+            return this.to.label
+                ? this.to.label
+                : _.capitalize(_.lowerCase(this.field.key));
         },
     },
 };

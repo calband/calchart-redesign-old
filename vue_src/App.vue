@@ -15,6 +15,7 @@ page according to the URL.
         >
             <li
                 v-for="message in messages"
+                :key="message.id"
                 :class="['message', { error: message.error }]"
             >{{ message.text }}
                 <i
@@ -24,7 +25,7 @@ page according to the URL.
                 ></i>
             </li>
         </ul>
-        <router-view></router-view>
+        <router-view />
     </div>
 </template>
 
@@ -48,14 +49,14 @@ export default {
          * @param {String} message
          * @param {Object} [options] - Options to customize the message:
          *   - {boolean} [error=false] - true if message is an error message
-         *   - {boolean} [autohide=!isError] - Automatically hide the message after
-         *     a given time.
+         *   - {boolean} [autohide=!isError] - Automatically hide the message
+         *     after a given time.
          * @param {boolean} error - true to style the message as an error
          */
         showMessage(message, options={}) {
             _.defaults(options, {
                 error: false,
-            })
+            });
             options.autohide = _.defaultTo(options.autohide, !options.error);
             options.id = this.messageId++;
             options.text = message;
