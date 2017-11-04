@@ -1,6 +1,8 @@
 /**
  * @file A collection of Javascript utility/helper functions.
  */
+import $ from 'jquery';
+import _ from 'lodash';
 
 import { IS_MAC } from 'utils/env';
 

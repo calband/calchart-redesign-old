@@ -3,4 +3,4 @@ dependencies:
     - npm install
 test:
   override:
-    - grunt lint
+    - npm run lint

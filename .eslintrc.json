@@ -1,19 +1,10 @@
 {
     "env": {
-        "browser": true,
-        "es6": true,
-        "jquery": true
-    },
-    "globals": {
-        "_": true,
-        "d3": true,
-        "jsPDF": true,
-        "svgAsPngUri": true,
-        "soundManager": true
+        "browser": true
     },
     "extends": [
         "eslint:recommended",
-        "eslint:vue/recommended"
+        "plugin:vue/recommended"
     ],
     "parserOptions": {
         "sourceType": "module"
@@ -28,12 +19,41 @@
         "no-console": ["error", {
             "allow": ["error"]
         }],
-        "no-trailing-spaces": ["error"],
+        "no-trailing-spaces": "error",
         "no-unused-vars": ["error", {
             "args": "none",
             "varsIgnorePattern": "^_"
         }],
-        "quotes": ["error", "double"],
-        "semi": ["error", "always"]
+        "quotes": ["error", "single"],
+        "semi": "error",
+        "vue/html-end-tags": "error",
+        "vue/no-async-in-computed-properties": "error",
+        "vue/no-dupe-keys": "error",
+        "vue/no-duplicate-attributes": "error",
+        "vue/no-reserved-keys": "error",
+        "vue/no-shared-component-data": "error",
+        "vue/no-side-effects-in-computed-properties": "error",
+        // "vue/no-unused-vars": "error",
+        "vue/order-in-components": ["error", {
+            "order": [
+                "name",
+                ["parent", "mixins", "extends", "provide", "inject"],
+                ["components", "directives", "filters"],
+                "props",
+                "propsData",
+                ["el", "template", "render", "renderError"],
+                "data",
+                "LIFECYCLE_HOOKS",
+                "methods",
+                "computed",
+                "watch",
+                ["delimiters", "functional", "model"]
+            ]
+        }],
+        "vue/require-render-return": "error",
+        "vue/require-valid-default-prop": "error",
+        "vue/return-in-computed-property": "error",
+        "vue/v-bind-style": "error",
+        "vue/v-on-style": "error"
     }
 }

@@ -1,6 +1,7 @@
 /**
  * @file Utility functions on Arrays.
  */
+import _ from 'lodash';
 
 /**
  * Find the element in the given array using the given

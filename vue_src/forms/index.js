@@ -26,7 +26,7 @@ let FormsPlugin = {
         });
         _.each(MESSAGES, (message, key) => {
             VueFormly.addValidationMessage(key, message);
-        })
+        });
     },
 };
 

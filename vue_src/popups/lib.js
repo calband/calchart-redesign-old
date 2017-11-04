@@ -2,7 +2,6 @@
  * @file The entrypoint for the popups package.
  */
 
-import $ from 'jquery';
 import Vue from 'vue';
 
 export { default as BasePopup } from './BasePopup';
