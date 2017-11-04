@@ -1,6 +1,9 @@
 #!/bin/bash
 
-# source /vagrant/.env
+if [[ -e /vagrant/.env ]]; then
+    source /vagrant/.env
+fi
+
 cd /vagrant/calchart
 
 # use python3 by default

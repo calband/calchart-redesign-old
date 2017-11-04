@@ -152,7 +152,7 @@ if IS_HEROKU:
     DEFAULT_FROM_EMAIL = 'Calchart <calband-compcomm@lists.berkeley.edu>'
 else:
     MEDIA_ROOT = os.path.join(BASE_DIR, '..', 'files')
-    STATIC_URL = 'http://localhost:4200/'
+    STATIC_URL = 'http://localhost:%s/' % os.environ.get('WEBPACK_PORT', '4200')
     MEDIA_URL = '/media/'
 
 # Authentication
