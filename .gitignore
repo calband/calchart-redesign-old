@@ -7,7 +7,6 @@ files/
 
 # Node
 node_modules/
-package-lock.json
 
 # SASS
 .sass-cache
