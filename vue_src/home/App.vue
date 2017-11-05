@@ -25,15 +25,30 @@ The entry point for the home page.
                         v-if="shows.unpublished.length > 0"
                         class="unpublished"
                     >Unpublished</h2>
-                    <ShowList :shows="shows.unpublished" />
+                    <ShowList
+                        :shows="shows.unpublished"
+                        :isOwner="isOwner"
+                        :canPublish="true"
+                        @publish="togglePublished"
+                    />
                     <h2
-                        class="published"
                         v-if="shows.published.length > 0"
+                        class="published"
                     >Published</h2>
-                    <ShowList :shows="shows.published" />
+                    <ShowList
+                        :shows="shows.published"
+                        :isOwner="isOwner"
+                        :canPublish="true"
+                        @publish="togglePublished"
+                    />
                 </template>
                 <template v-else>
-                    <ShowList :shows="shows" />
+                    <ShowList
+                        :shows="shows"
+                        :isOwner="isOwner"
+                        :canPublish="false"
+                        @publish="togglePublished"
+                    />
                 </template>
             </div>
         </div>
@@ -58,10 +73,16 @@ import { IS_STUNT } from 'utils/env';
 export default {
     name: 'Home',
     components: { ShowList },
+    props: {
+        allTabs: {
+            type: Array,
+            required: true,
+            validator: obj => obj.length === 2,
+        },
+    },
     data() {
-        // Convert tabs from an array of tuples into an object
         let tabs = {};
-        window.tabs.forEach(([name, label]) => {
+        this.allTabs.forEach(([name, label]) => {
             tabs[name] = {
                 label,
                 shows: null, // to be set with loadTab
@@ -71,13 +92,20 @@ export default {
         return {
             isLoading: true,
             tabs,
-            activeTab: window.tabs[0][0],
+            activeTab: this.allTabs[0][0],
         };
     },
     mounted() {
         $(this.$refs.tabs).children('li:first').click();
     },
     computed: {
+        /**
+         * @return {boolean} true if the User is the owner of the
+         *   currently active tab.
+         */
+        isOwner() {
+            return this.activeTab === 'owned' || IS_STUNT;
+        },
         /**
          * @return {Object[]} The shows in the currently active tab
          */

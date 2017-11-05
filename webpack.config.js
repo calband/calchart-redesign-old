@@ -140,6 +140,7 @@ webpackConfig = {
 if (process.env.NODE_ENV === 'test') {
     webpackConfig.externals = [require('webpack-node-externals')()];
     webpackConfig.devtool = 'inline-cheap-module-source-map';
+    webpackConfig.resolve.modules.push(path.resolve(__dirname));
 }
 
 module.exports = webpackConfig;

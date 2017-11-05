@@ -1,5 +1,10 @@
-require('jsdom-global')();
+/**** NODE GLOBALS ****/
 
 global.expect = require('expect');
-global.jQuery = {};
+
+/**** BROWSER GLOBALS ****/
+
+require('jsdom-global')();
+
+window.jQuery = {};
 window.env = {};

@@ -18,6 +18,9 @@ export default new VueRouter({
             path: '/',
             name: 'home',
             component: Home,
+            props: {
+                allTabs: window.tabs,
+            },
         },
         {
             path: '/editor/:slug/',

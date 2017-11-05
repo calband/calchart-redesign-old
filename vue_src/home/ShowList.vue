@@ -16,15 +16,15 @@ A list of shows for a tab.
 
 <context-menu>
     <li
-        v-if="isOwned"
+        v-if="isOwner"
         @click="openShow('editor', activeShow.slug)"
     >Open in editor</li>
     <li
         @click="openShow('viewer', activeShow.slug)"
     >Open in viewer</li>
     <li
-        v-if="$parent.showPublished"
-        @click="$parent.togglePublished(activeShow)"
+        v-if="canPublish"
+        @click="$emit('publish', activeShow)"
     >{{ activeShow.published|togglePublishedLabel }}</li>
 </context-menu>
 
@@ -42,6 +42,12 @@ export default {
                 validateObject('slug', 'name', 'published')
             ),
             required: true,
+        },
+        isOwner: {
+            type: Boolean,
+        },
+        canPublish: {
+            type: Boolean,
         },
     },
     data() {
@@ -65,19 +71,10 @@ export default {
     },
     computed: {
         /**
-         * @return {boolean} true if the current show list is a list
-         *   of shows that are owned by the user.
-         */
-        isOwned() {
-            return this.$parent.activeTab === 'owned' || IS_STUNT;
-        },
-        /**
          * @return {Object}
          */
         activeShow() {
-            return _.isNull(this.$data._activeShow)
-                ? {}
-                : this.$data._activeShow;
+            return _.defaultTo(this.$data._activeShow, {});
         },
     },
     methods: {
@@ -113,7 +110,7 @@ export default {
          *   show in the editor app. Otherwise, opens in the viewer app.
          */
         openDefaultShow(e, show) {
-            let app = this.isOwned ? 'editor' : 'viewer';
+            let app = this.isOwner ? 'editor' : 'viewer';
             this.openShow(app, show.slug, e.ctrlKey || e.metaKey);
         },
         /**
