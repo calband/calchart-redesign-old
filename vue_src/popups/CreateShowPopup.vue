@@ -20,7 +20,7 @@ import _ from 'lodash';
 
 import { BasePopup, FormPopup } from './lib';
 
-import sendAction, { handleError } from 'utils/actions';
+import sendAction, { handleError } from 'utils/ajax';
 import { IS_STUNT } from 'utils/env';
 
 export default {

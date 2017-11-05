@@ -63,7 +63,7 @@ import ShowList from './ShowList';
 
 import CreateShowPopup from 'popups/CreateShowPopup';
 import { showPopup } from 'popups/lib';
-import sendAction from 'utils/actions';
+import sendAction, { handleError } from 'utils/ajax';
 import { findAndRemove } from 'utils/array';
 import { IS_STUNT } from 'utils/env';
 
@@ -165,6 +165,7 @@ export default {
                         this.isLoading = false;
                         this.activeTab = tab;
                     },
+                    error: handleError,
                 });
             } else {
                 this.activeTab = tab;
