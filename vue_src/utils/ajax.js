@@ -1,7 +1,7 @@
 import $ from 'jquery';
 import _ from 'lodash';
 
-import { CSRF_TOKEN } from 'utils/env';
+import store from 'store';
 import { $root } from 'utils/vue';
 
 /**
@@ -38,7 +38,7 @@ export function handleError(xhr) {
 export default function sendAction(action, data, options) {
     // http://www.mattlunn.me.uk/blog/2012/05/sending-formdata-with-jquery-ajax/
     let formData = new FormData();
-    formData.append('csrfmiddlewaretoken', CSRF_TOKEN);
+    formData.append('csrfmiddlewaretoken', store.state.env.csrfToken);
     formData.append('action', action);
 
     let nonFileData = {};

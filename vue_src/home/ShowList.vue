@@ -31,7 +31,6 @@ A list of shows for a tab.
 <script>
 import _ from 'lodash';
 
-import { IS_STUNT } from 'utils/env';
 import { validateList, validateObject } from 'utils/validators';
 
 export default {

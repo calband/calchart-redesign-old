@@ -4,10 +4,10 @@
 import $ from 'jquery';
 import _ from 'lodash';
 
-import { IS_MAC } from 'utils/env';
+import store from 'store';
 
 let shortcutMap, shortcutSep;
-if (IS_MAC) {
+if (store.state.env.state.IS_MAC) {
     // HTML codes: http://apple.stackexchange.com/a/55729
     shortcutMap = {
         ctrl: '&#8984;',

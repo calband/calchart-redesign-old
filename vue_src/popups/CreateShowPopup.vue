@@ -21,12 +21,13 @@ import _ from 'lodash';
 import { BasePopup, FormPopup } from './lib';
 
 import sendAction, { handleError } from 'utils/ajax';
-import { IS_STUNT } from 'utils/env';
+import { $root } from 'utils/vue';
 
 export default {
     components: { FormPopup },
     extends: BasePopup,
     data() {
+        const IS_STUNT = $root.$store.state.env.isStunt;
         return {
             isSaving: false,
             model: {

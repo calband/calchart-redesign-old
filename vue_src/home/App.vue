@@ -58,6 +58,7 @@ The entry point for the home page.
 <script>
 import $ from 'jquery';
 import _ from 'lodash';
+import { mapState } from 'vuex';
 
 import ShowList from './ShowList';
 
@@ -65,7 +66,6 @@ import CreateShowPopup from 'popups/CreateShowPopup';
 import { showPopup } from 'popups/lib';
 import sendAction, { handleError } from 'utils/ajax';
 import { findAndRemove } from 'utils/array';
-import { IS_STUNT } from 'utils/env';
 
 // TODO: move tabs to above home-content (rename home-buttons)
 // TODO: have shows display as a box preview
@@ -104,7 +104,7 @@ export default {
          *   currently active tab.
          */
         isOwner() {
-            return this.activeTab === 'owned' || IS_STUNT;
+            return this.activeTab === 'owned' || this.isStunt;
         },
         /**
          * @return {Object[]} The shows in the currently active tab
@@ -117,8 +117,9 @@ export default {
          *   unpublished
          */
         showPublished() {
-            return this.activeTab == 'band' && IS_STUNT;
+            return this.activeTab == 'band' && this.isStunt;
         },
+        ...mapState('env', ['isStunt']),
     },
     methods: {
         /**
@@ -145,7 +146,7 @@ export default {
                     data: { tab },
                     dataType: 'json',
                     success: data => {
-                        if (tab === 'band' && IS_STUNT) {
+                        if (tab === 'band' && this.isStunt) {
                             let shows = {
                                 unpublished: [],
                                 published: [],

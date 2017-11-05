@@ -1,19 +1,42 @@
 import $ from 'jquery';
+import sinon from 'sinon';
 import { shallow } from 'vue-test-utils';
 
 import App from 'home/App';
-import 'test/utils';
+import { $store, setStunt } from 'test/utils';
+
+function withTabs(allTabs) {
+    return shallow(App, {
+        propsData: { allTabs },
+        mocks: { $store },
+    });
+}
+
+function mockAjaxTab(tab) {
+    let show = { published: undefined };
+    $.ajax.callsFake(options => {
+        expect(options.data.tab).toBe(tab);
+        options.success({
+            shows: [show],
+        });
+    });
+    return show;
+}
+
+const FOO_TABS = [
+    ['foo', 'My Foo Shows'],
+    ['bar', 'My Bar Shows'],
+];
 
 describe('home/App', () => {
+    it('is loading', () => {
+        let wrapper = withTabs([[]]);
+        expect(wrapper.vm.isLoading).toBe(true);
+        expect(wrapper.contains('p.loading')).toBe(true);
+    });
+
     it('renders tabs', () => {
-        let wrapper = shallow(App, {
-            propsData: {
-                allTabs: [
-                    ['foo', 'My Foo Shows'],
-                    ['bar', 'My Bar Shows'],
-                ],
-            },
-        });
+        let wrapper = withTabs(FOO_TABS);
         let tabs = wrapper.findAll('ul.tabs li');
         expect(tabs).toHaveLength(2);
         expect(tabs.at(0).text()).toBe('My Foo Shows');
@@ -21,15 +44,52 @@ describe('home/App', () => {
     });
 
     it('loads the first tab', () => {
-        $.ajax.callsFake(options => {
-            // TODO: fake success data
-        });
-        let wrapper = shallow(App, {
-            propsData: {
-                allTabs: [['foo', 'Foo']],
-            },
-        });
+        let show = mockAjaxTab('foo');
+
+        let wrapper = withTabs(FOO_TABS);
+        expect(wrapper.vm.activeTab).toBe('foo');
 
         expect($.ajax.calledOnce).toBe(true);
+        expect(wrapper.vm.tabs.foo.shows).toHaveLength(1);
+        expect(wrapper.vm.tabs.foo.shows[0]).toBe(show);
     });
+
+    describe('band tab not stunt', () => {
+        setStunt(false);
+
+        it('is not showing shows as published/unpublished', () => {
+            let show = mockAjaxTab('band');
+            let wrapper = withTabs([['band', 'Band']]);
+            let shows = wrapper.vm.tabs.band.shows;
+            expect(shows).not.toHaveProperty('published');
+            expect(shows).not.toHaveProperty('unpublished');
+            expect(shows).toHaveLength(1);
+            expect(wrapper.vm.showPublished).toBe(false);
+        });
+    });
+
+    describe('band tab as stunt', () => {
+        setStunt(true);
+
+        [true, false].forEach(published => {
+            let prop = published ? 'published' : 'unpublished';
+            let unprop = published ? 'unpublished' : 'published';
+
+            it(`is showing shows as ${prop}`, () => {
+                let show = mockAjaxTab('band');
+                sinon.stub(show, 'published').value(published);
+
+                let wrapper = withTabs([['band', 'Band']]);
+                let shows = wrapper.vm.tabs.band.shows;
+                expect(shows).toHaveProperty('published');
+                expect(shows).toHaveProperty('unpublished');
+                expect(shows[prop]).toHaveLength(1);
+                expect(shows[unprop]).toHaveLength(0);
+            })
+        });
+    });
+
+    // TODO: test changing tabs
+    // TODO: test publishing/unpublishing show
+    // TODO: test clicking create show button opens popup
 });
