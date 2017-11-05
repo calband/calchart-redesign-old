@@ -1,7 +1,15 @@
+machine:
+  python:
+    version: 3.6.0
+
 dependencies:
   override:
     - npm install
+
 test:
   override:
     - npm run lint
+    # TODO: add python linting
     - npm test
+    # TODO: add integration tests
+    - cd calchart; python3 manage.py test --verbosity 3
