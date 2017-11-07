@@ -30,7 +30,7 @@ class CreateShowTestCase(ActionsTestCase):
     """Test the create_show action."""
 
     def assertCreateShow(self, is_band, members_only, final_is_band):
-        """Assert that creating a Show satisfies certain checks."""
+        """Assert that the create_show action satisfies certain checks."""
         response = self.do_action('create_show', {
             'name': 'Foo',
             'isBand': is_band,
