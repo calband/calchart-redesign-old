@@ -1,7 +1,6 @@
 import Vue from 'vue';
 import VueContextMenu from 'vue-ctxmenu';
 import { directive as onClickOutside } from 'vue-on-click-outside';
-import Vuex from 'vuex';
 
 import App from 'App';
 import FormsPlugin from 'forms';

@@ -58,7 +58,7 @@ describe('home/App', () => {
         setStunt(false);
 
         it('is not showing shows as published/unpublished', () => {
-            let show = mockAjaxTab('band');
+            mockAjaxTab('band');
             let wrapper = withTabs([['band', 'Band']]);
             let shows = wrapper.vm.tabs.band.shows;
             expect(shows).not.toHaveProperty('published');
@@ -85,7 +85,7 @@ describe('home/App', () => {
                 expect(shows).toHaveProperty('unpublished');
                 expect(shows[prop]).toHaveLength(1);
                 expect(shows[unprop]).toHaveLength(0);
-            })
+            });
         });
     });
 
