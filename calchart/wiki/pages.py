@@ -1,17 +1,22 @@
+"""The list of Wiki pages."""
+
 from django.core.urlresolvers import reverse
 
 
 class HelpPage(object):
     """
-    A helper class to organize pages in a hierarchy. Each help page
-    needs a slug, a human-readable name, and help pages that are
-    children of this page (i.e. underneath this page in the page
+    A helper class to organize pages in a hierarchy.
+
+    Each help page needs a slug, a human-readable name, and help pages
+    that are children of this page (i.e. underneath this page in the page
     hierarchy).
 
     By default, the name is the slug, replacing hyphens with spaces and
     capitalizing the first letter of each word.
     """
+
     def __init__(self, *args):
+        """Initialize a HelpPage."""
         self.slug = args[0]
         assert isinstance(self.slug, str)
 
@@ -27,9 +32,7 @@ class HelpPage(object):
             child.parent = self
 
     def get_parents(self):
-        """
-        Get a list of parents of the form [root, parent1, parent2, self]
-        """
+        """Get a list of parents of the form [root, parent1, parent2, self]."""
         curr = self
         parents = []
         while curr is not None:
@@ -38,24 +41,21 @@ class HelpPage(object):
         return reversed(parents)
 
     def get_child(self, slug):
-        """
-        Get the child with the given slug, or None if no child has the slug.
-        """
+        """Get the child with the given slug."""
         for child in self.children:
             if child.slug == slug:
                 return child
         return None
 
     def get_url(self):
-        """
-        Get the URL for this page
-        """
+        """Get the URL for this page."""
         slug = '/'.join([
             parent.slug
             for parent in self.get_parents()
             if parent.slug != 'home'
         ])
         return reverse('wiki:page', kwargs={'slug': slug})
+
 
 ROOT_PAGE = HelpPage(
     'home',

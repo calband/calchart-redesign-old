@@ -7,7 +7,7 @@ requests[security]==2.10.0
 cryptography==1.5
 
 # linting
-flake8==3.1.0
+flake8==3.5.0
 flake8-blind-except==0.1.1
 flake8-bugbear==17.4.0
 flake8-builtins==1.0

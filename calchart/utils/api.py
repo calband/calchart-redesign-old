@@ -1,17 +1,21 @@
+"""Utilities for accessing the Members Only API."""
+
+from urllib.parse import quote
+
 from django.conf import settings
 from django.core.urlresolvers import reverse
 
 import requests
-from urllib.parse import quote
 
 APP_NAME = 'calchart'
 
 
 def get_login_url(request, redirect_url=None):
     """
-    Get the URL for the auth-login endpoint in the Members Only API. After
-    authenticating, the user is redirected to the given URL (defaults to
-    the path of the request).
+    Get the URL for the auth-login endpoint in the Members Only API.
+
+    After authenticating, the user is redirected to the given URL (defaults
+    to the path of the request).
     """
     base_url = request.build_absolute_uri(reverse('login-members-only'))
     if redirect_url is None:
@@ -31,9 +35,10 @@ def get_login_url(request, redirect_url=None):
 
 def call_endpoint(endpoint, user, method='GET', **params):
     """
-    Call the given Members Only API endpoint on behalf of the given user
-    with the given method and parameters, returning the JSON data returned
-    by the API.
+    Call the given Members Only API endpoint on behalf of the given user.
+
+    The endpoint is called with the given method and parameters, returning
+    the JSON data returned by the API.
     """
     if method == 'GET':
         call = requests.get

@@ -1,3 +1,5 @@
+"""URL patterns for the wiki app."""
+
 from django.conf.urls import url
 
 from wiki.views import HelpView

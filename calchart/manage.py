@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+"""The entrypoint for all Django management commands."""
+
 import os
 import sys
 

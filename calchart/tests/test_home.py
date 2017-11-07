@@ -1,7 +1,10 @@
-from django.test import TestCase
+"""Tests for the home page."""
 
 from base.models import Show
 from base.views import CalchartView
+
+from django.test import TestCase
+
 from utils.testing import ActionsTestCase, RequestFactory
 
 
@@ -9,6 +12,7 @@ class TabsTestCase(TestCase):
     """Test retrieving tabs for the home page."""
 
     def test_get_tabs_members_only_user(self):
+        """Test that a Members Only user sees the band tab."""
         request = RequestFactory.GET(members_only=True)
         response = CalchartView.as_view()(request)
 
@@ -26,6 +30,7 @@ class CreateShowTestCase(ActionsTestCase):
     """Test the create_show action."""
 
     def assertCreateShow(self, is_band, members_only, final_is_band):
+        """Assert that creating a Show satisfies certain checks."""
         response = self.do_action('create_show', {
             'name': 'Foo',
             'isBand': is_band,
@@ -37,16 +42,20 @@ class CreateShowTestCase(ActionsTestCase):
         self.assertEqual(response.get('slug'), 'foo')
 
     def test_create_show_band_members_only(self):
+        """Test creating a band show as a Members Only user."""
         self.assertCreateShow(True, True, True)
 
     def test_create_show_band_calchart(self):
+        """Test creating a band show as a Calchart user."""
         # if Calchart-only user, Show should never be is_band
         self.assertCreateShow(True, False, False)
 
     def test_create_show_not_band_members_only(self):
+        """Test creating a non-band show as a Members Only user."""
         self.assertCreateShow(False, True, False)
 
     def test_create_show_not_band_calchart(self):
+        """Test creating a non-band show as a Calchart user."""
         self.assertCreateShow(False, False, False)
 
     # TODO: test create Show twice errors

@@ -1,7 +1,9 @@
+"""Custom template tags that create HTML fragments."""
+
 from django import template
 from django.contrib.messages import get_messages as django_get_messages
-from django.templatetags.static import static as get_static_path
 from django.template.defaulttags import CsrfTokenNode
+from django.templatetags.static import static as get_static_path
 from django.utils.html import format_html, format_html_join, mark_safe
 
 register = template.Library()
@@ -10,7 +12,7 @@ register = template.Library()
 @register.simple_tag
 def add_style(*paths):
     """
-    Add a stylesheet link to the <head> from the given path
+    Add a stylesheet link to the <head> from the given path.
 
     from:
     {% add_style 'base/page_modify.css' %}
@@ -35,14 +37,14 @@ def add_style(*paths):
     return format_html_join(
         '',
         '<link rel="{}" type="{}" href="{}" crossorigin="{}">',
-        attrs
+        attrs,
     )
 
 
 @register.simple_tag
 def add_script(*paths):
     """
-    Add a script to the <head> from the given path
+    Add a script to the <head> from the given path.
 
     from:
     {% add_script 'base/page_modify.js' %}
@@ -53,15 +55,14 @@ def add_script(*paths):
     return format_html_join(
         '',
         '<script src="{}"></script>',
-        [(get_static_path(path),) for path in paths]
+        [(get_static_path(path),) for path in paths],
     )
 
 
 @register.simple_tag(takes_context=True)
 def get_feedback(context, *forms):
     """
-    Generate a list of messages consisting of errors contained in
-    these forms and from the messages framework
+    Generate a list of messages from forms and the messages framework.
 
     from:
     {% get_feedback form1 form2 %}
@@ -92,7 +93,7 @@ def get_feedback(context, *forms):
         message_list = format_html_join(
             '',
             '<li class="{}">{}</li>',
-            messages
+            messages,
         )
         return format_html(
             '<ul class="messages">{}</ul>',
@@ -103,7 +104,7 @@ def get_feedback(context, *forms):
 @register.simple_tag
 def create_field(*fields):
     """
-    Generate a form field using the provided fields
+    Generate a form field using the provided fields.
 
     from:
     {% create_field field1 field2 %}
@@ -129,23 +130,20 @@ def create_field(*fields):
     return format_html_join(
         '',
         '<div class="field {}">{}{}</div>',
-        info
+        info,
     )
 
 
 @register.simple_tag
 def create_all_fields(form):
-    """
-    Call create_field for every field in this form
-    """
+    """Call create_field for every field in this form."""
     return create_field(*[field for field in form])
 
 
 @register.tag
 def create_form(parser, token):
     """
-    Creates a form, putting anything between the template tags
-    at the end of the form
+    Create a form with the given contents at the end of the form.
 
     from:
     {% create_form form form_class %}
@@ -162,7 +160,7 @@ def create_form(parser, token):
     contents = token.split_contents()
     if len(contents) == 1:
         raise template.TemplateSyntaxError(
-            '%r tag requires a form' % contents[0]
+            f'{repr(contents[0])} tag requires a form',
         )
 
     form = contents[1]
@@ -174,12 +172,16 @@ def create_form(parser, token):
 
 
 class CreateFormNode(template.Node):
+    """A template node for the create_form template tag."""
+
     def __init__(self, form, form_classes, nodelist):
+        """Initialize a CreateFormNode."""
         self.form = template.Variable(form)
         self.form_classes = form_classes
         self.nodelist = nodelist
 
     def render(self, context):
+        """Render the create_form tag."""
         form_class = ' '.join(self.form_classes)
         csrf_token = CsrfTokenNode().render(context)
         fields = create_all_fields(self.form.resolve(context))
@@ -191,5 +193,5 @@ class CreateFormNode(template.Node):
             form_class,
             csrf_token,
             mark_safe(fields),
-            mark_safe(rest)
+            mark_safe(rest),
         )

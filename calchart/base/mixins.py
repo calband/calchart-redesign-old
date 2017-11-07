@@ -1,3 +1,5 @@
+"""Mixins for views in the base app."""
+
 from django.contrib.auth.mixins import AccessMixin
 from django.shortcuts import redirect
 
@@ -5,7 +7,10 @@ from utils.api import get_login_url
 
 
 class LoginRequiredMixin(AccessMixin):
+    """A mixin for requiring a logged-in user for a view."""
+
     def dispatch(self, request, *args, **kwargs):
+        """Dispatch the given HTTP request."""
         if not request.user.is_authenticated:
             return self.handle_no_permission()
 
@@ -19,5 +24,5 @@ class LoginRequiredMixin(AccessMixin):
         return super().dispatch(request, *args, **kwargs)
 
     def post_auth(self, request, *args, **kwargs):
-        """A hook for actions after user is authenticated."""
+        """Do actions after authenticating the user."""
         pass

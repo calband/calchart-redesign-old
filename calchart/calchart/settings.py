@@ -1,6 +1,4 @@
-"""
-Django settings for calchart
-"""
+"""Django settings for Calchart."""
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
@@ -78,8 +76,8 @@ TEMPLATES = [
                 'django.template.context_processors.tz',
                 'django.contrib.messages.context_processors.messages',
             ),
-        }
-    }
+        },
+    },
 ]
 
 # Database
@@ -88,7 +86,7 @@ TEMPLATES = [
 if IS_HEROKU:
     import dj_database_url
     DATABASES = {
-        'default': dj_database_url.config()
+        'default': dj_database_url.config(),
     }
 else:
     DATABASES = {
@@ -126,7 +124,7 @@ MEDIAFILES_LOCATION = 'files'
 # use different directories for review apps
 if IS_REVIEW:
     review_num = int(HEROKU_APP.split('calchart-staging-pr-')[1])
-    STATICFILES_LOCATION = 'static-pr-%d' % review_num
+    STATICFILES_LOCATION = f'static-pr-{review_num}'
 
 # use local static files for development
 if IS_HEROKU:

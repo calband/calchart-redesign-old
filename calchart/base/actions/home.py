@@ -1,16 +1,16 @@
-from base.models import Show
+"""Actions for the home page."""
+
+from ..models import Show
 
 
 def create_show(data, **kwargs):
-    """
-    A POST action that creates a show with the given name.
-    """
+    """Create a show with the given name."""
     user = kwargs['user']
     name = data['name']
     is_band = data['isBand'] and user.has_committee('STUNT')
 
     if Show.objects.filter(name=name).exists():
-        raise Exception('Show with the name `%s` already exists.' % name)
+        raise Exception(f'Show with the name `{name}` already exists.')
 
     kwargs = {
         'name': name,
@@ -25,9 +25,7 @@ def create_show(data, **kwargs):
 
 
 def publish_show(data, **kwargs):
-    """
-    A POST action that publishes or unpublishes a show
-    """
+    """Publish or unpublish a show."""
     published = data['publish']
     slug = data['slug']
 

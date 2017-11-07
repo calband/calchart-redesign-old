@@ -1,16 +1,18 @@
-from django.contrib.auth import models
-from django.core.files.base import ContentFile
-from django.db import models
-from django.utils.text import slugify
-from django.utils import timezone
+"""Models for the base app."""
 
 import json
 from datetime import timedelta
 
+from django.contrib.auth import models as auth_models
+from django.core.files.base import ContentFile
+from django.db import models
+from django.utils import timezone
+from django.utils.text import slugify
+
 from utils.api import call_endpoint
 
 
-class UserManager(models.UserManager):
+class UserManager(auth_models.UserManager):
     """A subclass of the default UserManager."""
 
     def create_members_only_user(self, username, api_token, ttl_days):
@@ -34,15 +36,18 @@ class UserManager(models.UserManager):
         return user
 
 
-class User(models.AbstractUser):
+class User(auth_models.AbstractUser):
     """
-    A user can either be a Calchart user (create an account specifically
-    for Calchart) or imported from Members Only.
+    A user can either be a Calchart user or a Members Only user.
+
+    A Calchart user is an account specifically created for Calchart, while
+    a Members Only user is imported from Members Only.
 
     If a Members Only User, no password is set (see Django's
     User.set_unusable_password) and an API token is used to communicate
     with Members Only.
     """
+
     objects = UserManager()
 
     members_only_username = models.CharField(max_length=150, null=True)
@@ -53,6 +58,7 @@ class User(models.AbstractUser):
     viewpsheet_settings = models.TextField(default='{}')
 
     def get_username(self):
+        """Get this User's username."""
         if self.is_superuser or not self.is_members_only_user():
             return self.username
         else:
@@ -65,12 +71,18 @@ class User(models.AbstractUser):
         self.api_token_expiry = timezone.now() + timedelta(days=ttl_days)
 
     def is_members_only_user(self):
+        """
+        Return True if this User is a Members Only user.
+
+        For the purposes of development, a superuser is a Members Only user.
+        """
         return self.is_superuser or len(self.api_token) > 0
 
     def is_valid_api_token(self):
         """
-        Return True if this User has a valid API token. Also returns
-        True if this user is not a Members Only user.
+        Return True if this User has a valid API token.
+
+        Also returns True if this user is not a Members Only user.
         """
         return (
             self.is_superuser or
@@ -80,8 +92,9 @@ class User(models.AbstractUser):
 
     def has_committee(self, committee):
         """
-        Check if this user is part of the given committee. See the Members
-        Only API endpoint.
+        Check if this user is part of the given committee.
+
+        See the Members Only API endpoint.
         """
         if self.is_superuser:
             return True
@@ -95,9 +108,11 @@ class User(models.AbstractUser):
 
 class Show(models.Model):
     """
-    A Show contains all of the data for a show (saved as a JSON file), along
-    with any metadata related to a show.
+    The model containing all of the data and metadata for a Calchart Show.
+
+    The data is saved as a JSON file along with media files.
     """
+
     name = models.CharField(max_length=255, unique=True)
     slug = models.SlugField()
     owner = models.ForeignKey(User)
@@ -109,6 +124,7 @@ class Show(models.Model):
     data_file = models.FileField(upload_to='shows')
 
     def __str__(self):
+        """Get the string representation of a Show."""
         return self.name
 
     def get_data(self):

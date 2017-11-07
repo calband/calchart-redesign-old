@@ -1,12 +1,12 @@
 """Utilities for testing."""
 
-from django.test import TestCase, RequestFactory as DjangoRequestFactory
-
 import json
 from unittest import mock
 
 from base.models import User
 from base.views import CalchartView
+
+from django.test import RequestFactory as DjangoRequestFactory, TestCase
 
 
 class _RequestFactory(object):
@@ -41,6 +41,7 @@ class _RequestFactory(object):
         request = self._factory.post('/', data)
         request.user = self.get_user(members_only=members_only)
         return request
+
 
 RequestFactory = _RequestFactory()
 

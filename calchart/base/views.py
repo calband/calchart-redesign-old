@@ -1,3 +1,12 @@
+"""Views for the base app."""
+
+import json
+
+from base import actions
+from base.forms import CreateUserForm
+from base.mixins import LoginRequiredMixin
+from base.models import Show, User
+
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import login
@@ -6,51 +15,47 @@ from django.core.exceptions import PermissionDenied
 from django.http.response import HttpResponse, JsonResponse
 from django.middleware.csrf import get_token
 from django.shortcuts import redirect
-from django.views.generic import TemplateView, RedirectView, CreateView
 from django.utils import timezone
+from django.views.generic import CreateView, RedirectView, TemplateView
 
-import json
-from datetime import timedelta
-
-import base.actions as actions
-from base.forms import CreateUserForm
-from base.mixins import LoginRequiredMixin
-from base.models import User, Show
 from utils.api import get_login_url
 
 """ ENDPOINTS """
 
 
 def export(request, slug):
-    """
-    Return a JSON file to be downloaded automatically.
-    """
+    """Return a JSON file to be downloaded automatically."""
     show = Show.objects.get(slug=slug)
     response = HttpResponse(show.data_file.read())
     response['Content-Disposition'] = f'attachment; filename={slug}.json'
 
     return response
 
+
 """ AUTH PAGES """
 
 
 class LoginView(DjangoLoginView):
     """
-    Logs in a user with their Members Only credentials. When a user submits
-    their credentials, send a request to the Members Only server and validate
-    that the credentials are valid. If so, flag the user's session as having
-    logged in.
+    The login page for a user.
+
+    The page allows a user to login with their Calchart credentials, or click
+    a link to login with their Members Only account.
     """
+
     template_name = 'login.html'
     redirect_authenticated_user = True
 
 
 class AuthMembersOnlyView(RedirectView):
     """
-    Redirects the user to Members Only, which will redirect back to Calchart
-    after the user logs in (or immediately, if the user is already logged in).
+    Redirects the user to Members Only for authentication.
+
+    The Members Only API will redirect back to Calchart after the user logs in.
     """
+
     def dispatch(self, request, *args, **kwargs):
+        """Login the given user, or redirect to the Members Only API."""
         if 'username' in request.GET:
             self.login_user()
             return redirect(request.GET['next'])
@@ -58,17 +63,23 @@ class AuthMembersOnlyView(RedirectView):
             return super().dispatch(request, *args, **kwargs)
 
     def get_redirect_url(self, *args, **kwargs):
+        """Get the redirect URL for the Members Only API."""
         redirect_url = self.request.GET['next']
         return get_login_url(self.request, redirect_url)
 
     def login_user(self):
+        """Login the user after authenticating from Members Only."""
         username = self.request.GET['username']
         api_token = self.request.GET['api_token']
         ttl_days = int(self.request.GET['ttl_days'])
 
         user = User.objects.filter(members_only_username=username).first()
         if user is None:
-            user = User.objects.create_members_only_user(username, api_token, ttl_days)
+            user = User.objects.create_members_only_user(
+                username=username,
+                api_token=api_token,
+                ttl_days=ttl_days,
+            )
         else:
             user.api_token = api_token
             user.set_expiry(ttl_days)
@@ -78,30 +89,33 @@ class AuthMembersOnlyView(RedirectView):
 
 
 class CreateUserView(CreateView):
+    """Create a new Calchart user."""
+
     template_name = 'create_user.html'
     form_class = CreateUserForm
 
     def form_valid(self, form):
+        """Save the form and redirect to the login page."""
         form.save()
         messages.success(self.request, 'User successfully created.')
         return redirect('login')
+
 
 """ CALCHART PAGE """
 
 
 class CalchartView(LoginRequiredMixin, TemplateView):
     """
-    The single page application for all Calchart pages. Each page renders
-    the same HTML file, but Vue will route to the appropriate page. See
-    router.js.
+    The single page application for all Calchart pages.
+
+    Each page renders the same HTML file, but Vue will route to the
+    appropriate page. See router.js.
     """
+
     template_name = 'calchart.html'
 
     def get(self, request, *args, **kwargs):
-        """
-        Tabs are loaded with AJAX requests that contain the "tab" key
-        in the query string
-        """
+        """Handle a GET request, either for the page or for tab data."""
         if 'tab' in request.GET:
             shows = self.get_tab(request.GET['tab'])
             return JsonResponse({
@@ -148,6 +162,7 @@ class CalchartView(LoginRequiredMixin, TemplateView):
             return JsonResponse(response)
 
     def get_context_data(self, **kwargs):
+        """Get the context data for the template."""
         context = super().get_context_data(**kwargs)
 
         context['env'] = {
@@ -163,7 +178,9 @@ class CalchartView(LoginRequiredMixin, TemplateView):
 
     def get_tabs(self):
         """
-        Get all available tabs for the current user. Available tabs are:
+        Get all available tabs for the current user.
+
+        Available tabs are:
         - band: Shows created by STUNT for this year
         - created: Shows created by the current user
 
@@ -182,9 +199,7 @@ class CalchartView(LoginRequiredMixin, TemplateView):
             ]
 
     def get_tab(self, tab):
-        """
-        Get Shows for the given tab (see get_tabs).
-        """
+        """Get Shows for the given tab (see get_tabs)."""
         if tab == 'band':
             if not self.request.user.is_members_only_user():
                 raise PermissionDenied

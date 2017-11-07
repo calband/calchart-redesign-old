@@ -1,10 +1,13 @@
-from django.views.generic.base import TemplateView
+"""Views for the wiki app."""
+
+from base.mixins import LoginRequiredMixin
+
 from django.http import Http404
 from django.template.loader import get_template
+from django.views.generic.base import TemplateView
 
 from markdown import Markdown
 
-from base.mixins import LoginRequiredMixin
 from wiki.pages import ROOT_PAGE
 
 extensions = [
@@ -15,20 +18,20 @@ MARKDOWN = Markdown(extensions=extensions)
 
 class HelpView(LoginRequiredMixin, TemplateView):
     """
-    The class for all help pages. Help pages are defined in HELP_PAGES. Any
-    incoming page requests will be routed to the display the appropriate
-    help page.
+    The class for all help pages.
 
-    The body of each page should go into a template located at
-    `wiki/<slug>.md`.
+    Help pages are defined in `wiki/pages.py`. The body of each
+    page should go into a template located at `wiki/<slug>.md`.
     """
+
     template_name = 'wiki/base.html'
 
     def dispatch(self, request, *args, **kwargs):
         """
-        Route the request according to kwargs['slug']. If slug is the
-        empty string, display the home page. Otherwise, route to the
-        appropriate page.
+        Route the request according to kwargs['slug'].
+
+        If slug is the empty string, display the home page. Otherwise,
+        route to the appropriate page.
         """
         self.page = ROOT_PAGE
 
@@ -43,6 +46,7 @@ class HelpView(LoginRequiredMixin, TemplateView):
         return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
+        """Get the context for the template."""
         context = super().get_context_data(**kwargs)
 
         wiki_template = get_template(f'wiki/{self.page.slug}.md')
