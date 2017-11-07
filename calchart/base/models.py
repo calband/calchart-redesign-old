@@ -1,4 +1,4 @@
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth import models
 from django.core.files.base import ContentFile
 from django.db import models
 from django.utils.text import slugify
@@ -10,7 +10,31 @@ from datetime import timedelta
 from utils.api import call_endpoint
 
 
-class User(AbstractUser):
+class UserManager(models.UserManager):
+    """A subclass of the default UserManager."""
+
+    def create_members_only_user(self, username, api_token, ttl_days):
+        """
+        Create a Members Only user.
+
+        Since the User uses the same username as on Members Only, makes
+        sure to make the username unique from Calchart usernames.
+        """
+        calchart_username = username
+        while User.objects.filter(username=calchart_username).exists():
+            calchart_username += '_'
+
+        user = User.objects.create(
+            username=calchart_username,
+            members_only_username=username,
+            api_token=api_token,
+        )
+        user.set_expiry(ttl_days)
+        user.save()
+        return user
+
+
+class User(models.AbstractUser):
     """
     A user can either be a Calchart user (create an account specifically
     for Calchart) or imported from Members Only.
@@ -19,6 +43,8 @@ class User(AbstractUser):
     User.set_unusable_password) and an API token is used to communicate
     with Members Only.
     """
+    objects = UserManager()
+
     members_only_username = models.CharField(max_length=150, null=True)
     api_token = models.CharField(max_length=40)
     api_token_expiry = models.DateTimeField(null=True)
@@ -31,6 +57,12 @@ class User(AbstractUser):
             return self.username
         else:
             return self.members_only_username
+
+    def set_expiry(self, ttl_days):
+        """Set a Members Only user's expiry to ttl_days from now."""
+        if not self.is_members_only_user():
+            return
+        self.api_token_expiry = timezone.now() + timedelta(days=ttl_days)
 
     def is_members_only_user(self):
         return self.is_superuser or len(self.api_token) > 0

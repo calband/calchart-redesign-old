@@ -64,21 +64,15 @@ class AuthMembersOnlyView(RedirectView):
     def login_user(self):
         username = self.request.GET['username']
         api_token = self.request.GET['api_token']
-        ttl_days = self.request.GET['ttl_days']
+        ttl_days = int(self.request.GET['ttl_days'])
 
         user = User.objects.filter(members_only_username=username).first()
         if user is None:
-            _username = username
-            while User.objects.filter(username=_username).exists():
-                _username = f'{username}_'
-            user = User.objects.create_user(
-                username=_username,
-                members_only_username=username,
-            )
-
-        user.api_token = api_token
-        user.api_token_expiry = timezone.now() + timedelta(days=int(ttl_days))
-        user.save()
+            user = User.objects.create_members_only_user(username, api_token, ttl_days)
+        else:
+            user.api_token = api_token
+            user.set_expiry(ttl_days)
+            user.save()
 
         login(self.request, user)
 
