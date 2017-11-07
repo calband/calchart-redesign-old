@@ -18,7 +18,10 @@ Goals:
 
 ## Development
 
-First, get the Django server running with `python vmanage.py runserver`.
+First, get the Django server running:
+
+1. `vagrant ssh`
+2. `python manage.py runserver`.
 
 You should now be able to connect to `http://localhost:5000` (but it won't be pretty).
 
@@ -61,7 +64,7 @@ After all the appropriate steps are run, `http://localhost:5000` should now be s
 
 This project contains four testing facilities:
 
-1. Linting (`npm run lint`): Checks code style in the Javascript files
+1. Linting (`npm run lint` and `flake8 calchart`): Checks code style in the Javascript files
 2. Server-side tests (`python vmanage.py test`): These are Django tests that test functionality within the back-end; e.g. testing Django models
 3. Unit tests (`npm test`): These are Javascript tests (using the Karma library) that test functionality within the front-end; e.g. testing Component methods
 4. Integration tests (`npm run integration`): These are Javascript tests that test functionality between the front-end and the back-end; e.g. testing `sendAction` calls
