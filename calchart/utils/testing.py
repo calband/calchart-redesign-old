@@ -8,6 +8,7 @@ from unittest import mock
 from base.models import User
 from base.views import CalchartView
 
+
 class _RequestFactory(object):
     """A new RequestFactory that augments Django's built-in RequestFactory."""
 
@@ -17,7 +18,11 @@ class _RequestFactory(object):
         """Get a Members Only or Calchart-only user for a request."""
         if members_only:
             # use superuser to avoid API call to check-committee
-            return User.objects.create_superuser(username='foo', password='foo', email='')
+            return User.objects.create_superuser(
+                username='foo',
+                password='foo',
+                email='',
+            )
         else:
             return User.objects.create(username='bar')
 
@@ -39,6 +44,7 @@ class _RequestFactory(object):
 
 RequestFactory = _RequestFactory()
 
+
 class ActionsTestCase(TestCase):
     """A TestCase for testing POST actions."""
 
@@ -51,6 +57,7 @@ class ActionsTestCase(TestCase):
         response = CalchartView.as_view()(request)
         self.assertEqual(response.status_code, 200)
         return json.loads(response.content)
+
 
 def mock_endpoint(endpoint, data):
     """

@@ -3,24 +3,23 @@ from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.views import LoginView as DjangoLoginView
 from django.core.exceptions import PermissionDenied
-from django.core.files.storage import default_storage
-from django.core.urlresolvers import reverse
 from django.http.response import HttpResponse, JsonResponse
 from django.middleware.csrf import get_token
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import redirect
 from django.views.generic import TemplateView, RedirectView, CreateView
 from django.utils import timezone
 
-import json, os
+import json
 from datetime import timedelta
 
 import base.actions as actions
-from base.forms import *
+from base.forms import CreateUserForm
 from base.mixins import LoginRequiredMixin
 from base.models import User, Show
 from utils.api import get_login_url
 
-### ENDPOINTS ###
+""" ENDPOINTS """
+
 
 def export(request, slug):
     """
@@ -32,26 +31,29 @@ def export(request, slug):
 
     return response
 
-### AUTH PAGES ###
+""" AUTH PAGES """
+
 
 class LoginView(DjangoLoginView):
     """
-    Logs in a user with their Members Only credentials. When a user submits their
-    credentials, send a request to the Members Only server and validate that the
-    credentials are valid. If so, flag the user's session as having logged in.
+    Logs in a user with their Members Only credentials. When a user submits
+    their credentials, send a request to the Members Only server and validate
+    that the credentials are valid. If so, flag the user's session as having
+    logged in.
     """
     template_name = 'login.html'
     redirect_authenticated_user = True
 
+
 class AuthMembersOnlyView(RedirectView):
     """
-    Redirects the user to Members Only, which will redirect back to Calchart after
-    the user logs in (or immediately, if the user is already logged in).
+    Redirects the user to Members Only, which will redirect back to Calchart
+    after the user logs in (or immediately, if the user is already logged in).
     """
     def dispatch(self, request, *args, **kwargs):
         if 'username' in request.GET:
             self.login_user()
-            return redirect(request.GET['next']) 
+            return redirect(request.GET['next'])
         else:
             return super().dispatch(request, *args, **kwargs)
 
@@ -69,13 +71,17 @@ class AuthMembersOnlyView(RedirectView):
             _username = username
             while User.objects.filter(username=_username).exists():
                 _username = f'{username}_'
-            user = User.objects.create_user(username=_username, members_only_username=username)
+            user = User.objects.create_user(
+                username=_username,
+                members_only_username=username,
+            )
 
         user.api_token = api_token
         user.api_token_expiry = timezone.now() + timedelta(days=int(ttl_days))
         user.save()
 
         login(self.request, user)
+
 
 class CreateUserView(CreateView):
     template_name = 'create_user.html'
@@ -86,7 +92,8 @@ class CreateUserView(CreateView):
         messages.success(self.request, 'User successfully created.')
         return redirect('login')
 
-### CALCHART PAGE ###
+""" CALCHART PAGE """
+
 
 class CalchartView(LoginRequiredMixin, TemplateView):
     """
@@ -199,77 +206,6 @@ class CalchartView(LoginRequiredMixin, TemplateView):
         if tab == 'owned':
             return Show.objects.filter(owner=self.request.user, is_band=False)
 
-# class HomeView(CalchartMixin, TemplateView):
-#     """
-#     The home page that lists all shows created by the user and shared
-#     by the STUNT committee in a Google Drive-like format.
-#     """
-#     template_name = 'home.html'
-
-#     def get(self, request, *args, **kwargs):
-#         """
-#         Tabs are loaded with AJAX requests that contain the "tab" key
-#         in the query string
-#         """
-#         if 'tab' in request.GET:
-#             shows = self.get_tab(request.GET['tab'])
-#             return JsonResponse({
-#                 'shows': [
-#                     {
-#                         'slug': show.slug,
-#                         'name': show.name,
-#                         'published': show.published,
-#                     }
-#                     for show in shows
-#                 ],
-#             })
-#         else:
-#             return super().get(request, *args, **kwargs)
-
-#     def get_context_data(self, **kwargs):
-#         context = super().get_context_data(**kwargs)
-#         context['tabs'] = self.get_tabs()
-#         return context
-
-#     def get_tabs(self):
-#         """
-#         Get all available tabs for the current user. Available tabs are:
-#         - band: Shows created by STUNT for this year
-#         - created: Shows created by the current user
-
-#         Returns tabs in a tuple of the form (id, display_name). The first
-#         tab in the list is the first tab.
-#         """
-#         if self.request.user.is_members_only_user():
-#             year = timezone.now().year
-#             return [
-#                 ('band', f'{year} Shows'),
-#                 ('owned', 'My Shows'),
-#             ]
-#         else:
-#             return [
-#                 ('owned', 'My Shows'),
-#             ]
-
-#     def get_tab(self, tab):
-#         """
-#         Get Shows for the given tab (see get_tabs).
-#         """
-#         if tab == 'band':
-#             if not self.request.user.is_members_only_user():
-#                 raise PermissionDenied
-#             kwargs = {
-#                 'is_band': True,
-#                 'date_added__year': timezone.now().year,
-#             }
-#             if not self.request.user.has_committee('STUNT'):
-#                 kwargs['published'] = True
-
-#             return Show.objects.filter(**kwargs)
-
-#         if tab == 'owned':
-#             return Show.objects.filter(owner=self.request.user, is_band=False)
-
 # class EditorView(CalchartMixin, TemplateView):
 #     """
 #     The editor view that can edit shows
@@ -279,7 +215,8 @@ class CalchartView(LoginRequiredMixin, TemplateView):
 #     def post_auth(self, request, *args, **kwargs):
 #         self.show = get_object_or_404(Show, slug=kwargs['slug'])
 
-#         if self.show.is_band and not self.request.user.has_committee('STUNT'):
+#         if (self.show.is_band and
+#                 not self.request.user.has_committee('STUNT')):
 #             raise PermissionDenied
 
 #     def get_context_data(self, **kwargs):
@@ -362,7 +299,11 @@ class CalchartView(LoginRequiredMixin, TemplateView):
 #         """
 #         settings = {
 #             key: self.request.POST[key]
-#             for key in ['pathOrientation', 'nearbyOrientation', 'birdsEyeOrientation', 'layoutLeftRight']
+#             for key in [
+#               'pathOrientation',
+#               'nearbyOrientation',
+#               'birdsEyeOrientation',
+#               'layoutLeftRight']
 #         }
 #         settings['layoutLeftRight'] = settings['layoutLeftRight'] == 'true'
 #         self.request.user.viewpsheet_settings = json.dumps(settings)

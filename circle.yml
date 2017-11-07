@@ -5,11 +5,13 @@ machine:
 dependencies:
   override:
     - npm install
+    - pip3 install -r requirements/dev.txt
 
 test:
   override:
     - npm run lint
-    # TODO: add python linting
+    - flake8 calchart
     - npm test
     # TODO: add integration tests
-    - cd calchart; python3 manage.py test --verbosity 3
+    - python3 manage.py test --verbosity 3:
+        pwd: calchart

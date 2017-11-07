@@ -10,7 +10,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 # environment the app is running in
 IS_PROD = bool(os.environ.get('CALCHART_PROD'))
 IS_STAGING = bool(os.environ.get('CALCHART_STAGING'))
-IS_REVIEW = os.environ.get('HEROKU_APP_NAME', '').startswith('calchart-staging-pr-')
+HEROKU_APP = os.environ.get('HEROKU_APP_NAME', '')
+IS_REVIEW = HEROKU_APP.startswith('calchart-staging-pr-')
 IS_HEROKU = IS_STAGING or IS_PROD or IS_REVIEW
 IS_LOCAL = not IS_HEROKU
 
@@ -18,7 +19,10 @@ IS_LOCAL = not IS_HEROKU
 # See https://docs.djangoproject.com/en/1.7/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('SECRET_KEY', 'shhhhhdonttellanyoneaboutthispassworditsasecret')
+SECRET_KEY = os.environ.get(
+    'SECRET_KEY',
+    'shhhhhdonttellanyoneaboutthispassworditsasecret',
+)
 
 DEBUG = not IS_HEROKU
 
@@ -40,7 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'storages',
     'base',
-    'wiki', # help pages
+    'wiki',  # help pages
 ]
 
 if IS_HEROKU:
@@ -121,7 +125,7 @@ MEDIAFILES_LOCATION = 'files'
 
 # use different directories for review apps
 if IS_REVIEW:
-    review_num = int(os.environ['HEROKU_APP_NAME'].split('calchart-staging-pr-')[1])
+    review_num = int(HEROKU_APP.split('calchart-staging-pr-')[1])
     STATICFILES_LOCATION = 'static-pr-%d' % review_num
 
 # use local static files for development
@@ -152,7 +156,8 @@ if IS_HEROKU:
     DEFAULT_FROM_EMAIL = 'Calchart <calband-compcomm@lists.berkeley.edu>'
 else:
     MEDIA_ROOT = os.path.join(BASE_DIR, '..', 'files')
-    STATIC_URL = 'http://localhost:%s/' % os.environ.get('WEBPACK_PORT', '4200')
+    webpack_port = os.environ.get('WEBPACK_PORT', '4200')
+    STATIC_URL = f'http://localhost:{webpack_port}/'
     MEDIA_URL = '/media/'
 
 # Authentication

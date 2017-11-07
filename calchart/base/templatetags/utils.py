@@ -4,6 +4,7 @@ import json
 
 register = template.Library()
 
+
 @register.filter
 def asjson(json_str):
     """Convert the given JSON object into a string"""

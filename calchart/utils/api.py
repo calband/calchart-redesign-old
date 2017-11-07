@@ -6,6 +6,7 @@ from urllib.parse import quote
 
 APP_NAME = 'calchart'
 
+
 def get_login_url(request, redirect_url=None):
     """
     Get the URL for the auth-login endpoint in the Members Only API. After
@@ -22,7 +23,11 @@ def get_login_url(request, redirect_url=None):
     else:
         domain = 'https://membersonly-prod.herokuapp.com'
 
-    return f'{domain}/api/auth-login/?redirect_uri={redirect_uri}&app_name={APP_NAME}'
+    return (
+        f'{domain}/api/auth-login/' +
+        f'?redirect_uri={redirect_uri}&app_name={APP_NAME}'
+    )
+
 
 def call_endpoint(endpoint, user, method='GET', **params):
     """

@@ -1,12 +1,11 @@
 from django import template
-from django.conf import settings
 from django.contrib.messages import get_messages as django_get_messages
-from django.core.urlresolvers import reverse
 from django.templatetags.static import static as get_static_path
 from django.template.defaulttags import CsrfTokenNode
 from django.utils.html import format_html, format_html_join, mark_safe
 
 register = template.Library()
+
 
 @register.simple_tag
 def add_style(*paths):
@@ -17,13 +16,28 @@ def add_style(*paths):
     {% add_style 'base/page_modify.css' %}
 
     to:
-    <link rel="stylesheet" type="text/css" href="{% static 'css/base/page_modify.css' %} crossorigin="anonymous">
+    <link
+        rel="stylesheet"
+        type="text/css"
+        href="{% static 'css/base/page_modify.css' %}"
+        crossorigin="anonymous"
+    >
     """
+    attrs = [
+        (
+            'stylesheet',
+            'text/css',
+            get_static_path(path),
+            'anonymous',
+        )
+        for path in paths
+    ]
     return format_html_join(
         '',
-        '<link rel="stylesheet" type="text/css" href="{}" crossorigin="anonymous">',
-        [(get_static_path(path),) for path in paths]
+        '<link rel="{}" type="{}" href="{}" crossorigin="{}">',
+        attrs
     )
+
 
 @register.simple_tag
 def add_script(*paths):
@@ -42,11 +56,12 @@ def add_script(*paths):
         [(get_static_path(path),) for path in paths]
     )
 
+
 @register.simple_tag(takes_context=True)
 def get_feedback(context, *forms):
     """
-    Generate a list of messages consisting of errors contained in these forms and from the messages
-    framework
+    Generate a list of messages consisting of errors contained in
+    these forms and from the messages framework
 
     from:
     {% get_feedback form1 form2 %}
@@ -72,14 +87,18 @@ def get_feedback(context, *forms):
         ]
 
     if len(messages) == 0:
-        return '' # return nothing if no messages
+        return ''  # return nothing if no messages
     else:
         message_list = format_html_join(
             '',
             '<li class="{}">{}</li>',
             messages
         )
-        return format_html('<ul class="messages">{}</ul>', mark_safe(message_list))
+        return format_html(
+            '<ul class="messages">{}</ul>',
+            mark_safe(message_list),
+        )
+
 
 @register.simple_tag
 def create_field(*fields):
@@ -113,6 +132,7 @@ def create_field(*fields):
         info
     )
 
+
 @register.simple_tag
 def create_all_fields(form):
     """
@@ -120,10 +140,12 @@ def create_all_fields(form):
     """
     return create_field(*[field for field in form])
 
+
 @register.tag
 def create_form(parser, token):
     """
-    Creates a form, putting anything between the template tags at the end of the form
+    Creates a form, putting anything between the template tags
+    at the end of the form
 
     from:
     {% create_form form form_class %}
@@ -139,7 +161,9 @@ def create_form(parser, token):
     """
     contents = token.split_contents()
     if len(contents) == 1:
-        raise template.TemplateSyntaxError('%r tag requires a form' % contents[0])
+        raise template.TemplateSyntaxError(
+            '%r tag requires a form' % contents[0]
+        )
 
     form = contents[1]
     form_classes = contents[2:]
@@ -147,6 +171,7 @@ def create_form(parser, token):
     nodelist = parser.parse(('end_create_form',))
     parser.delete_first_token()
     return CreateFormNode(form, form_classes, nodelist)
+
 
 class CreateFormNode(template.Node):
     def __init__(self, form, form_classes, nodelist):
@@ -160,7 +185,9 @@ class CreateFormNode(template.Node):
         fields = create_all_fields(self.form.resolve(context))
         rest = self.nodelist.render(context)
         return format_html(
-            '<form method="post" enctype="multipart/form-data" class="{}">{}{}{}</form>',
+            '<form method="{}" enctype="{}" class="{}">{}{}{}</form>',
+            'post',
+            'multipart/form-data',
             form_class,
             csrf_token,
             mark_safe(fields),

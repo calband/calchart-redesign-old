@@ -1,6 +1,6 @@
 from django.conf.urls import url
 
-from wiki.views import *
+from wiki.views import HelpView
 
 urlpatterns = [
     url(r'^$', HelpView.as_view(), name='home'),

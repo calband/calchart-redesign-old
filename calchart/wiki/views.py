@@ -12,6 +12,7 @@ extensions = [
 ]
 MARKDOWN = Markdown(extensions=extensions)
 
+
 class HelpView(LoginRequiredMixin, TemplateView):
     """
     The class for all help pages. Help pages are defined in HELP_PAGES. Any

@@ -1,3 +1,4 @@
+# flake8: noqa
 """
 This package organizes actions that can be sent from sendAction
 on each page. Each action needs to have the following declaration:

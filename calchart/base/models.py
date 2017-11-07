@@ -9,6 +9,7 @@ from datetime import timedelta
 
 from utils.api import call_endpoint
 
+
 class User(AbstractUser):
     """
     A user can either be a Calchart user (create an account specifically
@@ -59,6 +60,7 @@ class User(AbstractUser):
         response = call_endpoint('check-committee', self, committee=committee)
         return response['has_committee']
 
+
 class Show(models.Model):
     """
     A Show contains all of the data for a show (saved as a JSON file), along
@@ -108,7 +110,7 @@ class Show(models.Model):
             i = 0
             self.slug = slug
             while Show.objects.filter(slug=self.slug).exists():
-                i += 1 
+                i += 1
                 self.slug = f'{slug}-{i}'
 
         return super().save(*args, **kwargs)

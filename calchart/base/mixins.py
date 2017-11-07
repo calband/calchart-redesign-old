@@ -3,6 +3,7 @@ from django.shortcuts import redirect
 
 from utils.api import get_login_url
 
+
 class LoginRequiredMixin(AccessMixin):
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
@@ -15,7 +16,7 @@ class LoginRequiredMixin(AccessMixin):
 
         self.post_auth(request, *args, **kwargs)
 
-        return super(LoginRequiredMixin, self).dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
     def post_auth(self, request, *args, **kwargs):
         """A hook for actions after user is authenticated."""

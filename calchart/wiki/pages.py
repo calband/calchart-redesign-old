@@ -1,5 +1,6 @@
 from django.core.urlresolvers import reverse
 
+
 class HelpPage(object):
     """
     A helper class to organize pages in a hierarchy. Each help page
@@ -56,15 +57,18 @@ class HelpPage(object):
         ])
         return reverse('wiki:page', kwargs={'slug': slug})
 
-ROOT_PAGE = HelpPage('home',
+ROOT_PAGE = HelpPage(
+    'home',
     HelpPage('setup-show'),
     HelpPage('setup-sheet', 'Setup Stuntsheets'),
-    HelpPage('editing-dots',
+    HelpPage(
+        'editing-dots',
         HelpPage('select-dots'),
         HelpPage('position-dots'),
         HelpPage('change-dot-types'),
     ),
-    HelpPage('editing-continuities',
+    HelpPage(
+        'editing-continuities',
         HelpPage('fountain-grid', 'EWNS/NSEW'),
         HelpPage('forward-march'),
         HelpPage('mark-time'),

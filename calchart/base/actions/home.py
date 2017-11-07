@@ -1,5 +1,6 @@
 from base.models import Show
 
+
 def create_show(data, **kwargs):
     """
     A POST action that creates a show with the given name.
@@ -21,6 +22,7 @@ def create_show(data, **kwargs):
     return {
         'slug': show.slug,
     }
+
 
 def publish_show(data, **kwargs):
     """

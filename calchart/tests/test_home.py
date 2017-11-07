@@ -1,11 +1,9 @@
 from django.test import TestCase
-from django.utils import timezone
 
-from datetime import timedelta
-
-from base.models import User, Show
+from base.models import Show
 from base.views import CalchartView
 from utils.testing import ActionsTestCase, RequestFactory
+
 
 class TabsTestCase(TestCase):
     """Test retrieving tabs for the home page."""
@@ -23,6 +21,7 @@ class TabsTestCase(TestCase):
     # TODO: test get_tab band not members_only_user
     # TODO: test get_tab owned
 
+
 class CreateShowTestCase(ActionsTestCase):
     """Test the create_show action."""
 
@@ -31,7 +30,7 @@ class CreateShowTestCase(ActionsTestCase):
             'name': 'Foo',
             'isBand': is_band,
         }, members_only=members_only)
-        
+
         self.assertTrue(Show.objects.filter(name='Foo').exists())
         show = Show.objects.get(name='Foo')
         self.assertEqual(show.is_band, final_is_band)
@@ -51,6 +50,7 @@ class CreateShowTestCase(ActionsTestCase):
         self.assertCreateShow(False, False, False)
 
     # TODO: test create Show twice errors
+
 
 class PublishShowTestCase(ActionsTestCase):
     """Test the publish_show action."""
