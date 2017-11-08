@@ -65,3 +65,5 @@ $ npm run e2e
 # if installed in the VM
 $ vagrant ssh -c 'npm run e2e'
 ```
+
+You should also be running `npm run dev` when running end-to-end tests.

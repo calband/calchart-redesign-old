@@ -14,5 +14,6 @@ test:
     - npm test
     - python3 manage.py test --verbosity 3:
         pwd: calchart
+    - npm run build
     - npm run e2e:
         pwd: calchart

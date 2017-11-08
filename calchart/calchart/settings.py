@@ -6,12 +6,13 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 # environment checks: based on the environment variables, we can determine what
 # environment the app is running in
+IS_CI = bool(os.environ.get('CIRCLECI'))
 IS_PROD = bool(os.environ.get('CALCHART_PROD'))
 IS_STAGING = bool(os.environ.get('CALCHART_STAGING'))
 HEROKU_APP = os.environ.get('HEROKU_APP_NAME', '')
 IS_REVIEW = HEROKU_APP.startswith('calchart-staging-pr-')
 IS_HEROKU = IS_STAGING or IS_PROD or IS_REVIEW
-IS_LOCAL = not IS_HEROKU
+IS_LOCAL = not IS_HEROKU and not IS_CI
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.7/howto/deployment/checklist/
@@ -88,6 +89,14 @@ if IS_HEROKU:
     DATABASES = {
         'default': dj_database_url.config(),
     }
+elif IS_CI:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': 'circle_test',
+            'USER': 'ubuntu',
+        },
+    }
 else:
     DATABASES = {
         'default': {
@@ -154,9 +163,13 @@ if IS_HEROKU:
     DEFAULT_FROM_EMAIL = 'Calchart <calband-compcomm@lists.berkeley.edu>'
 else:
     MEDIA_ROOT = os.path.join(BASE_DIR, '..', 'files')
-    webpack_port = os.environ.get('WEBPACK_PORT', '4200')
-    STATIC_URL = f'http://localhost:{webpack_port}/'
     MEDIA_URL = '/media/'
+
+    if IS_CI:
+        STATIC_URL = '/static/'
+    else:
+        webpack_port = os.environ.get('WEBPACK_PORT', '4200')
+        STATIC_URL = f'http://localhost:{webpack_port}/'
 
 # Authentication
 
