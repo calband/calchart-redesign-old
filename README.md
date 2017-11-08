@@ -62,13 +62,10 @@ After all the appropriate steps are run, `http://localhost:5000` should now be s
 
 ## Testing
 
-This project contains four testing facilities:
+This project contains three testing facilities:
 
-1. Linting (`npm run lint` and `flake8 calchart`): Checks code style in the Javascript files
-2. Server-side tests (`python vmanage.py test`): These are Django tests that test functionality within the back-end; e.g. testing Django models
-3. Unit tests (`npm test`): These are Javascript tests (using the Karma library) that test functionality within the front-end; e.g. testing Component methods
-4. Integration tests (`npm run integration`): These are Javascript tests that test functionality between the front-end and the back-end; e.g. testing `sendAction` calls
-
-These commands should be run on the same machine you called `npm install` on.
+1. Linting (`npm run lint` and `flake8 calchart/`): Checks code style
+2. Server-side tests (`python manage.py test`): These are Django tests that test functionality within the back-end; e.g. testing Django models
+3. Unit tests (`npm test`): These are Javascript tests (using the Mocha library) that test functionality within the front-end; e.g. testing Component methods
 
 More detailed information and examples of these tests can be found in `docs/Testing.md`.

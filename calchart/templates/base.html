@@ -5,9 +5,6 @@
         <title>{% block title %}Calchart{% endblock %}</title>
         <link rel="icon" type="image/png" href="{% static 'img/favicon.png' %}">
         {% add_style "vendor/reset.css" "vendor/icons.css" "base.css" %}
-        <script>
-            window.env = {{ env|asjson|safe }};
-        </script>
         {% block head %}{% endblock %}
     </head>
     <body>

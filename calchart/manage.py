@@ -9,9 +9,12 @@ if __name__ == "__main__":
 
     from django.core.management import execute_from_command_line
 
-    # by default, runserver runs on port 5000. Also requires running on
-    # 0.0.0.0 since localhost is not exposed from the VM
-    if len(sys.argv) == 2 and sys.argv[1] == 'runserver':
-        sys.argv.append('0.0.0.0:5000')
+    if len(sys.argv) > 1:
+        # by default, runserver runs on port 5000. Also requires running on
+        # 0.0.0.0 since localhost is not exposed from the VM
+        if sys.argv[1] == 'runserver' and len(sys.argv) == 2:
+            sys.argv.append('0.0.0.0:5000')
+        elif sys.argv[1] == 'testserver':
+            sys.argv = sys.argv[:2] + ['--addrport', '0.0.0.0:5000'] + sys.argv[2:]
 
     execute_from_command_line(sys.argv)

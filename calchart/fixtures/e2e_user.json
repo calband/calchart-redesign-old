@@ -1,0 +1,24 @@
+[
+{
+    "model": "base.user",
+    "pk": 1,
+    "fields": {
+        "password": "pbkdf2_sha256$36000$f7NjiMXarKpY$p3637YX9tQ6C2tBJ4u4/naRncSlNPqpzN2LWBGieIdQ=",
+        "last_login": "2017-11-04T04:25:35.871Z",
+        "is_superuser": true,
+        "username": "member",
+        "first_name": "",
+        "last_name": "",
+        "email": "example@gmail.com",
+        "is_staff": true,
+        "is_active": true,
+        "date_joined": "2017-11-04T04:21:16.198Z",
+        "members_only_username": null,
+        "api_token": "",
+        "api_token_expiry": null,
+        "viewpsheet_settings": "{}",
+        "groups": [],
+        "user_permissions": []
+    }
+}
+]

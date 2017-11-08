@@ -3,6 +3,7 @@
 
 {% block head %}
     <script>
+        window.env = {{ env|asjson|safe }};
         window.tabs = {{ tabs|asjson|safe }};
     </script>
 {% endblock %}

@@ -11,7 +11,8 @@
         "build": "webpack --progress",
         "dev": "webpack-dev-server",
         "lint": "eslint --ignore-pattern **/vendor/*.js --ext js,vue vue_src/ test/",
-        "test": "cross-env NODE_ENV=test mocha-webpack --webpack-config webpack.config.js --require test/setup.js 'test/**/*.spec.js'"
+        "test": "cross-env NODE_ENV=test mocha-webpack -r test/setup.js 'test/**/*.spec.js'",
+        "e2e": "node scripts/npm_e2e.js"
     },
     "devDependencies": {
         "babel-core": "^6.24.1",
@@ -46,6 +47,7 @@
         "sass-loader": "^6.0.6",
         "sass-resources-loader": "^1.3.1",
         "sinon": "^4.1.1",
+        "testcafe": "^0.18.2",
         "vue": "^2.5.2",
         "vue-ctxmenu": "0.0.6",
         "vue-formly": "^2.5.3",

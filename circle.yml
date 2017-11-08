@@ -12,6 +12,7 @@ test:
     - npm run lint
     - flake8 calchart
     - npm test
-    # TODO: add integration tests
     - python3 manage.py test --verbosity 3:
+        pwd: calchart
+    - npm run e2e:
         pwd: calchart

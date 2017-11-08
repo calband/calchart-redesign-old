@@ -3,7 +3,7 @@ The entry point for the home page.
 </docs>
 
 <template>
-    <div>
+    <div class="home-view">
         <div class="home-buttons">
             <button @click="showPopupCreateShow">New Show</button>
         </div>
