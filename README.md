@@ -43,17 +43,17 @@ Using `webpack-dev-server` in a virtual machine is difficult to use because chan
     * Con: Need to edit files on the virtual machine
     * Pro: You get really good at `vim`?
     * Steps:
-        1. `vagrant ssh`
-        2. Add `export WEBPACK_PORT=4100` to `.env`
+        1. Add `export WEBPACK_PORT=4100` to `.env`
+        2. `vagrant ssh`
         3. `npm install --no-bin-links` (only needs to run the first time)
-        4. `npm run dev`
+        4. `npm run dev -- --port 4100`
         5. Edit files on the VM using `vim` or another text editor
 3. Use the `--watch-poll` option. (Not recommended)
     * Pro: No additional installation necessary
     * Con: Recompiling takes ~5000 ms
     * Steps:
-        1. `vagrant ssh`
-        2. Add `export WEBPACK_PORT=4100` to `.env`
+        1. Add `export WEBPACK_PORT=4100` to `.env`
+        2. `vagrant ssh`
         3. `npm install --no-bin-links` (only needs to run the first time)
         4. `npm run dev -- --port 4100 --watch-poll`
         5. Edit files locally
