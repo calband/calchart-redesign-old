@@ -9,9 +9,9 @@ const IS_LOCAL = ! (IS_CI || IS_VAGRANT);
 
 var startApp = [
     'python3',
-    `calchart/manage.py`,
+    'calchart/manage.py',
     'testserver',
-    `e2e_user.json`,
+    'e2e_user.json',
     '--noinput',
 ].join(' ');
 if (IS_LOCAL) {
