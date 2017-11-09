@@ -90,13 +90,13 @@ export default {
 </script>
 
 <style lang="scss">
-    .vue-context-menu {
-        @include hover-menu;
-    }
+.vue-context-menu {
+    @include hover-menu;
+}
 </style>
 
 <style lang="scss" scoped>
-    .messages {
-        @include hover-messages;
-    }
+.messages {
+    @include hover-messages;
+}
 </style>

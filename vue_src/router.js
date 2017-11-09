@@ -7,6 +7,7 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
 
+import Editor from 'editor/App';
 import Home from 'home/App';
 
 Vue.use(VueRouter);
@@ -25,7 +26,7 @@ export default new VueRouter({
         {
             path: '/editor/:slug/',
             name: 'editor',
-            component: Home, // TODO
+            component: Editor,
         },
         {
             path: '/viewer/:slug/',

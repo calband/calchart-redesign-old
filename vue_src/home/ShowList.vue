@@ -135,21 +135,21 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-    .show-list {
-        margin: 5px;
-        background: $white;
-        box-shadow: 0 0 5px $dark-gray;
-        li {
-            padding: 15px 20px 10px;
-            cursor: pointer;
-            border-bottom: 1px solid darken($semilight-gray, 10);
-            &:hover, &.active {
-                color: lighten($blue, 20);
-                background: $white;
-            }
-            &:last-child {
-                border-bottom: none;
-            }
+.show-list {
+    margin: 5px;
+    background: $white;
+    box-shadow: 0 0 5px $dark-gray;
+    li {
+        padding: 15px 20px 10px;
+        cursor: pointer;
+        border-bottom: 1px solid darken($semilight-gray, 10);
+        &:hover, &.active {
+            color: lighten($blue, 20);
+            background: $white;
+        }
+        &:last-child {
+            border-bottom: none;
         }
     }
+}
 </style>

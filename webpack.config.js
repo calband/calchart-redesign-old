@@ -30,6 +30,13 @@ const babelLoaderOptions = {
     cacheDirectory: true,
 };
 
+const cssLoader = {
+    loader: 'css-loader',
+    options: {
+        url: false,
+    },
+};
+
 const partials = path.resolve(src, 'scss', 'partials');
 const sassResourcesLoaderOptions = {
     resources: [
@@ -51,7 +58,7 @@ const vueLoaderOptions = {
         // TODO: https://vue-loader.vuejs.org/en/configurations/extract-css.html
         scss: [
             'vue-style-loader',
-            'css-loader',
+            cssLoader,
             'sass-loader',
             {
                 loader: 'sass-resources-loader',
@@ -102,12 +109,7 @@ webpackConfig = {
                 test: /\.scss$/,
                 exclude: /node_modules/,
                 use: ExtractTextPlugin.extract([
-                    {
-                        loader: 'css-loader',
-                        options: {
-                            url: false,
-                        },
-                    },
+                    cssLoader,
                     'sass-loader',
                 ]),
             },
