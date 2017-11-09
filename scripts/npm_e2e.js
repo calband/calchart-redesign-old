@@ -11,7 +11,7 @@ var startApp = [
     'python3',
     `calchart/manage.py`,
     'testserver',
-    `calchart/fixtures/e2e_user.json`,
+    `e2e_user.json`,
     '--noinput',
 ].join(' ');
 if (IS_LOCAL) {
@@ -20,11 +20,10 @@ if (IS_LOCAL) {
 
 // check that webpack-dev-server is running
 if (!IS_CI) {
-    var port = IS_VAGRANT ? 4100 : 4200;
     try {
-        child_process.execSync(`lsof -i :${port}`);
+        child_process.execSync(`lsof -i :4200`);
     } catch (e) {
-        throw new Error(`No webpack-dev-server running on port ${port}`);
+        throw new Error(`No webpack-dev-server running`);
     }
 }
 

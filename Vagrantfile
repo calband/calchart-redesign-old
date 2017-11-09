@@ -9,10 +9,9 @@ Vagrant.configure("2") do |config|
     # Forward a port from the guest to the host, which allows us to access the ports
     # exposed by the VM from our local machine.
     config.vm.network :forwarded_port, guest: 5000, host: 5000
-    config.vm.network :forwarded_port, guest: 4100, host: 4100
-    
+ 
     # sync the current directory with the /vagrant directory on the virtual machine
-    config.vm.synced_folder ".", "/vagrant", :mount_options => ["fmode=666"]
+    config.vm.synced_folder ".", "/vagrant", :mount_options => ["fmode=775"]
     
     # provision using Ansible
     config.vm.provision "ansible_local" do |ansible|

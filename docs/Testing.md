@@ -14,14 +14,10 @@ We use [`flake8`](http://flake8.pycqa.org/en/latest/) for linting the Python cod
 $ vagrant ssh -c 'flake8 calchart/'
 ```
 
-We use [`eslint`](https://eslint.org/) and [`eslint-plugin-vue`](https://github.com/vuejs/eslint-plugin-vue) for linting the Javascript/Vue code. `eslint` is super configurable; everything we're checking is listed in `.eslintrc.json`. Anything not on the list is checked, so if you want something else to be linted, add it to `.eslintrc.json`. This command should be run wherever you ran `npm install`:
+We use [`eslint`](https://eslint.org/) and [`eslint-plugin-vue`](https://github.com/vuejs/eslint-plugin-vue) for linting the Javascript/Vue code. `eslint` is super configurable; everything we're checking is listed in `.eslintrc.json`. Anything not on the list is checked, so if you want something else to be linted, add it to `.eslintrc.json`. This command should be run locally:
 
 ```
-# if installed locally
 $ npm run lint
-
-# if installed in the VM
-$ vagrant ssh -c 'npm run lint'
 ```
 
 ## Server-Side Tests
@@ -42,28 +38,20 @@ These tests are Javascript tests that test functionality within the front-end; f
 
 These tests should be written in the `test/` directory, following the same layout as the `vue_src` directory. For example, testing the `vue_src/home/ShowList.vue` component should be done in the file `test/home/ShowList.spec.js`.
 
-This command should be run wherever you ran `npm install`:
+This command should be run locally:
 
 ```
-# if installed locally
 $ npm test
-
-# if installed in the VM
-$ vagrant ssh -c 'npm test'
 ```
 
 ## End-to-End Tests
 
 These tests test functionality between the backend and frontend; for example, testing that actions from the frontend being sent to the backend have the correct events occur. Think of these tests as automating user experiences, steps a developer might run manually to check that a given sequence of actions works (e.g. text in box, click button, click other button that appears, etc).
 
-We use the [`testcafe`](https://devexpress.github.io/testcafe/) library to write tests. Tests should be written in the `e2e/` directory. This command should be run wherever you ran `npm install`:
+We use the [`testcafe`](https://devexpress.github.io/testcafe/) library to write tests. Tests should be written in the `e2e/` directory. This command should be run locally:
 
 ```
-# if installed locally
 $ npm run e2e
-
-# if installed in the VM
-$ vagrant ssh -c 'npm run e2e'
 ```
 
 You should also be running `npm run dev` when running end-to-end tests.
