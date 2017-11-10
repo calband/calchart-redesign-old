@@ -2,7 +2,6 @@ import $ from 'jquery';
 import _ from 'lodash';
 
 import store from 'store';
-import { $root } from 'utils/vue';
 
 /**
  * The default callback for handling an error returned by the server.
@@ -25,7 +24,7 @@ export function handleError(xhr) {
         }
     }
 
-    $root.showError(message);
+    store.dispatch('messages/showError', message);
 }
 
 /**

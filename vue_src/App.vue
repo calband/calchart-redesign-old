@@ -20,7 +20,7 @@ page according to the URL.
             >{{ message.text }}
                 <i
                     v-if="!message.autohide"
-                    @click="hideMessage(message.id)"
+                    @click="removeMessage(message.id)"
                     class="icon-times close-message"
                 ></i>
             </li>
@@ -31,61 +31,15 @@ page according to the URL.
 
 <script>
 import _ from 'lodash';
-
-import { findAndRemove } from 'utils/array';
+import { mapState, mapMutations } from 'vuex';
 
 export default {
     name: 'Calchart',
-    data() {
-        return {
-            messages: [],
-            messageId: 0,
-        };
+    computed: {
+        ...mapState('messages', ['messages']),
     },
     methods: {
-        /**
-         * Shows a message on the page.
-         *
-         * @param {String} message
-         * @param {Object} [options] - Options to customize the message:
-         *   - {boolean} [error=false] - true if message is an error message
-         *   - {boolean} [autohide=!isError] - Automatically hide the message
-         *     after a given time.
-         * @param {boolean} error - true to style the message as an error
-         */
-        showMessage(message, options={}) {
-            _.defaults(options, {
-                error: false,
-            });
-            options.autohide = _.defaultTo(options.autohide, !options.error);
-            options.id = this.messageId++;
-            options.text = message;
-            this.messages.push(options);
-
-            if (options.autohide) {
-                setTimeout(() => {
-                    this.hideMessage(options.id);
-                }, 1000);
-            }
-        },
-        /**
-         * Shows an error message on the page.
-         *
-         * @param {String} message
-         * @param {Object} [options]
-         */
-        showError(message, options={}) {
-            options.error = true;
-            this.showMessage(message, options);
-        },
-        /**
-         * Hide the message with the given id.
-         *
-         * @param {int} id
-         */
-        hideMessage(id) {
-            findAndRemove(this.messages, ['id', id]);
-        },
+        ...mapMutations('messages', ['removeMessage']),
     },
 };
 </script>

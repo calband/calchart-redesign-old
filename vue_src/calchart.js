@@ -6,7 +6,6 @@ import App from 'App';
 import FormsPlugin from 'forms';
 import router from 'router';
 import store from 'store';
-import { setRoot } from 'utils/vue';
 
 Vue.use(FormsPlugin);
 Vue.use(VueContextMenu);
@@ -19,4 +18,3 @@ let vm = new CalchartApp({
     router,
     store,
 });
-setRoot(vm);

@@ -13,14 +13,7 @@ The base component for a generic popup.
 <script>
 import $ from 'jquery';
 
-import { $root } from 'utils/vue';
-
 export default {
-    computed: {
-        $router() {
-            return $root.$router;
-        },
-    },
     methods: {
         open() {
             $('body').append(this.$el);

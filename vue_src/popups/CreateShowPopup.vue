@@ -20,14 +20,15 @@ import _ from 'lodash';
 
 import { BasePopup, FormPopup } from './lib';
 
+import router from 'router';
+import store from 'store';
 import sendAction, { handleError } from 'utils/ajax';
-import { $root } from 'utils/vue';
 
 export default {
     components: { FormPopup },
     extends: BasePopup,
     data() {
-        const IS_STUNT = $root.$store.state.env.isStunt;
+        const IS_STUNT = store.state.env.isStunt;
         return {
             isSaving: false,
             model: {
@@ -61,7 +62,7 @@ export default {
             sendAction('create_show', data, {
                 success: data => {
                     this.hide();
-                    this.$router.push({
+                    router.push({
                         name: 'editor',
                         params: {
                             slug: data.slug,
