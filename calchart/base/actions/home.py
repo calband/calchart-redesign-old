@@ -1,6 +1,41 @@
 """Actions for the home page."""
 
+from django.utils import timezone
+
 from ..models import Show
+
+
+def get_tab(data, **kwargs):
+    """Get the shows in the given tab."""
+    user = kwargs['user']
+    tab = data['tab']
+
+    if tab == 'band':
+        if not user.is_members_only_user():
+            raise PermissionDenied
+        kwargs = {
+            'is_band': True,
+            'date_added__year': timezone.now().year,
+        }
+        if not user.has_committee('STUNT'):
+            kwargs['published'] = True
+
+        shows = Show.objects.filter(**kwargs)
+    elif tab == 'owned':
+        shows = Show.objects.filter(owner=user, is_band=False)
+    else:
+        raise ValueError(f'Invalid tab: {tab}')
+
+    return {
+        'shows': [
+            {
+                'slug': show.slug,
+                'name': show.name,
+                'published': show.published,
+            }
+            for show in shows
+        ],
+    }
 
 
 def create_show(data, **kwargs):

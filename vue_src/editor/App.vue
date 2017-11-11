@@ -43,12 +43,39 @@ The entry point for the editor page.
 </template>
 
 <script>
+import _ from 'lodash';
+import { mapState } from 'vuex';
+
 export default {
     name: 'Editor',
     data() {
         return {
-            show: null,
         };
+    },
+    mounted() {
+        if (!this.isInitialized) {
+            // TODO: setup show popup
+        }
+    },
+    computed: {
+        /**
+         * @return {Boolean} true if the show is initialized.
+         */
+        isInitialized() {
+            return !_.isNull(this.$store.state.show);
+        },
+        /**
+         * @return {Show|Object} The Show currently loaded in the editor. If
+         *   the Show is not initialized yet, returns the data for creating
+         *   a show.
+         */
+        show() {
+            if (this.isInitialized) {
+                return this.$store.state.show;
+            } else {
+                return this.$store.state.editor.newShowData;
+            }
+        },
     },
 };
 </script>

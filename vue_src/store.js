@@ -11,6 +11,27 @@ import { findAndRemove } from 'utils/array';
 Vue.use(Vuex);
 
 /**
+ * The module containing state relating to the editor.
+ */
+const editor = {
+    namespaced: true,
+    state: {
+        // data for creating a new show
+        newShowData: null,
+    },
+    mutations: {
+        /**
+         * Set data for creating a new show.
+         *
+         * @param {Object} data
+         */
+        setNewShowData(state, data) {
+            state.newShowData = data;
+        },
+    },
+};
+
+/**
  * The module containing state relating to the environment.
  */
 const env = {
@@ -101,7 +122,22 @@ const messages = {
 };
 
 export default new Vuex.Store({
+    state: {
+        // the Show loaded in the current page (or null if none loaded)
+        show: null,
+    },
+    mutations: {
+        /**
+         * Set the show from the given show data.
+         *
+         * @param {?Show} show
+         */
+        setShow(state, show) {
+            state.show = show;
+        },
+    },
     modules: {
+        editor,
         env,
         messages,
     },

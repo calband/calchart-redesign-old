@@ -142,9 +142,7 @@ export default {
          */
         loadTab(tab) {
             if (isNull(this.tabs[tab].shows)) {
-                $.ajax({
-                    data: { tab },
-                    dataType: 'json',
+                sendAction('get_tab', { tab }, {
                     success: data => {
                         if (tab === 'band' && this.isStunt) {
                             let shows = {
@@ -166,7 +164,6 @@ export default {
                         this.isLoading = false;
                         this.activeTab = tab;
                     },
-                    error: handleError,
                 });
             } else {
                 this.activeTab = tab;
