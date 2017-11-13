@@ -1,6 +1,6 @@
 # django packages
 Django==1.11
-psycopg2==2.5.4
+psycopg2==2.7.3
 boto==2.35.2
 django-storages==1.5.2
 requests[security]==2.10.0

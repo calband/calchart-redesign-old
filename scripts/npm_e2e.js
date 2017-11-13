@@ -1,20 +1,34 @@
 const createTestCafe = require('testcafe');
 const glob = require('glob');
-const exec = require('child_process').exec;
+const child_process = require('child_process');
+
+// where is npm run e2e running?
+const IS_CI = !! process.env.CIRCLECI;
+const IS_VAGRANT = process.env.USER === 'vagrant';
+const IS_LOCAL = ! (IS_CI || IS_VAGRANT);
+
+var startApp = [
+    'python3',
+    'calchart/manage.py',
+    'testserver',
+    'e2e_user.json',
+    '--noinput',
+].join(' ');
+if (IS_LOCAL) {
+    startApp = `vagrant ssh -c "cd .. && ${startApp}"`;
+}
+
+// check that webpack-dev-server is running
+if (!IS_CI) {
+    try {
+        child_process.execSync(`lsof -i :4200`);
+    } catch (e) {
+        throw new Error(`No webpack-dev-server running`);
+    }
+}
 
 var testcafe = null;
 var failed = false;
-
-var startApp = `manage.py testserver fixtures/e2e_user.json --noinput`;
-var isVagrant = false;
-if (process.env.CIRCLECI) {
-    startApp = `python3 ${startApp}`;
-} else if (process.env.USER === 'vagrant') {
-    startApp = `python ${startApp}`;
-} else {
-    startApp = `vagrant ssh -c "python ${startApp}"`;
-    isVagrant = true;
-}
 
 createTestCafe('localhost', 5000)
     .then(tc => {
@@ -41,8 +55,8 @@ createTestCafe('localhost', 5000)
     .finally(() => {
         testcafe.close();
         // need to kill the manage.py process inside VM
-        if (isVagrant) {
-            exec('vagrant ssh -c "pkill -9 -f testserver"', {
+        if (IS_LOCAL) {
+            child_process.exec('vagrant ssh -c "pkill -9 -f testserver"', {
                 timeout: 5000,
             });
         }

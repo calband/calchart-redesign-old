@@ -1,6 +1,8 @@
 machine:
   python:
     version: 3.6.0
+  node:
+    version: 6.11.4
 
 dependencies:
   override:
@@ -12,8 +14,6 @@ test:
     - npm run lint
     - flake8 calchart
     - npm test
-    - python3 manage.py test --verbosity 3:
+    - python3 manage.py test --verbosity 3 --noinput:
         pwd: calchart
-    - npm run build
-    - npm run e2e:
-        pwd: calchart
+    # - npm run build && npm run e2e
