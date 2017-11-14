@@ -5,7 +5,7 @@ The entry point for the home page.
 <template>
     <div class="home-view">
         <div class="home-buttons">
-            <button @click="showPopupCreateShow">New Show</button>
+            <button @click="showCreateShowPopup">New Show</button>
         </div>
         <div class="home-content">
             <ul class="tabs" ref="tabs">
@@ -172,7 +172,7 @@ export default {
         /**
          * Display the CreateShowPopup.
          */
-        showPopupCreateShow() {
+        showCreateShowPopup() {
             showPopup(CreateShowPopup);
         },
         /**

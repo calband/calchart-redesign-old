@@ -20,6 +20,9 @@ The entry point for the editor page.
 import _ from 'lodash';
 import { mapState } from 'vuex';
 
+import { showPopup } from 'popups/lib';
+import SetupShowPopup from 'popups/SetupShowPopup';
+
 import EditorMenu from './EditorMenu';
 import EditorToolbar from './EditorToolbar';
 import GraphEditor from './GraphEditor';
@@ -40,7 +43,7 @@ export default {
     },
     mounted() {
         if (!this.isInitialized) {
-            // TODO: setup show popup
+            showPopup(SetupShowPopup);
         }
     },
     computed: {

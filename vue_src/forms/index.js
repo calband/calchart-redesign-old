@@ -6,15 +6,20 @@ import { each } from 'lodash';
 import VueFormly from 'vue-formly';
 
 import CheckboxField from './CheckboxField';
+import ChoiceField from './ChoiceField';
 import InputField from './InputField';
+import NumberField from './NumberField';
 
 let FIELD_TYPES = {
-    text: InputField,
     checkbox: CheckboxField,
+    choice: ChoiceField,
+    number: NumberField,
+    text: InputField,
 };
 
 let MESSAGES = {
     required: 'This field is required.',
+    positive: 'This field needs to be positive.',
 };
 
 let FormsPlugin = {
