@@ -16,8 +16,6 @@ A popup for creating a new show.
 </template>
 
 <script>
-import _ from 'lodash';
-
 import { BasePopup, FormPopup } from './lib';
 
 import router from 'router';

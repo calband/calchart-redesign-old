@@ -29,7 +29,7 @@ A list of shows for a tab.
 </context-menu>
 
 <script>
-import _ from 'lodash';
+import { defaultTo } from 'lodash';
 
 import { validateList, validateObject } from 'utils/validators';
 
@@ -73,7 +73,7 @@ export default {
          * @return {Object}
          */
         activeShow() {
-            return _.defaultTo(this.$data._activeShow, {});
+            return defaultTo(this.$data._activeShow, {});
         },
     },
     methods: {

@@ -2,7 +2,7 @@
  * @file A collection of functions that validate data or types.
  */
 
-import _ from 'lodash';
+import { difference, every, keys as _keys } from 'lodash';
 
 /**
  * Return a validator for a list whose elements satisfy the provided
@@ -12,7 +12,7 @@ import _ from 'lodash';
  * @return {function(Array): boolean}
  */
 export function validateList(validator) {
-    return arr => _.every(arr, validator);
+    return arr => every(arr, validator);
 }
 
 /**
@@ -23,5 +23,5 @@ export function validateList(validator) {
  * @return {function(Object): boolean}
  */
 export function validateObject(...keys) {
-    return obj => _.difference(keys, _.keys(obj)).length === 0;
+    return obj => difference(keys, _keys(obj)).length === 0;
 }

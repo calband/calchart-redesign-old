@@ -2,7 +2,7 @@
  * @file The entrypoint for the forms package.
  */
 
-import _ from 'lodash';
+import { each } from 'lodash';
 import VueFormly from 'vue-formly';
 
 import CheckboxField from './CheckboxField';
@@ -21,10 +21,10 @@ let FormsPlugin = {
     install: Vue => {
         Vue.use(VueFormly);
 
-        _.each(FIELD_TYPES, (field, type) => {
+        each(FIELD_TYPES, (field, type) => {
             VueFormly.addType(type, field);
         });
-        _.each(MESSAGES, (message, key) => {
+        each(MESSAGES, (message, key) => {
             VueFormly.addValidationMessage(key, message);
         });
     },

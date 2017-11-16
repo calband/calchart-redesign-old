@@ -57,7 +57,7 @@ The entry point for the home page.
 
 <script>
 import $ from 'jquery';
-import _ from 'lodash';
+import { isNull } from 'lodash';
 import { mapState } from 'vuex';
 
 import ShowList from './ShowList';
@@ -141,7 +141,7 @@ export default {
          * @param {string} tab - The slug of the tab to load
          */
         loadTab(tab) {
-            if (_.isNull(this.tabs[tab].shows)) {
+            if (isNull(this.tabs[tab].shows)) {
                 $.ajax({
                     data: { tab },
                     dataType: 'json',
