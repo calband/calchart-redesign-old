@@ -12,6 +12,9 @@ def action_name(data, **kwargs):
 the request.
 """
 
+from .editor import (
+    save_show,
+)
 from .general import (
     get_show,
 )

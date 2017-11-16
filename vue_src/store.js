@@ -6,6 +6,7 @@ import _ from 'lodash';
 import Vue from 'vue';
 import Vuex from 'vuex';
 
+import sendAction from 'utils/ajax';
 import { findAndRemove } from 'utils/array';
 
 Vue.use(Vuex);
@@ -27,6 +28,18 @@ const editor = {
          */
         setNewShowData(state, data) {
             state.newShowData = data;
+        },
+    },
+    actions: {
+        /**
+         * Save the current show to the server.
+         *
+         * @param {Object} options - Options to pass to AJAX.
+         */
+        saveShow(context, options) {
+            sendAction('save_show', {
+                showData: context.rootState.show.serialize(),
+            }, options);
         },
     },
 };

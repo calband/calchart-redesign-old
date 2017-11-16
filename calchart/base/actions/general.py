@@ -1,19 +1,13 @@
 """General actions for the application."""
 
-from django.core.exceptions import PermissionDenied
-from django.shortcuts import get_object_or_404
-
-from ..models import Show
+from .utils import retrieve_show
 
 
 def get_show(data, **kwargs):
     """Get the show with the given slug."""
-    user = kwargs['user']
-    show = get_object_or_404(Show, slug=data['slug'])
+    show = retrieve_show(data['slug'], kwargs['user'])
 
-    if (show.is_band and not user.has_committee('STUNT')):
-        raise PermissionDenied
-    elif show.data_file:
+    if show.data_file:
         return {
             'isInitialized': True,
             'show': show.get_data(),

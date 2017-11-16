@@ -18,7 +18,7 @@ import {
 import store from 'store';
 
 let shortcutMap, shortcutSep;
-if (store.state.env.state.IS_MAC) {
+if (store.state.env.IS_MAC) {
     // HTML codes: http://apple.stackexchange.com/a/55729
     shortcutMap = {
         ctrl: '&#8984;',

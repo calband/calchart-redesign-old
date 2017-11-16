@@ -15,6 +15,7 @@ application.
 
 <script>
 import store from 'store';
+import Show from 'calchart/Show';
 import { DOT_FORMATS, SHOW_FIELD_TYPES } from 'utils/CalchartUtils';
 
 import { BasePopup, FormPopup } from './lib';

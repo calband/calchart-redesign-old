@@ -3,6 +3,7 @@
 from django.utils import timezone
 
 from ..models import Show
+from .utils import retrieve_show
 
 
 def get_tab(data, **kwargs):
@@ -62,9 +63,8 @@ def create_show(data, **kwargs):
 def publish_show(data, **kwargs):
     """Publish or unpublish a show."""
     published = data['publish']
-    slug = data['slug']
+    show = retrieve_show(data['slug'], kwargs['user'])
 
-    show = Show.objects.get(slug=slug)
     if not show.data_file:
         # Should only apply to publishing, since a show without data
         # cannot be published in the first place to be "unpublished"

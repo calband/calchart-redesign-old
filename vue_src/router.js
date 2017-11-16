@@ -8,6 +8,7 @@ import Vue from 'vue';
 import VueRouter from 'vue-router';
 
 import store from 'store';
+import Show from 'calchart/Show';
 import Editor from 'editor/App';
 import Home from 'home/App';
 import sendAction, { handleError } from 'utils/ajax';
@@ -51,7 +52,7 @@ router.beforeEach((to, from, next) => {
         sendAction('get_show', { slug }, {
             success: data => {
                 if (data.isInitialized) {
-                    store.commit('setShow', Show.deserialize(data));
+                    store.commit('setShow', Show.deserialize(data.show));
                     next();
                 } else {
                     if (to.name === 'editor') {
