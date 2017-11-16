@@ -7,7 +7,7 @@ application.
     <FormPopup
         title="Set Up Show"
         :onSubmit="saveShow"
-        :allowCancel="false"
+        :allowHide="false"
         :model="model"
         :fields="fields"
     />
