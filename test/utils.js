@@ -5,11 +5,8 @@
 import $ from 'jquery';
 import _ from 'lodash';
 import sinon from 'sinon';
-import Vue from 'vue';
 
-import App from 'App';
 import store from 'store';
-import { setRoot } from 'utils/vue';
 
 /**
  * An object that can be used to stub context menus.
@@ -43,12 +40,6 @@ export function setStunt(value) {
 
 // global setup
 beforeEach(() => {
-    // automatically set the root for all tests
-    let _App = Vue.extend(App);
-    setRoot(new _App({
-        store: $store,
-    }));
-
     // stub all ajax calls
     sinon.stub($, 'ajax');
 });

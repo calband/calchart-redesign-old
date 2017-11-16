@@ -2,6 +2,7 @@
  * @file Defines a Vuex Store that will store application-wide data.
  */
 
+import _ from 'lodash';
 import Vue from 'vue';
 import Vuex from 'vuex';
 
