@@ -55,16 +55,14 @@ const vueLoaderOptions = {
                 options: babelLoaderOptions,
             },
         ],
-        // TODO: https://vue-loader.vuejs.org/en/configurations/extract-css.html
-        scss: [
-            'vue-style-loader',
+        scss: ExtractTextPlugin.extract([
             cssLoader,
             'sass-loader',
             {
                 loader: 'sass-resources-loader',
                 options: sassResourcesLoaderOptions,
             },
-        ],
+        ]),
         'context-menu': require.resolve('vue-ctxmenu/loader'),
     },
 };
@@ -106,8 +104,13 @@ webpackConfig = {
                 },
             },
             {
+                test: /\.css$/,
+                use: ExtractTextPlugin.extract([
+                    cssLoader,
+                ]),
+            },
+            {
                 test: /\.scss$/,
-                exclude: /node_modules/,
                 use: ExtractTextPlugin.extract([
                     cssLoader,
                     'sass-loader',
