@@ -23,7 +23,7 @@ import { mapState } from 'vuex';
 import { showPopup } from 'popups/lib';
 import SetupShowPopup from 'popups/SetupShowPopup';
 
-import EditorMenu from './EditorMenu';
+import EditorMenu from './menu/EditorMenu';
 import EditorToolbar from './EditorToolbar';
 import GraphEditor from './GraphEditor';
 import MusicEditor from './MusicEditor';

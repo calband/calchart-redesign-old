@@ -65,6 +65,7 @@ const vueLoaderOptions = {
         ]),
         'context-menu': require.resolve('vue-ctxmenu/loader'),
     },
+    preserveWhitespace: false,
 };
 
 /**** WEBPACK CONFIG ****/

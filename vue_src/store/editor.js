@@ -2,11 +2,15 @@
  * @file Defines the Vuex module containing state relating to the editor.
  */
 
+import ContextType from 'editor/ContextType';
+
 export default {
     namespaced: true,
     state: {
         // data for creating a new show
         newShowData: null,
+        // the context
+        context: ContextType.DOT,
     },
     mutations: {
         /**

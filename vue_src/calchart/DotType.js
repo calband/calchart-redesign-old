@@ -1,4 +1,4 @@
-import makeEnum from "utils/enum";
+import makeEnum from 'utils/enum';
 
 /**
  * An Enum containing all the possible dot types.
@@ -32,14 +32,14 @@ export default class DotType {
 }
 
 makeEnum(DotType, [
-    "all-before",
-    "plain",
-    "solid",
-    "plain-forwardslash",
-    "solid-forwardslash",
-    "plain-backslash",
-    "solid-backslash",
-    "plain-x",
-    "solid-x",
-    "all-after",
+    'all-before',
+    'plain',
+    'solid',
+    'plain-forwardslash',
+    'solid-forwardslash',
+    'plain-backslash',
+    'solid-backslash',
+    'plain-x',
+    'solid-x',
+    'all-after',
 ]);
