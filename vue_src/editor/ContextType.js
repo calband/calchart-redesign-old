@@ -21,8 +21,11 @@ export default class ContextType {
 }
 
 makeEnum(ContextType, [
+    'graph',
     'dot',
     'continuity',
-    'graph',
     'music',
+    'background',
+    'ftl-path',
+    'gate-reference',
 ]);
