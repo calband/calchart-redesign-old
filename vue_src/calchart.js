@@ -5,7 +5,9 @@ import App from 'App';
 import FormsPlugin from 'forms';
 import router from 'router';
 import store from 'store';
+import { ConstantsPlugin } from 'utils/vue';
 
+Vue.use(ConstantsPlugin);
 Vue.use(FormsPlugin);
 Vue.use(VueContextMenu);
 

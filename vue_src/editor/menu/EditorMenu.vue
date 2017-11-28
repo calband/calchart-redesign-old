@@ -135,7 +135,6 @@ export default {
     },
     data() {
         return {
-            ZOOMS,
             undoLabel: '',
             redoLabel: '',
             activeTab: null,
@@ -158,6 +157,9 @@ export default {
                 }
             })
         });
+    },
+    constants: {
+        ZOOMS,
     },
     methods: {
         /**

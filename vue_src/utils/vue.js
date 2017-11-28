@@ -14,3 +14,18 @@ import { clone } from 'lodash';
 export function allProps() {
     return clone(this.$props);
 }
+
+/**
+ * A plugin to activate the `constants` component option.
+ */
+export let ConstantsPlugin = {
+    install: Vue => {
+        Vue.mixin({
+            created() {
+                _.each(this.$options.constants, (val, key) => {
+                    this[key] = val;
+                });
+            },
+        });
+    },
+};
