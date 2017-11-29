@@ -18,6 +18,17 @@ export default class ContextType {
             return base === type;
         }
     }
+
+    /**
+     * Check if the given context type is the current context.
+     *
+     * @param {Store} store
+     * @param {ContextType} context
+     * @return {Boolean}
+     */
+    static isCurrent(store, context) {
+        return this.equals(store.state.editor.context, context);
+    }
 }
 
 makeEnum(ContextType, [

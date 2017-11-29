@@ -204,7 +204,7 @@ export default {
 <style lang="scss" scoped>
 .menu {
     @include unselectable;
-    margin: 5px 0;
+    margin: 2px 0;
     padding-left: 10px;
     z-index: z-index(menu);
 }

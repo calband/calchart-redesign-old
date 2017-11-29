@@ -3,12 +3,14 @@ A group of toolbar items in the editor application.
 </doc>
 
 <template>
-    <div class="toolbar-group">
+    <div v-show="isContext" class="toolbar-group">
         <slot />
     </div>
 </template>
 
 <script>
+import _ from 'lodash';
+
 import ContextType from 'editor/ContextType';
 import { validateOneOf } from 'utils/validators';
 
@@ -21,11 +23,27 @@ export default {
             validator: validateOneOf(ContextType.values),
         },
     },
+    computed: {
+        /**
+         * @return {Boolean} true if the toolbar group is context-agnostic or
+         *   if it matches the current context.
+         */
+        isContext() {
+            return (
+                _.isNull(this.context) ||
+                ContextType.isCurrent(this.$store, this.context)
+            );
+        },
+    },
 };
 </script>
 
 <style lang="scss" scoped>
 .toolbar-group {
     display: inline-block;
+    padding: 0 5px;
+    &:not(:first-child) {
+        border-left: 1px solid $medium-gray;
+    }
 }
 </style>

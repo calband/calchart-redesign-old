@@ -93,6 +93,23 @@ export default {
 .vue-context-menu {
     @include hover-menu;
 }
+
+.tooltip {
+    position: absolute;
+    background: $black;
+    color: $white;
+    padding: 5px 7px;
+    font-size: 14px;
+    z-index: z-index(tooltip);
+    .tooltip-arrow {
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        margin-left: -5px;
+        border: 5px solid transparent;
+        border-top-color: $black;
+    }
+}
 </style>
 
 <style lang="scss" scoped>

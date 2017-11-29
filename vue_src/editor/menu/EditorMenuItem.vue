@@ -84,10 +84,9 @@ export default {
          * @return {Boolean} true if the menu item is disabled.
          */
         isDisabled() {
-            let activeContext = this.$store.state.editor.context;
             return this.disabled || (
                 this.context &&
-                !ContextType.equals(this.context, activeContext)
+                !ContextType.isCurrent(this.$store, this.context)
             );
         },
         /**
@@ -120,6 +119,7 @@ export default {
          * Do the action for the menu item.
          */
         doAction() {
+            // TODO: fix
             if (!this.isDisabled && this.action) {
                 let action = parseAction(this.action);
                 this.$store.dispatch(`editor/${action.name}`, action.data);
