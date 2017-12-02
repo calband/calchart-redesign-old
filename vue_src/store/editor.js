@@ -2,11 +2,18 @@
  * @file Defines the Vuex module containing state relating to the editor.
  */
 
+import _ from 'lodash';
+
+import parseAction from 'editor/actions';
 import ContextType from 'editor/ContextType';
 import ToolType from 'editor/ToolType';
+import History from 'utils/History';
 
 export default {
     namespaced: true,
+    $init(store) {
+        History.init(store);
+    },
     state: {
         // data for creating a new show
         newShowData: null,
@@ -33,6 +40,30 @@ export default {
     },
     actions: {
         /**
+         * Do the given action.
+         *
+         * @param {String} action - See parseAction for format.
+         */
+        doAction(context, action) {
+            let parsed = parseAction(action);
+            if (_.has(this._actions, parsed.name)) {
+                this.dispatch(parsed.name, parsed.data).then(() => {
+                    History.addState(parsed.name, context.rootState);
+                });
+            } else if (_.has(this._mutations, parsed.name)) {
+                this.commit(parsed.name, parsed.data);
+                History.addState(parsed.name, context.rootState);
+            } else {
+                throw new Error(`Invalid action: ${parsed.name}`);
+            }
+        },
+        /**
+         * Redo an action.
+         */
+        redo() {
+            History.redo();
+        },
+        /**
          * Save the current show to the server.
          *
          * @param {Object} options - Options to pass to AJAX.
@@ -41,6 +72,12 @@ export default {
             sendAction('save_show', {
                 showData: context.rootState.show.serialize(),
             }, options);
+        },
+        /**
+         * Undo an action.
+         */
+        undo() {
+            History.undo();
         },
     },
 };

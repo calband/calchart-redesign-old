@@ -1,3 +1,7 @@
+/**
+ * @file Functions for parsing editor actions.
+ */
+
 import _ from 'lodash';
 
 import { attempt } from 'utils/JSUtils';

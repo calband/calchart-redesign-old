@@ -15,8 +15,6 @@ An item with an icon in the toolbar in the editor application.
 </template>
 
 <script>
-import parseAction from 'editor/actions';
-
 import EditorToolbarItemCustom from './EditorToolbarItemCustom';
 
 export default {
@@ -52,16 +50,6 @@ export default {
     },
     methods: {
         /**
-         * Do the action for the toolbar item.
-         */
-        doAction() {
-            // TODO: fix
-            if (this.action) {
-                let action = parseAction(this.action);
-                this.$store.dispatch(`editor/${action.name}`, action.data);
-            }
-        },
-        /**
          * Handle the mousedown event.
          */
         mousedown(e) {
@@ -87,7 +75,12 @@ export default {
          * Handle the mouseup event.
          */
         mouseup(e) {
-            this.focus = false;
+            if (this.focus) {
+                this.focus = false;
+                if (this.action) {
+                    this.$store.dispatch('editor/doAction', this.action);
+                }
+            }
         },
     },
 };

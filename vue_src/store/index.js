@@ -13,6 +13,9 @@ import sendAction from 'utils/ajax';
 Vue.use(Vuex);
 
 export default new Vuex.Store({
+    plugins: [
+        store => editor.$init(store),
+    ],
     state: {
         // the Show loaded in the current page (or null if none loaded)
         show: null,

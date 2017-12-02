@@ -43,13 +43,13 @@ The top menu in the editor application.
         <EditorMenuTab label="Edit">
             <EditorMenuItem
                 :label="`Undo ${undoLabel}`"
-                :disabled="undoLabel === ''"
+                :disabled="!hasUndo"
                 action="undo"
                 icon="undo"
             />
             <EditorMenuItem
                 :label="`Redo ${redoLabel}`"
-                :disabled="redoLabel === ''"
+                :disabled="!hasRedo"
                 action="redo"
                 icon="repeat"
             />
@@ -120,8 +120,10 @@ The top menu in the editor application.
 
 <script>
 import $ from 'jquery';
+import { mapGetters, mapActions } from 'vuex';
 
 import { ZOOMS } from 'utils/CalchartUtils';
+import History from 'utils/History';
 
 import EditorMenuTab from './EditorMenuTab';
 import EditorMenuItem from './EditorMenuItem';
@@ -135,8 +137,6 @@ export default {
     },
     data() {
         return {
-            undoLabel: '',
-            redoLabel: '',
             activeTab: null,
         };
     },
@@ -160,6 +160,32 @@ export default {
     },
     constants: {
         ZOOMS,
+    },
+    computed: {
+        /**
+         * @return {Boolean} true if the history has a redo action.
+         */
+        hasRedo() {
+            return History.hasRedo;
+        },
+        /**
+         * @return {Boolean} true if the history has an undo action.
+         */
+        hasUndo() {
+            return History.hasUndo;
+        },
+        /**
+         * @return {String} The label for the redo action.
+         */
+        redoLabel() {
+            return History.redoLabel;
+        },
+        /**
+         * @return {String} The label for the undo action.
+         */
+        undoLabel() {
+            return History.undoLabel;
+        },
     },
     methods: {
         /**

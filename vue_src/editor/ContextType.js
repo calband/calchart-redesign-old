@@ -27,7 +27,7 @@ export default class ContextType {
      * @return {Boolean}
      */
     static isCurrent(store, context) {
-        return this.equals(store.state.editor.context, context);
+        return this.equals(context, store.state.editor.context);
     }
 }
 

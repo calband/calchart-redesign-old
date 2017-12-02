@@ -21,7 +21,6 @@ A menu item in the Editor menu.
 </template>
 
 <script>
-import parseAction from 'editor/actions';
 import ContextType from 'editor/ContextType';
 import { validateOneOf } from 'utils/validators';
 
@@ -119,10 +118,8 @@ export default {
          * Do the action for the menu item.
          */
         doAction() {
-            // TODO: fix
             if (!this.isDisabled && this.action) {
-                let action = parseAction(this.action);
-                this.$store.dispatch(`editor/${action.name}`, action.data);
+                this.$store.dispatch('editor/doAction', this.action);
             }
         },
     },

@@ -10,7 +10,7 @@ The entry point for the editor page.
             <EditorToolbar />
         </div>
         <div class="content">
-            <GraphEditor v-if="graphEditor" />
+            <GraphEditor v-if="isGraphContext" />
             <MusicEditor v-else />
         </div>
     </div>
@@ -23,6 +23,7 @@ import { mapState } from 'vuex';
 import { showPopup } from 'popups/lib';
 import SetupShowPopup from 'popups/SetupShowPopup';
 
+import ContextType from './ContextType';
 import GraphEditor from './GraphEditor';
 import EditorMenu from './menu/EditorMenu';
 import MusicEditor from './MusicEditor';
@@ -38,7 +39,6 @@ export default {
     },
     data() {
         return {
-            graphEditor: true,
         };
     },
     mounted() {
@@ -47,6 +47,12 @@ export default {
         }
     },
     computed: {
+        /**
+         * @return {Boolean} true if the current context is a graph context.
+         */
+        isGraphContext() {
+            return ContextType.isCurrent(this.$store, 'graph');
+        },
         /**
          * @return {Boolean} true if the show is initialized.
          */
