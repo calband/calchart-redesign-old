@@ -2,7 +2,18 @@
  * @file A collection of Javascript utility/helper functions.
  */
 import $ from 'jquery';
-import _ from 'lodash';
+import {
+    defaultTo,
+    each,
+    flatMap,
+    fromPairs,
+    mapKeys,
+    includes,
+    isNaN,
+    isNull,
+    isPlainObject,
+    isUndefined,
+} from 'lodash';
 
 import store from 'store';
 
@@ -66,13 +77,13 @@ export function attempt(func, errors=null) {
     try {
         return func();
     } catch (ex) {
-        if (!_.isNull(errors)) {
+        if (!isNull(errors)) {
             let found = false;
-            if (_.isPlainObject(errors)) {
+            if (isPlainObject(errors)) {
                 errors = [errors];
             }
 
-            _.each(errors, error => {
+            each(errors, error => {
                 if (ex instanceof error.class) {
                     error.callback(ex);
                     found = true;
@@ -96,7 +107,7 @@ export function attempt(func, errors=null) {
  */
 export function convertShortcut(shortcut) {
     return shortcut.split('+').map(key => {
-        return _.defaultTo(shortcutMap[key], key.toUpperCase());
+        return defaultTo(shortcutMap[key], key.toUpperCase());
     }).join(shortcutSep);
 }
 
@@ -118,8 +129,8 @@ export function empty(array) {
  * @return {Array}
  */
 export function mapSome(array, callback) {
-    return _.flatMap(array, function(val, key) {
-        return _.defaultTo(callback(val, key), []);
+    return flatMap(array, function(val, key) {
+        return defaultTo(callback(val, key), []);
     });
 }
 
@@ -162,7 +173,7 @@ export function newCall(Cls) {
 export function update(obj, data) {
     let changed = {};
 
-    _.each(data, function(value, key) {
+    each(data, function(value, key) {
         let old = obj[key];
         if (old !== value) {
             changed[key] = old;
@@ -185,10 +196,10 @@ export function update(obj, data) {
  *   labels and the values either undefined or the parsed argument.
  */
 export function parseArgs(args, labels) {
-    if (args.length === 1 && !_.isNull(args[0])) {
+    if (args.length === 1 && !isNull(args[0])) {
         let kwargs = args[0];
         for (let key in kwargs) {
-            if (!_.includes(labels, key)) {
+            if (!includes(labels, key)) {
                 kwargs = null;
                 break;
             }
@@ -198,7 +209,7 @@ export function parseArgs(args, labels) {
         }
     }
 
-    return _.fromPairs(labels.map(
+    return fromPairs(labels.map(
         (label, i) => [label, args[i]]
     ));
 }
@@ -211,7 +222,7 @@ export function parseArgs(args, labels) {
  */
 export function parseNumber(value) {
     let float = parseFloat(value);
-    return _.isNaN(float) ? value : float;
+    return isNaN(float) ? value : float;
 }
 
 /**
@@ -222,7 +233,7 @@ export function parseNumber(value) {
  */
 let queue; // the Deferred object that will be collecting asynchronous functions
 export function runAsync(callback) {
-    if (_.isUndefined(queue)) {
+    if (isUndefined(queue)) {
         queue = $.Deferred();
         queue.resolve(); // automatically triggers any subsequent callbacks
     }
@@ -238,7 +249,7 @@ export function runAsync(callback) {
  * @return {Object}
  */
 export function underscoreKeys(data) {
-    return _.mapKeys(data, (val, key) => `_${key}`);
+    return mapKeys(data, (val, key) => `_${key}`);
 }
 
 /**

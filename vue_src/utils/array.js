@@ -1,7 +1,7 @@
 /**
  * @file Utility functions on Arrays.
  */
-import _ from 'lodash';
+import { findIndex } from 'lodash';
 
 /**
  * Find the element in the given array using the given
@@ -11,6 +11,6 @@ import _ from 'lodash';
  * See `_.findIndex` for usage.
  */
 export function findAndRemove(array) {
-    let index = _.findIndex.apply(null, arguments);
+    let index = findIndex.apply(null, arguments);
     array.splice(index, 1);
 }

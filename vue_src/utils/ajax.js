@@ -1,5 +1,5 @@
 import $ from 'jquery';
-import _ from 'lodash';
+import { each, defaults } from 'lodash';
 
 import store from 'store';
 
@@ -41,7 +41,7 @@ export default function sendAction(action, data, options) {
     formData.append('action', action);
 
     let nonFileData = {};
-    _.each(data, (val, name) => {
+    each(data, (val, name) => {
         if (val instanceof File) {
             formData.append(name, val);
         } else {
@@ -51,7 +51,7 @@ export default function sendAction(action, data, options) {
 
     formData.append('data', JSON.stringify(nonFileData));
 
-    $.ajax('', _.defaults(options, {
+    $.ajax('', defaults(options, {
         method: 'POST',
         data: formData,
         dataType: 'json',

@@ -11,7 +11,7 @@ The base component for a form field.
 </template>
 
 <script>
-import _ from 'lodash';
+import { capitalize, lowerCase } from 'lodash';
 import baseField from 'vue-formly-bootstrap/src/fields/baseField';
 
 export default {
@@ -20,7 +20,7 @@ export default {
         label() {
             return this.to.label
                 ? this.to.label
-                : _.capitalize(_.lowerCase(this.field.key));
+                : capitalize(lowerCase(this.field.key));
         },
     },
 };

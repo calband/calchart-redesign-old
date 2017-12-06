@@ -28,7 +28,7 @@ A popup that contains a form to be submitted or modified.
 </template>
 
 <script>
-import _ from 'lodash';
+import { fromPairs, toPairs } from 'lodash';
 
 import BasePopup from './BasePopup';
 
@@ -84,7 +84,7 @@ export default {
 
                     // this.model is a Vue proxy, need to force
                     // out data
-                    let data = _.fromPairs(_.toPairs(this.model));
+                    let data = fromPairs(toPairs(this.model));
                     let result = this.onSubmit(data);
                     if (result !== false) {
                         this.hide();

@@ -2,7 +2,7 @@
  * @file Utility and helper functions for Vue components.
  */
 
-import _ from 'lodash';
+import { clone } from 'lodash';
 
 /**
  * A function to be used as a computed function for a component, that
@@ -12,5 +12,5 @@ import _ from 'lodash';
  * @return {Object}
  */
 export function allProps() {
-    return _.clone(this.$props);
+    return clone(this.$props);
 }
