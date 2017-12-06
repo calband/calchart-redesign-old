@@ -17,6 +17,7 @@ A component that renders a Select2 element.
 
 <script>
 import $ from 'jquery';
+import { defaults } from 'lodash';
 import 'select2/dist/js/select2.min.js';
 import 'select2/dist/css/select2.min.css';
 
@@ -44,7 +45,7 @@ export default {
     },
     mounted() {
         let vm = this;
-        let options = _.defaults({}, this.options, {
+        let options = defaults({}, this.options, {
             minimumResultsForSearch: 10,
             multiple: this.multiple,
         });

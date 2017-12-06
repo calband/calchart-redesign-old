@@ -2,7 +2,14 @@
  * @file A collection of functions that validate data or types.
  */
 
-import { difference, every, isArray, keys as _keys } from 'lodash';
+import {
+    difference,
+    every,
+    includes,
+    isArray,
+    keys as _keys,
+    partial,
+} from 'lodash';
 
 /**
  * Return a validator for a list whose elements satisfy the provided
@@ -36,8 +43,8 @@ export function validateObject(...keys) {
  * @return {function(String): boolean}
  */
 export function validateOneOf(...vals) {
-    if (_.isArray(vals[0])) {
+    if (isArray(vals[0])) {
         vals = vals[0];
     }
-    return _.partial(_.includes, vals);
+    return partial(includes, vals);
 }

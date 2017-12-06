@@ -2,7 +2,7 @@
  * @file Utility and helper functions for Vue components.
  */
 
-import { clone } from 'lodash';
+import { clone, each } from 'lodash';
 
 /**
  * A function to be used as a computed function for a component, that
@@ -22,7 +22,7 @@ export let ConstantsPlugin = {
     install: Vue => {
         Vue.mixin({
             created() {
-                _.each(this.$options.constants, (val, key) => {
+                each(this.$options.constants, (val, key) => {
                     this[key] = val;
                 });
             },

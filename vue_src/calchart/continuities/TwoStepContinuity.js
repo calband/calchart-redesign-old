@@ -1,3 +1,5 @@
+import { cloneDeepWith, concat, defaults, pull } from 'lodash';
+
 import OrderedDotsContinuity from "calchart/continuities/OrderedDotsContinuity";
 import Continuity from "calchart/Continuity";
 import MovementCommandStop from "calchart/movements/MovementCommandStop";
@@ -27,7 +29,7 @@ export default class TwoStepContinuity extends OrderedDotsContinuity {
     constructor(sheet, dotType, order, continuities, options) {
         super(sheet, dotType, order, options);
 
-        options = _.defaults({}, options, {
+        options = defaults({}, options, {
             isMarktime: true,
         });
 
@@ -69,7 +71,7 @@ export default class TwoStepContinuity extends OrderedDotsContinuity {
         switch (key) {
             case "_continuities":
                 return val.map(continuity =>
-                    _.cloneDeepWith(continuity, (val, key) => continuity.clone(key, val))
+                    cloneDeepWith(continuity, (val, key) => continuity.clone(key, val))
                 );
         }
         return super.clone(key, val);
@@ -141,7 +143,7 @@ export default class TwoStepContinuity extends OrderedDotsContinuity {
         });
         setupTooltip(editContinuities, "Continuities");
 
-        return _.concat(panel, editContinuities);
+        return concat(panel, editContinuities);
     }
 
     /**
@@ -162,7 +164,7 @@ export default class TwoStepContinuity extends OrderedDotsContinuity {
      * @param {Continuity} continuity
      */
     removeContinuity(continuity) {
-        _.pull(this._continuities, continuity);
+        pull(this._continuities, continuity);
         this.sheet.updateMovements(this.dotType);
     }
 }

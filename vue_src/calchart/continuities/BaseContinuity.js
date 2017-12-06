@@ -1,3 +1,5 @@
+import { clone, defaults, extend, flatMap } from 'lodash';
+
 import { NotImplementedError } from "utils/errors";
 
 /**
@@ -24,7 +26,7 @@ export default class BaseContinuity {
         this._sheet = sheet;
         this._dotType = dotType;
 
-        options = _.defaults({}, options, {
+        options = defaults({}, options, {
             stepType: "default",
             beatsPerStep: "default",
             orientation: "default",
@@ -57,7 +59,7 @@ export default class BaseContinuity {
      * @return {Object}
      */
     serialize(data={}) {
-        return _.extend({}, data, {
+        return extend({}, data, {
             type: this.info.type,
             stepType: this._stepType,
             beatsPerStep: this._beatsPerStep,
@@ -83,9 +85,9 @@ export default class BaseContinuity {
      */
     static buildMovements(continuities, dot, start, duration) {
         // getMovements() can modify anything passed in
-        start = _.clone(start);
+        start = clone(start);
 
-        return _.flatMap(continuities, continuity => {
+        return flatMap(continuities, continuity => {
             if (duration <= 0) {
                 return [];
             }

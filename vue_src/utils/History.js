@@ -2,7 +2,7 @@
  * @file Defines the class that tracks undo/redo history in the editor.
  */
 
-import _ from 'lodash';
+import { capitalize, cloneDeep, lowerCase } from 'lodash';
 
 class BaseHistory {
     /**
@@ -65,8 +65,8 @@ class BaseHistory {
             this._history.splice(this._index + 1);
         }
         this._history.push({
-            label: _.capitalize(_.lowerCase(action)),
-            state: _.cloneDeep(state)
+            label: capitalize(lowerCase(action)),
+            state: cloneDeep(state)
         });
         this._index++;
     }
@@ -78,7 +78,7 @@ class BaseHistory {
      */
     getState(index) {
         let state = this._history[index];
-        state.state = _.cloneDeep(state.state);
+        state.state = cloneDeep(state.state);
         return state;
     }
 

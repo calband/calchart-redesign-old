@@ -1,3 +1,5 @@
+import { isNull } from 'lodash';
+
 import BaseContinuity from "calchart/continuities/BaseContinuity";
 import MovementCommandStop from "calchart/movements/MovementCommandStop";
 import { StopContinuityPopup } from "popups/ContinuityPopups";
@@ -67,7 +69,7 @@ export default class StopContinuity extends BaseContinuity {
             return `Close ${orientation}`;
         }
 
-        if (_.isNull(this._duration)) {
+        if (isNull(this._duration)) {
             return `MT${this.getStepType()} ${orientation}`;
         } else {
             let duration = roundSmall(this._duration * this.getBeatsPerStep());
@@ -84,7 +86,7 @@ export default class StopContinuity extends BaseContinuity {
 
     getMovements(dot, data) {
         let duration = this._duration;
-        if (_.isNull(duration)) {
+        if (isNull(duration)) {
             duration = data.remaining;
         }
 
@@ -119,7 +121,7 @@ export default class StopContinuity extends BaseContinuity {
                 remaining: "To End",
                 custom: "Custom",
             },
-            initial: _.isNull(this._duration) ? "remaining" : "custom",
+            initial: isNull(this._duration) ? "remaining" : "custom",
             change: e => {
                 switch ($(e.currentTarget).val()) {
                     case "custom":
@@ -133,7 +135,7 @@ export default class StopContinuity extends BaseContinuity {
             },
         });
 
-        numBeats.prop("disabled", _.isNull(this._duration));
+        numBeats.prop("disabled", isNull(this._duration));
 
         return [duration, numBeats];
     }

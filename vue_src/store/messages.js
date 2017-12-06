@@ -3,7 +3,7 @@
  *   messages.
  */
 
-import _ from 'lodash';
+import { defaults, defaultTo, isString } from 'lodash';
 
 import { findAndRemove } from 'utils/array';
 
@@ -44,14 +44,14 @@ export default {
          *   after a given time.
          */
         showMessage(context, payload) {
-            if (_.isString(payload)) {
+            if (isString(payload)) {
                 payload = { text: payload };
             }
-            _.defaults(payload, {
+            defaults(payload, {
                 error: false,
                 autohide: undefined,
             });
-            payload.autohide = _.defaultTo(payload.autohide, !payload.error);
+            payload.autohide = defaultTo(payload.autohide, !payload.error);
             context.commit('addMessage', payload);
             let id = context.state.messageId;
 
@@ -65,7 +65,7 @@ export default {
          * Shows an error message on the page. See showMessage.
          */
         showError(context, payload) {
-            if (_.isString(payload)) {
+            if (isString(payload)) {
                 payload = { text: payload };
             }
             payload.error = true;

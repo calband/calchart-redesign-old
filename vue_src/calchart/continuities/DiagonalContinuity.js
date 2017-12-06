@@ -1,3 +1,5 @@
+import { isNull } from 'lodash';
+
 import FountainGridContinuity from "calchart/continuities/FountainGridContinuity";
 import MovementCommandMove from "calchart/movements/MovementCommandMove";
 
@@ -113,7 +115,7 @@ export default class DiagonalContinuity extends FountainGridContinuity {
     getMovements(dot, data) {
         let start = data.position;
         let end = this._getNextPosition(dot);
-        if (_.isNull(end)) {
+        if (isNull(end)) {
             return [];
         }
 

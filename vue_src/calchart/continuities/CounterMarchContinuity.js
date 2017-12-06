@@ -1,3 +1,5 @@
+import { defaultTo } from 'lodash';
+
 import FollowLeaderContinuity from "calchart/continuities/FollowLeaderContinuity";
 import { CounterMarchContinuityPopup } from "popups/ContinuityPopups";
 
@@ -88,7 +90,7 @@ export default class CounterMarchContinuity extends FollowLeaderContinuity {
     }
 
     _getMaxDuration(data) {
-        let duration = _.defaultTo(this._duration, Infinity);
+        let duration = defaultTo(this._duration, Infinity);
         return Math.min(data.remaining, duration);
     }
 }

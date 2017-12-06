@@ -1,3 +1,5 @@
+import { defaults, extend } from 'lodash';
+
 import Coordinate from "calchart/Coordinate";
 
 import { getOrientation } from "utils/CalchartUtils";
@@ -27,7 +29,7 @@ export default class BaseMovementCommand {
         this._endY = endY;
         this._duration = duration;
 
-        options = _.defaults({}, options, {
+        options = defaults({}, options, {
             orientation: undefined,
             beatsPerStep: 1,
         });
@@ -54,7 +56,7 @@ export default class BaseMovementCommand {
      * @return {Object}
      */
     serialize(type, data) {
-        return _.extend({}, data, {
+        return extend({}, data, {
             type: type,
             startX: this._startX,
             startY: this._startY,

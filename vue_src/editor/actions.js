@@ -2,7 +2,7 @@
  * @file Functions for parsing editor actions.
  */
 
-import _ from 'lodash';
+import { includes, isNull, split } from 'lodash';
 
 import { attempt } from 'utils/JSUtils';
 
@@ -18,12 +18,12 @@ import { attempt } from 'utils/JSUtils';
  */
 function parseArg(arg) {
     let json = attempt(() => JSON.parse(arg));
-    if (!_.isNull(json)) {
+    if (!isNull(json)) {
         return json;
-    } else if (_.includes(arg, "=")) {
+    } else if (includes(arg, "=")) {
         let o = {};
-        _.split(arg, ",").forEach(pair => {
-            let [key, val] = _.split(pair, "=");
+        split(arg, ",").forEach(pair => {
+            let [key, val] = split(pair, "=");
             o[key] = parseArg(val);
         });
         return o;
@@ -47,7 +47,7 @@ function parseArg(arg) {
 export default function parseAction(name) {
     let actionMatch = name.match(/^(\w+)(\((.+)\))?$/);
 
-    if (_.isNull(actionMatch)) {
+    if (isNull(actionMatch)) {
         throw new Error(`Action name in an invalid format: ${name}`);
     }
 

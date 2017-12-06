@@ -21,6 +21,8 @@ A menu item in the Editor menu.
 </template>
 
 <script>
+import { isUndefined } from 'lodash';
+
 import ContextType from 'editor/ContextType';
 import { validateOneOf } from 'utils/validators';
 
@@ -77,7 +79,7 @@ export default {
          * @return {Boolean} true if the menu item has a submenu.
          */
         hasSubmenu() {
-            return !_.isUndefined(this.$slots.default);
+            return !isUndefined(this.$slots.default);
         },
         /**
          * @return {Boolean} true if the menu item is disabled.

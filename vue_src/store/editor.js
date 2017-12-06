@@ -2,7 +2,7 @@
  * @file Defines the Vuex module containing state relating to the editor.
  */
 
-import _ from 'lodash';
+import { has } from 'lodash';
 
 import parseAction from 'editor/actions';
 import ContextType from 'editor/ContextType';
@@ -46,11 +46,11 @@ export default {
          */
         doAction(context, action) {
             let parsed = parseAction(action);
-            if (_.has(this._actions, parsed.name)) {
+            if (has(this._actions, parsed.name)) {
                 this.dispatch(parsed.name, parsed.data).then(() => {
                     History.addState(parsed.name, context.rootState);
                 });
-            } else if (_.has(this._mutations, parsed.name)) {
+            } else if (has(this._mutations, parsed.name)) {
                 this.commit(parsed.name, parsed.data);
                 History.addState(parsed.name, context.rootState);
             } else {

@@ -1,3 +1,5 @@
+import { compact } from 'lodash';
+
 import makeEnum from 'utils/enum';
 
 /**
@@ -13,7 +15,7 @@ export default class DotType {
      */
     static sort(dotTypes) {
         let types = new Set(dotTypes);
-        return _.compact(this.values.map(function(dotType) {
+        return compact(this.values.map(function(dotType) {
             if (types.has(dotType)) {
                 return dotType;
             }

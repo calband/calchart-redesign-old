@@ -1,3 +1,5 @@
+import { concat, last, pull, take } from 'lodash';
+
 import DiagonalContinuity from "calchart/continuities/DiagonalContinuity";
 import OrderedDotsContinuity from "calchart/continuities/OrderedDotsContinuity";
 import Coordinate from "calchart/Coordinate";
@@ -108,7 +110,7 @@ export default class FollowLeaderContinuity extends OrderedDotsContinuity {
                     move.setDuration(duration + maxDuration - beats);
 
                     // drop all further movements
-                    movesToNext = _.take(movesToNext, i + 1);
+                    movesToNext = take(movesToNext, i + 1);
                 }
             }
 
@@ -123,12 +125,12 @@ export default class FollowLeaderContinuity extends OrderedDotsContinuity {
                     let duration = lastMove.getDuration() + currMove.getDuration();
                     lastMove.setDuration(duration);
                     // remove currMove from movements
-                    _.pull(movements, currMove);
+                    pull(movements, currMove);
                 }
             }
 
             prev = next;
-            lastMove = _.last(movements);
+            lastMove = last(movements);
         }
 
         return movements;
@@ -144,7 +146,7 @@ export default class FollowLeaderContinuity extends OrderedDotsContinuity {
         });
         setupTooltip(editPath, "Path");
 
-        return _.concat(panel, editPath);
+        return concat(panel, editPath);
     }
 
     /**

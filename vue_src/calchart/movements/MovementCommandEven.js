@@ -1,3 +1,5 @@
+import { isNaN, isUndefined } from 'lodash';
+
 import MovementCommandMove from "calchart/movements/MovementCommandMove";
 
 import { calcAngle, calcDistance } from "utils/MathUtils";
@@ -18,7 +20,7 @@ export default class MovementCommandEven extends MovementCommandMove {
      */
     constructor(startX, startY, endX, endY, duration, options={}) {
         let direction = calcAngle(startX, startY, endX, endY);
-        if (_.isNaN(direction)) {
+        if (isNaN(direction)) {
             direction = 0;
         }
 
@@ -85,7 +87,7 @@ export default class MovementCommandEven extends MovementCommandMove {
         }
 
         // Error checking for an even move without movement in any direction
-        if (_.isUndefined(text)) {
+        if (isUndefined(text)) {
             text = "0";
         }
 

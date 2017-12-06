@@ -1,3 +1,5 @@
+import { defaults } from 'lodash';
+
 import BaseContinuity from "calchart/continuities/BaseContinuity";
 import MovementCommandStop from "calchart/movements/MovementCommandStop";
 import { ToEndContinuityPopup } from "popups/ContinuityPopups";
@@ -22,7 +24,7 @@ export default class ToEndContinuity extends BaseContinuity {
     constructor(sheet, dotType, options={}) {
         super(sheet, dotType, options);
 
-        options = _.defaults({}, options, {
+        options = defaults({}, options, {
             end: "MT",
         });
 

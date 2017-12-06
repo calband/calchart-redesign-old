@@ -1,3 +1,5 @@
+import { defaults, find, isNumber, pull, pullAt, range } from 'lodash';
+
 import Dot from "calchart/Dot";
 // import Sheet from "calchart/Sheet";
 import Song from "calchart/Song";
@@ -74,7 +76,7 @@ export default class Show {
         this._songs = songs.map(data => Song.deserialize(this, data));
         this._fieldType = fieldType;
 
-        options = _.defaults({}, options, {
+        options = defaults({}, options, {
             beatsPerStep: 1,
             stepType: "HS",
             orientation: "east",
@@ -264,7 +266,7 @@ export default class Show {
     insertSheet(sheet, index) {
         this._sheets.splice(index, 0, sheet);
 
-        _.range(index, this._sheets.length).forEach(i => {
+        range(index, this._sheets.length).forEach(i => {
             this._sheets[i].setIndex(i);
         });
 
@@ -308,9 +310,9 @@ export default class Show {
      */
     removeSheet(sheet) {
         let i = this._sheets.indexOf(sheet);
-        _.pullAt(this._sheets, i);
+        pullAt(this._sheets, i);
 
-        _.range(i, this._sheets.length).forEach(i => {
+        range(i, this._sheets.length).forEach(i => {
             this._sheets[i].setIndex(i);
         });
 
@@ -324,7 +326,7 @@ export default class Show {
      */
     updateMovements(...indices) {
         if (indices.length === 0) {
-            indices = _.range(0, this._sheets.length);
+            indices = range(0, this._sheets.length);
         }
 
         indices.forEach(i => {
@@ -354,10 +356,10 @@ export default class Show {
      * @return {Song}
      */
     getSong(param) {
-        if (_.isNumber(param)) {
+        if (isNumber(param)) {
             return this._songs[param];
         } else {
-            return _.find(this._songs, song => song.getName() === param);
+            return find(this._songs, song => song.getName() === param);
         }
     }
 
@@ -391,7 +393,7 @@ export default class Show {
             sheet.updateMovements();
         });
 
-        _.pull(this._songs, song);
+        pull(this._songs, song);
     }
 
     /**** AUDIO ****/

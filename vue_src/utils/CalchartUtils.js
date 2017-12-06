@@ -2,7 +2,7 @@
  * @file A collection of utility functions related to charting or shows.
  */
 
-import _ from 'lodash';
+import { clone, range, round } from 'lodash';
 
 /** @const {string[]} */
 export const AUDIO_EXTENSIONS = ["ogg"];
@@ -95,15 +95,15 @@ export const STEP_TYPES = {
 export const ZOOMS = [0.5, 0.75, 1, 1.5, 2];
 
 /** @const {Object.<string, string>} */
-export const SHOW_FIELD_TYPES = _.clone(FIELD_TYPES);
+export const SHOW_FIELD_TYPES = clone(FIELD_TYPES);
 delete SHOW_FIELD_TYPES.default;
 
 /** @const {Object.<string, string>} */
-export const SHOW_ORIENTATIONS = _.clone(ORIENTATIONS);
+export const SHOW_ORIENTATIONS = clone(ORIENTATIONS);
 delete SHOW_ORIENTATIONS.default;
 
 /** @const {Object.<string, string>} */
-export const SHOW_STEP_TYPES = _.clone(STEP_TYPES);
+export const SHOW_STEP_TYPES = clone(STEP_TYPES);
 delete SHOW_STEP_TYPES.default;
 
 /**
@@ -133,7 +133,7 @@ export function getDotLabels(dotFormat, numDots) {
             throw new Error("Invalid dot format: ${dotFormat}");
     }
 
-    return _.range(numDots).map(getLabel);
+    return range(numDots).map(getLabel);
 }
 
 /**
@@ -189,7 +189,7 @@ export function getOrientation(angle) {
  * @return {string}
  */
 export function getYCoordinateText(y) {
-    let round10 = y => _.round(y, 1);
+    let round10 = y => round(y, 1);
 
     // West Sideline
     if (y == 0) {

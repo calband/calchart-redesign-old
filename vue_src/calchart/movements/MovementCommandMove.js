@@ -1,3 +1,5 @@
+import { defaults } from 'lodash';
+
 import AnimationState from "calchart/AnimationState";
 import BaseMovementCommand from "calchart/movements/BaseMovementCommand";
 import Coordinate from "calchart/Coordinate";
@@ -22,7 +24,7 @@ export default class MovementCommandMove extends BaseMovementCommand {
      *   - {int} beatsPerStep
      */
     constructor(startX, startY, direction, duration, options={}) {
-        options = _.defaults({}, options, {
+        options = defaults({}, options, {
             stepSize: STEP_SIZES.STANDARD,
             orientation: direction,
         });

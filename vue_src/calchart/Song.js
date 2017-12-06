@@ -1,3 +1,5 @@
+import { defaults, isNumber } from 'lodash';
+
 /**
  * A song represents a collection of Sheets that comprise a Song. Songs can be used
  * to set defaults for continuities, such as west-facing songs.
@@ -23,13 +25,13 @@ export default class Song {
         this._name = name;
 
         if (sheets.length > 0) {
-            if (_.isNumber(sheets[0])) {
+            if (isNumber(sheets[0])) {
                 sheets = sheets.map(i => this._show.getSheet(i));
             }
         }
         this._sheets = new Set(sheets);
 
-        options = _.defaults({}, options, {
+        options = defaults({}, options, {
             fieldType: "default",
             beatsPerStep: "default",
             orientation: "default",

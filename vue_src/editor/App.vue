@@ -17,7 +17,7 @@ The entry point for the editor page.
 </template>
 
 <script>
-import _ from 'lodash';
+import { isNull } from 'lodash';
 import { mapState } from 'vuex';
 
 import { showPopup } from 'popups/lib';
@@ -57,7 +57,7 @@ export default {
          * @return {Boolean} true if the show is initialized.
          */
         isInitialized() {
-            return !_.isNull(this.$store.state.show);
+            return !isNull(this.$store.state.show);
         },
         /**
          * @return {Show|Object} The Show currently loaded in the editor. If

@@ -1,3 +1,5 @@
+import { defaults, isNull, isUndefined } from 'lodash';
+
 import BaseContinuity from "calchart/continuities/BaseContinuity";
 import MovementCommandEven from "calchart/movements/MovementCommandEven";
 import { EvenContinuityPopup } from "popups/ContinuityPopups";
@@ -18,7 +20,7 @@ export default class EvenContinuity extends BaseContinuity {
      *     direction of travel
      */
     constructor(sheet, dotType, options={}) {
-        options = _.defaults({}, options, {
+        options = defaults({}, options, {
             orientation: "",
         });
 
@@ -47,7 +49,7 @@ export default class EvenContinuity extends BaseContinuity {
         let label = this.sheet.getNextSheet().getLabel();
         let step = this.getStepType();
         let orientation = this.getOrientation();
-        if (_.isUndefined(orientation)) {
+        if (isUndefined(orientation)) {
             return `EVEN ${step} TO SS ${label}`;
         } else {
             return `${step}F${orientation} TO SS ${label}`;
@@ -57,7 +59,7 @@ export default class EvenContinuity extends BaseContinuity {
     getMovements(dot, data) {
         let start = data.position;
         let end = this._getNextPosition(dot);
-        if (_.isNull(end)) {
+        if (isNull(end)) {
             return [];
         }
 

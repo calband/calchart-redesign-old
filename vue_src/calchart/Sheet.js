@@ -1,3 +1,18 @@
+import {
+    assign,
+    cloneDeepWith,
+    defaults,
+    defaultTo,
+    each,
+    isNull,
+    isString,
+    isUndefined,
+    last,
+    map,
+    pull,
+    range,
+} from 'lodash';
+
 import Coordinate from "calchart/Coordinate";
 import Continuity from "calchart/Continuity";
 import TwoStepContinuity from "calchart/continuities/TwoStepContinuity";
@@ -45,7 +60,7 @@ export default class Sheet {
         this._index = index;
         this._numBeats = numBeats;
 
-        options = _.defaults({}, options, {
+        options = defaults({}, options, {
             label: null,
             song: null,
             background: undefined,
@@ -86,7 +101,7 @@ export default class Sheet {
         let sheet = new Sheet(show, index, numBeats);
 
         // initialize dots as plain dots
-        sheet._dots = _.range(numDots).map(i => {
+        sheet._dots = range(numDots).map(i => {
             return {
                 type: DotType.PLAIN,
                 position: new Coordinate(0, 0),
@@ -123,7 +138,7 @@ export default class Sheet {
             };
         });
 
-        _.each(data.continuities, function(continuitiesData, dotType) {
+        each(data.continuities, function(continuitiesData, dotType) {
             sheet._continuities[dotType] = continuitiesData.map(
                 data => Continuity.deserialize(sheet, dotType, data)
             );
@@ -163,7 +178,7 @@ export default class Sheet {
         });
 
         data.continuities = {};
-        _.each(this._continuities, function(continuities, dotType) {
+        each(this._continuities, function(continuities, dotType) {
             data.continuities[dotType] = continuities.map(continuity => continuity.serialize());
         });
 
@@ -183,7 +198,7 @@ export default class Sheet {
      * @return {(Song|Show)}
      */
     get parent() {
-        return _.defaultTo(this.getSong(), this.show);
+        return defaultTo(this.getSong(), this.show);
     }
 
     get show() {
@@ -214,7 +229,7 @@ export default class Sheet {
             this._dots[dot.id].type = dotType;
         });
 
-        if (_.isUndefined(this._continuities[dotType])) {
+        if (isUndefined(this._continuities[dotType])) {
             this._continuities[dotType] = [];
         }
 
@@ -231,7 +246,7 @@ export default class Sheet {
     clone() {
         let allContinuities = [];
 
-        let clone = _.cloneDeepWith(this, (val, key) => {
+        let clone = cloneDeepWith(this, (val, key) => {
             switch (key) {
                 // make sure to not clone foreign keys
                 case "_show":
@@ -239,9 +254,9 @@ export default class Sheet {
                     return val;
                 case "_continuities": {
                     let dotContinuities = {};
-                    _.each(val, (continuities, dotType) => {
+                    each(val, (continuities, dotType) => {
                         dotContinuities[dotType] = continuities.map(continuity => {
-                            let clone = _.cloneDeepWith(continuity,
+                            let clone = cloneDeepWith(continuity,
                                 (val, key) => continuity.clone(key, val)
                             );
 
@@ -272,7 +287,7 @@ export default class Sheet {
      *   in the show.
      */
     getAdjacentSheet() {
-        return _.defaultTo(this.getPrevSheet(), this.getNextSheet());
+        return defaultTo(this.getPrevSheet(), this.getNextSheet());
     }
 
     /**
@@ -353,7 +368,7 @@ export default class Sheet {
      * @return {Continuity[]}
      */
     getContinuities(dotType) {
-        return _.defaultTo(this._continuities[dotType], []);
+        return defaultTo(this._continuities[dotType], []);
     }
 
     /**
@@ -402,7 +417,7 @@ export default class Sheet {
      * @return {DotType[]} The dot types in this sheet, sorted by DotType.
      */
     getDotTypes() {
-        let dotTypes = new Set(_.map(this._dots, "type"));
+        let dotTypes = new Set(map(this._dots, "type"));
 
         // always include continuities for ALL
         dotTypes.add(DotType.ALL_BEFORE);
@@ -436,7 +451,7 @@ export default class Sheet {
         if (dotInfo.movements.length === 0) {
             return dotInfo.position;
         } else {
-            return _.last(dotInfo.movements).getEndPosition();
+            return last(dotInfo.movements).getEndPosition();
         }
     }
 
@@ -451,7 +466,7 @@ export default class Sheet {
      * @return {string} The label for this Sheet.
      */
     getLabel() {
-        return _.defaultTo(this._label, String(this._index + 1));
+        return defaultTo(this._label, String(this._index + 1));
     }
 
     /**
@@ -555,7 +570,7 @@ export default class Sheet {
      */
     removeContinuity(dotType, continuity) {
         let continuities = this._continuities[dotType];
-        _.pull(continuities, continuity);
+        pull(continuities, continuity);
         this.updateMovements(dotType);
     }
 
@@ -565,7 +580,7 @@ export default class Sheet {
      * @param {Object} data - See getBackground
      */
     saveBackground(data) {
-        _.assign(this._background, data);
+        assign(this._background, data);
     }
 
     /**
@@ -655,9 +670,9 @@ export default class Sheet {
      *   either the dot type, the Dot, or a list of Dots. If undefined, updates all dots.
      */
     updateMovements(dots) {
-        if (_.isString(dots)) {
+        if (isString(dots)) {
             dots = this.getDotsOfType(dots);
-        } else if (_.isUndefined(dots)) {
+        } else if (isUndefined(dots)) {
             dots = this.show.getDots();
         } else if (dots instanceof Dot) {
             dots = [dots];
@@ -687,14 +702,14 @@ export default class Sheet {
                 for (let i = 0; i < allDots.length; i++) {
                     let dot1 = allDots[i];
                     let state1 = this.getAnimationState(dot1, beat);
-                    if (_.isNull(state1)) {
+                    if (isNull(state1)) {
                         continue;
                     }
 
                     for (let j = i + 1; j < allDots.length; j++) {
                         let dot2 = allDots[j];
                         let state2 = this.getAnimationState(dot2, beat);
-                        if (_.isNull(state2)) {
+                        if (isNull(state2)) {
                             continue;
                         }
 

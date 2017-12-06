@@ -9,7 +9,7 @@ A group of toolbar items in the editor application.
 </template>
 
 <script>
-import _ from 'lodash';
+import { isNull } from 'lodash';
 
 import ContextType from 'editor/ContextType';
 import { validateOneOf } from 'utils/validators';
@@ -30,7 +30,7 @@ export default {
          */
         isContext() {
             return (
-                _.isNull(this.context) ||
+                isNull(this.context) ||
                 ContextType.isCurrent(this.$store, this.context)
             );
         },
