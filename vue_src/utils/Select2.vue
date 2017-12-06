@@ -25,6 +25,7 @@ export default {
     props: {
         value: {
             // The v-model attribute.
+            type: null,
             required: true,
         },
         choices: {

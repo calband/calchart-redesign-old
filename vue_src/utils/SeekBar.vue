@@ -4,8 +4,8 @@ A component with a bar and a marker that can be moved along the axis.
 
 <template>
     <div class="seek-bar">
-        <span class="bar" />
-        <span class="marker" />
+        <span class="bar"></span>
+        <span class="marker"></span>
     </div>
 </template>
 

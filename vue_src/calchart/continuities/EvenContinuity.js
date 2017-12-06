@@ -1,8 +1,8 @@
 import { defaults, isNull, isUndefined } from 'lodash';
 
-import BaseContinuity from "calchart/continuities/BaseContinuity";
-import MovementCommandEven from "calchart/movements/MovementCommandEven";
-import { EvenContinuityPopup } from "popups/ContinuityPopups";
+import BaseContinuity from 'calchart/continuities/BaseContinuity';
+import MovementCommandEven from 'calchart/movements/MovementCommandEven';
+import { EvenContinuityPopup } from 'popups/ContinuityPopups';
 
 /**
  * A continuity where dots use the rest of the time to go straight to
@@ -15,13 +15,13 @@ export default class EvenContinuity extends BaseContinuity {
      * @param {object} [options] - Options for the continuity, including:
      *   - {string} stepType
      *   - {int} beatsPerStep
-     *   - {string} [orientation=""] - The direction to face while moving (only for
-     *     military slides). Can also be the empty string to denote facing the
-     *     direction of travel
+     *   - {string} [orientation=''] - The direction to face while moving (only
+     *     for military slides). Can also be the empty string to denote facing
+     *     the direction of travel.
      */
     constructor(sheet, dotType, options={}) {
         options = defaults({}, options, {
-            orientation: "",
+            orientation: '',
         });
 
         super(sheet, dotType, options);
@@ -37,9 +37,9 @@ export default class EvenContinuity extends BaseContinuity {
 
     get info() {
         return {
-            type: "even",
-            name: "Even",
-            label: "Even",
+            type: 'even',
+            name: 'Even',
+            label: 'Even',
         };
     }
 

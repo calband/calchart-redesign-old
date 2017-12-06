@@ -10,7 +10,7 @@ A menu tab in the Editor menu.
     >
         <span>{{ label }}</span>
         <EditorMenuSubMenu ref="submenu">
-            <slot />
+            <slot></slot>
         </EditorMenuSubMenu>
     </div>
 </template>

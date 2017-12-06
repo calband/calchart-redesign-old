@@ -1,7 +1,7 @@
-import AnimationState from "calchart/AnimationState";
-import BaseMovementCommand from "calchart/movements/BaseMovementCommand";
+import AnimationState from 'calchart/AnimationState';
+import BaseMovementCommand from 'calchart/movements/BaseMovementCommand';
 
-import { roundSmall } from "utils/MathUtils";
+import { roundSmall } from 'utils/MathUtils';
 
 /**
  * A MovementCommand which represents no motion.
@@ -10,7 +10,8 @@ export default class MovementCommandStop extends BaseMovementCommand {
     /**
      * @param {number} startX
      * @param {number} startY
-     * @param {number} orientation - The direction the dot will face, in Calchart degrees.
+     * @param {number} orientation - The direction the dot will face, in
+     *   Calchart degrees.
      * @param {int} duration
      * @param {boolean} isMarkTime - true if marking time, false if close.
      * @param {object} [options] - Options for the movement, including:
@@ -36,7 +37,7 @@ export default class MovementCommandStop extends BaseMovementCommand {
     }
 
     serialize() {
-        return super.serialize("MovementCommandStop", {
+        return super.serialize('MovementCommandStop', {
             isMarkTime: this._isMarkTime,
         });
     }
@@ -49,7 +50,7 @@ export default class MovementCommandStop extends BaseMovementCommand {
     }
 
     /**
-     * @return {string} The continuity text in the form "MT 4 E" or "Close".
+     * @return {string} The continuity text in the form 'MT 4 E' or 'Close'.
      */
     getText() {
         if (this._isMarkTime) {
@@ -57,7 +58,7 @@ export default class MovementCommandStop extends BaseMovementCommand {
             let orientation = this.getOrientation();
             return `MT ${steps} ${orientation}`;
         } else {
-            return "Close";
+            return 'Close';
         }
     }
 }

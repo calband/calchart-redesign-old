@@ -10,7 +10,7 @@ An item with an icon in the toolbar in the editor application.
         @mouseleave="mouseleave"
         :class="{ focus, active }"
     >
-        <i :class="`icon-${icon}`" />
+        <i :class="`icon-${icon}`"></i>
     </EditorToolbarItemCustom>
 </template>
 

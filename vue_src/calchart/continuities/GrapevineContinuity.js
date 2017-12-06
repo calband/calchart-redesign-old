@@ -1,7 +1,7 @@
 import { isNull } from 'lodash';
 
-import ToEndContinuity from "calchart/continuities/ToEndContinuity";
-import MovementCommandMove from "calchart/movements/MovementCommandMove";
+import ToEndContinuity from 'calchart/continuities/ToEndContinuity';
+import MovementCommandMove from 'calchart/movements/MovementCommandMove';
 
 /**
  * A grapevine continuity, which moves north or south to get to the next sheet's
@@ -14,9 +14,9 @@ export default class GrapevineContinuity extends ToEndContinuity {
 
     get info() {
         return {
-            type: "gv",
-            name: "Grapevine",
-            label: "GV",
+            type: 'gv',
+            name: 'Grapevine',
+            label: 'GV',
         };
     }
 

@@ -1,14 +1,15 @@
 import { defaults } from 'lodash';
 
-import AnimationState from "calchart/AnimationState";
-import BaseMovementCommand from "calchart/movements/BaseMovementCommand";
-import Coordinate from "calchart/Coordinate";
+import AnimationState from 'calchart/AnimationState';
+import BaseMovementCommand from 'calchart/movements/BaseMovementCommand';
+import Coordinate from 'calchart/Coordinate';
 
-import { STEP_SIZES } from "utils/CalchartUtils";
-import { calcRotatedXPos, calcRotatedYPos, roundSmall } from "utils/MathUtils";
+import { STEP_SIZES } from 'utils/CalchartUtils';
+import { calcRotatedXPos, calcRotatedYPos, roundSmall } from 'utils/MathUtils';
 
 /**
- * A MovementCommand which represents a constant movement in the given direction.
+ * A MovementCommand which represents a constant movement in the given
+ * direction.
  */
 export default class MovementCommandMove extends BaseMovementCommand {
     /**
@@ -18,8 +19,8 @@ export default class MovementCommandMove extends BaseMovementCommand {
      *   in Calchart degrees.
      * @param {int} duration - The duration of the movement, in beats.
      * @param {object} [options] - Options for the movement, including:
-     *   - {number} [stepSize=STEP_SIZES.STANDARD] - The multiplier for converting steps
-     *     into standard step sizes. @see STEP_SIZES.
+     *   - {number} [stepSize=STEP_SIZES.STANDARD] - The multiplier for
+     *     converting steps into standard step sizes. @see STEP_SIZES.
      *   - {number} [orientation=direction]
      *   - {int} beatsPerStep
      */
@@ -52,7 +53,7 @@ export default class MovementCommandMove extends BaseMovementCommand {
     }
 
     serialize() {
-        return super.serialize("MovementCommandMove", {
+        return super.serialize('MovementCommandMove', {
             direction: this._direction,
             stepSize: this._stepSize,
         });
@@ -75,13 +76,13 @@ export default class MovementCommandMove extends BaseMovementCommand {
     }
 
     /**
-     * @return {string} The continuity text in the form "Move 4 E".
+     * @return {string} The continuity text in the form 'Move 4 E'.
      */
     getText() {
         let deltaX = roundSmall(this._endX - this._startX);
         let deltaY = roundSmall(this._endY - this._startY);
-        let dirX = (deltaX < 0) ? "S" : "N";
-        let dirY = (deltaY < 0) ? "W" : "E";
+        let dirX = (deltaX < 0) ? 'S' : 'N';
+        let dirY = (deltaY < 0) ? 'W' : 'E';
 
         // this movement stays on the grid
         if (this._direction % 180 === 0) {
@@ -109,7 +110,8 @@ export default class MovementCommandMove extends BaseMovementCommand {
     /**
      * Get the coordinate the dot will be at at the given beat
      *
-     * @param {int} beatNum - The number of beats relative to the start of the movement.
+     * @param {int} beatNum - The number of beats relative to the start of the
+     *   movement.
      * @return {Coordinate}
      */
     _getPosition(beatNum) {

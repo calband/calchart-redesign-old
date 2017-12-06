@@ -1,11 +1,12 @@
+import $ from 'jquery';
 import { defaults } from 'lodash';
 
-import BaseContinuity from "calchart/continuities/BaseContinuity";
-import MovementCommandStop from "calchart/movements/MovementCommandStop";
-import { ToEndContinuityPopup } from "popups/ContinuityPopups";
+import BaseContinuity from 'calchart/continuities/BaseContinuity';
+import MovementCommandStop from 'calchart/movements/MovementCommandStop';
+import { ToEndContinuityPopup } from 'popups/ContinuityPopups';
 
-import { ENDINGS } from "utils/CalchartUtils";
-import HTMLBuilder from "utils/HTMLBuilder";
+import { ENDINGS } from 'utils/CalchartUtils';
+import HTMLBuilder from 'utils/HTMLBuilder';
 
 /**
  * A superclass for all continuities that end with a StopContinuity
@@ -25,7 +26,7 @@ export default class ToEndContinuity extends BaseContinuity {
         super(sheet, dotType, options);
 
         options = defaults({}, options, {
-            end: "MT",
+            end: 'MT',
         });
 
         this._end = options.end;
@@ -50,7 +51,7 @@ export default class ToEndContinuity extends BaseContinuity {
     }
 
     getPanel(context) {
-        let endLabel = HTMLBuilder.label("End:");
+        let endLabel = HTMLBuilder.label('End:');
         let endChoices = HTMLBuilder.select({
             options: ENDINGS,
             change: e => {
@@ -77,8 +78,10 @@ export default class ToEndContinuity extends BaseContinuity {
     _addEnd(movements, remaining, end, options) {
         if (remaining > 0) {
             let orientation = this.getOrientationDegrees();
-            let marktime = this._end === "MT";
-            let stop = new MovementCommandStop(end.x, end.y, orientation, remaining, marktime, options);
+            let marktime = this._end === 'MT';
+            let stop = new MovementCommandStop(
+                end.x, end.y, orientation, remaining, marktime, options
+            );
             movements.push(stop);
         }
     }
@@ -88,7 +91,7 @@ export default class ToEndContinuity extends BaseContinuity {
      */
     _getEndText() {
         let label = this.sheet.getNextSheet().getLabel();
-        let end = this._end === "MT" ? `MT${this.getStepType()}` : "CLOSE";
+        let end = this._end === 'MT' ? `MT${this.getStepType()}` : 'CLOSE';
         let orientation = this.getOrientation();
         return `TO SS ${label} [${end} ${orientation}]`;
     }

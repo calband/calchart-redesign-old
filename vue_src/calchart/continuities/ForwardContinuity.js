@@ -1,10 +1,12 @@
-import BaseContinuity from "calchart/continuities/BaseContinuity";
-import MovementCommandMove from "calchart/movements/MovementCommandMove";
-import { ForwardContinuityPopup } from "popups/ContinuityPopups";
+import $ from 'jquery';
 
-import { DIRECTIONS } from "utils/CalchartUtils";
-import HTMLBuilder from "utils/HTMLBuilder";
-import { validatePositive, parseNumber } from "utils/JSUtils";
+import BaseContinuity from 'calchart/continuities/BaseContinuity';
+import MovementCommandMove from 'calchart/movements/MovementCommandMove';
+import { ForwardContinuityPopup } from 'popups/ContinuityPopups';
+
+import { DIRECTIONS } from 'utils/CalchartUtils';
+import HTMLBuilder from 'utils/HTMLBuilder';
+import { validatePositive, parseNumber } from 'utils/JSUtils';
 
 /**
  * A simple forward march continuity, taking the given number
@@ -28,7 +30,9 @@ export default class ForwardContinuity extends BaseContinuity {
     }
 
     static deserialize(sheet, dotType, data) {
-        return new ForwardContinuity(sheet, dotType, data.steps, data.direction, data);
+        return new ForwardContinuity(
+            sheet, dotType, data.steps, data.direction, data
+        );
     }
 
     serialize() {
@@ -44,9 +48,9 @@ export default class ForwardContinuity extends BaseContinuity {
 
     get info() {
         return {
-            type: "fm",
-            name: "Forward March",
-            label: "Move",
+            type: 'fm',
+            name: 'Forward March',
+            label: 'Move',
         };
     }
 
@@ -88,7 +92,7 @@ export default class ForwardContinuity extends BaseContinuity {
 
     getPanel(context) {
         let steps = HTMLBuilder.input({
-            type: "number",
+            type: 'number',
             initial: this._numSteps,
             change: e => {
                 this._numSteps = validatePositive(e.currentTarget);

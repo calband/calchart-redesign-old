@@ -7,6 +7,7 @@ import { has } from 'lodash';
 import parseAction from 'editor/actions';
 import ContextType from 'editor/ContextType';
 import ToolType from 'editor/ToolType';
+import sendAction from 'utils/ajax';
 import History from 'utils/History';
 
 export default {

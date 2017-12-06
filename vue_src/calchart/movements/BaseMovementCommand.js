@@ -1,9 +1,9 @@
 import { defaults, extend } from 'lodash';
 
-import Coordinate from "calchart/Coordinate";
+import Coordinate from 'calchart/Coordinate';
 
-import { getOrientation } from "utils/CalchartUtils";
-import { NotImplementedError } from "utils/errors";
+import { getOrientation } from 'utils/CalchartUtils';
+import { NotImplementedError } from 'utils/errors';
 
 /**
  * Represents an individual movement that a dot executes during a
@@ -20,7 +20,8 @@ export default class BaseMovementCommand {
      * @param {object} [options] - Options for all/most movements, including:
      *   - {float} [orientation] - The direction toward which the dot will face,
      *     while moving, in Calchart degrees.
-     *   - {int} [beatsPerStep=1] - The number of beats per each step of the movement.
+     *   - {int} [beatsPerStep=1] - The number of beats per each step of the
+     *     movement.
      */
     constructor(startX, startY, endX, endY, duration, options={}) {
         this._startX = startX;
@@ -41,7 +42,8 @@ export default class BaseMovementCommand {
     /**
      * Create a MovementCommand from the given serialized data.
      *
-     * @param {Object} data - The JSON data to initialize the MovementCommand with.
+     * @param {Object} data - The JSON data to initialize the MovementCommand
+     *   with.
      * @return {MovementCommand}
      */
     static deserialize(data) {
@@ -51,7 +53,8 @@ export default class BaseMovementCommand {
     /**
      * Return the JSONified version of this MovementCommand.
      *
-     * @param {string} type - The type of the MovementCommmand (@see MovementCommand.deserialize).
+     * @param {string} type - The type of the MovementCommmand (@see
+     *   MovementCommand.deserialize).
      * @param {Object} [data] - Additional data to add to the serialized data.
      * @return {Object}
      */

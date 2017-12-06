@@ -4,7 +4,7 @@ A submenu in the Editor menu.
 
 <template>
     <div class="submenu" v-show="active" :style="position">
-        <slot />
+        <slot></slot>
     </div>
 </template>
 

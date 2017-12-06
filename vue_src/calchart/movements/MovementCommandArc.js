@@ -1,6 +1,6 @@
-import AnimationState from "calchart/AnimationState";
-import BaseMovementCommand from "calchart/movements/BaseMovementCommand";
-import Coordinate from "calchart/Coordinate";
+import AnimationState from 'calchart/AnimationState';
+import BaseMovementCommand from 'calchart/movements/BaseMovementCommand';
+import Coordinate from 'calchart/Coordinate';
 
 import {
     calcAngle,
@@ -9,7 +9,7 @@ import {
     calcRotatedYPos,
     roundSmall,
     wrap,
-} from "utils/MathUtils";
+} from 'utils/MathUtils';
 
 /**
  * A MovementCommand which represents a circular movement around an origin.
@@ -56,7 +56,7 @@ export default class MovementCommandArc extends BaseMovementCommand {
     }
 
     serialize() {
-        return super.serialize("MovementCommandArc", {
+        return super.serialize('MovementCommandArc', {
             origin: this._origin,
             degrees: this._degrees,
             duration: this._duration,
@@ -75,13 +75,15 @@ export default class MovementCommandArc extends BaseMovementCommand {
 
         // dot facing perpendicular to origin
         let offset = Math.sign(this._degrees) * -90;
-        let orientation = calcAngle(x, y, this._origin.x, this._origin.y) + offset;
+        let orientation = calcAngle(
+            x, y, this._origin.x, this._origin.y
+        ) + offset;
 
         return new AnimationState(position, wrap(orientation, 360));
     }
 
     /**
-     * Get the "d" attribute for this arc in a <path> element.
+     * Get the 'd' attribute for this arc in a <path> element.
      *
      * @param {GrapherScale} scale
      * @return {string}
@@ -95,10 +97,11 @@ export default class MovementCommandArc extends BaseMovementCommand {
     }
 
     /**
-     * @return {string} The continuity text in the form "GT CW 90 deg. (16 steps)".
+     * @return {string} The continuity text in the form 'GT CW 90 deg. (16
+     *   steps)'.
      */
     getText() {
-        let direction = this._degrees > 0 ? "CW" : "CCW";
+        let direction = this._degrees > 0 ? 'CW' : 'CCW';
         let degrees = Math.abs(this._degrees);
         let steps = this._duration / this._beatsPerStep;
         return `GT ${direction} ${degrees} deg. (${steps} steps)`;

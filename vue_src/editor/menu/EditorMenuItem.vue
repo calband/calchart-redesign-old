@@ -15,7 +15,7 @@ A menu item in the Editor menu.
             v-if="hasSubmenu"
             ref="submenu"
         >
-            <slot />
+            <slot></slot>
         </EditorMenuSubMenu>
     </div>
 </template>

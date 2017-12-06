@@ -1,7 +1,7 @@
-import MovementCommandArc from "calchart/movements/MovementCommandArc";
-import MovementCommandMove from "calchart/movements/MovementCommandMove";
-import MovementCommandEven from "calchart/movements/MovementCommandEven";
-import MovementCommandStop from "calchart/movements/MovementCommandStop";
+import MovementCommandArc from 'calchart/movements/MovementCommandArc';
+import MovementCommandMove from 'calchart/movements/MovementCommandMove';
+import MovementCommandEven from 'calchart/movements/MovementCommandEven';
+import MovementCommandStop from 'calchart/movements/MovementCommandStop';
 
 /**
  * A proxy class for creating/deserializing all MovementCommand types, although
@@ -13,20 +13,21 @@ export default class MovementCommand {
     /**
      * Route the deserialization to the appropriate MovementCommand.
      *
-     * @param {Object} data - The JSON data to initialize the MovementCommand with.
+     * @param {Object} data - The JSON data to initialize the MovementCommand
+     *   with.
      * @return {MovementCommand}
      */
     static deserialize(data) {
         switch (data.type) {
-            case "MovementCommandArc":
+            case 'MovementCommandArc':
                 return MovementCommandArc.deserialize(data);
-            case "MovementCommandMove":
+            case 'MovementCommandMove':
                 return MovementCommandMove.deserialize(data);
-            case "MovementCommandEven":
+            case 'MovementCommandEven':
                 return MovementCommandEven.deserialize(data);
-            case "MovementCommandStop":
+            case 'MovementCommandStop':
                 return MovementCommandStop.deserialize(data);
         }
-        throw new Error("No movement of the type: " + data.type);
+        throw new Error('No movement of the type: ' + data.type);
     }
 }

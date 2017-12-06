@@ -164,7 +164,6 @@ The toolbar in the editor application.
 import { mapMutations } from 'vuex';
 
 import ContextType from 'editor/ContextType';
-import ToolType from 'editor/ToolType';
 import SeekBar from 'utils/SeekBar';
 import Select2 from 'utils/Select2';
 

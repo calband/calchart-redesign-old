@@ -4,7 +4,7 @@ A group of toolbar items in the editor application.
 
 <template>
     <div v-show="isContext" class="toolbar-group">
-        <slot />
+        <slot></slot>
     </div>
 </template>
 

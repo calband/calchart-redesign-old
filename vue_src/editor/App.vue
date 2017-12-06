@@ -18,7 +18,6 @@ The entry point for the editor page.
 
 <script>
 import { isNull } from 'lodash';
-import { mapState } from 'vuex';
 
 import { showPopup } from 'popups/lib';
 import SetupShowPopup from 'popups/SetupShowPopup';

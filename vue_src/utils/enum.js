@@ -3,11 +3,12 @@
  * acting like an Enum. Usage:
  *
  * class Color {...}
- * makeEnum(Color, ["red", "blue", "green"])
- * Color.RED // "red"
- * Color.keys // ["RED"]
- * Color.values // ["red"]
- * Color.forEach(color => { console.log(color); }) // prints "red", then "green", then "blue"
+ * makeEnum(Color, ['red', 'blue', 'green'])
+ * Color.RED // 'red'
+ * Color.keys // ['RED']
+ * Color.values // ['red']
+ * Color.forEach(color => { console.log(color); })
+ *   // prints 'red', then 'green', then 'blue'
  *
  * @param {class} cls
  * @param {Array} values
@@ -15,7 +16,7 @@
 export default function makeEnum(cls, values) {
     let keys = [];
     for (let val of values) {
-        let key = val.toUpperCase().replace(/[\s-]+/g, "_");
+        let key = val.toUpperCase().replace(/[\s-]+/g, '_');
         // creates immutable values
         Object.defineProperty(cls, key, {
             value: val,

@@ -64,7 +64,7 @@ import ShowList from './ShowList';
 
 import CreateShowPopup from 'popups/CreateShowPopup';
 import { showPopup } from 'popups/lib';
-import sendAction, { handleError } from 'utils/ajax';
+import sendAction from 'utils/ajax';
 import { findAndRemove } from 'utils/array';
 
 // TODO: move tabs to above home-content (rename home-buttons)
@@ -72,7 +72,6 @@ import { findAndRemove } from 'utils/array';
 
 export default {
     name: 'Home',
-    components: { ShowList },
     props: {
         allTabs: {
             type: Array,
@@ -80,6 +79,7 @@ export default {
             validator: obj => obj.length === 2,
         },
     },
+    components: { ShowList },
     data() {
         let tabs = {};
         this.allTabs.forEach(([name, label]) => {

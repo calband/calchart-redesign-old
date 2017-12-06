@@ -1,11 +1,12 @@
 import { isNaN, isUndefined } from 'lodash';
 
-import MovementCommandMove from "calchart/movements/MovementCommandMove";
+import MovementCommandMove from 'calchart/movements/MovementCommandMove';
 
-import { calcAngle, calcDistance } from "utils/MathUtils";
+import { calcAngle, calcDistance } from 'utils/MathUtils';
 
 /**
- * A MovementCommand which represents an even-step transition between two points.
+ * A MovementCommand which represents an even-step transition between two
+ * points.
  */
 export default class MovementCommandEven extends MovementCommandMove {
     /**
@@ -42,25 +43,26 @@ export default class MovementCommandEven extends MovementCommandMove {
 
     serialize() {
         let data = super.serialize();
-        data.type = "MovementCommandEven";
+        data.type = 'MovementCommandEven';
         return data;
     }
 
     /**
-     * @return {string} The continuity text in the form "Even 8 E, 4 S" or "Move 8 NE" if
-     * in one direction.
+     * @return {string} The continuity text in the form 'Even 8 E, 4 S' or
+     * 'Move 8 NE' if in one direction.
      */
     getText() {
         let deltaX = this._endX - this._startX;
         let deltaY = this._endY - this._startY;
-        let dirX = (deltaX < 0) ? "S" : "N";
-        let dirY = (deltaY < 0) ? "W" : "E";
+        let dirX = (deltaX < 0) ? 'S' : 'N';
+        let dirY = (deltaY < 0) ? 'W' : 'E';
         let steps = this._duration / this._beatsPerStep;
 
         deltaX = Math.abs(deltaX);
         deltaY = Math.abs(deltaY);
 
-        // Check if movement only in one direction and same number of steps as change in position
+        // Check if movement only in one direction and same number of steps as
+        // change in position
         if (deltaX == 0 && deltaY == steps) {
             return `Move ${steps} ${dirY}`;
         } else if (deltaY == 0 && deltaX == steps) {
@@ -70,12 +72,12 @@ export default class MovementCommandEven extends MovementCommandMove {
         }
 
         let text;
-        // If movement is a fraction of steps, simply say "NE" or "S"
+        // If movement is a fraction of steps, simply say 'NE' or 'S'
         if (deltaX % 1 !== 0 || deltaY % 1 !== 0) {
-            text = (deltaX !== 0) ? dirX : "";
-            text = (deltaY !== 0) ? dirY : "";
+            text = (deltaX !== 0) ? dirX : '';
+            text = (deltaY !== 0) ? dirY : '';
         } else {
-            // End result will be concat. of directions, e.g. "Even 8E, 4S"
+            // End result will be concat. of directions, e.g. 'Even 8E, 4S'
             let moveTexts = [];
             if (deltaY != 0) {
                 moveTexts.push(`${deltaY} ${dirY}`);
@@ -83,12 +85,12 @@ export default class MovementCommandEven extends MovementCommandMove {
             if (deltaX != 0) {
                 moveTexts.push(`${deltaX} ${dirX}`);
             }
-            text = moveTexts.join(", ");
+            text = moveTexts.join(', ');
         }
 
         // Error checking for an even move without movement in any direction
         if (isUndefined(text)) {
-            text = "0";
+            text = '0';
         }
 
         return `Even ${text} (${steps} steps)`;

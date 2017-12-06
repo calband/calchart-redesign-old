@@ -1,9 +1,9 @@
 import { defaultTo } from 'lodash';
 
-import FollowLeaderContinuity from "calchart/continuities/FollowLeaderContinuity";
-import { CounterMarchContinuityPopup } from "popups/ContinuityPopups";
+import FollowLeaderContinuity from './FollowLeaderContinuity';
+import { CounterMarchContinuityPopup } from 'popups/ContinuityPopups';
 
-import Iterator from "utils/Iterator";
+import Iterator from 'utils/Iterator';
 
 /**
  * A counter-march continuity, which is basically a follow-the-leader continuity
@@ -13,10 +13,10 @@ export default class CounterMarchContinuity extends FollowLeaderContinuity {
     /**
      * @param {Sheet} sheet
      * @param {DotType} dotType
-     * @param {?int} duration - The number of beats to execute countermarch. If null,
-     *   use remaining beats.
-     * @param {Dot[]} order - The order of dots in the line. order[i] moves towards
-     *   order[i+1], and order[len - 1] follows order[0].
+     * @param {?int} duration - The number of beats to execute countermarch. If
+     *   null, use remaining beats.
+     * @param {Dot[]} order - The order of dots in the line. order[i] moves
+     *   towards order[i+1], and order[len - 1] follows order[0].
      * @param {object} [options] - Options for the continuity, including:
      *   - {string} stepType
      *   - {int} beatsPerStep
@@ -29,7 +29,9 @@ export default class CounterMarchContinuity extends FollowLeaderContinuity {
 
     static deserialize(sheet, dotType, data) {
         let order = data.order.map(dotId => sheet.show.getDot(dotId));
-        return new CounterMarchContinuity(sheet, dotType, data.duration, order, data);
+        return new CounterMarchContinuity(
+            sheet, dotType, data.duration, order, data
+        );
     }
 
     serialize() {
@@ -45,9 +47,9 @@ export default class CounterMarchContinuity extends FollowLeaderContinuity {
 
     get info() {
         return {
-            type: "cm",
-            name: "Counter March",
-            label: "CM",
+            type: 'cm',
+            name: 'Counter March',
+            label: 'CM',
         };
     }
 
@@ -55,7 +57,7 @@ export default class CounterMarchContinuity extends FollowLeaderContinuity {
 
     getContinuityText() {
         let step = this.getStepType();
-        let duration = this._duration ? ` ${this._duration} beats` : "";
+        let duration = this._duration ? ` ${this._duration} beats` : '';
         return `Countermarch FM${step}${duration}`;
     }
 

@@ -10,7 +10,7 @@ A custom item in the toolbar in the editor application.
         @mouseleave="$emit('mouseleave', $event)"
         class="toolbar-item"
     >
-        <slot />
+        <slot></slot>
     </div>
 </template>
 

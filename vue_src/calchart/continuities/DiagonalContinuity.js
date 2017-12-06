@@ -1,10 +1,10 @@
 import { isNull } from 'lodash';
 
-import FountainGridContinuity from "calchart/continuities/FountainGridContinuity";
-import MovementCommandMove from "calchart/movements/MovementCommandMove";
+import FountainGridContinuity from './FountainGridContinuity';
+import MovementCommandMove from 'calchart/movements/MovementCommandMove';
 
-import { STEP_SIZES } from "utils/CalchartUtils";
-import { calcAngle } from "utils/MathUtils";
+import { STEP_SIZES } from 'utils/CalchartUtils';
+import { calcAngle } from 'utils/MathUtils';
 
 /**
  * An DMHS or HSDM continuity, where dots move as far diagonally as possible,
@@ -58,12 +58,16 @@ export default class DiagonalContinuity extends FountainGridContinuity {
             stepSize: STEP_SIZES.DIAGONAL,
         };
         let moveInfo = {
-            angle: absX > absY ? this.getXAngle(deltaX) : this.getYAngle(deltaY),
+            angle: absX > absY ?
+                this.getXAngle(deltaX) :
+                this.getYAngle(deltaY),
             steps: Math.abs(absX - absY),
             stepSize: STEP_SIZES.STANDARD,
         };
 
-        let order = options.diagFirst ? [diagInfo, moveInfo] : [moveInfo, diagInfo];
+        let order = options.diagFirst ?
+            [diagInfo, moveInfo] :
+            [moveInfo, diagInfo];
         let movements = [];
 
         function addMovement(x, y, i) {
@@ -74,7 +78,9 @@ export default class DiagonalContinuity extends FountainGridContinuity {
 
             let duration = info.steps * options.beatsPerStep;
             options.stepSize = info.stepSize;
-            let movement = new MovementCommandMove(x, y, info.angle, duration, options);
+            let movement = new MovementCommandMove(
+                x, y, info.angle, duration, options
+            );
             movements.push(movement);
         }
 
@@ -96,9 +102,9 @@ export default class DiagonalContinuity extends FountainGridContinuity {
     }
 
     get info() {
-        let name = this._diagFirst ? "DMHS" : "HSDM";
+        let name = this._diagFirst ? 'DMHS' : 'HSDM';
         return {
-            type: "diagonal",
+            type: 'diagonal',
             name: name,
             label: name,
         };
@@ -107,7 +113,7 @@ export default class DiagonalContinuity extends FountainGridContinuity {
     /**** METHODS ****/
 
     getContinuityText() {
-        let directions = this._diagFirst ? "DHS/HS" : "HS/DHS";
+        let directions = this._diagFirst ? 'DHS/HS' : 'HS/DHS';
         let end = this._getEndText();
         return `FM${directions} ${end}`;
     }
@@ -124,7 +130,9 @@ export default class DiagonalContinuity extends FountainGridContinuity {
             diagFirst: this._diagFirst,
         };
 
-        let movements = this.constructor.getDiagonalMoves(start.x, start.y, end.x, end.y, options);
+        let movements = this.constructor.getDiagonalMoves(
+            start.x, start.y, end.x, end.y, options
+        );
 
         let remaining = this.sheet.getDuration();
         movements.forEach(movement => {

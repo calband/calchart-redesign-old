@@ -9,7 +9,7 @@ import { attempt } from 'utils/JSUtils';
 /**
  * A helper to parse arguments. Supports any JSON strings, with the following
  * syntactic helpers:
- *  - a string does not need quotes: `foo(bar)` -> `foo("bar")`
+ *  - a string does not need quotes: `foo(bar)` -> `foo('bar')`
  *  - an object can use python notation:
  *    `foo(bar=1, foo=2)` -> `foo({ bar: 1, foo: 2 })
  *
@@ -20,10 +20,10 @@ function parseArg(arg) {
     let json = attempt(() => JSON.parse(arg));
     if (!isNull(json)) {
         return json;
-    } else if (includes(arg, "=")) {
+    } else if (includes(arg, '=')) {
         let o = {};
-        split(arg, ",").forEach(pair => {
-            let [key, val] = split(pair, "=");
+        split(arg, ',').forEach(pair => {
+            let [key, val] = split(pair, '=');
             o[key] = parseArg(val);
         });
         return o;
@@ -37,8 +37,8 @@ function parseArg(arg) {
  * Parse the given function name.
  *
  * @param {string} name - The function name, in one of the following formats:
- *   - "name": the name of the function, without arguments specified
- *   - "name(arg)": the name of the function, run with the given argument.
+ *   - 'name': the name of the function, without arguments specified
+ *   - 'name(arg)': the name of the function, run with the given argument.
  *     See parseArg for the format of the argument.
  * @return {Object}
  *   - {String} name
@@ -62,4 +62,4 @@ export default function parseAction(name) {
         name: actionName,
         data: actionArg,
     };
-};
+}

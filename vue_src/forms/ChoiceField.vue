@@ -26,7 +26,7 @@ import Select2 from 'utils/Select2';
 import BaseField from './BaseField';
 
 export default {
-    mixins: [BaseField],
+    mixins: [ BaseField ],
     components: { Select2 },
 };
 </script>

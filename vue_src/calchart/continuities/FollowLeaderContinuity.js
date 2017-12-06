@@ -1,13 +1,13 @@
 import { concat, last, pull, take } from 'lodash';
 
-import DiagonalContinuity from "calchart/continuities/DiagonalContinuity";
-import OrderedDotsContinuity from "calchart/continuities/OrderedDotsContinuity";
-import Coordinate from "calchart/Coordinate";
-import { FollowLeaderContinuityPopup } from "popups/ContinuityPopups";
+import DiagonalContinuity from 'calchart/continuities/DiagonalContinuity';
+import OrderedDotsContinuity from 'calchart/continuities/OrderedDotsContinuity';
+import Coordinate from 'calchart/Coordinate';
+import { FollowLeaderContinuityPopup } from 'popups/ContinuityPopups';
 
-import HTMLBuilder from "utils/HTMLBuilder";
-import Iterator from "utils/Iterator";
-import { setupTooltip } from "utils/UIUtils";
+import HTMLBuilder from 'utils/HTMLBuilder';
+import Iterator from 'utils/Iterator';
+import { setupTooltip } from 'utils/UIUtils';
 
 /**
  * A follow-the-leader continuity, where the sequence of dots is defined and
@@ -19,8 +19,8 @@ export default class FollowLeaderContinuity extends OrderedDotsContinuity {
      * @param {Sheet} sheet
      * @param {DotType} dotType
      * @param {Dot[]} order
-     * @param {Coordinate[]} path - The coordinates for the path of the first dot.
-     *   path[0] is the first coordinate to go to.
+     * @param {Coordinate[]} path - The coordinates for the path of the first
+     *   dot. path[0] is the first coordinate to go to.
      * @param {object} [options] - Options for the continuity, including:
      *   - {string} stepType
      *   - {int} beatsPerStep
@@ -33,7 +33,9 @@ export default class FollowLeaderContinuity extends OrderedDotsContinuity {
 
     static deserialize(sheet, dotType, data) {
         let order = this.deserializeOrder(sheet, data);
-        let path = data.path.map(coordData => Coordinate.deserialize(coordData));
+        let path = data.path.map(
+            coordData => Coordinate.deserialize(coordData)
+        );
 
         return new FollowLeaderContinuity(sheet, dotType, order, path, data);
     }
@@ -52,9 +54,9 @@ export default class FollowLeaderContinuity extends OrderedDotsContinuity {
 
     get info() {
         return {
-            type: "ftl",
-            name: "Follow the Leader",
-            label: "FTL",
+            type: 'ftl',
+            name: 'Follow the Leader',
+            label: 'FTL',
         };
     }
 
@@ -71,7 +73,7 @@ export default class FollowLeaderContinuity extends OrderedDotsContinuity {
     }
 
     getContinuityText() {
-        return "Follow the leader";
+        return 'Follow the leader';
     }
 
     getMovements(dot, data) {
@@ -95,10 +97,12 @@ export default class FollowLeaderContinuity extends OrderedDotsContinuity {
             let next = path.get();
 
             // DMHS to next position
-            let movesToNext = DiagonalContinuity.getDiagonalMoves(prev.x, prev.y, next.x, next.y, {
-                diagFirst: true,
-                beatsPerStep: this.getBeatsPerStep(),
-            });
+            let movesToNext = DiagonalContinuity.getDiagonalMoves(
+                prev.x, prev.y, next.x, next.y, {
+                    diagFirst: true,
+                    beatsPerStep: this.getBeatsPerStep(),
+                }
+            );
 
             // update beats
             for (let i = 0; i < movesToNext.length; i++) {
@@ -122,8 +126,9 @@ export default class FollowLeaderContinuity extends OrderedDotsContinuity {
                 let dir1 = lastMove.getDirection();
                 let dir2 = currMove.getDirection();
                 if (dir1 === dir2) {
-                    let duration = lastMove.getDuration() + currMove.getDuration();
-                    lastMove.setDuration(duration);
+                    lastMove.setDuration(
+                        lastMove.getDuration() + currMove.getDuration()
+                    );
                     // remove currMove from movements
                     pull(movements, currMove);
                 }
@@ -139,12 +144,12 @@ export default class FollowLeaderContinuity extends OrderedDotsContinuity {
     getPanel(context) {
         let panel = super.getPanel(context);
 
-        let editPath = HTMLBuilder.icon("crosshairs").click(e => {
-            context.controller.loadContext("ftl-path", {
+        let editPath = HTMLBuilder.icon('crosshairs').click(e => {
+            context.controller.loadContext('ftl-path', {
                 continuity: this,
             });
         });
-        setupTooltip(editPath, "Path");
+        setupTooltip(editPath, 'Path');
 
         return concat(panel, editPath);
     }

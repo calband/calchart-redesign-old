@@ -23,8 +23,8 @@ import store from 'store';
 import sendAction, { handleError } from 'utils/ajax';
 
 export default {
-    components: { FormPopup },
     extends: BasePopup,
+    components: { FormPopup },
     data() {
         const IS_STUNT = store.state.env.isStunt;
         return {

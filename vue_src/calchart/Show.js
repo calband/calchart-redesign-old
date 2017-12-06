@@ -1,11 +1,11 @@
 import { defaults, find, isNumber, pull, pullAt, range } from 'lodash';
 
-import Dot from "calchart/Dot";
-// import Sheet from "calchart/Sheet";
-import Song from "calchart/Song";
+import Dot from 'calchart/Dot';
+// import Sheet from 'calchart/Sheet';
+import Song from 'calchart/Song';
 
-import { getDotLabels } from "utils/CalchartUtils";
-import { moveElem } from "utils/JSUtils";
+import { getDotLabels } from 'utils/CalchartUtils';
+import { moveElem } from 'utils/JSUtils';
 
 /**
  * Increment this variable whenever an edit was made to any serializable
@@ -41,13 +41,16 @@ export default class Show {
      *   - {boolean} published - Whether the show is published for the band.
      *   - {string} dotFormat - The format used to label the dots.
      *   - {int} version - The version of the Show.
-     *   - {number[]} beats - The beats in the Show, where each number is the number
-     *     of milliseconds between each beat.
+     *   - {number[]} beats - The beats in the Show, where each number is the
+     *     number of milliseconds between each beat.
      *   - {string} audio - The URL of the audio file.
-     * @param {Object[]} dots - The serialized data for every Dot marching in the Show.
-     * @param {Object[]} sheets - The serialized data for every Sheet contained in the Show.
+     * @param {Object[]} dots - The serialized data for every Dot marching in
+     *   the Show.
+     * @param {Object[]} sheets - The serialized data for every Sheet contained
+     *   in the Show.
      * @param {Object[]} songs - The serialized data for every Song in the Show.
-     * @param {string} fieldType - The show's field type (see base/constants.py).
+     * @param {string} fieldType - The show's field type (@see
+     *   CalchartUtils.FIELD_TYPES).
      * @param {Object} [options] - Other options to customize the Show:
      *   - {int} [beatsPerStep=1] - The default number of beats per step for the
      *     entire Show.
@@ -65,21 +68,24 @@ export default class Show {
         this._version = metadata.version;
 
         if (this._version < VERSION) {
-            alert("WARNING: You are running an outdated version of a Calchart show!");
+            alert(
+                'WARNING: You are running an outdated version ' +
+                'of a Calchart show!'
+            );
         }
 
         this._beats = metadata.beats;
         this._audio = metadata.audio;
 
         this._dots = dots.map(data => Dot.deserialize(data));
-        this._sheets = sheets.map(data => Sheet.deserialize(this, data));
+        this._sheets = sheets.map(data => Sheet.deserialize(this, data)); // eslint-disable-line no-undef, max-len
         this._songs = songs.map(data => Song.deserialize(this, data));
         this._fieldType = fieldType;
 
         options = defaults({}, options, {
             beatsPerStep: 1,
-            stepType: "HS",
-            orientation: "east",
+            stepType: 'HS',
+            orientation: 'east',
         });
 
         this._beatsPerStep = options.beatsPerStep;
@@ -122,7 +128,14 @@ export default class Show {
      * @return {Show}
      */
     static deserialize(data) {
-        return new Show(data, data.dots, data.sheets, data.songs, data.fieldType, data);
+        return new Show(
+            data,
+            data.dots,
+            data.sheets,
+            data.songs,
+            data.fieldType,
+            data
+        );
     }
 
     /**
@@ -183,20 +196,21 @@ export default class Show {
     }
 
     /**
-     * @return {int} The default orientation of the entire Show, in Calchart degrees.
+     * @return {int} The default orientation of the entire Show, in Calchart
+     *   degrees.
      */
     getOrientationDegrees() {
         switch (this._orientation) {
-            case "east":
+            case 'east':
                 return 0;
-            case "west":
+            case 'west':
                 return 180;
         }
         throw new Error(`Invalid orientation: ${this._orientation}`);
     }
 
     /**
-     * @return {string} The default step type for the entire show. (see
+     * @return {string} The default step type for the entire show. (@see
      *   CalchartUtils.STEP_TYPES)
      */
     getStepType() {
@@ -232,7 +246,7 @@ export default class Show {
      */
     addSheet(numBeats) {
         let index = this._sheets.length;
-        let sheet = Sheet.create(this, index, numBeats, this._dots.length);
+        let sheet = Sheet.create(this, index, numBeats, this._dots.length); // eslint-disable-line no-undef, max-len
 
         this._sheets.push(sheet);
         this.updateMovements(index - 1);

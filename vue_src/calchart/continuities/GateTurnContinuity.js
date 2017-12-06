@@ -1,11 +1,13 @@
-import BaseContinuity from "calchart/continuities/BaseContinuity";
-import Coordinate from "calchart/Coordinate";
-import MovementCommandArc from "calchart/movements/MovementCommandArc";
-import { GateTurnContinuityPopup } from "popups/ContinuityPopups";
+import $ from 'jquery';
 
-import HTMLBuilder from "utils/HTMLBuilder";
-import { validatePositive } from "utils/JSUtils";
-import { setupTooltip } from "utils/UIUtils";
+import BaseContinuity from 'calchart/continuities/BaseContinuity';
+import Coordinate from 'calchart/Coordinate';
+import MovementCommandArc from 'calchart/movements/MovementCommandArc';
+import { GateTurnContinuityPopup } from 'popups/ContinuityPopups';
+
+import HTMLBuilder from 'utils/HTMLBuilder';
+import { validatePositive } from 'utils/JSUtils';
+import { setupTooltip } from 'utils/UIUtils';
 
 /**
  * A continuity where the dots rotate around a reference point for the
@@ -31,7 +33,9 @@ export default class GateTurnContinuity extends BaseContinuity {
 
     static deserialize(sheet, dotType, data) {
         let reference = Coordinate.deserialize(data.reference);
-        return new GateTurnContinuity(sheet, dotType, data.degrees, reference, data);
+        return new GateTurnContinuity(
+            sheet, dotType, data.degrees, reference, data
+        );
     }
 
     serialize() {
@@ -47,9 +51,9 @@ export default class GateTurnContinuity extends BaseContinuity {
 
     get info() {
         return {
-            type: "gate",
-            name: "Gate Turn",
-            label: "Gate",
+            type: 'gate',
+            name: 'Gate Turn',
+            label: 'Gate',
         };
     }
 
@@ -57,7 +61,7 @@ export default class GateTurnContinuity extends BaseContinuity {
 
     getContinuityText() {
         let degrees = Math.abs(this._degrees);
-        let orientation = this._degrees < 0 ? "CCW" : "CW";
+        let orientation = this._degrees < 0 ? 'CCW' : 'CW';
         return `Gate Turn ${degrees} degrees ${orientation}`;
     }
 
@@ -87,7 +91,7 @@ export default class GateTurnContinuity extends BaseContinuity {
 
     getPanel(context) {
         let degrees = HTMLBuilder.input({
-            type: "number",
+            type: 'number',
             initial: Math.abs(this._degrees),
             change: e => {
                 let degrees = validatePositive(e.currentTarget);
@@ -98,23 +102,23 @@ export default class GateTurnContinuity extends BaseContinuity {
 
         let direction = HTMLBuilder.select({
             options: {
-                CW: "CW",
-                CCW: "CCW",
+                CW: 'CW',
+                CCW: 'CCW',
             },
-            initial: this._degrees > 0 ? "CW" : "CCW",
+            initial: this._degrees > 0 ? 'CW' : 'CCW',
             change: e => {
-                let sign = $(e.currentTarget).val() === "CW" ? 1 : -1;
+                let sign = $(e.currentTarget).val() === 'CW' ? 1 : -1;
                 this._degrees = sign * Math.abs(this._degrees);
                 this._updateMovements(context);
             },
         });
 
-        let editReference = HTMLBuilder.icon("crosshairs").click(() => {
-            context.controller.loadContext("gate-reference", {
+        let editReference = HTMLBuilder.icon('crosshairs').click(() => {
+            context.controller.loadContext('gate-reference', {
                 continuity: this,
             });
         });
-        setupTooltip(editReference, "Reference Point");
+        setupTooltip(editReference, 'Reference Point');
 
         return [degrees, direction, editReference];
     }

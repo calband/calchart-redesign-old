@@ -37,7 +37,6 @@ import BasePopup from './BasePopup';
 import store from 'store';
 
 export default {
-    components: { BasePopup },
     extends: BasePopup,
     props: {
         title: {
@@ -63,10 +62,14 @@ export default {
             required: true,
         },
     },
+    components: { BasePopup },
     data() {
         return {
             form: {},
         };
+    },
+    computed: {
+        allProps,
     },
     methods: {
         /**
@@ -92,9 +95,6 @@ export default {
                     store.dispatch('messages/showError', e.message);
                 });
         },
-    },
-    computed: {
-        allProps,
     },
 };
 </script>

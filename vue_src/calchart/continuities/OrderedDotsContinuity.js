@@ -1,7 +1,7 @@
-import BaseContinuity from "calchart/continuities/BaseContinuity";
+import BaseContinuity from 'calchart/continuities/BaseContinuity';
 
-import HTMLBuilder from "utils/HTMLBuilder";
-import { setupTooltip } from "utils/UIUtils";
+import HTMLBuilder from 'utils/HTMLBuilder';
+import { setupTooltip } from 'utils/UIUtils';
 
 /**
  * A superclass for all continuities that require dots to be in order.
@@ -40,7 +40,7 @@ export default class OrderedDotsContinuity extends BaseContinuity {
 
     clone(key, val) {
         switch (key) {
-            case "_order":
+            case '_order':
                 return val;
         }
         return super.clone(key, val);
@@ -72,14 +72,14 @@ export default class OrderedDotsContinuity extends BaseContinuity {
     }
 
     getPanel(context) {
-        let editLabel = HTMLBuilder.label("Edit:");
+        let editLabel = HTMLBuilder.label('Edit:');
 
-        let editDots = HTMLBuilder.icon("ellipsis-h").click(e => {
-            context.controller.loadContext("continuity-dots", {
+        let editDots = HTMLBuilder.icon('ellipsis-h').click(e => {
+            context.controller.loadContext('continuity-dots', {
                 continuity: this,
             });
         });
-        setupTooltip(editDots, "Dots");
+        setupTooltip(editDots, 'Dots');
 
         return [editLabel, editDots];
     }

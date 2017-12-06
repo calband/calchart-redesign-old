@@ -1,6 +1,6 @@
 import { clone, defaults, extend, flatMap } from 'lodash';
 
-import { NotImplementedError } from "utils/errors";
+import { NotImplementedError } from 'utils/errors';
 
 /**
  * Represents a Continuity for a dot type during a stuntsheet. This is
@@ -13,12 +13,12 @@ export default class BaseContinuity {
      * @param {Sheet} sheet - The Sheet the Continuity is for.
      * @param {DotType} dotType - The dot type the continuity is for.
      * @param {Object} [options] - Options for most/all continuities. Can either
-     *   be the given type or the string "default", which will be resolved by getting
-     *   the value from the Sheet. Possible options include:
-     *   - {string} stepType - The step type to march, like high step, show high.
-     *   - {int} beatsPerStep - The number of beats per each step of the movement.
-     *   - {string} orientation - Orientation, as either east or west. The meaning for
-     *     this option is different for each continuity.
+     *   be the given type or the string 'default', which will be resolved by
+     *   getting the value from the Sheet. Possible options include:
+     *   - {string} stepType - The step type to march
+     *   - {int} beatsPerStep - The number of beats per step of the movement.
+     *   - {string} orientation - Orientation, as either east or west. The
+     *     meaning for this option is different for each continuity.
      *   - {string} customText - Custom continuity text to override the default
      *     text that should be shown for the continuity.
      */
@@ -27,10 +27,10 @@ export default class BaseContinuity {
         this._dotType = dotType;
 
         options = defaults({}, options, {
-            stepType: "default",
-            beatsPerStep: "default",
-            orientation: "default",
-            customText: "",
+            stepType: 'default',
+            beatsPerStep: 'default',
+            orientation: 'default',
+            customText: '',
         });
 
         this._stepType = options.stepType;
@@ -116,10 +116,11 @@ export default class BaseContinuity {
     }
 
     /**
-     * @return {object} meta info for this continuity, including the following keys:
-     *   - {string} type - The short, unique ID of the continuity; e.g. "fm"
-     *   - {string} name - The name of the continuity; e.g. "Forward March"
-     *   - {string} label - The label for the continuity to use in the panel; e.g. "FM"
+     * @return {object} meta info for this continuity:
+     *   - {string} type - The short, unique ID of the continuity; e.g. 'fm'
+     *   - {string} name - The name of the continuity; e.g. 'Forward March'
+     *   - {string} label - The label for the continuity to use in the panel;
+     *     e.g. 'FM'
      */
     get info() {
         throw new NotImplementedError(this);
@@ -134,31 +135,30 @@ export default class BaseContinuity {
     /**
      * Clone the given property, being careful to not clone any foreign keys.
      *
-     * @param {string} key - The property to clone, such as "_sheet"
+     * @param {string} key - The property to clone, such as '_sheet'
      * @param {*} val - The value of the property (equivalent to this[key]).
      * @return {undefined|*} The value to use for this property in the cloned
      *   continuity. If undefined, will be cloned as normal.
      */
     clone(key, val) {
         switch (key) {
-            case "_sheet":
+            case '_sheet':
                 return null; // set manually later
         }
     }
 
     /**
-     * Get the number of beats per step for this continuity, resolving any defaults.
-     *
-     * @return {int}
+     * @return {int} the number of beats per step for this continuity, resolving
+     * any defaults.
      */
     getBeatsPerStep() {
-        return this._beatsPerStep === "default" ?
+        return this._beatsPerStep === 'default' ?
             this.sheet.getBeatsPerStep() : this._beatsPerStep;
     }
 
     /**
-     * @return {string} The continuity text to be displayed for this continuity, assuming
-     *   this is a sheet after this sheet.
+     * @return {string} The continuity text to be displayed for this continuity,
+     *   assuming this is a sheet after this sheet.
      */
     getContinuityText() {
         throw new NotImplementedError(this);
@@ -193,9 +193,9 @@ export default class BaseContinuity {
     getOrientation() {
         switch(this.getOrientationDegrees()) {
             case 0:
-                return "E";
+                return 'E';
             case 180:
-                return "W";
+                return 'W';
             default:
                 return undefined;
         }
@@ -208,17 +208,17 @@ export default class BaseContinuity {
      */
     getOrientationDegrees() {
         switch (this._orientation) {
-            case "default":
+            case 'default':
                 return this.sheet.getOrientationDegrees();
-            case "east":
+            case 'east':
                 return 0;
-            case "west":
+            case 'west':
                 return 180;
-            case "":
+            case '':
                 // for EvenContinuity, moving in direction of travel
                 return undefined;
         }
-        throw new Error("Invalid orientation: " + this._orientation);
+        throw new Error('Invalid orientation: ' + this._orientation);
     }
 
     /**
@@ -237,7 +237,9 @@ export default class BaseContinuity {
      * @return {string} Step type (see CalchartUtils.STEP_TYPES).
      */
     getStepType() {
-        return this._stepType === "default" ? this.sheet.getStepType() : this._stepType;
+        return this._stepType === 'default' ?
+            this.sheet.getStepType() :
+            this._stepType;
     }
 
     /**
@@ -285,6 +287,6 @@ export default class BaseContinuity {
      */
     _updateMovements(context) {
         this.sheet.updateMovements(this.dotType);
-        context.refresh("grapher");
+        context.refresh('grapher');
     }
 }

@@ -66,7 +66,7 @@ class BaseHistory {
         }
         this._history.push({
             label: capitalize(lowerCase(action)),
-            state: cloneDeep(state)
+            state: cloneDeep(state),
         });
         this._index++;
     }

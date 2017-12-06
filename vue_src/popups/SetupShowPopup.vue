@@ -22,8 +22,8 @@ import { BasePopup, FormPopup } from './lib';
 import { positive } from './validators';
 
 export default {
-    components: { FormPopup },
     extends: BasePopup,
+    components: { FormPopup },
     data() {
         return {
             model: {
@@ -67,7 +67,7 @@ export default {
                 metadata.name,
                 metadata.slug,
                 metadata.isBand,
-                data,
+                data
             );
             store.commit('setShow', show);
             store.dispatch('editor/saveShow', {

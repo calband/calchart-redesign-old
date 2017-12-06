@@ -5,70 +5,70 @@
 import { clone, range, round } from 'lodash';
 
 /** @const {string[]} */
-export const AUDIO_EXTENSIONS = ["ogg"];
+export const AUDIO_EXTENSIONS = ['ogg'];
 
 /** @const {Object} */
 export const CONTINUITIES = {
-    "Simple": {
-        EWNS: "EWNS",
-        NSEW: "NSEW",
-        FM: "FM: Forward March",
+    'Simple': {
+        EWNS: 'EWNS',
+        NSEW: 'NSEW',
+        FM: 'FM: Forward March',
     },
-    "Stops": {
-        MT: "MT: Mark Time",
-        CL: "CL: Close",
+    'Stops': {
+        MT: 'MT: Mark Time',
+        CL: 'CL: Close',
     },
-    "Off-Grid": {
-        EVEN: "Even",
-        DMHS: "DMHS",
-        HSDM: "HSDM",
+    'Off-Grid': {
+        EVEN: 'Even',
+        DMHS: 'DMHS',
+        HSDM: 'HSDM',
     },
-    "Flows": {
-        FTL: "FTL: Follow the Leader",
-        CM: "CM: Counter March",
-        TWO: "TWO: 2 Step",
-        GT: "GT: Gate Turn",
-        GV: "GV: Grapevine",
+    'Flows': {
+        FTL: 'FTL: Follow the Leader',
+        CM: 'CM: Counter March',
+        TWO: 'TWO: 2 Step',
+        GT: 'GT: Gate Turn',
+        GV: 'GV: Grapevine',
     },
 };
 
 /** @const {Object.<string, string>} */
 export const DEFAULT_CUSTOM = {
-    default: "Default",
-    custom: "Custom",
+    default: 'Default',
+    custom: 'Custom',
 };
 
 /** @const {Object.<string, string>} */
 export const DIRECTIONS = {
-    0: "E",
-    90: "S",
-    180: "W",
-    270: "N",
+    0: 'E',
+    90: 'S',
+    180: 'W',
+    270: 'N',
 };
 
 /** @const {Object.<string, string>} */
 export const DOT_FORMATS = {
-    combo: "A0, A1, A2, ...",
-    number: "1, 2, 3, ...",
+    combo: 'A0, A1, A2, ...',
+    number: '1, 2, 3, ...',
 };
 
 /** @const {Object.<string, string>} */
 export const ENDINGS = {
-    MT: "Mark Time",
-    CL: "Close",
+    MT: 'Mark Time',
+    CL: 'Close',
 };
 
 /** @const {Object.<string, string>} */
 export const FIELD_TYPES = {
-    default: "Default",
-    college: "College Field",
+    default: 'Default',
+    college: 'College Field',
 };
 
 /** @const {Object.<string, string>} */
 export const ORIENTATIONS = {
-    default: "Default",
-    east: "East",
-    west: "West",
+    default: 'Default',
+    east: 'East',
+    west: 'West',
 };
 
 /**
@@ -83,12 +83,12 @@ export const STEP_SIZES = {
 
 /** @const{Object.<string, string>} */
 export const STEP_TYPES = {
-    default: "Default",
-    HS: "High Step",
-    MM: "Mini Military",
-    FF: "Full Field",
-    SH: "Show High",
-    JS: "Jerky Step",
+    default: 'Default',
+    HS: 'High Step',
+    MM: 'Mini Military',
+    FF: 'Full Field',
+    SH: 'Show High',
+    JS: 'Jerky Step',
 };
 
 /** @const {number[]} **/
@@ -116,21 +116,21 @@ delete SHOW_STEP_TYPES.default;
 export function getDotLabels(dotFormat, numDots) {
     let getLabel;
     switch (dotFormat) {
-        case "combo":
+        case 'combo':
             getLabel = function(n) {
-                // 65 = "A"
+                // 65 = 'A'
                 let charCode = 65 + (n / 10);
                 let num = n % 10;
                 return String.fromCharCode(charCode) + num;
             };
             break;
-        case "number":
+        case 'number':
             getLabel = function(n) {
                 return String(n);
             };
             break;
         default:
-            throw new Error("Invalid dot format: ${dotFormat}");
+            throw new Error('Invalid dot format: ${dotFormat}');
     }
 
     return range(numDots).map(getLabel);
@@ -141,18 +141,22 @@ export function getDotLabels(dotFormat, numDots) {
  * and colored in the CSS.
  *
  * @param {number} angle - The angle, in Calchart degrees
- * @return {string} one of: "facing-east", "facing-south", "facing-west", "facing-north"
+ * @return {string} one of:
+ *   - 'facing-east'
+ *   - 'facing-south'
+ *   - 'facing-west'
+ *   - 'facing-north'
  */
 export function getNearestOrientation(angle) {
     // exactly half counts as east/west
     if (angle <= 45 || angle >= 315) {
-        return "facing-east";
+        return 'facing-east';
     } else if (angle < 135) {
-        return "facing-south";
+        return 'facing-south';
     } else if (angle <= 225) {
-        return "facing-west";
+        return 'facing-west';
     } else {
-        return "facing-north";
+        return 'facing-north';
     }
 }
 
@@ -165,17 +169,17 @@ export function getNearestOrientation(angle) {
  * @return {string}
  */
 export function getOrientation(angle) {
-    let dir = "";
+    let dir = '';
     if (angle > 0 && angle < 180) {
-        dir = "S";
+        dir = 'S';
     } else if (angle > 180 && angle < 360) {
-        dir = "N";
+        dir = 'N';
     }
 
     if (angle < 90 || angle > 270) {
-        return dir + "E";
+        return dir + 'E';
     } else if (angle > 90 && angle < 270) {
-        return dir + "W";
+        return dir + 'W';
     } else {
         return dir;
     }
@@ -183,7 +187,7 @@ export function getOrientation(angle) {
 
 /**
  * Convert the given y-coordinate to a human-readable format; e.g.
- * "8E EH" would mean "8 steps east of the east hash".
+ * '8E EH' would mean '8 steps east of the east hash'.
  *
  * @param {number} y
  * @return {string}
@@ -193,40 +197,40 @@ export function getYCoordinateText(y) {
 
     // West Sideline
     if (y == 0) {
-        return "WS";
+        return 'WS';
     }
     // Near West Sideline
     if (y <= 16) {
-        return round10(y) + " WS";
+        return round10(y) + ' WS';
     }
     // West of West Hash
     if (y < 32) {
-        return round10(32 - y) + "W WH";
+        return round10(32 - y) + 'W WH';
     }
     // West Hash
     if (y == 32) {
-        return "WH";
+        return 'WH';
     }
     // East of West Hash
     if (y <= 40) {
-        return round10(y - 32) + "E WH";
+        return round10(y - 32) + 'E WH';
     }
     // West of East Hash
     if (y < 52) {
-        return round10(52 - y) + "W EH";
+        return round10(52 - y) + 'W EH';
     }
     // East Hash
     if (y == 52) {
-        return "EH";
+        return 'EH';
     }
     // East of East Hash
     if (y <= 68) {
-        return round10(y - 52) + "E EH";
+        return round10(y - 52) + 'E EH';
     }
     // Near East Sideline
     if (y < 84) {
-        return round10(84 - y) + " ES";
+        return round10(84 - y) + ' ES';
     }
     // East Sideline
-    return "ES";
+    return 'ES';
 }

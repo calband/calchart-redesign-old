@@ -1,13 +1,13 @@
 import { cloneDeepWith, concat, defaults, pull } from 'lodash';
 
-import OrderedDotsContinuity from "calchart/continuities/OrderedDotsContinuity";
-import Continuity from "calchart/Continuity";
-import MovementCommandStop from "calchart/movements/MovementCommandStop";
-import { TwoStepContinuityPopup } from "popups/ContinuityPopups";
+import OrderedDotsContinuity from 'calchart/continuities/OrderedDotsContinuity';
+import Continuity from 'calchart/Continuity';
+import MovementCommandStop from 'calchart/movements/MovementCommandStop';
+import { TwoStepContinuityPopup } from 'popups/ContinuityPopups';
 
-import HTMLBuilder from "utils/HTMLBuilder";
-import { moveElem } from "utils/JSUtils";
-import { setupTooltip } from "utils/UIUtils";
+import HTMLBuilder from 'utils/HTMLBuilder';
+import { moveElem } from 'utils/JSUtils';
+import { setupTooltip } from 'utils/UIUtils';
 
 /**
  * A two step continuity, where each dot in a line does a given set of
@@ -18,13 +18,14 @@ export default class TwoStepContinuity extends OrderedDotsContinuity {
      * @param {Sheet} sheet
      * @param {DotType} dotType
      * @param {Dot[]} order
-     * @param {Continuity[]} continuities - The continuities each dot should execute
-     *   after waiting the appropriate amount of time.
+     * @param {Continuity[]} continuities - The continuities each dot should
+     *   execute after waiting the appropriate amount of time.
      * @param {object} [options] - Options for the continuity, including:
      *   - {string} stepType
      *   - {int} beatsPerStep
      *   - {string} orientation - The direction to face in the beginning.
-     *   - {boolean} [isMarktime=true] - true if mark time during step two, false for close
+     *   - {boolean} [isMarktime=true] - true if mark time during step two,
+     *     false for close
      */
     constructor(sheet, dotType, order, continuities, options) {
         super(sheet, dotType, order, options);
@@ -46,7 +47,9 @@ export default class TwoStepContinuity extends OrderedDotsContinuity {
     }
 
     serialize() {
-        let continuities = this._continuities.map(continuity => continuity.serialize());
+        let continuities = this._continuities.map(
+            continuity => continuity.serialize()
+        );
         return super.serialize({
             continuities: continuities,
             isMarktime: this._isMarktime,
@@ -59,9 +62,9 @@ export default class TwoStepContinuity extends OrderedDotsContinuity {
 
     get info() {
         return {
-            type: "two",
-            name: "Two Step",
-            label: "2-Step",
+            type: 'two',
+            name: 'Two Step',
+            label: '2-Step',
         };
     }
 
@@ -69,9 +72,11 @@ export default class TwoStepContinuity extends OrderedDotsContinuity {
 
     clone(key, val) {
         switch (key) {
-            case "_continuities":
+            case '_continuities':
                 return val.map(continuity =>
-                    cloneDeepWith(continuity, (val, key) => continuity.clone(key, val))
+                    cloneDeepWith(continuity,
+                        (val, key) => continuity.clone(key, val)
+                    )
                 );
         }
         return super.clone(key, val);
@@ -96,11 +101,14 @@ export default class TwoStepContinuity extends OrderedDotsContinuity {
 
     getContinuityText() {
         let beats = this.getBeatsPerStep() * 2;
-        let stop = this._isMarktime ? `MT${this.getStepType()}` : "Close";
+        let stop = this._isMarktime ? `MT${this.getStepType()}` : 'Close';
         let orientation = this.getOrientation();
-        let continuities = this._continuities.map(continuity => continuity.getText()).join("\n");
+        let beforeText = `${stop} ${orientation} before`;
+        let continuities = this._continuities.map(
+            continuity => continuity.getText()
+        ).join('\n');
 
-        return `Step ${beats} drill [${stop} ${orientation} before]:\n${continuities}`;
+        return `Step ${beats} drill [${beforeText}]:\n${continuities}`;
     }
 
     /**
@@ -136,12 +144,12 @@ export default class TwoStepContinuity extends OrderedDotsContinuity {
     getPanel(context) {
         let panel = super.getPanel(context);
 
-        let editContinuities = HTMLBuilder.icon("map-signs").click(e => {
-            context.controller.loadContext("two-step", {
+        let editContinuities = HTMLBuilder.icon('map-signs').click(e => {
+            context.controller.loadContext('two-step', {
                 continuity: this,
             });
         });
-        setupTooltip(editContinuities, "Continuities");
+        setupTooltip(editContinuities, 'Continuities');
 
         return concat(panel, editContinuities);
     }

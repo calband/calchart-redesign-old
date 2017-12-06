@@ -1,9 +1,9 @@
 import { isNull } from 'lodash';
 
-import ToEndContinuity from "calchart/continuities/ToEndContinuity";
-import MovementCommandMove from "calchart/movements/MovementCommandMove";
+import ToEndContinuity from 'calchart/continuities/ToEndContinuity';
+import MovementCommandMove from 'calchart/movements/MovementCommandMove';
 
-import { roundSmall } from "utils/MathUtils";
+import { roundSmall } from 'utils/MathUtils';
 
 /**
  * An EWNS or NSEW continuity, where dots move as far EW or NS as possible,
@@ -41,9 +41,9 @@ export default class FountainGridContinuity extends ToEndContinuity {
     }
 
     get info() {
-        let name = this._isEWNS ? "EWNS" : "NSEW";
+        let name = this._isEWNS ? 'EWNS' : 'NSEW';
         return {
-            type: "fountain",
+            type: 'fountain',
             name: name,
             label: name,
         };
@@ -52,7 +52,7 @@ export default class FountainGridContinuity extends ToEndContinuity {
     /**** METHODS ****/
 
     getContinuityText() {
-        let directions = this._isEWNS ? "EW/NS" : "NS/EW";
+        let directions = this._isEWNS ? 'EW/NS' : 'NS/EW';
         let end = this._getEndText();
         return `FM${this.getStepType()} ${directions} ${end}`;
     }
@@ -76,7 +76,9 @@ export default class FountainGridContinuity extends ToEndContinuity {
 
         function addMovement(x, y, dir, steps) {
             let duration = Math.abs(steps) * options.beatsPerStep;
-            let movement = new MovementCommandMove(x, y, dir, duration, options);
+            let movement = new MovementCommandMove(
+                x, y, dir, duration, options
+            );
             movements.push(movement);
         }
 

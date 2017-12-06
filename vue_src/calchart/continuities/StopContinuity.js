@@ -1,12 +1,13 @@
+import $ from 'jquery';
 import { isNull } from 'lodash';
 
-import BaseContinuity from "calchart/continuities/BaseContinuity";
-import MovementCommandStop from "calchart/movements/MovementCommandStop";
-import { StopContinuityPopup } from "popups/ContinuityPopups";
+import BaseContinuity from 'calchart/continuities/BaseContinuity';
+import MovementCommandStop from 'calchart/movements/MovementCommandStop';
+import { StopContinuityPopup } from 'popups/ContinuityPopups';
 
-import HTMLBuilder from "utils/HTMLBuilder";
-import { validatePositive } from "utils/JSUtils";
-import { roundSmall } from "utils/MathUtils";
+import HTMLBuilder from 'utils/HTMLBuilder';
+import { validatePositive } from 'utils/JSUtils';
+import { roundSmall } from 'utils/MathUtils';
 
 /**
  * A continuity that does not move
@@ -16,8 +17,8 @@ export default class StopContinuity extends BaseContinuity {
      * @param {Sheet} sheet
      * @param {DotType} dotType
      * @param {boolean} isMarkTime - true if mark time, false if close.
-     * @param {?int} duration - The number of beats to mark time or close. If null,
-     *   use remaining beats.
+     * @param {?int} duration - The number of beats to mark time or close. If
+     *   null, use remaining beats.
      * @param {object} [options] - Options for the continuity, including:
      *   - {string} stepType - Only used for mark time.
      *   - {int} beatsPerStep - Only used for mark time.
@@ -31,7 +32,9 @@ export default class StopContinuity extends BaseContinuity {
     }
 
     static deserialize(sheet, dotType, data) {
-        return new StopContinuity(sheet, dotType, data.isMarkTime, data.duration, data);
+        return new StopContinuity(
+            sheet, dotType, data.isMarkTime, data.duration, data
+        );
     }
 
     serialize() {
@@ -48,15 +51,15 @@ export default class StopContinuity extends BaseContinuity {
     get info() {
         if (this._marktime) {
             return {
-                type: "mt",
-                name: "Mark Time",
-                label: "MT",
+                type: 'mt',
+                name: 'Mark Time',
+                label: 'MT',
             };
         } else {
             return {
-                type: "close",
-                name: "Close",
-                label: "Close",
+                type: 'close',
+                name: 'Close',
+                label: 'Close',
             };
         }
     }
@@ -108,7 +111,7 @@ export default class StopContinuity extends BaseContinuity {
 
     getPanel(context) {
         let numBeats = HTMLBuilder.input({
-            type: "number",
+            type: 'number',
             initial: this._duration,
             change: e => {
                 this._duration = validatePositive(e.currentTarget);
@@ -118,24 +121,24 @@ export default class StopContinuity extends BaseContinuity {
 
         let duration = HTMLBuilder.select({
             options: {
-                remaining: "To End",
-                custom: "Custom",
+                remaining: 'To End',
+                custom: 'Custom',
             },
-            initial: isNull(this._duration) ? "remaining" : "custom",
+            initial: isNull(this._duration) ? 'remaining' : 'custom',
             change: e => {
                 switch ($(e.currentTarget).val()) {
-                    case "custom":
-                        numBeats.prop("disabled", false).change();
+                    case 'custom':
+                        numBeats.prop('disabled', false).change();
                         break;
-                    case "remaining":
-                        numBeats.prop("disabled", true);
+                    case 'remaining':
+                        numBeats.prop('disabled', true);
                         this._duration = null;
                         this._updateMovements(context);
                 }
             },
         });
 
-        numBeats.prop("disabled", isNull(this._duration));
+        numBeats.prop('disabled', isNull(this._duration));
 
         return [duration, numBeats];
     }

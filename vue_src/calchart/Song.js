@@ -1,8 +1,8 @@
 import { defaults, isNumber } from 'lodash';
 
 /**
- * A song represents a collection of Sheets that comprise a Song. Songs can be used
- * to set defaults for continuities, such as west-facing songs.
+ * A song represents a collection of Sheets that comprise a Song. Songs can be
+ * used to set defaults for continuities, such as west-facing songs.
  */
 export default class Song {
     /**
@@ -10,15 +10,15 @@ export default class Song {
      * @param {string} name - The name of the song
      * @param {(number[]|Sheet[])} sheets - The sheets contained in this song.
      * @param {Object} [options] - Optional information about the song, such as:
-     *   - {string} fieldType - The field type, or "default" to use the same field
-     *     type as the Show.
-     *   - {(int|string)} beatsPerStep - The default number of beats per step for
-     *       continuities in the Song, or "default" to get the number of beats per
-     *       step from the Show.
-     *   - {string} orientation - The default orientation for continuities in the
-     *       Song, or "default" to get the orientation from the Show.
-     *   - {string} stepType - The default step type for continuities in the Song,
-     *       or "default" to get the step type from the Show.
+     *   - {string} fieldType - The field type, or 'default' to use the same
+     *     field type as the Show.
+     *   - {(int|string)} beatsPerStep - The default number of beats per step
+     *       for continuities in the Song, or 'default' to get the number of
+     *       beats per step from the Show.
+     *   - {string} orientation - The default orientation for continuities in
+     *       the Song, or 'default' to get the orientation from the Show.
+     *   - {string} stepType - The default step type for continuities in the
+     *       Song, or 'default' to get the step type from the Show.
      */
     constructor(show, name, sheets, options={}) {
         this._show = show;
@@ -32,10 +32,10 @@ export default class Song {
         this._sheets = new Set(sheets);
 
         options = defaults({}, options, {
-            fieldType: "default",
-            beatsPerStep: "default",
-            orientation: "default",
-            stepType: "default",
+            fieldType: 'default',
+            beatsPerStep: 'default',
+            orientation: 'default',
+            stepType: 'default',
         });
 
         this._fieldType = options.fieldType;
@@ -124,14 +124,18 @@ export default class Song {
      * @return {int}
      */
     getBeatsPerStep() {
-        return this._beatsPerStep === "default" ? this.show.getBeatsPerStep() : this._beatsPerStep;
+        return this._beatsPerStep === 'default' ?
+            this.show.getBeatsPerStep() :
+            this._beatsPerStep;
     }
 
     /**
      * @return {string} The field type for the song, resolving any defaults.
      */
     getFieldType() {
-        return this._fieldType === "default" ? this.show.getFieldType() : this._fieldType;
+        return this._fieldType === 'default' ?
+            this.show.getFieldType() :
+            this._fieldType;
     }
 
     /**
@@ -146,11 +150,11 @@ export default class Song {
      */
     getOrientationDegrees() {
         switch (this._orientation) {
-            case "default":
+            case 'default':
                 return this.show.getOrientationDegrees();
-            case "east":
+            case 'east':
                 return 0;
-            case "west":
+            case 'west':
                 return 180;
         }
         throw new Error(`Invalid orientation: ${this._orientation}`);
@@ -164,10 +168,13 @@ export default class Song {
     }
 
     /**
-     * @return {string} The song's step type, resolving any defaults. (@see CalchartUtils.STEP_TYPES)
+     * @return {string} The song's step type, resolving any defaults.
+     *   (@see CalchartUtils.STEP_TYPES)
      */
     getStepType() {
-        return this._stepType === "default" ? this.show.getStepType() : this._stepType;
+        return this._stepType === 'default' ?
+            this.show.getStepType() :
+            this._stepType;
     }
 
     /**

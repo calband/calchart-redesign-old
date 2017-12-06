@@ -1,14 +1,14 @@
-import BaseContinuity from "calchart/continuities/BaseContinuity";
-import CounterMarchContinuity from "calchart/continuities/CounterMarchContinuity";
-import DiagonalContinuity from "calchart/continuities/DiagonalContinuity";
-import EvenContinuity from "calchart/continuities/EvenContinuity";
-import FollowLeaderContinuity from "calchart/continuities/FollowLeaderContinuity";
-import ForwardContinuity from "calchart/continuities/ForwardContinuity";
-import FountainGridContinuity from "calchart/continuities/FountainGridContinuity";
-import GateTurnContinuity from "calchart/continuities/GateTurnContinuity";
-import GrapevineContinuity from "calchart/continuities/GrapevineContinuity";
-import StopContinuity from "calchart/continuities/StopContinuity";
-import TwoStepContinuity from "calchart/continuities/TwoStepContinuity";
+import BaseContinuity from './continuities/BaseContinuity';
+import CounterMarchContinuity from './continuities/CounterMarchContinuity';
+import DiagonalContinuity from './continuities/DiagonalContinuity';
+import EvenContinuity from './continuities/EvenContinuity';
+import FollowLeaderContinuity from './continuities/FollowLeaderContinuity';
+import ForwardContinuity from './continuities/ForwardContinuity';
+import FountainGridContinuity from './continuities/FountainGridContinuity';
+import GateTurnContinuity from './continuities/GateTurnContinuity';
+import GrapevineContinuity from './continuities/GrapevineContinuity';
+import StopContinuity from './continuities/StopContinuity';
+import TwoStepContinuity from './continuities/TwoStepContinuity';
 
 /**
  * A proxy class for creating/deserializing all Continuity types, although
@@ -20,7 +20,8 @@ export default class Continuity {
     /**
      * Create a Continuity of the given type.
      *
-     * @param {string} type - The type of Continuity to create (@see CalchartUtils.CONTINUITIES).
+     * @param {string} type - The type of Continuity to create (@see
+     *   CalchartUtils.CONTINUITIES).
      * @param {Sheet} sheet - The sheet the Continuity is for.
      * @param {DotType} dotType - The dot type the Continuity is for.
      * @return {Continuity}
@@ -28,36 +29,36 @@ export default class Continuity {
     static create(type, sheet, dotType) {
         let dots = sheet.getDotsOfType(dotType);
         switch (type) {
-            case "EWNS":
+            case 'EWNS':
                 return new FountainGridContinuity(sheet, dotType, true);
-            case "NSEW":
+            case 'NSEW':
                 return new FountainGridContinuity(sheet, dotType, false);
-            case "FM":
+            case 'FM':
                 return new ForwardContinuity(sheet, dotType, 0, 0);
-            case "MT":
+            case 'MT':
                 return new StopContinuity(sheet, dotType, true, null);
-            case "CL":
+            case 'CL':
                 return new StopContinuity(sheet, dotType, false, null);
-            case "EVEN":
+            case 'EVEN':
                 return new EvenContinuity(sheet, dotType);
-            case "DMHS":
+            case 'DMHS':
                 return new DiagonalContinuity(sheet, dotType, true);
-            case "HSDM":
+            case 'HSDM':
                 return new DiagonalContinuity(sheet, dotType, false);
-            case "FTL":
+            case 'FTL':
                 return new FollowLeaderContinuity(sheet, dotType, dots, []);
-            case "CM":
+            case 'CM':
                 return new CounterMarchContinuity(sheet, dotType, null, dots);
-            case "TWO":
+            case 'TWO':
                 return new TwoStepContinuity(sheet, dotType, dots, []);
-            case "GT": {
+            case 'GT': {
                 let reference = sheet.getDotInfo(dots[0]).position;
                 return new GateTurnContinuity(sheet, dotType, 90, reference);
             }
-            case "GV":
+            case 'GV':
                 return new GrapevineContinuity(sheet, dotType, 0, 90);
         }
-        throw new Error("No continuity of the type: " + type);
+        throw new Error('No continuity of the type: ' + type);
     }
 
     /**
@@ -70,29 +71,29 @@ export default class Continuity {
      */
     static deserialize(sheet, dotType, data) {
         switch (data.type) {
-            case "fountain":
+            case 'fountain':
                 return FountainGridContinuity.deserialize(sheet, dotType, data);
-            case "fm":
+            case 'fm':
                 return ForwardContinuity.deserialize(sheet, dotType, data);
-            case "close":
-            case "mt":
+            case 'close':
+            case 'mt':
                 return StopContinuity.deserialize(sheet, dotType, data);
-            case "even":
+            case 'even':
                 return EvenContinuity.deserialize(sheet, dotType, data);
-            case "diagonal":
+            case 'diagonal':
                 return DiagonalContinuity.deserialize(sheet, dotType, data);
-            case "ftl":
+            case 'ftl':
                 return FollowLeaderContinuity.deserialize(sheet, dotType, data);
-            case "cm":
+            case 'cm':
                 return CounterMarchContinuity.deserialize(sheet, dotType, data);
-            case "two":
+            case 'two':
                 return TwoStepContinuity.deserialize(sheet, dotType, data);
-            case "gate":
+            case 'gate':
                 return GateTurnContinuity.deserialize(sheet, dotType, data);
-            case "gv":
+            case 'gv':
                 return GrapevineContinuity.deserialize(sheet, dotType, data);
         }
-        throw new Error("No continuity of the type: " + data.type);
+        throw new Error('No continuity of the type: ' + data.type);
     }
 
     /**

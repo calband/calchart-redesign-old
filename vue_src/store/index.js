@@ -8,7 +8,6 @@ import Vuex from 'vuex';
 import editor from 'store/editor';
 import env from 'store/env';
 import messages from 'store/messages';
-import sendAction from 'utils/ajax';
 
 Vue.use(Vuex);
 

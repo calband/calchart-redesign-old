@@ -120,7 +120,6 @@ The top menu in the editor application.
 
 <script>
 import $ from 'jquery';
-import { mapGetters, mapActions } from 'vuex';
 
 import { ZOOMS } from 'utils/CalchartUtils';
 import History from 'utils/History';
@@ -155,7 +154,7 @@ export default {
                 } else {
                     this.activate(menuTab);
                 }
-            })
+            });
         });
     },
     constants: {
@@ -215,13 +214,13 @@ export default {
          * Open the viewer app for the current show.
          */
         openViewer() {
-            console.log('open viewer');
+            alert('open viewer');
         },
         /**
          * Open the help pages.
          */
         openHelp() {
-            console.log('open help');
+            alert('open help');
         },
     },
 };
