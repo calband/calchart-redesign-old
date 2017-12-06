@@ -30,9 +30,9 @@ A popup that contains a form to be submitted or modified.
 <script>
 import _ from 'lodash';
 
-import { $root } from 'utils/vue';
-
 import BasePopup from './BasePopup';
+
+import store from 'store';
 
 export default {
     components: { BasePopup },
@@ -91,7 +91,8 @@ export default {
                     }
                 })
                 .catch(e => {
-                    $root.showError(e.message);
+                    // BUG: closing error message should not close popup
+                    store.dispatch('messages/showError', e.message);
                 });
         },
     },

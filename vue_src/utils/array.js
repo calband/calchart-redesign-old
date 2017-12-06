@@ -11,6 +11,6 @@ import _ from 'lodash';
  * See `_.findIndex` for usage.
  */
 export function findAndRemove(array) {
-    let index = _.findIndex.apply(arguments);
+    let index = _.findIndex.apply(null, arguments);
     array.splice(index, 1);
 }

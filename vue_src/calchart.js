@@ -6,7 +6,6 @@ import App from 'App';
 import FormsPlugin from 'forms';
 import router from 'router';
 import store from 'store';
-import { setRoot } from 'utils/vue';
 
 Vue.use(FormsPlugin);
 Vue.use(VueContextMenu);
@@ -14,9 +13,8 @@ Vue.use(VueContextMenu);
 Vue.directive('on-click-outside', onClickOutside);
 
 let CalchartApp = Vue.extend(App);
-let vm = new CalchartApp({
+new CalchartApp({
     el: '#app',
     router,
     store,
 });
-setRoot(vm);
