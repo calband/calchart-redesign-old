@@ -117,7 +117,7 @@ export function getDotLabels(dotFormat, numDots) {
     let getLabel;
     switch (dotFormat) {
         case "combo":
-            getLabel = function(n) {
+            getLabel = n => {
                 // 65 = "A"
                 let charCode = 65 + (n / 10);
                 let num = n % 10;
@@ -125,9 +125,7 @@ export function getDotLabels(dotFormat, numDots) {
             };
             break;
         case "number":
-            getLabel = function(n) {
-                return String(n);
-            };
+            getLabel = String;
             break;
         default:
             throw new Error("Invalid dot format: ${dotFormat}");

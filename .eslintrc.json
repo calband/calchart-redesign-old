@@ -23,6 +23,7 @@
             "allow": ["error"]
         }],
         "no-trailing-spaces": "error",
+        "no-unneeded-ternary": "error",
         "no-unused-vars": ["error", {
             "args": "none",
             "varsIgnorePattern": "^_"
@@ -42,11 +43,11 @@
         "vue/order-in-components": ["error", {
             "order": [
                 "name",
-                "components",
                 ["parent", "mixins", "extends", "provide", "inject"],
                 "props",
                 "propsData",
                 ["el", "template", "render", "renderError"],
+                "components",
                 "data",
                 "LIFECYCLE_HOOKS",
                 ["directives", "filters"],

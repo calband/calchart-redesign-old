@@ -51,7 +51,8 @@ export default function sendAction(action, data, options) {
 
     formData.append('data', JSON.stringify(nonFileData));
 
-    $.ajax('', defaults(options, {
+    $.ajax(defaults(options, {
+        url: '',
         method: 'POST',
         data: formData,
         dataType: 'json',

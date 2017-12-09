@@ -3,7 +3,7 @@ A popup that contains a form to be submitted or modified.
 </doc>
 
 <template>
-    <BasePopup>
+    <BasePopup v-bind="allProps">
         <h1 class="title">{{ title }}</h1>
         <form class="form-popup" @submit.prevent="submit">
             <formly-form
@@ -16,7 +16,7 @@ A popup that contains a form to be submitted or modified.
                 <slot name="buttons">
                     <button>Save</button>
                     <button
-                        v-if="allowCancel"
+                        v-if="allowHide"
                         @click="hide"
                         class="cancel"
                         type="button"
@@ -30,12 +30,13 @@ A popup that contains a form to be submitted or modified.
 <script>
 import { fromPairs, toPairs } from 'lodash';
 
+import { allProps } from 'utils/vue';
+
 import BasePopup from './BasePopup';
 
 import store from 'store';
 
 export default {
-    components: { BasePopup },
     extends: BasePopup,
     props: {
         title: {
@@ -50,11 +51,6 @@ export default {
             type: Function,
             required: true,
         },
-        allowCancel: {
-            // Show the cancel button
-            type: Boolean,
-            default: true,
-        },
         model: {
             // Model for vue-formly
             type: null,
@@ -66,10 +62,14 @@ export default {
             required: true,
         },
     },
+    components: { BasePopup },
     data() {
         return {
             form: {},
         };
+    },
+    computed: {
+        allProps,
     },
     methods: {
         /**

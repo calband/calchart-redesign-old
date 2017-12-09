@@ -1,6 +1,43 @@
 """Actions for the home page."""
 
+from django.core.exceptions import PermissionDenied
+from django.utils import timezone
+
+from .utils import retrieve_show
 from ..models import Show
+
+
+def get_tab(data, **kwargs):
+    """Get the shows in the given tab."""
+    user = kwargs['user']
+    tab = data['tab']
+
+    if tab == 'band':
+        if not user.is_members_only_user():
+            raise PermissionDenied
+        kwargs = {
+            'is_band': True,
+            'date_added__year': timezone.now().year,
+        }
+        if not user.has_committee('STUNT'):
+            kwargs['published'] = True
+
+        shows = Show.objects.filter(**kwargs)
+    elif tab == 'owned':
+        shows = Show.objects.filter(owner=user, is_band=False)
+    else:
+        raise ValueError(f'Invalid tab: {tab}')
+
+    return {
+        'shows': [
+            {
+                'slug': show.slug,
+                'name': show.name,
+                'published': show.published,
+            }
+            for show in shows
+        ],
+    }
 
 
 def create_show(data, **kwargs):
@@ -27,9 +64,8 @@ def create_show(data, **kwargs):
 def publish_show(data, **kwargs):
     """Publish or unpublish a show."""
     published = data['publish']
-    slug = data['slug']
+    show = retrieve_show(data['slug'], kwargs['user'])
 
-    show = Show.objects.get(slug=slug)
     if not show.data_file:
         # Should only apply to publishing, since a show without data
         # cannot be published in the first place to be "unpublished"

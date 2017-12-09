@@ -1,3 +1,5 @@
+import { clamp, defaults, extend, isPlainObject, isUndefined } from 'lodash';
+
 import GraphContext from "editor/contexts/GraphContext";
 import EditTools from "editor/EditTools";
 import { DotContextMenus as menus } from "menus/EditorContextMenus";
@@ -26,7 +28,7 @@ export default class DotContext extends GraphContext {
     }
 
     static get shortcuts() {
-        return _.extend({}, super.shortcuts, ContextShortcuts);
+        return extend({}, super.shortcuts, ContextShortcuts);
     }
 
     static get actions() {
@@ -112,12 +114,12 @@ export default class DotContext extends GraphContext {
      *     refresh the panel (optimization).
      */
     deselectDots(dots, options={}) {
-        if (_.isPlainObject(arguments[0])) {
+        if (isPlainObject(arguments[0])) {
             dots = undefined;
             options = arguments[0];
         }
 
-        options = _.defaults({}, options, {
+        options = defaults({}, options, {
             refresh: true,
         });
 
@@ -162,7 +164,7 @@ export default class DotContext extends GraphContext {
      *     refresh the panel (optimization).
      */
     selectDots(dots, options={}) {
-        options = _.defaults({}, options, {
+        options = defaults({}, options, {
             refresh: true,
         });
 
@@ -189,7 +191,7 @@ export default class DotContext extends GraphContext {
      *     refresh the panel (optimization).
      */
     toggleDots(dots, options={}) {
-        options = _.defaults({}, options, {
+        options = defaults({}, options, {
             refresh: true,
         });
 
@@ -268,7 +270,7 @@ class ContextActions extends GraphContext.actions {
      * @param {Sheet} [sheet=this.activeSheet]
      */
     static changeDotType(dotType, dots, sheet=this.activeSheet) {
-        if (_.isUndefined(dots)) {
+        if (isUndefined(dots)) {
             dots = this.getSelectedDots();
         }
 
@@ -276,7 +278,7 @@ class ContextActions extends GraphContext.actions {
 
         dots.forEach(function(dot) {
             let dotType = sheet.getDotType(dot);
-            if (_.isUndefined(oldTypes[dotType])) {
+            if (isUndefined(oldTypes[dotType])) {
                 oldTypes[dotType] = [];
             }
             oldTypes[dotType].push(dot);
@@ -288,7 +290,7 @@ class ContextActions extends GraphContext.actions {
         return {
             data: [dotType, dots, sheet],
             undo: function() {
-                _.each(oldTypes, (dots, dotType) => {
+                each(oldTypes, (dots, dotType) => {
                     sheet.changeDotTypes(dots, dotType);
                 });
                 this.loadSheet(sheet);
@@ -308,7 +310,7 @@ class ContextActions extends GraphContext.actions {
      * @param {Sheet} [sheet=this.activeSheet]
      */
     static moveDots(deltaX, deltaY, dots, sheet=this.activeSheet) {
-        if (_.isUndefined(dots)) {
+        if (isUndefined(dots)) {
             dots = this.getSelectedDots();
         }
 
@@ -318,8 +320,8 @@ class ContextActions extends GraphContext.actions {
         let boundPosition = position => {
             position = scale.toDistance(position);
 
-            let x = _.clamp(position.x + _deltaX, 0, this.grapher.svgWidth);
-            let y = _.clamp(position.y + _deltaY, 0, this.grapher.svgHeight);
+            let x = clamp(position.x + _deltaX, 0, this.grapher.svgWidth);
+            let y = clamp(position.y + _deltaY, 0, this.grapher.svgHeight);
 
             return scale.toSteps({ x, y });
         };
@@ -402,7 +404,7 @@ class ContextActions extends GraphContext.actions {
      * @param {Sheet} [sheet=this.activeSheet]
      */
     static resnapDots(data, sheet=this.activeSheet) {
-        if (_.isUndefined(data)) {
+        if (isUndefined(data)) {
             data = mapSome(this.show.getDots(), dot => {
                 let position = this.activeSheet.getPosition(dot);
                 let rounded = {

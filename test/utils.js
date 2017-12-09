@@ -38,13 +38,20 @@ export function setStunt(value) {
     });
 }
 
-// global setup
-beforeEach(() => {
-    // stub all ajax calls
-    sinon.stub($, 'ajax');
-});
-
-// global teardown
-afterEach(() => {
-    $.ajax.restore();
-});
+/**
+ * Stub a POST action sent to the server.
+ *
+ * @param {String} action - Validates that the POST action matches this value.
+ * @param {Function} callback - The callback to run instead of the AJAX call.
+ *   Will receive the data passed to the action. Should return the result of
+ *   the AJAX call.
+ */
+export function stubAction(action, callback) {
+    $.ajax.callsFake(options => {
+        expect(options.data.get('action')).toBe(action);
+        expect(options.data.has('csrfmiddlewaretoken')).toBe(true);
+        let data = options.data.get('data');
+        let result = callback(JSON.parse(data));
+        options.success(result);
+    });
+}

@@ -8,8 +8,8 @@ import { allProps } from 'utils/vue';
 import Field from './Field';
 
 export default {
-    components: { Field },
     extends: Field,
+    components: { Field },
     computed: { allProps },
 };
 </script>

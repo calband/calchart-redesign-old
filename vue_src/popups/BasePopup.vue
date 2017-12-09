@@ -3,8 +3,11 @@ The base component for a generic popup.
 </doc>
 
 <template>
-    <div class="popup-wrapper">
-        <div v-on-click-outside="hide" class="popup">
+    <div
+        class="popup-wrapper"
+        @click.self="clickOff"
+    >
+        <div class="popup">
             <slot></slot>
         </div>
     </div>
@@ -14,6 +17,13 @@ The base component for a generic popup.
 import $ from 'jquery';
 
 export default {
+    props: {
+        allowHide: {
+            // Allow user to hide the popup without submitting
+            type: Boolean,
+            default: true,
+        },
+    },
     methods: {
         open() {
             $('body').append(this.$el);
@@ -28,6 +38,11 @@ export default {
             $(window).off('.popup');
             this.$destroy();
             $(this.$el).remove();
+        },
+        clickOff() {
+            if (this.allowHide) {
+                this.hide();
+            }
         },
     },
 };

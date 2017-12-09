@@ -7,11 +7,15 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
 
+import store from 'store';
+import Show from 'calchart/Show';
+import Editor from 'editor/App';
 import Home from 'home/App';
+import sendAction, { handleError } from 'utils/ajax';
 
 Vue.use(VueRouter);
 
-export default new VueRouter({
+let router = new VueRouter({
     mode: 'history',
     routes: [
         {
@@ -25,7 +29,7 @@ export default new VueRouter({
         {
             path: '/editor/:slug/',
             name: 'editor',
-            component: Home, // TODO
+            component: Editor,
         },
         {
             path: '/viewer/:slug/',
@@ -39,3 +43,34 @@ export default new VueRouter({
         },
     ],
 });
+
+router.beforeEach((to, from, next) => {
+    store.commit('setShow', null);
+
+    let slug = to.params.slug;
+    if (slug) {
+        sendAction('get_show', { slug }, {
+            success: data => {
+                if (data.isInitialized) {
+                    store.commit('setShow', Show.deserialize(data.show));
+                    next();
+                } else {
+                    if (to.name === 'editor') {
+                        store.commit('editor/setNewShowData', data);
+                    } else {
+                        alert('The show is not set up yet!');
+                    }
+                    next();
+                }
+            },
+            error: xhr => {
+                handleError(xhr);
+                next('/');
+            },
+        });
+    } else {
+        next();
+    }
+});
+
+export default router;

@@ -11,8 +11,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.views import LoginView as DjangoLoginView
-from django.core.exceptions import PermissionDenied
-from django.http.response import HttpResponse, JsonResponse
+from django.http.response import Http404, HttpResponse, JsonResponse
 from django.middleware.csrf import get_token
 from django.shortcuts import redirect
 from django.utils import timezone
@@ -138,23 +137,23 @@ class CalchartView(LoginRequiredMixin, TemplateView):
         except KeyError:
             return super().post(request, *args, **kwargs)
 
-        try:
-            data = json.loads(request.POST['data'])
-            response = getattr(actions, action)(
-                data=data,
-                user=request.user,
-                request=request,
-            )
-        except Exception as e:
-            if isinstance(e, AttributeError):
-                message = f'Action does not exist: {action}'
-            else:
-                message = str(e)
-
-            data = {
-                'message': message,
-            }
-            return JsonResponse(data, status=500)
+        if hasattr(actions, action):
+            try:
+                data = json.loads(request.POST['data'])
+                response = getattr(actions, action)(
+                    data=data,
+                    user=request.user,
+                    request=request,
+                )
+            except Exception as e:
+                status = 404 if isinstance(e, Http404) else 500
+                return JsonResponse({
+                    'message': str(e),
+                }, status=status)
+        else:
+            return JsonResponse({
+                'message': f'Action does not exist: {action}',
+            }, status=500)
 
         if response is None:
             return JsonResponse({})
@@ -184,8 +183,7 @@ class CalchartView(LoginRequiredMixin, TemplateView):
         - band: Shows created by STUNT for this year
         - created: Shows created by the current user
 
-        Returns tabs in a tuple of the form (id, display_name). The first
-        tab in the list is the first tab.
+        Returns tabs in a tuple of the form (id, display_name).
         """
         if self.request.user.is_members_only_user():
             year = timezone.now().year
@@ -197,23 +195,6 @@ class CalchartView(LoginRequiredMixin, TemplateView):
             return [
                 ('owned', 'My Shows'),
             ]
-
-    def get_tab(self, tab):
-        """Get Shows for the given tab (see get_tabs)."""
-        if tab == 'band':
-            if not self.request.user.is_members_only_user():
-                raise PermissionDenied
-            kwargs = {
-                'is_band': True,
-                'date_added__year': timezone.now().year,
-            }
-            if not self.request.user.has_committee('STUNT'):
-                kwargs['published'] = True
-
-            return Show.objects.filter(**kwargs)
-
-        if tab == 'owned':
-            return Show.objects.filter(owner=self.request.user, is_band=False)
 
 # class EditorView(CalchartMixin, TemplateView):
 #     """

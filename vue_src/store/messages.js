@@ -1,39 +1,13 @@
 /**
- * @file Defines a Vuex Store that will store application-wide data.
+ * @file Defines the Vuex module containing state relating to displaying
+ *   messages.
  */
 
-import _ from 'lodash';
-import Vue from 'vue';
-import Vuex from 'vuex';
+import { defaults, defaultTo, isString } from 'lodash';
 
 import { findAndRemove } from 'utils/array';
 
-Vue.use(Vuex);
-
-/**
- * The module containing state relating to the environment.
- */
-const env = {
-    namespaced: true,
-    state: {
-        // The CSRF token for POST requests
-        csrfToken: window.env.csrf_token,
-        // true if working on the development site
-        isLocal: window.env.is_local,
-        // true if the user is on a Mac
-        // https://css-tricks.com/snippets/javascript/test-mac-pc-javascript/
-        isMac: navigator.userAgent.includes('Mac OS X'),
-        // true if the current user is on Stunt
-        isStunt: window.env.is_stunt,
-        // the path to static files, without a trailing slash
-        staticPath: window.env.static_path,
-    },
-};
-
-/**
- * The module containing state relating to displaying messages.
- */
-const messages = {
+export default {
     namespaced: true,
     state: {
         messages: [],
@@ -70,14 +44,14 @@ const messages = {
          *   after a given time.
          */
         showMessage(context, payload) {
-            if (_.isString(payload)) {
+            if (isString(payload)) {
                 payload = { text: payload };
             }
-            _.defaults(payload, {
+            defaults(payload, {
                 error: false,
                 autohide: undefined,
             });
-            payload.autohide = _.defaultTo(payload.autohide, !payload.error);
+            payload.autohide = defaultTo(payload.autohide, !payload.error);
             context.commit('addMessage', payload);
             let id = context.state.messageId;
 
@@ -91,7 +65,7 @@ const messages = {
          * Shows an error message on the page. See showMessage.
          */
         showError(context, payload) {
-            if (_.isString(payload)) {
+            if (isString(payload)) {
                 payload = { text: payload };
             }
             payload.error = true;
@@ -99,10 +73,3 @@ const messages = {
         },
     },
 };
-
-export default new Vuex.Store({
-    modules: {
-        env,
-        messages,
-    },
-});

@@ -2,6 +2,7 @@ const path = require('path');
 const fs = require('fs');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const nodeExternals = require('webpack-node-externals');
 
 const src = path.resolve(__dirname, 'vue_src');
 const static = path.resolve(__dirname, 'calchart', 'static');
@@ -30,6 +31,13 @@ const babelLoaderOptions = {
     cacheDirectory: true,
 };
 
+const cssLoader = {
+    loader: 'css-loader',
+    options: {
+        url: false,
+    },
+};
+
 const partials = path.resolve(src, 'scss', 'partials');
 const sassResourcesLoaderOptions = {
     resources: [
@@ -48,18 +56,17 @@ const vueLoaderOptions = {
                 options: babelLoaderOptions,
             },
         ],
-        // TODO: https://vue-loader.vuejs.org/en/configurations/extract-css.html
-        scss: [
-            'vue-style-loader',
-            'css-loader',
+        scss: ExtractTextPlugin.extract([
+            cssLoader,
             'sass-loader',
             {
                 loader: 'sass-resources-loader',
                 options: sassResourcesLoaderOptions,
             },
-        ],
+        ]),
         'context-menu': require.resolve('vue-ctxmenu/loader'),
     },
+    preserveWhitespace: false,
 };
 
 /**** WEBPACK CONFIG ****/
@@ -99,15 +106,15 @@ webpackConfig = {
                 },
             },
             {
-                test: /\.scss$/,
-                exclude: /node_modules/,
+                test: /\.css$/,
                 use: ExtractTextPlugin.extract([
-                    {
-                        loader: 'css-loader',
-                        options: {
-                            url: false,
-                        },
-                    },
+                    cssLoader,
+                ]),
+            },
+            {
+                test: /\.scss$/,
+                use: ExtractTextPlugin.extract([
+                    cssLoader,
                     'sass-loader',
                 ]),
             },
@@ -138,7 +145,9 @@ webpackConfig = {
 };
 
 if (process.env.NODE_ENV === 'test') {
-    webpackConfig.externals = [require('webpack-node-externals')()];
+    webpackConfig.externals = [nodeExternals({
+        whitelist: [/\.css/],
+    })];
     webpackConfig.devtool = 'inline-cheap-module-source-map';
     webpackConfig.resolve.modules.push(path.resolve(__dirname));
 }
