@@ -3,7 +3,7 @@ import sinon from 'sinon';
 import { shallow } from 'vue-test-utils';
 
 import App from 'home/App';
-import { $store, setStunt } from 'test/utils';
+import { $store, setStunt, stubAction } from 'test/utils';
 
 function withTabs(allTabs) {
     return shallow(App, {
@@ -14,11 +14,11 @@ function withTabs(allTabs) {
 
 function mockAjaxTab(tab) {
     let show = { published: undefined };
-    $.ajax.callsFake(options => {
-        expect(options.data.tab).toBe(tab);
-        options.success({
+    stubAction('get_tab', data => {
+        expect(data.tab).toBe(tab);
+        return {
             shows: [show],
-        });
+        };
     });
     return show;
 }
