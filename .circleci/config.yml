@@ -1,0 +1,101 @@
+version: 2
+
+aliases:
+  - &cache-key
+    v1-calchart-{{ arch }}-{{ checksum "package-lock.json" }}
+
+jobs:
+  - build-node:
+      docker:
+        - image: circleci/node:6.11.4
+      steps:
+        - checkout
+        - restore_cache:
+            key: *cache-key
+        - run:
+            name: Install Node requirements
+            command: npm install
+        - save_cache:
+            key: *cache-key
+            paths:
+              - node_modules
+        - run:
+            name: Build Javascript files
+            command: npm build
+        - persist_to_workspace:
+            root: "."
+            paths:
+              - calchart/static/
+  - build-python:
+      docker:
+        - image: circleci/python:3.6
+      steps:
+        - checkout
+        - run:
+            name: Create virtual environment
+            command: virtualenv venv
+        - run:
+            name: Install Python requirements
+            command: venv/bin/pip install -r requirements/dev.txt
+        - persist_to_workspace:
+            root: "."
+            paths:
+              - venv
+  - test-node:
+      docker:
+        - image: circleci/node:6.11.4
+      steps:
+        - checkout
+        - attach_workspace:
+            at: "."
+        - run:
+            name: Lint Javascript files
+            command: npm run lint
+        - run:
+            name: Run Javascript unit tests
+            command: npm test
+  - test-python:
+      docker:
+        - image: circleci/python:3.6
+        - image: circleci/postgres:9.4
+      steps:
+        - checkout
+        - attach_workspace:
+            at: "."
+        - run:
+            name: Lint Python files
+            command: venv/bin/flake8 calchart/
+        - run:
+            name: Run Django tests
+            command: python3 manage.py test --verbosity 3 --noinput
+            working_directory: calchart
+  - test-e2e:
+      docker:
+        - image: circleci/node:6.11.4
+        - image: circleci/python:3.6
+        - image: circleci/postgres:9.4
+      steps:
+        - checkout
+        - attach_workspace:
+            at: "."
+        - run:
+            name: Run end-to-end tests
+            command: npm run e2e
+
+workflows:
+  version: 2
+
+  calchart:
+    jobs:
+      - build-node
+      - build-python
+      - test-node:
+          requires:
+            - build-node
+      - test-python:
+          requires:
+            - build-python
+      - test-e2e:
+          requires:
+            - build-node
+            - build-python
