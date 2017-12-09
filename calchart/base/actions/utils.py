@@ -5,6 +5,7 @@ from django.shortcuts import get_object_or_404
 
 from ..models import Show
 
+
 def retrieve_show(slug, user):
     """
     Retrieve the Show with the given slug.

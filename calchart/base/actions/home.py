@@ -1,9 +1,10 @@
 """Actions for the home page."""
 
+from django.core.exceptions import PermissionDenied
 from django.utils import timezone
 
-from ..models import Show
 from .utils import retrieve_show
+from ..models import Show
 
 
 def get_tab(data, **kwargs):
