@@ -21,7 +21,9 @@ jobs:
             key: *cache-key
         - run:
             name: Install Node requirements
-            command: npm install
+            command: |
+              npm --version
+              npm install
         - save_cache:
             key: *cache-key
             paths:
@@ -45,7 +47,10 @@ jobs:
         - *activate-venv
         - run:
             name: Install Python requirements
-            command: pip install -r requirements/dev.txt
+            command: |
+              echo $PATH
+              pip --version
+              pip install -r requirements/dev.txt
         - persist_to_workspace:
             root: "."
             paths:
