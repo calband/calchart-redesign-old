@@ -6,6 +6,10 @@ aliases:
   - &postgres-env
     POSTGRES_USER: root
     POSTGRES_DB: circle_test
+  - &activate-venv
+    run:
+      name: Activate virtual environment
+      command: echo 'source venv/bin/activate' > ~/.bashrc
 
 jobs:
   build-node:
@@ -29,6 +33,7 @@ jobs:
             root: "."
             paths:
               - calchart/static/
+              - node_modules/
   build-python:
       docker:
         - image: circleci/python:3.6
@@ -37,9 +42,10 @@ jobs:
         - run:
             name: Create virtual environment
             command: python -m venv venv
+        - *activate-venv
         - run:
             name: Install Python requirements
-            command: venv/bin/pip install -r requirements/dev.txt
+            command: pip install -r requirements/dev.txt
         - persist_to_workspace:
             root: "."
             paths:
@@ -66,12 +72,13 @@ jobs:
         - checkout
         - attach_workspace:
             at: "."
+        - *activate-venv
         - run:
             name: Lint Python files
-            command: venv/bin/flake8 calchart/
+            command: flake8 calchart/
         - run:
             name: Run Django tests
-            command: python3 manage.py test --verbosity 3 --noinput
+            command: python manage.py test --verbosity 3 --noinput
             working_directory: calchart
   test-e2e:
       docker:
@@ -83,6 +90,7 @@ jobs:
         - checkout
         - attach_workspace:
             at: "."
+        - *activate-venv
         - run:
             name: Run end-to-end tests
             command: npm run e2e
