@@ -24,7 +24,7 @@ jobs:
               - node_modules
         - run:
             name: Build Javascript files
-            command: npm build
+            command: npm run build
         - persist_to_workspace:
             root: "."
             paths:
@@ -36,7 +36,7 @@ jobs:
         - checkout
         - run:
             name: Create virtual environment
-            command: virtualenv venv
+            command: python -m venv venv
         - run:
             name: Install Python requirements
             command: venv/bin/pip install -r requirements/dev.txt
