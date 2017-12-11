@@ -9,7 +9,7 @@ aliases:
   - &activate-venv
     run:
       name: Activate virtual environment
-      command: echo 'export PATH="$PWD/venv/bin:$PATH"' > ~/.bashrc
+      command: echo 'export PATH="$HOME/project/venv/bin:$PATH"' > ~/.bashrc
 
 jobs:
   build-node:
