@@ -8,7 +8,7 @@ aliases:
     POSTGRES_DB: circle_test
 
 jobs:
-  - build-node:
+  build-node:
       docker:
         - image: circleci/node:6.11.4
       steps:
@@ -29,7 +29,7 @@ jobs:
             root: "."
             paths:
               - calchart/static/
-  - build-python:
+  build-python:
       docker:
         - image: circleci/python:3.6
       steps:
@@ -44,7 +44,7 @@ jobs:
             root: "."
             paths:
               - venv
-  - test-node:
+  test-node:
       docker:
         - image: circleci/node:6.11.4
       steps:
@@ -57,7 +57,7 @@ jobs:
         - run:
             name: Run Javascript unit tests
             command: npm test
-  - test-python:
+  test-python:
       docker:
         - image: circleci/python:3.6
         - image: circleci/postgres:9.4
@@ -73,7 +73,7 @@ jobs:
             name: Run Django tests
             command: python3 manage.py test --verbosity 3 --noinput
             working_directory: calchart
-  - test-e2e:
+  test-e2e:
       docker:
         - image: circleci/node:6.11.4
         - image: circleci/python:3.6
