@@ -9,7 +9,7 @@ aliases:
   - &activate-venv
     run:
       name: Activate virtual environment
-      command: echo 'export PATH="$HOME/project/venv/bin:$PATH"' >> ~/.bashrc
+      command: echo 'export PATH="$HOME/project/venv/bin:$PATH"' >> $BASH_ENV
 
 jobs:
   build-node:
@@ -48,7 +48,6 @@ jobs:
         - run:
             name: Install Python requirements
             command: |
-              cat ~/.bashrc
               echo $PATH
               pip --version
               pip install -r requirements/dev.txt
