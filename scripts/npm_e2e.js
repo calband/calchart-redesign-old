@@ -8,7 +8,7 @@ const IS_VAGRANT = process.env.USER === 'vagrant';
 const IS_LOCAL = ! (IS_CI || IS_VAGRANT);
 
 var startApp = [
-    'python3',
+    'python',
     'calchart/manage.py',
     'testserver',
     'e2e_user.json',

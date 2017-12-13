@@ -71,7 +71,7 @@ jobs:
   test-python:
       docker:
         - image: circleci/python:3.6
-        - image: circleci/postgres:9.4
+        - image: circleci/postgres:9.6.2
           environment: *postgres-env
       steps:
         - checkout
@@ -82,6 +82,9 @@ jobs:
             name: Lint Python files
             command: flake8 calchart/
         - run:
+            name: Wait for PostgreSQL
+            command: dockerize -wait tcp://localhost:5432 -timeout 1m
+        - run:
             name: Run Django tests
             command: python manage.py test --verbosity 3 --noinput
             working_directory: calchart
@@ -89,13 +92,16 @@ jobs:
       docker:
         - image: circleci/node:6.11.4
         - image: circleci/python:3.6
-        - image: circleci/postgres:9.4
+        - image: circleci/postgres:9.6.2
           environment: *postgres-env
       steps:
         - checkout
         - attach_workspace:
             at: "."
         - *activate-venv
+        - run:
+            name: Wait for PostgreSQL
+            command: dockerize -wait tcp://localhost:5432 -timeout 1m
         - run:
             name: Run end-to-end tests
             command: npm run e2e
