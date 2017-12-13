@@ -14,7 +14,7 @@ aliases:
 jobs:
   build-node:
       docker:
-        - image: calband/circleci-calchart:1.0.0
+        - image: calband/circleci-calchart:1.1.0
       steps:
         - checkout
         - restore_cache:
@@ -38,7 +38,7 @@ jobs:
               - node_modules/
   build-python:
       docker:
-        - image: calband/circleci-calchart:1.0.0
+        - image: calband/circleci-calchart:1.1.0
       steps:
         - checkout
         - run:
@@ -56,7 +56,7 @@ jobs:
               - venv
   test-node:
       docker:
-        - image: calband/circleci-calchart:1.0.0
+        - image: calband/circleci-calchart:1.1.0
       steps:
         - checkout
         - attach_workspace:
@@ -69,7 +69,7 @@ jobs:
             command: npm test
   test-python:
       docker:
-        - image: calband/circleci-calchart:1.0.0
+        - image: calband/circleci-calchart:1.1.0
         - image: circleci/postgres:9.6.2
           environment: *postgres-env
       steps:
@@ -80,16 +80,16 @@ jobs:
         - run:
             name: Lint Python files
             command: flake8 calchart/
-        # - run:
-        #     name: Wait for PostgreSQL
-        #     command: dockerize -wait tcp://localhost:5432 -timeout 1m
+        - run:
+            name: Wait for PostgreSQL
+            command: dockerize -wait tcp://localhost:5432 -timeout 1m
         - run:
             name: Run Django tests
             command: python manage.py test --verbosity 3 --noinput
             working_directory: calchart
   test-e2e:
       docker:
-        - image: calband/circleci-calchart:1.0.0
+        - image: calband/circleci-calchart:1.1.0
         - image: circleci/postgres:9.6.2
           environment: *postgres-env
       steps:
@@ -97,9 +97,9 @@ jobs:
         - attach_workspace:
             at: "."
         - *activate-venv
-        # - run:
-        #     name: Wait for PostgreSQL
-        #     command: dockerize -wait tcp://localhost:5432 -timeout 1m
+        - run:
+            name: Wait for PostgreSQL
+            command: dockerize -wait tcp://localhost:5432 -timeout 1m
         - run:
             name: Run end-to-end tests
             command: npm run e2e
