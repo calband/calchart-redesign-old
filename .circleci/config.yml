@@ -2,7 +2,7 @@ version: 2
 
 aliases:
   - &cache-key
-    v1-calchart-{{ arch }}-{{ checksum "package-lock.json" }}
+    v2-calchart-{{ arch }}-{{ checksum "package-lock.json" }}
   - &postgres-env
     POSTGRES_USER: root
     POSTGRES_DB: circle_test
