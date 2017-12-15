@@ -4,7 +4,7 @@ These files define a Docker image used by Circle CI to run tests, since we requi
 
 ## Build
 
-To build the image, run `docker build -t calband/circleci-calchart:VERSION .`.
+To build the image, `cd` into this directory and run `docker build -t calband/circleci-calchart:VERSION .`.
 
 This will build the Docker image according to the Dockerfile and tag it as `calband/circleci-calchart:VERSION`. Update the version whenever you change the Dockerfile.
 

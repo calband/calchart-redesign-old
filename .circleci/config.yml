@@ -14,7 +14,7 @@ aliases:
 jobs:
   build-node:
       docker:
-        - image: calband/circleci-calchart:1.1.0
+        - image: calband/circleci-calchart:1.1.1
       steps:
         - checkout
         - restore_cache:
@@ -38,7 +38,7 @@ jobs:
               - node_modules/
   build-python:
       docker:
-        - image: calband/circleci-calchart:1.1.0
+        - image: calband/circleci-calchart:1.1.1
       steps:
         - checkout
         - run:
@@ -56,7 +56,7 @@ jobs:
               - venv
   test-node:
       docker:
-        - image: calband/circleci-calchart:1.1.0
+        - image: calband/circleci-calchart:1.1.1
       steps:
         - checkout
         - attach_workspace:
@@ -69,7 +69,7 @@ jobs:
             command: npm test
   test-python:
       docker:
-        - image: calband/circleci-calchart:1.1.0
+        - image: calband/circleci-calchart:1.1.1
         - image: circleci/postgres:9.6.2
           environment: *postgres-env
       steps:
@@ -89,7 +89,7 @@ jobs:
             working_directory: calchart
   test-e2e:
       docker:
-        - image: calband/circleci-calchart:1.1.0
+        - image: calband/circleci-calchart:1.1.1
         - image: circleci/postgres:9.6.2
           environment: *postgres-env
       steps:
