@@ -85,7 +85,7 @@ jobs:
             command: flake8 calchart/
         - run:
             name: Wait for PostgreSQL
-            command: dockerize -wait tcp://localhost:5432 -timeout 1m
+            command: sleep 10
         - run:
             name: Run Django tests
             command: python manage.py test --verbosity 3 --noinput
@@ -101,7 +101,7 @@ jobs:
         - *activate-venv
         - run:
             name: Wait for PostgreSQL
-            command: dockerize -wait tcp://localhost:5432 -timeout 1m
+            command: sleep 10
         - run:
             name: Run end-to-end tests
             command: npm run e2e
