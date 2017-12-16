@@ -30,7 +30,7 @@ if (!IS_CI) {
 var testcafe = null;
 var failed = false;
 
-createTestCafe('localhost', 5000)
+createTestCafe('localhost')
     .then(tc => {
         testcafe = tc;
 

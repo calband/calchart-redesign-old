@@ -102,9 +102,9 @@ jobs:
         - run:
             name: Wait for PostgreSQL
             command: sleep 10
-        # - run:
-        #     name: Run end-to-end tests
-        #     command: npm run e2e
+        - run:
+            name: Run end-to-end tests
+            command: npm run e2e
 
 workflows:
   version: 2
