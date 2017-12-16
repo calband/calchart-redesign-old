@@ -1,11 +1,15 @@
 version: 2
 
 aliases:
+  - &docker-image
+    image: calband/circleci-calchart:1.1.1
+  - &postgres-image
+    image: circleci/postgres:9.6.2
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_DB: circle_test
   - &cache-key
     v2-calchart-{{ arch }}-{{ checksum "package-lock.json" }}
-  - &postgres-env
-    POSTGRES_USER: root
-    POSTGRES_DB: circle_test
   - &activate-venv
     run:
       name: Activate virtual environment
@@ -14,7 +18,7 @@ aliases:
 jobs:
   build-node:
       docker:
-        - image: calband/circleci-calchart:1.1.1
+        - *docker-image
       steps:
         - checkout
         - restore_cache:
@@ -38,7 +42,7 @@ jobs:
               - node_modules/
   build-python:
       docker:
-        - image: calband/circleci-calchart:1.1.1
+        - *docker-image
       steps:
         - checkout
         - run:
@@ -56,7 +60,7 @@ jobs:
               - venv
   test-node:
       docker:
-        - image: calband/circleci-calchart:1.1.1
+        - *docker-image
       steps:
         - checkout
         - attach_workspace:
@@ -69,9 +73,8 @@ jobs:
             command: npm test
   test-python:
       docker:
-        - image: calband/circleci-calchart:1.1.1
-        - image: circleci/postgres:9.6.2
-          environment: *postgres-env
+        - *docker-image
+        - *postgres-image
       steps:
         - checkout
         - attach_workspace:
@@ -89,9 +92,8 @@ jobs:
             working_directory: calchart
   test-e2e:
       docker:
-        - image: calband/circleci-calchart:1.1.1
-        - image: circleci/postgres:9.6.2
-          environment: *postgres-env
+        - *docker-image
+        - *postgres-image
       steps:
         - checkout
         - attach_workspace:
