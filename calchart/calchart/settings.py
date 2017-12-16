@@ -94,7 +94,7 @@ elif IS_CI:
         'default': {
             'ENGINE': 'django.db.backends.postgresql_psycopg2',
             'NAME': 'circle_test',
-            'USER': 'root',
+            'USER': 'ubuntu',
             'HOST': '127.0.0.1',
         },
     }
