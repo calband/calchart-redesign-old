@@ -37,7 +37,7 @@ createTestCafe('localhost', 5000)
         return testcafe.createRunner()
             .src(glob.sync('e2e/**/*.test.js'))
             .browsers(['chrome:headless', 'firefox:headless'])
-            .startApp(startApp, 5000)
+            .startApp(startApp)
             .run();
     })
     .then(failed => {
