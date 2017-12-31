@@ -35,14 +35,6 @@ export default {
         // the current snap grid
         snap: 2,
     },
-    getters: {
-        /**
-         * @return {Show}
-         */
-        show(state, getters, rootState) {
-            return rootState.show;
-        },
-    },
     mutations: {
         ...editorMutations,
         ...historyMutations,

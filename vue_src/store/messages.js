@@ -3,15 +3,15 @@
  *   messages.
  */
 
-import { defaults, defaultTo, isString } from 'lodash';
+import { defaults, defaultTo, find, isString } from 'lodash';
 
 import { findAndRemove } from 'utils/array';
+import { uniqueId } from 'utils/JSUtils';
 
 export default {
     namespaced: true,
     state: {
         messages: [],
-        messageId: 0,
     },
     mutations: {
         /**
@@ -20,14 +20,23 @@ export default {
          * @param {Object} message
          */
         addMessage(state, message) {
-            state.messageId++;
-            message.id = state.messageId;
             state.messages.push(message);
+        },
+        /**
+         * Modify the message with the given ID.
+         *
+         * @param {Object}
+         *   - {String} id - The ID of the message to modify.
+         *   - {String} message - The new text of the message.
+         */
+        modifyMessage(state, { id, message }) {
+            let data = find(state.messages, ['id', id]);
+            data.message = message;
         },
         /**
          * Remove the message with the given ID from the message list.
          *
-         * @param {int} id
+         * @param {String} id
          */
         removeMessage(state, id) {
             findAndRemove(state.messages, ['id', id]);
@@ -48,16 +57,16 @@ export default {
                 payload = { text: payload };
             }
             defaults(payload, {
+                id: uniqueId(),
                 error: false,
                 autohide: undefined,
             });
             payload.autohide = defaultTo(payload.autohide, !payload.error);
             context.commit('addMessage', payload);
-            let id = context.state.messageId;
 
             if (payload.autohide) {
                 setTimeout(() => {
-                    context.commit('removeMessage', id);
+                    context.commit('removeMessage', payload.id);
                 }, 1000);
             }
         },

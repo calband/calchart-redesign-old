@@ -10,10 +10,10 @@ import Sheet from 'calchart/Sheet';
  * @param {int} numBeats - The number of beats for the Sheet.
  */
 export function addSheet(context, { numBeats }) {
-    let show = context.getters.show;
+    let show = context.rootState.show;
     let index = show.getSheets().length;
     let numDots = show.getDots().length;
-    let sheet = Sheet.create(context.getters.show, index, numBeats, numDots);
+    let sheet = Sheet.create(show, index, numBeats, numDots);
 
     context.commit('modifyShow', {
         func: 'addSheet',
