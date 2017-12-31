@@ -43,6 +43,9 @@ export default {
     mounted() {
         if (!this.isInitialized) {
             showPopup(SetupShowPopup);
+        } else {
+            let sheet = this.show.getSheets()[0];
+            this.$store.commit('editor/setActiveSheet', sheet);
         }
     },
     computed: {

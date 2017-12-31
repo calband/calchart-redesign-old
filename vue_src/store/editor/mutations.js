@@ -3,6 +3,13 @@
  */
 
 /**
+ * @param {?Sheet} sheet
+ */
+export function setActiveSheet(state, sheet) {
+    state.sheet = sheet;
+}
+
+/**
  * @param {Object} data
  */
 export function setNewShowData(state, data) {

@@ -16,13 +16,13 @@ import {
 
 import Coordinate from 'calchart/Coordinate';
 import Continuity from 'calchart/Continuity';
-import TwoStepContinuity from 'calchart/continuities/TwoStepContinuity';
+// import TwoStepContinuity from 'calchart/continuities/TwoStepContinuity';
 import Dot from 'calchart/Dot';
 import DotType from 'calchart/DotType';
 import MovementCommand from 'calchart/MovementCommand';
 import { AnimationStateError } from 'utils/errors';
 import { mapSome, moveElem, runAsync, uniqueId } from 'utils/JSUtils';
-import { isEqual, roundSmall } from 'utils/MathUtils';
+// import { isEqual, roundSmall } from 'utils/MathUtils';
 
 /**
  * A Sheet represents a stuntsheet, containing the following information:

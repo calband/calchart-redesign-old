@@ -6,7 +6,7 @@
  * the History.
  */
 
-import { has } from 'lodash';
+import { has, isString } from 'lodash';
 
 import parseAction from 'editor/actions';
 import ContextType from 'editor/ContextType';
@@ -28,10 +28,20 @@ export default {
         newShowData: null,
         // the currently active context
         context: ContextType.DOT,
+        // the currently active Sheet
+        sheet: null,
         // the currently active edit tool
         tool: ToolType.SELECTION,
         // the current snap grid
         snap: 2,
+    },
+    getters: {
+        /**
+         * @return {Show}
+         */
+        show(state, getters, rootState) {
+            return rootState.show;
+        },
     },
     mutations: {
         ...editorMutations,
@@ -39,12 +49,17 @@ export default {
     },
     actions: {
         /**
-         * Do the given action.
+         * Do the given action, which is either a String that contains the
+         * action to run or the Object containing the values for the action.
          *
-         * @param {String} action - See parseAction for format.
+         * @param {String|Object} action - See parseAction for format.
          */
         doAction(context, action) {
-            let { name, data } = parseAction(action);
+            if (isString(action)) {
+                action = parseAction(action);
+            }
+            let { name, data } = action;
+
             if (has(editorActions, name)) {
                 context.dispatch(name, data);
             } else if (has(historyActions, name)) {

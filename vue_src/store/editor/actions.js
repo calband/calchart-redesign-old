@@ -2,7 +2,7 @@
  * @file Actions that are not saved in History.
  */
 
-// import AddSheetPopup from 'popups/AddSheetPopup';
+import AddSheetPopup from 'popups/AddSheetPopup';
 import { showPopup } from 'popups/lib';
 import sendAction from 'utils/ajax';
 import History from 'utils/History';
@@ -29,8 +29,7 @@ export function saveShow(context, options) {
  * Display the AddSheetPopup.
  */
 export function showAddSheet() {
-    // showPopup(AddSheetPopup);
-    console.log('add sheet');
+    showPopup(AddSheetPopup);
 }
 
 /**

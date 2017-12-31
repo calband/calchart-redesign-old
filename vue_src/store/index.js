@@ -21,6 +21,21 @@ export default new Vuex.Store({
     },
     mutations: {
         /**
+         * Modify the Show with the given arguments.
+         *
+         * @param {Object}
+         *   - {*} target - An object in the Show object to be updated (defaults
+         *     to the Show itself). This target should have been freshly
+         *     retrieved from the Show in the state, since `modifyShow` is
+         *     supposed to actually change the state, but this is not checked.
+         *   - {String} func - The name of the function to call.
+         *   - {[*]} args - Arguments to pass to the function.
+         */
+        modifyShow(state, { target, func, args }) {
+            target = target || state.show;
+            target[func].apply(target, args);
+        },
+        /**
          * Set the show from the given show data.
          *
          * @param {?Show} show

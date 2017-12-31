@@ -5,7 +5,7 @@ import BaseMovementCommand from 'calchart/movements/BaseMovementCommand';
 import Coordinate from 'calchart/Coordinate';
 
 import { STEP_SIZES } from 'utils/CalchartUtils';
-import { calcRotatedXPos, calcRotatedYPos, roundSmall } from 'utils/MathUtils';
+// import { calcRotatedXPos, calcRotatedYPos, roundSmall } from 'utils/MathUtils';
 
 /**
  * A MovementCommand which represents a constant movement in the given

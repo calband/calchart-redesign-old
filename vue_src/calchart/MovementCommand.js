@@ -1,7 +1,7 @@
-import MovementCommandArc from 'calchart/movements/MovementCommandArc';
+// import MovementCommandArc from 'calchart/movements/MovementCommandArc';
 import MovementCommandMove from 'calchart/movements/MovementCommandMove';
-import MovementCommandEven from 'calchart/movements/MovementCommandEven';
-import MovementCommandStop from 'calchart/movements/MovementCommandStop';
+// import MovementCommandEven from 'calchart/movements/MovementCommandEven';
+// import MovementCommandStop from 'calchart/movements/MovementCommandStop';
 
 /**
  * A proxy class for creating/deserializing all MovementCommand types, although

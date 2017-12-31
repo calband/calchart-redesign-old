@@ -1,14 +1,14 @@
 import BaseContinuity from './continuities/BaseContinuity';
-import CounterMarchContinuity from './continuities/CounterMarchContinuity';
-import DiagonalContinuity from './continuities/DiagonalContinuity';
-import EvenContinuity from './continuities/EvenContinuity';
-import FollowLeaderContinuity from './continuities/FollowLeaderContinuity';
+// import CounterMarchContinuity from './continuities/CounterMarchContinuity';
+// import DiagonalContinuity from './continuities/DiagonalContinuity';
+// import EvenContinuity from './continuities/EvenContinuity';
+// import FollowLeaderContinuity from './continuities/FollowLeaderContinuity';
 import ForwardContinuity from './continuities/ForwardContinuity';
-import FountainGridContinuity from './continuities/FountainGridContinuity';
-import GateTurnContinuity from './continuities/GateTurnContinuity';
-import GrapevineContinuity from './continuities/GrapevineContinuity';
-import StopContinuity from './continuities/StopContinuity';
-import TwoStepContinuity from './continuities/TwoStepContinuity';
+// import FountainGridContinuity from './continuities/FountainGridContinuity';
+// import GateTurnContinuity from './continuities/GateTurnContinuity';
+// import GrapevineContinuity from './continuities/GrapevineContinuity';
+// import StopContinuity from './continuities/StopContinuity';
+// import TwoStepContinuity from './continuities/TwoStepContinuity';
 
 /**
  * A proxy class for creating/deserializing all Continuity types, although
