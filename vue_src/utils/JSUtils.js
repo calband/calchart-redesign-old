@@ -115,6 +115,15 @@ export function newCall(Cls) {
 }
 
 /**
+ * Generate a unique 8-character hexadecimal ID.
+ *
+ * @return {String}
+ */
+export function uniqueId() {
+    return Math.random().toString(16).substring(2, 10);
+}
+
+/**
  * Update the given object with the given data, returning an object mapping
  * any keys that have been changed to the old value.
  *

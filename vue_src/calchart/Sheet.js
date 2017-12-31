@@ -21,7 +21,7 @@ import Dot from 'calchart/Dot';
 import DotType from 'calchart/DotType';
 import MovementCommand from 'calchart/MovementCommand';
 import { AnimationStateError } from 'utils/errors';
-import { mapSome, moveElem, runAsync } from 'utils/JSUtils';
+import { mapSome, moveElem, runAsync, uniqueId } from 'utils/JSUtils';
 import { isEqual, roundSmall } from 'utils/MathUtils';
 
 /**
@@ -39,6 +39,7 @@ import { isEqual, roundSmall } from 'utils/MathUtils';
 export default class Sheet {
     /**
      * @param {Show} show - The Show this sheet is part of.
+     * @param {String} id - The ID of the sheet.
      * @param {int} index - The index of this Sheet in the Show.
      * @param {int} numBeats - The number of beats in the stuntsheet.
      * @param {Object} [options] - Optional information about a stuntsheet,
@@ -58,8 +59,9 @@ export default class Sheet {
      *       Sheet, or 'default' to get the step type from the associated
      *       song/show.
      */
-    constructor(show, index, numBeats, options) {
+    constructor(show, id, index, numBeats, options) {
         this._show = show;
+        this._id = id;
         this._index = index;
         this._numBeats = numBeats;
 
@@ -101,7 +103,7 @@ export default class Sheet {
      * @return {Sheet}
      */
     static create(show, index, numBeats, numDots) {
-        let sheet = new Sheet(show, index, numBeats);
+        let sheet = new Sheet(show, uniqueId(), index, numBeats);
 
         // initialize dots as plain dots
         sheet._dots = range(numDots).map(i => {
@@ -128,7 +130,13 @@ export default class Sheet {
      * @return {Sheet}
      */
     static deserialize(show, data) {
-        let sheet = new Sheet(show, data.index, data.numBeats, data.options);
+        let sheet = new Sheet(
+            show,
+            data.id,
+            data.index,
+            data.numBeats,
+            data.options
+        );
 
         sheet._dots = data.dots.map(dotData => {
             return {
@@ -158,6 +166,7 @@ export default class Sheet {
     serialize() {
         let data = {
             numBeats: this._numBeats,
+            id: this._id,
             index: this._index,
         };
 
@@ -198,6 +207,15 @@ export default class Sheet {
     get label() { return this._label; }
     get orientation() { return this._orientation; }
     get stepType() { return this._stepType; }
+
+    /**
+     * Get the Sheet's ID.
+     *
+     * @return {String}
+     */
+    get id() {
+        return this._id;
+    }
 
     /**
      * Get the parent of this Sheet for resolving defaults.
