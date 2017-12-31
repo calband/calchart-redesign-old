@@ -75,7 +75,7 @@ export default {
 </script>
 
 <style lang="scss">
-body {
+#app.editor {
     padding: 0;
     padding-top: 20px;
     min-width: 800px;
@@ -106,7 +106,6 @@ $editor-header-height: 95px;
 
 .content {
     @include remove-children-space;
-    display: none;
     height: calc(100% - #{$editor-header-height + $header-height + 20px});
     width: 100%;
     font-size: 0;

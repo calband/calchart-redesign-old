@@ -4,7 +4,7 @@ page according to the URL.
 </docs>
 
 <template>
-    <div>
+    <div id="app" :class="$route.name">
         <header>
             <h1><router-link :to="{ name: 'home' }">Calchart</router-link></h1>
             <p class="logout-link"><a href="/logout">Logout</a></p>
@@ -90,6 +90,10 @@ export default {
 </script>
 
 <style lang="scss">
+body {
+    padding: 0;
+}
+
 .vue-context-menu {
     @include hover-menu;
 }
