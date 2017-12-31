@@ -5,14 +5,18 @@ show in the editor application.
 
 <template>
     <div class="graph-content">
-        <div class="sidebar"></div>
+        <SheetList :menu="true" />
         <div class="workspace"></div>
     </div>
 </template>
 
 <script>
-export default {
+import SheetList from 'editor/SheetList';
 
+export default {
+    components: {
+        SheetList,
+    },
 };
 </script>
 
