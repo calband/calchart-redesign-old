@@ -3,7 +3,6 @@ import { defaults, find, isNumber, pull, pullAt, range } from 'lodash';
 import Dot from 'calchart/Dot';
 // import Sheet from 'calchart/Sheet';
 import Song from 'calchart/Song';
-
 import { getDotLabels } from 'utils/CalchartUtils';
 import { moveElem } from 'utils/JSUtils';
 
