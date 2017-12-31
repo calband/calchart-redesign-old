@@ -16,11 +16,11 @@ A popup for creating a new show.
 </template>
 
 <script>
-import { BasePopup, FormPopup } from './lib';
-
 import router from 'router';
 import store from 'store';
 import sendAction, { handleError } from 'utils/ajax';
+
+import { BasePopup, FormPopup } from './lib';
 
 export default {
     extends: BasePopup,

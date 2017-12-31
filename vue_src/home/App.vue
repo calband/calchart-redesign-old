@@ -60,12 +60,12 @@ import $ from 'jquery';
 import { isNull } from 'lodash';
 import { mapState } from 'vuex';
 
-import ShowList from './ShowList';
-
 import CreateShowPopup from 'popups/CreateShowPopup';
 import { showPopup } from 'popups/lib';
 import sendAction from 'utils/ajax';
 import { findAndRemove } from 'utils/array';
+
+import ShowList from './ShowList';
 
 // TODO: move tabs to above home-content (rename home-buttons)
 // TODO: have shows display as a box preview

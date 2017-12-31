@@ -30,11 +30,10 @@ A popup that contains a form to be submitted or modified.
 <script>
 import { fromPairs, toPairs } from 'lodash';
 
+import store from 'store';
 import { allProps } from 'utils/vue';
 
 import BasePopup from './BasePopup';
-
-import store from 'store';
 
 export default {
     extends: BasePopup,
