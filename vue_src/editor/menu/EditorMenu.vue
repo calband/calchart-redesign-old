@@ -78,8 +78,8 @@ The top menu in the editor application.
                 />
                 -->
                 <EditorMenuItem
-                    @click="openViewer"
                     label="Open in viewer..."
+                    action="openViewer"
                 />
             </EditorMenuItem>
             <EditorMenuItem
@@ -110,8 +110,8 @@ The top menu in the editor application.
         </EditorMenuTab>
         <EditorMenuTab label="Help">
             <EditorMenuItem
-                @click="openHelp"
                 label="Go to help..."
+                action="openHelp"
                 icon="question-circle"
             />
         </EditorMenuTab>
@@ -209,18 +209,6 @@ export default {
             }
 
             $(document).off('.menu');
-        },
-        /**
-         * Open the viewer app for the current show.
-         */
-        openViewer() {
-            alert('open viewer');
-        },
-        /**
-         * Open the help pages.
-         */
-        openHelp() {
-            alert('open help');
         },
     },
 };
