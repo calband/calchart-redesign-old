@@ -34,6 +34,9 @@ export default {
                     validators: {
                         positive,
                     },
+                    templateOptions: {
+                        label: 'Number of beats',
+                    },
                 },
             ],
         };

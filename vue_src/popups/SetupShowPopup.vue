@@ -39,6 +39,9 @@ export default {
                     validators: {
                         positive,
                     },
+                    templateOptions: {
+                        label: 'Number of dots',
+                    },
                 },
                 {
                     key: 'dotFormat',

@@ -4,10 +4,14 @@ and manipulation.
 </doc>
 
 <template>
-    <div :class="['sheet-list', horizontal ? 'horizontal' : 'vertical']">
+    <div
+        :class="['sheet-list', horizontal ? 'horizontal' : 'vertical']"
+        :style="listDimensions"
+    >
         <div
             v-for="sheet in sheets"
             :key="sheet.id"
+            :style="sheetDimensions"
             class="sheet"
         >
             <span class="label">{{ sheet.getLabel() }}</span>
@@ -17,6 +21,9 @@ and manipulation.
 </template>
 
 <script>
+// The width-to-height ratio for a Sheet
+let SHEET_RATIO = 10/7;
+
 export default {
     props: {
         horizontal: {
@@ -29,8 +36,48 @@ export default {
             type: Boolean,
             default: false,
         },
+        width: {
+            // The width of the component
+            type: [Number, String],
+            default: '100%',
+        },
+        height: {
+            // The height of the component
+            type: [Number, String],
+            default: '100%',
+        },
     },
     computed: {
+        /**
+         * @return {Object} The dimensions of the list.
+         */
+        listDimensions() {
+            return {
+                width: this.width,
+                height: this.height,
+            };
+        },
+        /**
+         * @return {Object} The dimensions of each Sheet.
+         */
+        sheetDimensions() {
+            if (this.horizontal) {
+                let height = this.height - 20;
+                return {
+                    width: height * SHEET_RATIO,
+                    height: height,
+                };
+            } else {
+                let width = this.width - 40;
+                return {
+                    width: width,
+                    height: width / SHEET_RATIO,
+                };
+            }
+        },
+        /**
+         * @return {[Sheet]} All the Sheets in the Show.
+         */
         sheets() {
             return this.$store.state.show.getSheets();
         },
@@ -47,11 +94,33 @@ export default {
     &.vertical {
         display: inline-block;
         vertical-align: top;
-        height: 100%;
-        width: 200px;
         padding: 20px;
         border-right: 3px double $medium-gray;
         overflow: auto;
+    }
+    .sheet {
+        margin-bottom: 10px;
+        &:last-child {
+            margin-bottom: 0;
+        }
+    }
+    .label {
+        @include max-text-width(96%);
+        position: absolute;
+        top: 4%;
+        left: 2%;
+        font-size: 24px;
+        font-family: sans-serif("DIN Next Medium");
+        z-index: z-index(toolbar);
+        color: $gold;
+        text-shadow: 1px 1px 2px $black;
+    }
+    .preview {
+        display: block;
+        width: 100%;
+        height: 100%;
+        border: 2px solid $blue;
+        background: green; // TODO: remove
     }
 }
 </style>
