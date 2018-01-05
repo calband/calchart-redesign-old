@@ -36,10 +36,6 @@ export default {
         GraphEditor,
         MusicEditor,
     },
-    data() {
-        return {
-        };
-    },
     mounted() {
         if (!this.isInitialized) {
             showPopup(SetupShowPopup);

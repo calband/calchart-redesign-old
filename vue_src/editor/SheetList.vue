@@ -11,8 +11,9 @@ and manipulation.
         <div
             v-for="sheet in sheets"
             :key="sheet.id"
+            :class="['sheet', isActiveSheet(sheet) ? 'active' : '']"
             :style="sheetDimensions"
-            class="sheet"
+            @click="makeActiveSheet(sheet)"
         >
             <span class="label">{{ sheet.getLabel() }}</span>
             <div class="preview"></div>
@@ -82,6 +83,24 @@ export default {
             return this.$store.state.show.getSheets();
         },
     },
+    methods: {
+        /**
+         * @param {String} sheet
+         * @return {Boolean} True if the given Sheet is the currently active
+         *   Sheet.
+         */
+        isActiveSheet(sheet) {
+            return sheet === this.$store.state.editor.sheet;
+        },
+        /**
+         * Make the given Sheet the currently active Sheet.
+         *
+         * @param {Sheet} sheet
+         */
+        makeActiveSheet(sheet) {
+            this.$store.commit('editor/setActiveSheet', sheet);
+        },
+    },
 };
 </script>
 
@@ -102,6 +121,10 @@ export default {
         margin-bottom: 10px;
         &:last-child {
             margin-bottom: 0;
+        }
+        &.active .preview {
+            border-color: $gold;
+            box-shadow: 0 0 5px $gold;
         }
     }
     .label {
