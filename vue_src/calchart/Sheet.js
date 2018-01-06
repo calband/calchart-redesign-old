@@ -287,11 +287,11 @@ export default class Sheet {
                                 );
 
                                 allContinuities.push(clone);
-                                if (clone instanceof TwoStepContinuity) {
-                                    let nested = clone.getContinuities();
-                                    allContinuities =
-                                        allContinuities.concat(nested);
-                                }
+                                // if (clone instanceof TwoStepContinuity) {
+                                //     let nested = clone.getContinuities();
+                                //     allContinuities =
+                                //         allContinuities.concat(nested);
+                                // }
 
                                 return clone;
                             }
@@ -339,14 +339,14 @@ export default class Sheet {
 
         for (let i = 0; i < movements.length; i++) {
             let movement = movements[i];
-            let duration = movement.getDuration();
+            let duration = movement.getDuration(); // eslint-disable-line
 
-            let beats = roundSmall(remaining - duration);
-            if (beats <= 0) {
-                return movement.getAnimationState(remaining);
-            } else {
-                remaining = beats;
-            }
+            // let beats = roundSmall(remaining - duration);
+            // if (beats <= 0) {
+            //     return movement.getAnimationState(remaining);
+            // } else {
+            //     remaining = beats;
+            // }
         }
 
         throw new AnimationStateError(
@@ -755,14 +755,14 @@ export default class Sheet {
                             continue;
                         }
 
-                        if (
-                            isEqual(state1.x, state2.x) &&
-                            isEqual(state1.y, state2.y)
-                        ) {
-                            this.getDotInfo(dot1).collisions.add(beat);
-                            this.getDotInfo(dot2).collisions.add(beat);
-                            break;
-                        }
+                        // if (
+                        //     isEqual(state1.x, state2.x) &&
+                        //     isEqual(state1.y, state2.y)
+                        // ) {
+                        //     this.getDotInfo(dot1).collisions.add(beat);
+                        //     this.getDotInfo(dot2).collisions.add(beat);
+                        //     break;
+                        // }
                     }
                 }
             }

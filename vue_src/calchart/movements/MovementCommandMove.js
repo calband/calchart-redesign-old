@@ -5,7 +5,11 @@ import BaseMovementCommand from 'calchart/movements/BaseMovementCommand';
 import Coordinate from 'calchart/Coordinate';
 
 import { STEP_SIZES } from 'utils/CalchartUtils';
-// import { calcRotatedXPos, calcRotatedYPos, roundSmall } from 'utils/MathUtils';
+// import {
+//     calcRotatedXPos,
+//     calcRotatedYPos,
+//     roundSmall,
+// } from 'utils/MathUtils';
 
 /**
  * A MovementCommand which represents a constant movement in the given
@@ -34,8 +38,8 @@ export default class MovementCommandMove extends BaseMovementCommand {
 
         this._stepSize = options.stepSize;
         this._direction = direction;
-        this._deltaXPerStep = calcRotatedXPos(direction) * this._stepSize;
-        this._deltaYPerStep = calcRotatedYPos(direction) * this._stepSize;
+        // this._deltaXPerStep = calcRotatedXPos(direction) * this._stepSize;
+        // this._deltaYPerStep = calcRotatedYPos(direction) * this._stepSize;
 
         let end = this._getPosition(duration);
         this._endX = end.x;
@@ -60,9 +64,9 @@ export default class MovementCommandMove extends BaseMovementCommand {
     }
 
     getAnimationState(beatNum) {
-        if (beatNum < 0 || roundSmall(beatNum - this._duration) > 0) {
-            return null;
-        }
+        // if (beatNum < 0 || roundSmall(beatNum - this._duration) > 0) {
+        //     return null;
+        // }
 
         let position = this._getPosition(beatNum);
         return new AnimationState(position, this._orientation);
@@ -79,17 +83,17 @@ export default class MovementCommandMove extends BaseMovementCommand {
      * @return {string} The continuity text in the form 'Move 4 E'.
      */
     getText() {
-        let deltaX = roundSmall(this._endX - this._startX);
-        let deltaY = roundSmall(this._endY - this._startY);
-        let dirX = (deltaX < 0) ? 'S' : 'N';
-        let dirY = (deltaY < 0) ? 'W' : 'E';
+        // let deltaX = roundSmall(this._endX - this._startX);
+        // let deltaY = roundSmall(this._endY - this._startY);
+        // let dirX = (deltaX < 0) ? 'S' : 'N';
+        // let dirY = (deltaY < 0) ? 'W' : 'E';
 
-        // this movement stays on the grid
-        if (this._direction % 180 === 0) {
-            return `Move ${Math.abs(deltaY)} ${dirY}`;
-        } else {
-            return `Move ${Math.abs(deltaX)} ${dirX}`;
-        }
+        // // this movement stays on the grid
+        // if (this._direction % 180 === 0) {
+        //     return `Move ${Math.abs(deltaY)} ${dirY}`;
+        // } else {
+        //     return `Move ${Math.abs(deltaX)} ${dirX}`;
+        // }
     }
 
     /**
@@ -119,9 +123,9 @@ export default class MovementCommandMove extends BaseMovementCommand {
         let x = this._startX + this._deltaXPerStep * numSteps;
         let y = this._startY + this._deltaYPerStep * numSteps;
 
-        // rounding errors
-        x = roundSmall(x);
-        y = roundSmall(y);
+        // // rounding errors
+        // x = roundSmall(x);
+        // y = roundSmall(y);
 
         return new Coordinate(x, y);
     }

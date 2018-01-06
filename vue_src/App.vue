@@ -30,10 +30,7 @@ page according to the URL.
 </template>
 
 <script>
-import { defaults, defaultTo } from 'lodash';
 import { mapState, mapMutations } from 'vuex';
-
-import { findAndRemove } from 'utils/array';
 
 export default {
     name: 'Calchart',

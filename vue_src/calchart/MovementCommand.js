@@ -19,14 +19,14 @@ export default class MovementCommand {
      */
     static deserialize(data) {
         switch (data.type) {
-            case 'MovementCommandArc':
-                return MovementCommandArc.deserialize(data);
+            // case 'MovementCommandArc':
+            //     return MovementCommandArc.deserialize(data);
             case 'MovementCommandMove':
                 return MovementCommandMove.deserialize(data);
-            case 'MovementCommandEven':
-                return MovementCommandEven.deserialize(data);
-            case 'MovementCommandStop':
-                return MovementCommandStop.deserialize(data);
+            // case 'MovementCommandEven':
+            //     return MovementCommandEven.deserialize(data);
+            // case 'MovementCommandStop':
+            //     return MovementCommandStop.deserialize(data);
         }
         throw new Error('No movement of the type: ' + data.type);
     }

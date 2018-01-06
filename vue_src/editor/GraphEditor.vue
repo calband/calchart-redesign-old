@@ -14,6 +14,8 @@ show in the editor application.
 </template>
 
 <script>
+import $ from 'jquery';
+
 import SheetList from 'editor/SheetList';
 
 export default {

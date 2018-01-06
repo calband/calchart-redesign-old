@@ -8,7 +8,6 @@ import AddSheetPopup from 'popups/AddSheetPopup';
 import { showPopup } from 'popups/lib';
 import sendAction from 'utils/ajax';
 import History from 'utils/History';
-import { uniqueId } from 'utils/JSUtils';
 
 /**
  * Redo an action.

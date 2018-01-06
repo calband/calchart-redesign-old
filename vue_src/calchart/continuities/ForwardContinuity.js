@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 import $ from 'jquery';
 
 import BaseContinuity from 'calchart/continuities/BaseContinuity';
