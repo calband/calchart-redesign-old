@@ -78,8 +78,8 @@ The top menu in the editor application.
                 />
                 -->
                 <EditorMenuItem
-                    @click="openViewer"
                     label="Open in viewer..."
+                    action="openViewer"
                 />
             </EditorMenuItem>
             <EditorMenuItem
@@ -110,8 +110,8 @@ The top menu in the editor application.
         </EditorMenuTab>
         <EditorMenuTab label="Help">
             <EditorMenuItem
-                @click="openHelp"
                 label="Go to help..."
+                action="openHelp"
                 icon="question-circle"
             />
         </EditorMenuTab>
@@ -120,6 +120,7 @@ The top menu in the editor application.
 
 <script>
 import $ from 'jquery';
+import { isNull } from 'lodash';
 
 import { ZOOMS } from 'utils/CalchartUtils';
 import History from 'utils/History';
@@ -127,6 +128,14 @@ import History from 'utils/History';
 import EditorMenuTab from './EditorMenuTab';
 import EditorMenuItem from './EditorMenuItem';
 import EditorMenuItemDivider from './EditorMenuItemDivider';
+
+/**
+ * @param {Event} e
+ * @return {Boolean} True if the event was triggered on a menu tab.
+ */
+function isOnTab(e) {
+    return $(e.target).parent().hasClass('menu-tab');
+}
 
 export default {
     components: {
@@ -148,11 +157,11 @@ export default {
                     this.activate(menuTab);
                 }
             });
-            menuTab.$on('mousedown', () => {
-                if (this.activeTab) {
-                    this.deactivate();
-                } else {
+            menuTab.$on('mousedown', e => {
+                if (isNull(this.activeTab)) {
                     this.activate(menuTab);
+                } else if (isOnTab(e)) {
+                    this.deactivate();
                 }
             });
         });
@@ -195,8 +204,13 @@ export default {
             menuTab.activate();
             this.activeTab = menuTab;
 
-            $(document).one('mousedown.menu', () => {
-                this.deactivate();
+            $(document).on('mouseup.menu', e => {
+                // clicking on a tab is handled in the mousedown event; we want
+                // to avoid capturing the mouseup event when clicking on a tab
+                // (e.g. when initially opening the tab).
+                if (!isOnTab(e)) {
+                    this.deactivate();
+                }
             });
         },
         /**
@@ -209,18 +223,6 @@ export default {
             }
 
             $(document).off('.menu');
-        },
-        /**
-         * Open the viewer app for the current show.
-         */
-        openViewer() {
-            alert('open viewer');
-        },
-        /**
-         * Open the help pages.
-         */
-        openHelp() {
-            alert('open help');
         },
     },
 };

@@ -4,7 +4,7 @@ A menu tab in the Editor menu.
 
 <template>
     <div
-        @mousedown.stop="$emit('mousedown')"
+        @mousedown.stop="$emit('mousedown', $event)"
         @mouseover="$emit('mouseover')"
         :class="['menu-tab', { active }]"
     >

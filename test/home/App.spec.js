@@ -3,12 +3,11 @@ import sinon from 'sinon';
 import { shallow } from 'vue-test-utils';
 
 import App from 'home/App';
-import { $store, setStunt, stubAction } from 'test/utils';
+import { addStore, setStunt, stubAction } from 'test/utils';
 
 function withTabs(allTabs) {
-    return shallow(App, {
+    return addStore(shallow)(App, {
         propsData: { allTabs },
-        mocks: { $store },
     });
 }
 
@@ -30,7 +29,7 @@ const FOO_TABS = [
 
 describe('home/App', () => {
     it('is loading', () => {
-        let wrapper = withTabs([[]]);
+        let wrapper = withTabs(FOO_TABS);
         expect(wrapper.vm.isLoading).toBe(true);
         expect(wrapper.contains('p.loading')).toBe(true);
     });

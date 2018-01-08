@@ -1,7 +1,7 @@
 import { defaults, find, isNumber, pull, pullAt, range } from 'lodash';
 
 import Dot from 'calchart/Dot';
-// import Sheet from 'calchart/Sheet';
+import Sheet from 'calchart/Sheet';
 import Song from 'calchart/Song';
 import { getDotLabels } from 'utils/CalchartUtils';
 import { moveElem } from 'utils/JSUtils';
@@ -238,19 +238,13 @@ export default class Show {
     /**** SHEETS ****/
 
     /**
-     * Add a stuntsheet to the show with the given number of beats.
+     * Add the given Sheet to the Show.
      *
-     * @param {int} numBeats - The number of beats for the stuntsheet.
-     * @return {Sheet}
+     * @param {Sheet} sheet
      */
-    addSheet(numBeats) {
-        let index = this._sheets.length;
-        let sheet = Sheet.create(this, index, numBeats, this._dots.length); // eslint-disable-line no-undef, max-len
-
+    addSheet(sheet) {
         this._sheets.push(sheet);
-        this.updateMovements(index - 1);
-
-        return sheet;
+        this.updateMovements(sheet.getIndex() - 1);
     }
 
     /**

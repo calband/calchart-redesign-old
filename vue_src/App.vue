@@ -4,7 +4,7 @@ page according to the URL.
 </docs>
 
 <template>
-    <div>
+    <div id="app" :class="$route.name">
         <header>
             <h1><router-link :to="{ name: 'home' }">Calchart</router-link></h1>
             <p class="logout-link"><a href="/logout">Logout</a></p>
@@ -30,10 +30,7 @@ page according to the URL.
 </template>
 
 <script>
-import { defaults, defaultTo } from 'lodash';
 import { mapState, mapMutations } from 'vuex';
-
-import { findAndRemove } from 'utils/array';
 
 export default {
     name: 'Calchart',
@@ -42,54 +39,15 @@ export default {
     },
     methods: {
         ...mapMutations('messages', ['removeMessage']),
-        /**
-         * Shows a message on the page.
-         *
-         * @param {String} message
-         * @param {Object} [options] - Options to customize the message:
-         *   - {boolean} [error=false] - true if message is an error message
-         *   - {boolean} [autohide=!isError] - Automatically hide the message
-         *     after a given time.
-         * @param {boolean} error - true to style the message as an error
-         */
-        showMessage(message, options={}) {
-            defaults(options, {
-                error: false,
-            });
-            options.autohide = defaultTo(options.autohide, !options.error);
-            options.id = this.messageId++;
-            options.text = message;
-            this.messages.push(options);
-
-            if (options.autohide) {
-                setTimeout(() => {
-                    this.hideMessage(options.id);
-                }, 1000);
-            }
-        },
-        /**
-         * Shows an error message on the page.
-         *
-         * @param {String} message
-         * @param {Object} [options]
-         */
-        showError(message, options={}) {
-            options.error = true;
-            this.showMessage(message, options);
-        },
-        /**
-         * Hide the message with the given id.
-         *
-         * @param {int} id
-         */
-        hideMessage(id) {
-            findAndRemove(this.messages, ['id', id]);
-        },
     },
 };
 </script>
 
 <style lang="scss">
+body {
+    padding: 0;
+}
+
 .vue-context-menu {
     @include hover-menu;
 }

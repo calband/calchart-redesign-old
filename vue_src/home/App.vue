@@ -206,7 +206,7 @@ export default {
 </script>
 
 <style lang="scss">
-body {
+#app.home {
     padding: 0;
     padding-top: 20px;
     min-width: 700px;
