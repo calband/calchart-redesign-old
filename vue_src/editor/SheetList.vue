@@ -80,7 +80,11 @@ export default {
          * @return {[Sheet]} All the Sheets in the Show.
          */
         sheets() {
-            return this.$store.state.show.getSheets();
+            if (this.$store.state.show) {
+                return this.$store.state.show.getSheets();
+            } else {
+                return [];
+            }
         },
     },
     methods: {
