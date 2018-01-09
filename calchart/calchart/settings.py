@@ -32,7 +32,6 @@ else:
     # add cross-vagrant host, 10.0.2.2 inside VM accesses localhost of host
     ALLOWED_HOSTS = ['localhost', '10.0.2.2']
 
-
 # Application definition
 
 INSTALLED_APPS = [

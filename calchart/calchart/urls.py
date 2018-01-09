@@ -15,9 +15,9 @@ from django.contrib.auth.views import LogoutView
 
 urlpatterns = [
     url(r'^$', CalchartView.as_view(), name='home'),
-    url(r'^editor/.+/$', CalchartView.as_view()),
-    url(r'^viewer/.+/$', CalchartView.as_view()),
-    url(r'^viewpsheet/.+/$', CalchartView.as_view()),
+    url(r'^editor', CalchartView.as_view()),
+    url(r'^viewer', CalchartView.as_view()),
+    url(r'^viewpsheet', CalchartView.as_view()),
     url(r'^help/', include('wiki.urls', namespace='wiki')),
 
     # authentication

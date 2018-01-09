@@ -4,6 +4,7 @@
  * to the URL goes to the proper place.
  */
 
+import $ from 'jquery';
 import Vue from 'vue';
 import VueRouter from 'vue-router';
 
@@ -27,17 +28,17 @@ let router = new VueRouter({
             },
         },
         {
-            path: '/editor/:slug/',
+            path: '/editor/:slug',
             name: 'editor',
             component: Editor,
         },
         {
-            path: '/viewer/:slug/',
+            path: '/viewer/:slug',
             name: 'viewer',
             component: Home, // TODO
         },
         {
-            path: '/viewpsheet/:slug/',
+            path: '/viewpsheet/:slug',
             name: 'viewpsheet',
             component: Home, // TODO
         },
@@ -45,6 +46,11 @@ let router = new VueRouter({
 });
 
 router.beforeEach((to, from, next) => {
+    // close any open popups
+    $('.popup-wrapper').each(function() {
+        this.__vue__.hide();
+    });
+
     store.commit('setShow', null);
 
     let slug = to.params.slug;
