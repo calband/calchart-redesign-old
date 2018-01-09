@@ -101,10 +101,10 @@ else:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            'NAME': 'calchart_db',
-            'USER': 'calchart_user',
-            'PASSWORD': 'calbandgreat',
-            'HOST': '127.0.0.1',
+            'NAME': os.environ.get('POSTGRES_DB', 'postgres'),
+            'USER': os.environ.get('POSTGRES_USER', 'postgres'),
+            'PASSWORD': os.environ.get('POSTGRES_PASSWORD', 'calbandgreat'),
+            'HOST': os.environ.get('POSTGRES_HOST', '127.0.0.1'),
         },
     }
 
