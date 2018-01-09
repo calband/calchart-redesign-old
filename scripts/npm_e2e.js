@@ -4,8 +4,7 @@ const child_process = require('child_process');
 
 // where is npm run e2e running?
 const IS_CI = !! process.env.CIRCLECI;
-const IS_VAGRANT = process.env.USER === 'vagrant';
-const IS_LOCAL = ! (IS_CI || IS_VAGRANT);
+const IS_LOCAL = !IS_CI;
 
 var startApp = [
     'python',
@@ -14,12 +13,9 @@ var startApp = [
     'e2e_user.json',
     '--noinput',
 ].join(' ');
-if (IS_LOCAL) {
-    startApp = `vagrant ssh -c "cd .. && ${startApp}"`;
-}
 
 // check that webpack-dev-server is running
-if (!IS_CI) {
+if (IS_LOCAL) {
     try {
         child_process.execSync(`lsof -i :4200`);
     } catch (e) {
@@ -54,12 +50,6 @@ createTestCafe('localhost', 5000)
     })
     .finally(() => {
         testcafe.close();
-        // need to kill the manage.py process inside VM
-        if (IS_LOCAL) {
-            child_process.exec('vagrant ssh -c "pkill -9 -f testserver"', {
-                timeout: 5000,
-            });
-        }
         if (failed) {
             process.exit(1);
         }

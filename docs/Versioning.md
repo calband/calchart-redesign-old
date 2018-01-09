@@ -11,7 +11,7 @@ To alleviate this problem and follow the same idiom as Django models, we'll be u
 
 We'll then use Django migrations to update all shows of the previous version to the newer version. One benefit of using Django migrations is that Django figures out for us which migrations have already been run; i.e. it remembers that we already migrated all Shows up to version X and only have to apply the last migration to update it to version X + 1.
 
-To make a new migration, run `python vmanage.py makemigrations base --empty`. This will create a file in `calchart/base/migrations` with a name like `00XX_auto_yyyymmdd_HHMM.py`. Rename this file to be `00XX_version_Y.py`, where `Y` is the version number you're updating to (i.e. if you're updating from version 2 to 3, name it `00XX_version_3.py`). Update the file to look something like this:
+To make a new migration, run `python calchart/manage.py makemigrations base --empty`. This will create a file in `calchart/base/migrations` with a name like `00XX_auto_yyyymmdd_HHMM.py`. Rename this file to be `00XX_version_Y.py`, where `Y` is the version number you're updating to (i.e. if you're updating from version 2 to 3, name it `00XX_version_3.py`). Update the file to look something like this:
 
 ```
 # -*- coding: utf-8 -*-
