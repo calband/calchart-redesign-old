@@ -27,17 +27,17 @@ let router = new VueRouter({
             },
         },
         {
-            path: '/editor/:slug/',
+            path: '/editor/:slug',
             name: 'editor',
             component: Editor,
         },
         {
-            path: '/viewer/:slug/',
+            path: '/viewer/:slug',
             name: 'viewer',
             component: Home, // TODO
         },
         {
-            path: '/viewpsheet/:slug/',
+            path: '/viewpsheet/:slug',
             name: 'viewpsheet',
             component: Home, // TODO
         },
