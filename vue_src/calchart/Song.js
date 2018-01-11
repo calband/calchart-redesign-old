@@ -136,7 +136,8 @@ export default class Song {
     }
 
     /**
-     * @return {FieldType} The field type for the song, resolving any defaults.
+     * @return {BaseFieldType} The field type for the song, resolving any
+     *   defaults.
      */
     getFieldType() {
         return this._fieldType === FieldType.DEFAULT ?
@@ -170,8 +171,7 @@ export default class Song {
     }
 
     /**
-     * @return {string} The song's step type, resolving any defaults.
-     *   (@see CalchartUtils.STEP_TYPES)
+     * @return {BaseStepType} The song's step type, resolving any defaults.
      */
     getStepType() {
         return this._stepType === StepType.DEFAULT ?

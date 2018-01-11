@@ -16,12 +16,19 @@ and manipulation.
             @click="makeActiveSheet(sheet)"
         >
             <span class="label">{{ sheet.getLabel() }}</span>
-            <div class="preview"></div>
+            <Grapher
+                :sheet="sheet"
+                :fieldPadding="5"
+                :fill="true"
+                :drawYardlines="false"
+            />
         </div>
     </div>
 </template>
 
 <script>
+import Grapher from 'grapher/Grapher';
+
 // The width-to-height ratio for a Sheet
 let SHEET_RATIO = 10/7;
 
@@ -48,6 +55,7 @@ export default {
             default: '100%',
         },
     },
+    components: { Grapher },
     computed: {
         /**
          * @return {Object} The dimensions of the list.
@@ -123,10 +131,11 @@ export default {
     }
     .sheet {
         margin-bottom: 10px;
+        border: 2px solid $blue;
         &:last-child {
             margin-bottom: 0;
         }
-        &.active .preview {
+        &.active {
             border-color: $gold;
             box-shadow: 0 0 5px $gold;
         }
@@ -141,11 +150,6 @@ export default {
         z-index: z-index(toolbar);
         color: $gold;
         text-shadow: 1px 1px 2px $black;
-    }
-    .preview {
-        width: 100%;
-        height: 100%;
-        border: 2px solid $blue;
     }
 }
 </style>

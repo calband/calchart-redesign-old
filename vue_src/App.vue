@@ -46,6 +46,7 @@ export default {
 <style lang="scss">
 body {
     padding: 0;
+    overflow: hidden;
 }
 
 .vue-context-menu {

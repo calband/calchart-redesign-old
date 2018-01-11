@@ -9,23 +9,33 @@ show in the editor application.
             :menu="true"
             :width="sidebarWidth"
         />
-        <div class="workspace"></div>
+        <Grapher
+            :sheet="$store.state.editor.sheet"
+            :drawFourStep="true"
+            :drawYardlineNumbers="true"
+            :style="{ width: this.workspaceWidth }"
+            class="workspace"
+        />
     </div>
 </template>
 
 <script>
 import $ from 'jquery';
 
-import SheetList from 'editor/SheetList';
+import Grapher from 'grapher/Grapher';
+
+import SheetList from './SheetList';
 
 export default {
-    components: {
-        SheetList,
-    },
+    components: { Grapher, SheetList },
     data() {
         return {
             sidebarWidth: 200, // TODO: click and drag to change width
+            contentWidth: null, // TODO: resize window
         };
+    },
+    mounted() {
+        this.contentWidth = this.$el.offsetWidth;
     },
     computed: {
         /**
@@ -34,7 +44,7 @@ export default {
          * @return {number}
          */
         workspaceWidth() {
-            return $(this.$el).width() - this.sidebarWidth;
+            return this.contentWidth - this.sidebarWidth;
         },
     },
 };
@@ -46,5 +56,6 @@ export default {
     display: inline-block;
     height: 100%;
     vertical-align: top;
+    overflow: auto;
 }
 </style>
