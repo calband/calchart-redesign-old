@@ -15,8 +15,9 @@ application.
 
 <script>
 import store from 'store';
+import DotFormat from 'calchart/DotFormat';
+import { BaseFieldType } from 'calchart/FieldType';
 import Show from 'calchart/Show';
-import { DOT_FORMATS, SHOW_FIELD_TYPES } from 'utils/CalchartUtils';
 
 import { BasePopup, FormPopup } from './lib';
 import { positive } from './validators';
@@ -28,8 +29,8 @@ export default {
         return {
             model: {
                 numDots: '',
-                dotFormat: 'combo',
-                fieldType: 'college',
+                dotFormat: DotFormat.COMBO,
+                fieldType: BaseFieldType.COLLEGE,
             },
             fields: [
                 {
@@ -47,14 +48,14 @@ export default {
                     key: 'dotFormat',
                     type: 'choice',
                     templateOptions: {
-                        choices: DOT_FORMATS,
+                        enum: DotFormat,
                     },
                 },
                 {
                     key: 'fieldType',
                     type: 'choice',
                     templateOptions: {
-                        choices: SHOW_FIELD_TYPES,
+                        enum: BaseFieldType,
                     },
                 },
             ],

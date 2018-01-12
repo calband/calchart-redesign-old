@@ -1,8 +1,8 @@
 import { defaults, extend } from 'lodash';
 
-import Coordinate from 'calchart/Coordinate';
+import { StepCoordinate } from 'calchart/Coordinate';
+import { CompoundDirection } from 'calchart/Direction';
 
-import { getOrientation } from 'utils/CalchartUtils';
 import { NotImplementedError } from 'utils/errors';
 
 /**
@@ -72,17 +72,17 @@ export default class BaseMovementCommand {
     }
 
     /**
-     * @return {Coordinate} The position where the movement begins.
+     * @return {StepCoordinate} The position where the movement begins.
      */
     getStartPosition() {
-        return new Coordinate(this._startX, this._startY);
+        return new StepCoordinate(this._startX, this._startY);
     }
 
     /**
-     * @return {Coordinate} The position where the movement ends.
+     * @return {StepCoordinate} The position where the movement ends.
      */
     getEndPosition() {
-        return new Coordinate(this._endX, this._endY);
+        return new StepCoordinate(this._endX, this._endY);
     }
 
     /**
@@ -97,7 +97,7 @@ export default class BaseMovementCommand {
      */
     getOrientation() {
         if (this._orientation !== undefined) {
-            return getOrientation(this._orientation);
+            return CompoundDirection.fromAngle(this._orientation);
         }
     }
 

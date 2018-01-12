@@ -49,7 +49,7 @@ export default {
          * @return {Boolean} true if the current context is a graph context.
          */
         isGraphContext() {
-            return ContextType.isCurrent(this.$store, 'graph');
+            return ContextType.isCurrent(this.$store, ContextType.GRAPH);
         },
         /**
          * @return {Boolean} true if the show is initialized.

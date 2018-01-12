@@ -23,11 +23,11 @@ export default class ContextType {
      * Check if the given context type is the current context.
      *
      * @param {Store} store
-     * @param {ContextType} context
+     * @param {(String|ContextType)} context
      * @return {Boolean}
      */
     static isCurrent(store, context) {
-        return this.equals(context, store.state.editor.context);
+        return this.equals(this.fromValue(context), store.state.editor.context);
     }
 }
 

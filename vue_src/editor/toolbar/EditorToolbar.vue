@@ -164,6 +164,7 @@ The toolbar in the editor application.
 import { mapMutations } from 'vuex';
 
 import ContextType from 'editor/ContextType';
+import ToolType from 'editor/ToolType';
 import SeekBar from 'utils/SeekBar';
 import Select2 from 'utils/Select2';
 
@@ -180,12 +181,12 @@ export default {
         Select2,
     },
     constants: {
-        SNAP_STEPS: {
-            0: 'None',
-            1: '1',
-            2: '2',
-            4: '4',
-        },
+        SNAP_STEPS: [
+            { value: '0', label: 'None' },
+            { value: '1', label: '1' },
+            { value: '2', label: '2' },
+            { value: '4', label: '4' },
+        ],
     },
     methods: {
         ...mapMutations('editor', [
@@ -203,7 +204,7 @@ export default {
          * @return {Boolean} true if the tool matches the current editing tool.
          */
         isTool(tool) {
-            return tool === this.$store.state.editor.tool;
+            return ToolType.fromValue(tool) === this.$store.state.editor.tool;
         },
     },
 };

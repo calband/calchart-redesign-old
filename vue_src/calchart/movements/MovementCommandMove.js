@@ -2,7 +2,7 @@ import { defaults } from 'lodash';
 
 import AnimationState from 'calchart/AnimationState';
 import BaseMovementCommand from 'calchart/movements/BaseMovementCommand';
-import Coordinate from 'calchart/Coordinate';
+import { StepCoordinate } from 'calchart/Coordinate';
 
 import { STEP_SIZES } from 'utils/CalchartUtils';
 // import {
@@ -116,7 +116,7 @@ export default class MovementCommandMove extends BaseMovementCommand {
      *
      * @param {int} beatNum - The number of beats relative to the start of the
      *   movement.
-     * @return {Coordinate}
+     * @return {StepCoordinate}
      */
     _getPosition(beatNum) {
         let numSteps = Math.floor(beatNum / this._beatsPerStep);
@@ -127,6 +127,6 @@ export default class MovementCommandMove extends BaseMovementCommand {
         // x = roundSmall(x);
         // y = roundSmall(y);
 
-        return new Coordinate(x, y);
+        return new StepCoordinate(x, y);
     }
 }

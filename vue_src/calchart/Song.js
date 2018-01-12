@@ -1,4 +1,8 @@
-import { defaults, isNumber } from 'lodash';
+import { defaults, isNull, isNumber } from 'lodash';
+
+import FieldType from 'calchart/FieldType';
+import Orientation from 'calchart/Orientation';
+import StepType from 'calchart/StepType';
 
 /**
  * A song represents a collection of Sheets that comprise a Song. Songs can be
@@ -10,15 +14,15 @@ export default class Song {
      * @param {string} name - The name of the song
      * @param {(number[]|Sheet[])} sheets - The sheets contained in this song.
      * @param {Object} [options] - Optional information about the song, such as:
-     *   - {string} fieldType - The field type, or 'default' to use the same
-     *     field type as the Show.
-     *   - {(int|string)} beatsPerStep - The default number of beats per step
-     *       for continuities in the Song, or 'default' to get the number of
-     *       beats per step from the Show.
-     *   - {string} orientation - The default orientation for continuities in
-     *       the Song, or 'default' to get the orientation from the Show.
-     *   - {string} stepType - The default step type for continuities in the
-     *       Song, or 'default' to get the step type from the Show.
+     *   - {FieldType} fieldType - The default field type for continuities in
+     *     the Song.
+     *   - {?int} beatsPerStep - The default number of beats per step for
+     *       continuities in the Song, or null to get the number of beats per
+     *       step from the Show.
+     *   - {Orientation} orientation - The default orientation for continuities
+     *       in the Song.
+     *   - {StepType} stepType - The default step type for continuities in the
+     *       Song.
      */
     constructor(show, name, sheets, options={}) {
         this._show = show;
@@ -32,13 +36,13 @@ export default class Song {
         this._sheets = new Set(sheets);
 
         options = defaults({}, options, {
-            fieldType: 'default',
-            beatsPerStep: 'default',
-            orientation: 'default',
-            stepType: 'default',
+            fieldType: null,
+            beatsPerStep: null,
+            orientation: Orientation.DEFAULT,
+            stepType: StepType.DEFAULT,
         });
 
-        this._fieldType = options.fieldType;
+        this._fieldType = FieldType.fromValue(options.fieldType);
         this._beatsPerStep = options.beatsPerStep;
         this._orientation = options.orientation;
         this._stepType = options.stepType;
@@ -63,6 +67,8 @@ export default class Song {
      * @return {Song}
      */
     static deserialize(show, data) {
+        data.orientation = Orientation.fromValue(data.orientation);
+        data.stepType = StepType.fromValue(data.stepType);
         return new Song(show, data.name, data.sheets, data);
     }
 
@@ -74,10 +80,10 @@ export default class Song {
     serialize() {
         let data = {
             name: this._name,
-            fieldType: this._fieldType,
+            fieldType: this._fieldType.value,
             beatsPerStep: this._beatsPerStep,
-            stepType: this._stepType,
-            orientation: this._orientation,
+            stepType: this._stepType.value,
+            orientation: this._orientation.value,
         };
 
         data.sheets = [];
@@ -124,16 +130,16 @@ export default class Song {
      * @return {int}
      */
     getBeatsPerStep() {
-        return this._beatsPerStep === 'default' ?
+        return isNull(this._beatsPerStep) ?
             this.show.getBeatsPerStep() :
             this._beatsPerStep;
     }
 
     /**
-     * @return {string} The field type for the song, resolving any defaults.
+     * @return {FieldType} The field type for the song, resolving any defaults.
      */
     getFieldType() {
-        return this._fieldType === 'default' ?
+        return this._fieldType === FieldType.DEFAULT ?
             this.show.getFieldType() :
             this._fieldType;
     }
@@ -149,15 +155,11 @@ export default class Song {
      * @return {int} The song's orientation, resolving any defaults.
      */
     getOrientationDegrees() {
-        switch (this._orientation) {
-            case 'default':
-                return this.show.getOrientationDegrees();
-            case 'east':
-                return 0;
-            case 'west':
-                return 180;
+        if (this._orientation === Orientation.DEFAULT) {
+            return this.show.getOrientationDegrees();
+        } else {
+            return this._orientation.angle;
         }
-        throw new Error(`Invalid orientation: ${this._orientation}`);
     }
 
     /**
@@ -172,7 +174,7 @@ export default class Song {
      *   (@see CalchartUtils.STEP_TYPES)
      */
     getStepType() {
-        return this._stepType === 'default' ?
+        return this._stepType === StepType.DEFAULT ?
             this.show.getStepType() :
             this._stepType;
     }

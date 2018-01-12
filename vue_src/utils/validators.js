@@ -3,12 +3,10 @@
  */
 
 import {
-    difference,
     every,
-    includes,
+    filter,
+    has,
     isArray,
-    keys as _keys,
-    partial,
 } from 'lodash';
 
 /**
@@ -33,18 +31,22 @@ export function validateObject(...keys) {
     if (isArray(keys[0])) {
         keys = keys[0];
     }
-    return obj => difference(keys, _keys(obj)).length === 0;
+    return obj => filter(keys, k => !has(obj, k)).length === 0;
 }
 
 /**
- * Return a validator for a string that must be one of the provided values.
+ * Return a validator for a string that must be one in an Enum.
  *
- * @param {string[]} ...vals
+ * @param {Enum} cls
  * @return {function(String): boolean}
  */
-export function validateOneOf(...vals) {
-    if (isArray(vals[0])) {
-        vals = vals[0];
-    }
-    return partial(includes, vals);
+export function validateInEnum(cls) {
+    return s => {
+        try {
+            cls.fromValue(s);
+            return true;
+        } catch (e) {
+            return false;
+        }
+    };
 }

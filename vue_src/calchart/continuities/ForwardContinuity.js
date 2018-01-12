@@ -3,10 +3,10 @@
 import $ from 'jquery';
 
 import BaseContinuity from 'calchart/continuities/BaseContinuity';
+import { CardinalDirection } from 'calchart/Direction';
 import MovementCommandMove from 'calchart/movements/MovementCommandMove';
 // import { ForwardContinuityPopup } from 'popups/ContinuityPopups';
 
-import { DIRECTIONS } from 'utils/CalchartUtils';
 // import HTMLBuilder from 'utils/HTMLBuilder';
 import { validatePositive, parseNumber } from 'utils/JSUtils';
 

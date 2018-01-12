@@ -143,11 +143,9 @@ export default {
         text-shadow: 1px 1px 2px $black;
     }
     .preview {
-        display: block;
         width: 100%;
         height: 100%;
         border: 2px solid $blue;
-        background: green; // TODO: remove
     }
 }
 </style>

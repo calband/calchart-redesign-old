@@ -1,14 +1,7 @@
 /**
- * A Coordinate represents a dot's position on the field, either
- * in units of steps or pixels.
- *
- * If in steps, x is the number of steps from the south endzone and
- * y is the number of steps from the west sideline.
- *
- * If in pixels, x is the number of pixels from the left edge and y
- * is the number of pixels from the top edge.
+ * A Coordinate represents a dot's position on the field.
  */
-export default class Coordinate {
+class Coordinate {
     /**
      * @param {number} x
      * @param {number} y
@@ -40,3 +33,15 @@ export default class Coordinate {
         };
     }
 }
+
+/**
+ * A dot's position in pixels. `x` is the number of pixels from the left edge
+ * and `y` is the number of pixels from the top edge.
+ */
+export class PixelCoordinate extends Coordinate {}
+
+/**
+ * A dot's position in steps. `x` is the number of steps from the south endzone
+ * and `y` is the number of steps from the west sideline.
+ */
+export class StepCoordinate extends Coordinate {}
