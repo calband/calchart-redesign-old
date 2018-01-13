@@ -12,7 +12,7 @@ A group of toolbar items in the editor application.
 import { isNull } from 'lodash';
 
 import ContextType from 'editor/ContextType';
-import { validateOneOf } from 'utils/validators';
+import { validateInEnum } from 'utils/validators';
 
 export default {
     props: {
@@ -20,7 +20,7 @@ export default {
             // Only enable group if the given context is the active context
             type: String,
             default: null,
-            validator: validateOneOf(ContextType.values),
+            validator: validateInEnum(ContextType),
         },
     },
     computed: {

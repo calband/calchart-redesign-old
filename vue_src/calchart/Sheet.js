@@ -14,12 +14,15 @@ import {
     range,
 } from 'lodash';
 
-import Coordinate from 'calchart/Coordinate';
+import { StepCoordinate } from 'calchart/Coordinate';
 import Continuity from 'calchart/Continuity';
 // import TwoStepContinuity from 'calchart/continuities/TwoStepContinuity';
 import Dot from 'calchart/Dot';
 import DotType from 'calchart/DotType';
+import FieldType from 'calchart/FieldType';
 import MovementCommand from 'calchart/MovementCommand';
+import Orientation from 'calchart/Orientation';
+import StepType from 'calchart/StepType';
 import { AnimationStateError } from 'utils/errors';
 import { mapSome, moveElem, runAsync, uniqueId } from 'utils/JSUtils';
 // import { isEqual, roundSmall } from 'utils/MathUtils';
@@ -47,17 +50,15 @@ export default class Sheet {
      *   - {string} label - A label for the Sheet.
      *   - {?string} song - The name of the song this sheet is a part of.
      *   - {string} [background] - The URL for the background image
-     *   - {string} fieldType - The field type, or 'default' to use the same
-     *     field type as the associated song/show.
-     *   - {(int|string)} beatsPerStep - The default number of beats per step
-     *       for continuities in the Sheet, or 'default' to get the number of
-     *       beats per step from the associated song/show.
-     *   - {string} orientation - The default orientation for continuities in
-     *       the Sheet, or 'default' to get the orientation from the associated
-     *       song/show.
-     *   - {string} stepType - The default step type for continuities in the
-     *       Sheet, or 'default' to get the step type from the associated
-     *       song/show.
+     *   - {FieldType} [fieldType] - The default field type for continuities in
+     *     the Sheet.
+     *   - {?int} [beatsPerStep] - The default number of beats per step for
+     *     continuities in the Sheet, or null to get the number of beats per
+     *     step from the associated song/show.
+     *   - {Orientation} [orientation] - The default orientation for
+     *     continuities in the Sheet.
+     *   - {StepType} [stepType] - The default step type for continuities in the
+     *     Sheet.
      */
     constructor(show, id, index, numBeats, options) {
         this._show = show;
@@ -69,18 +70,18 @@ export default class Sheet {
             label: null,
             song: null,
             background: undefined,
-            fieldType: 'default',
-            beatsPerStep: 'default',
-            orientation: 'default',
-            stepType: 'default',
+            fieldType: FieldType.DEFAULT,
+            beatsPerStep: null,
+            orientation: Orientation.DEFAULT,
+            stepType: StepType.DEFAULT,
         });
 
         this._label = options.label;
         this._background = options.background;
-        this._fieldType = options.fieldType;
+        this._fieldType = FieldType.fromValue(options.fieldType);
         this._beatsPerStep = options.beatsPerStep;
-        this._orientation = options.orientation;
-        this._stepType = options.stepType;
+        this._orientation = Orientation.fromValue(options.orientation);
+        this._stepType = StepType.fromValue(options.stepType);
 
         // {?string} the name of the song
         this._song = options.song;
@@ -109,7 +110,7 @@ export default class Sheet {
         sheet._dots = range(numDots).map(i => {
             return {
                 type: DotType.PLAIN,
-                position: new Coordinate(0, 0),
+                position: new StepCoordinate(0, 0),
                 movements: [],
                 collisions: new Set(),
             };
@@ -140,8 +141,8 @@ export default class Sheet {
 
         sheet._dots = data.dots.map(dotData => {
             return {
-                type: dotData.type,
-                position: Coordinate.deserialize(dotData.position),
+                type: DotType.fromValue(dotData.type),
+                position: StepCoordinate.deserialize(dotData.position),
                 movements: dotData.movements.map(
                     movementData => MovementCommand.deserialize(movementData)
                 ),
@@ -174,15 +175,15 @@ export default class Sheet {
             label: this._label,
             song: this._song,
             background: this._background,
-            fieldType: this._fieldType,
+            fieldType: this._fieldType.value,
             beatsPerStep: this._beatsPerStep,
-            orientation: this._orientation,
-            stepType: this._stepType,
+            orientation: this._orientation.value,
+            stepType: this._stepType.value,
         };
 
         data.dots = this._dots.map(dotInfo => {
             return {
-                type: dotInfo.type,
+                type: dotInfo.type.value,
                 position: dotInfo.position.serialize(),
                 movements: dotInfo.movements.map(
                     movement => movement.serialize()
@@ -373,7 +374,7 @@ export default class Sheet {
      * @return {int}
      */
     getBeatsPerStep() {
-        return this._beatsPerStep === 'default' ?
+        return isNull(this._beatsPerStep) ?
             this.parent.getBeatsPerStep() :
             this._beatsPerStep;
     }
@@ -408,7 +409,7 @@ export default class Sheet {
      * @param {Dot} dot - The dot to retrieve info for.
      * @return {Object} The dot's information for this stuntsheet, containing:
      *   - {DotType} type - The dot's type.
-     *   - {Coordinate} position - The dot's starting position.
+     *   - {StepCoordinate} position - The dot's starting position.
      *   - {MovementCommand[]} movements - The dot's movements in the sheet.
      *   - {Set.<int>} collisions - All beats where this dot collides with
      *     another dot.
@@ -466,11 +467,11 @@ export default class Sheet {
     }
 
     /**
-     * @return {string} The field type for the stuntsheet, resolving any
+     * @return {FieldType} The field type for the stuntsheet, resolving any
      *   defaults.
      */
     getFieldType() {
-        return this._fieldType === 'default' ?
+        return this._fieldType === FieldType.DEFAULT ?
             this.parent.getFieldType() :
             this._fieldType;
     }
@@ -479,7 +480,7 @@ export default class Sheet {
      * Get the position of the given dot at the end of the sheet.
      *
      * @param {Dot} dot
-     * @return {Coordinate}
+     * @return {StepCoordinate}
      */
     getFinalPosition(dot) {
         let dotInfo = this.getDotInfo(dot);
@@ -517,22 +518,18 @@ export default class Sheet {
      *   defaults.
      */
     getOrientationDegrees() {
-        switch (this._orientation) {
-            case 'default':
-                return this.parent.getOrientationDegrees();
-            case 'east':
-                return 0;
-            case 'west':
-                return 180;
+        if (this._orientation === Orientation.DEFAULT) {
+            return this.parent.getOrientationDegrees();
+        } else {
+            return this._orientation.angle;
         }
-        throw new Error(`Invalid orientation: ${this._orientation}`);
     }
 
     /**
      * Get the position of the dot at the beginning of the sheet.
      *
      * @param {Dot} dot
-     * @return {Coordinate}
+     * @return {StepCoordinate}
      */
     getPosition(dot) {
         return this.getDotInfo(dot).position;
@@ -562,7 +559,7 @@ export default class Sheet {
      *   CalchartUtils.STEP_TYPES)
      */
     getStepType() {
-        return this._stepType === 'default' ?
+        return this._stepType === StepType.DEFAULT ?
             this.parent.getStepType() :
             this._stepType;
     }
@@ -676,7 +673,7 @@ export default class Sheet {
      * @param {int} y - The y-coordinate of the new position, in steps.
      */
     setPosition(dot, x, y) {
-        this.getDotInfo(dot).position = new Coordinate(x, y);
+        this.getDotInfo(dot).position = new StepCoordinate(x, y);
     }
 
     /**

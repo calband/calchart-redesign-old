@@ -1,9 +1,12 @@
 import { defaults, find, isNumber, pull, pullAt, range } from 'lodash';
 
 import Dot from 'calchart/Dot';
+import DotFormat from 'calchart/DotFormat';
+import { BaseFieldType } from 'calchart/FieldType';
+import { BaseOrientation } from 'calchart/Orientation';
 import Sheet from 'calchart/Sheet';
 import Song from 'calchart/Song';
-import { getDotLabels } from 'utils/CalchartUtils';
+import { BaseStepType } from 'calchart/StepType';
 import { moveElem } from 'utils/JSUtils';
 
 /**
@@ -38,7 +41,7 @@ export default class Show {
      *   - {string} slug - The slug of the show.
      *   - {boolean} isBand - Whether the show is for the Band.
      *   - {boolean} published - Whether the show is published for the band.
-     *   - {string} dotFormat - The format used to label the dots.
+     *   - {DotFormat} dotFormat - The format used to label the dots.
      *   - {int} version - The version of the Show.
      *   - {number[]} beats - The beats in the Show, where each number is the
      *     number of milliseconds between each beat.
@@ -48,15 +51,15 @@ export default class Show {
      * @param {Object[]} sheets - The serialized data for every Sheet contained
      *   in the Show.
      * @param {Object[]} songs - The serialized data for every Song in the Show.
-     * @param {string} fieldType - The show's field type (@see
-     *   CalchartUtils.FIELD_TYPES).
+     * @param {BaseFieldType} fieldType - The default field type for the entire
+     *   Show.
      * @param {Object} [options] - Other options to customize the Show:
-     *   - {int} [beatsPerStep=1] - The default number of beats per step for the
+     *   - {int} [beatsPerStep] - The default number of beats per step for the
      *     entire Show.
-     *   - {string} [stepType=HS] - The default step type for the entire Show
-     *     (@see CalchartUtils.STEP_TYPES).
-     *   - {string} [orientation=east] - The default orientation for the entire
-     *     Show (@see CalchartUtils.ORIENTATIONS).
+     *   - {BaseStepType} [stepType] - The default step type for the entire
+     *     Show.
+     *   - {BaseOrientation} [orientation] - The default orientation for the
+     *     entire Show.
      */
     constructor(metadata, dots, sheets, songs, fieldType, options={}) {
         this._name = metadata.name;
@@ -77,14 +80,14 @@ export default class Show {
         this._audio = metadata.audio;
 
         this._dots = dots.map(data => Dot.deserialize(data));
-        this._sheets = sheets.map(data => Sheet.deserialize(this, data)); // eslint-disable-line no-undef, max-len
+        this._sheets = sheets.map(data => Sheet.deserialize(this, data));
         this._songs = songs.map(data => Song.deserialize(this, data));
         this._fieldType = fieldType;
 
         options = defaults({}, options, {
             beatsPerStep: 1,
-            stepType: 'HS',
-            orientation: 'east',
+            stepType: BaseStepType.HIGH_STEP,
+            orientation: BaseOrientation.EAST,
         });
 
         this._beatsPerStep = options.beatsPerStep;
@@ -103,21 +106,25 @@ export default class Show {
      * @return {Show}
      */
     static create(name, slug, isBand, data) {
-        let dots = getDotLabels(data.dotFormat, data.numDots).map(
+        let dotFormat = DotFormat.fromValue(data.dotFormat);
+        let dots = dotFormat.getDotLabels(data.numDots).map(
             (label, i) => new Dot(i, label).serialize()
         );
+
         let metadata = {
-            name: name,
-            slug: slug,
-            isBand: isBand,
+            name,
+            slug,
+            isBand,
             published: false,
-            dotFormat: data.dotFormat,
+            dotFormat,
             version: VERSION,
             beats: [],
             audio: null,
         };
 
-        return new Show(metadata, dots, [], [], data.fieldType);
+        let fieldType = BaseFieldType.fromValue(data.fieldType);
+
+        return new Show(metadata, dots, [], [], fieldType);
     }
 
     /**
@@ -127,12 +134,16 @@ export default class Show {
      * @return {Show}
      */
     static deserialize(data) {
+        data.dotFormat = DotFormat.fromValue(data.dotFormat);
+        data.stepType = BaseStepType.fromValue(data.stepType);
+        data.orientation = BaseOrientation.fromValue(data.orientation);
+
         return new Show(
             data,
             data.dots,
             data.sheets,
             data.songs,
-            data.fieldType,
+            BaseFieldType.fromValue(data.fieldType),
             data
         );
     }
@@ -148,14 +159,14 @@ export default class Show {
             slug: this._slug,
             isBand: this._isBand,
             published: this._published,
-            dotFormat: this._dotFormat,
+            dotFormat: this._dotFormat.value,
             version: this._version,
             beats: this._beats,
             audio: this._audio,
-            fieldType: this._fieldType,
+            fieldType: this._fieldType.value,
             beatsPerStep: this._beatsPerStep,
-            stepType: this._stepType,
-            orientation: this._orientation,
+            stepType: this._stepType.value,
+            orientation: this._orientation.value,
         };
 
         data.dots = this._dots.map(dot => dot.serialize());
@@ -181,14 +192,14 @@ export default class Show {
     }
 
     /**
-     * @return {string} The default field type for the entire show.
+     * @return {BaseFieldType} The default field type for the entire show.
      */
     getFieldType() {
         return this._fieldType;
     }
 
     /**
-     * @return {string} The default orientation of the entire Show.
+     * @return {BaseOrientation} The default orientation of the entire Show.
      */
     getOrientation() {
         return this._orientation;
@@ -199,18 +210,11 @@ export default class Show {
      *   degrees.
      */
     getOrientationDegrees() {
-        switch (this._orientation) {
-            case 'east':
-                return 0;
-            case 'west':
-                return 180;
-        }
-        throw new Error(`Invalid orientation: ${this._orientation}`);
+        return this._orientation.angle;
     }
 
     /**
-     * @return {string} The default step type for the entire show. (@see
-     *   CalchartUtils.STEP_TYPES)
+     * @return {BaseStepType} The default step type for the entire show.
      */
     getStepType() {
         return this._stepType;

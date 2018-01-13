@@ -1,4 +1,4 @@
-import { compact } from 'lodash';
+import { filter, has, includes } from 'lodash';
 
 import makeEnum from 'utils/enum';
 
@@ -15,11 +15,7 @@ export default class DotType {
      */
     static sort(dotTypes) {
         let types = new Set(dotTypes);
-        return compact(this.values.map(function(dotType) {
-            if (types.has(dotType)) {
-                return dotType;
-            }
-        }));
+        return filter(this.values, dotType => has(types, dotType));
     }
 
     /**
@@ -29,7 +25,7 @@ export default class DotType {
      * @return {boolean}
      */
     static isAll(dotType) {
-        return dotType === this.ALL_BEFORE || dotType === this.ALL_AFTER;
+        return includes([DotType.ALL_BEFORE, DotType.ALL_AFTER], dotType);
     }
 }
 

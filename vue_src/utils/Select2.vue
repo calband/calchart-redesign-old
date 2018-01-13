@@ -8,10 +8,10 @@ A component that renders a Select2 element.
         :value="value"
     >
         <option
-            v-for="(label, value) in choices"
-            :key="value"
-            :value="value"
-        >{{ label }}</option>
+            v-for="choice in choices"
+            :key="choice.value"
+            :value="choice.value"
+        >{{ choice.label }}</option>
     </select>
 </template>
 
@@ -21,6 +21,8 @@ import { defaults } from 'lodash';
 import 'select2/dist/js/select2.min.js';
 import 'select2/dist/css/select2.min.css';
 
+import { validateList, validateObject } from 'utils/validators';
+
 export default {
     props: {
         value: {
@@ -29,10 +31,11 @@ export default {
             required: true,
         },
         choices: {
-            // The choices in the <select> element, where the keys are the
-            // option values and the values are the label.
-            type: Object,
+            // The choices in the <select> element, as a list of objects
+            // containing `value` and `label` properties
+            type: Array,
             required: true,
+            validator: validateList(validateObject('value', 'label')),
         },
         multiple: {
             // true if this should be a multiple select

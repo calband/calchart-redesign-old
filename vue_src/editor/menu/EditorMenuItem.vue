@@ -24,7 +24,7 @@ A menu item in the Editor menu.
 import { isUndefined } from 'lodash';
 
 import ContextType from 'editor/ContextType';
-import { validateOneOf } from 'utils/validators';
+import { validateInEnum } from 'utils/validators';
 
 import EditorMenuSubMenu from './EditorMenuSubMenu';
 
@@ -55,7 +55,7 @@ export default {
             // Only enable menu item if the given context is the active context
             type: String,
             default: null,
-            validator: validateOneOf(ContextType.values),
+            validator: validateInEnum(ContextType),
         },
     },
     components: { EditorMenuSubMenu },
