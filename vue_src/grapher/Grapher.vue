@@ -6,18 +6,21 @@ The component that can draw a field and dots based on the state of a Sheet.
     <div :class="['grapher-container', { fill }]">
         <svg v-if="sheet" :width="svgWidth" :height="svgHeight">
             <component
-                v-bind="$attrs"
                 :is="fieldGrapher"
                 :scale="scale"
+                v-bind="$attrs"
                 class="field"
             />
             <g class="dots">
                 <GrapherDot
                     v-for="dot in sheet.show.getDots()"
                     :key="dot.id"
-                    :position="getPosition(dot)"
                     :dotType="sheet.getDotInfo(dot).type"
-                    :class="'dot-' + dot.id"
+                    :position="getPosition(dot)"
+                    :scale="scale"
+                    :zoom="zoom"
+                    v-bind="$attrs"
+                    :class="`dot-${dot.id}`"
                 />
             </g>
             <!-- separate to keep labels in another layer -->
@@ -28,6 +31,7 @@ The component that can draw a field and dots based on the state of a Sheet.
                     :position="getPosition(dot)"
                     :label="dot.label"
                     :labelLeft="labelLeft"
+                    :zoom="zoom"
                 />
             </g>
         </svg>

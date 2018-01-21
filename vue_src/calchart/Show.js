@@ -1,7 +1,7 @@
 import { defaults, find, isNumber, pull, pullAt, range } from 'lodash';
 
 import Dot from 'calchart/Dot';
-import DotFormat from 'calchart/DotFormat';
+import DotLabelFormat from 'calchart/DotLabelFormat';
 import { BaseFieldType } from 'calchart/FieldType';
 import { BaseOrientation } from 'calchart/Orientation';
 import Sheet from 'calchart/Sheet';
@@ -41,7 +41,7 @@ export default class Show {
      *   - {string} slug - The slug of the show.
      *   - {boolean} isBand - Whether the show is for the Band.
      *   - {boolean} published - Whether the show is published for the band.
-     *   - {DotFormat} dotFormat - The format used to label the dots.
+     *   - {DotLabelFormat} labelFormat - The format used to label the dots.
      *   - {int} version - The version of the Show.
      *   - {number[]} beats - The beats in the Show, where each number is the
      *     number of milliseconds between each beat.
@@ -66,7 +66,7 @@ export default class Show {
         this._slug = metadata.slug;
         this._isBand = metadata.isBand;
         this._published = metadata.published;
-        this._dotFormat = metadata.dotFormat;
+        this._labelFormat = metadata.labelFormat;
         this._version = metadata.version;
 
         if (this._version < VERSION) {
@@ -106,8 +106,8 @@ export default class Show {
      * @return {Show}
      */
     static create(name, slug, isBand, data) {
-        let dotFormat = DotFormat.fromValue(data.dotFormat);
-        let dots = dotFormat.getDotLabels(data.numDots).map(
+        let labelFormat = DotLabelFormat.fromValue(data.labelFormat);
+        let dots = labelFormat.getDotLabels(data.numDots).map(
             (label, i) => new Dot(i, label).serialize()
         );
 
@@ -116,7 +116,7 @@ export default class Show {
             slug,
             isBand,
             published: false,
-            dotFormat,
+            labelFormat,
             version: VERSION,
             beats: [],
             audio: null,
@@ -134,7 +134,7 @@ export default class Show {
      * @return {Show}
      */
     static deserialize(data) {
-        data.dotFormat = DotFormat.fromValue(data.dotFormat);
+        data.labelFormat = DotLabelFormat.fromValue(data.labelFormat);
         data.stepType = BaseStepType.fromValue(data.stepType);
         data.orientation = BaseOrientation.fromValue(data.orientation);
 
@@ -159,7 +159,7 @@ export default class Show {
             slug: this._slug,
             isBand: this._isBand,
             published: this._published,
-            dotFormat: this._dotFormat.value,
+            labelFormat: this._labelFormat.value,
             version: this._version,
             beats: this._beats,
             audio: this._audio,
