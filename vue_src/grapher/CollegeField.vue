@@ -4,7 +4,11 @@ The component that can draw a college field in a Grapher.
 
 <template>
     <g class="field-college">
-        <rect class="field-background" />
+        <rect
+            width="100%"
+            height="100%"
+            class="field-background"
+        />
         <rect
             :width="scale.width"
             :height="scale.height"
@@ -192,8 +196,6 @@ export default {
 
 <style lang="scss" scoped>
 .field-background {
-    width: 100%;
-    height: 100%;
     fill: $field-green;
 }
 .field-border {

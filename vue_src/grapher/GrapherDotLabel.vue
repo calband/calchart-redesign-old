@@ -40,11 +40,6 @@ export default {
             type: GrapherScale,
             required: true,
         },
-        zoom: {
-            // The zoom of the Grapher
-            type: Number,
-            required: true,
-        },
 
         // Options to customize drawing a Dot label
 

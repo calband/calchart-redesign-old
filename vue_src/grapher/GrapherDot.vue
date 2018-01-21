@@ -59,11 +59,6 @@ export default {
             type: PixelCoordinate,
             required: true,
         },
-        zoom: {
-            // The zoom of the Grapher
-            type: Number,
-            required: true,
-        },
 
         // Options to customize drawing a Dot
 

@@ -13,6 +13,7 @@ show in the editor application.
             :sheet="$store.state.editor.sheet"
             :drawFourStep="true"
             :drawYardlineNumbers="true"
+            :zoom="$store.state.editor.zoom"
             :style="{ width: this.workspaceWidth }"
             class="workspace"
         />

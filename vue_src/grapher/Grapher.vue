@@ -9,7 +9,6 @@ The component that can draw a field and dots based on the state of a Sheet.
                 :is="fieldGrapher"
                 :scale="scale"
                 v-bind="$attrs"
-                class="field"
             />
             <g class="dots">
                 <GrapherDot
@@ -19,9 +18,7 @@ The component that can draw a field and dots based on the state of a Sheet.
                     :dotType="sheet.getDotInfo(dot).type"
                     :position="getPosition(dot)"
                     :scale="scale"
-                    :zoom="zoom"
                     v-bind="$attrs"
-                    :class="`dot-${dot.id}`"
                 />
             </g>
             <!-- separate to keep labels in another layer -->
@@ -34,7 +31,6 @@ The component that can draw a field and dots based on the state of a Sheet.
                     :label="dot.label"
                     :labelLeft="labelLeft"
                     :scale="scale"
-                    :zoom="zoom"
                 />
             </g>
         </svg>
