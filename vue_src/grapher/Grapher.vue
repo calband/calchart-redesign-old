@@ -15,6 +15,7 @@ The component that can draw a field and dots based on the state of a Sheet.
                 <GrapherDot
                     v-for="dot in sheet.show.getDots()"
                     :key="dot.id"
+                    :dotRadius="dotRadius"
                     :dotType="sheet.getDotInfo(dot).type"
                     :position="getPosition(dot)"
                     :scale="scale"
@@ -28,9 +29,11 @@ The component that can draw a field and dots based on the state of a Sheet.
                 <GrapherDotLabel
                     v-for="dot in sheet.show.getDots()"
                     :key="dot.id"
+                    :dotRadius="dotRadius"
                     :position="getPosition(dot)"
                     :label="dot.label"
                     :labelLeft="labelLeft"
+                    :scale="scale"
                     :zoom="zoom"
                 />
             </g>
@@ -51,6 +54,8 @@ import GrapherScale from './GrapherScale';
 // The dimensions of the SVG object at 100% zoom
 const SVG_HEIGHT = 900;
 const SVG_WIDTH = 1600;
+
+const DOT_RADIUS = 0.75; // in steps
 
 export default {
     props: {
@@ -109,6 +114,12 @@ export default {
         }
     },
     computed: {
+        /**
+         * @return {number} The radius of a dot to draw.
+         */
+        dotRadius() {
+            return this.scale.toPixels(DOT_RADIUS);
+        },
         /**
          * @return {Component} The field to graph as determined by the Sheet.
          */

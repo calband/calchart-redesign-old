@@ -36,9 +36,6 @@ import { CardinalDirection } from 'calchart/Direction';
 import DotType from 'calchart/DotType';
 
 import DotDisplay from './DotDisplay';
-import GrapherScale from './GrapherScale';
-
-const DOT_RADIUS = 0.75; // in steps
 
 export default {
     props: {
@@ -46,6 +43,11 @@ export default {
             // The direction a Dot is facing.
             type: CardinalDirection,
             default: () => CardinalDirection.EAST,
+        },
+        dotRadius: {
+            // The radius of the Dot.
+            type: Number,
+            required: true,
         },
         dotType: {
             // The dot type of the Dot in the Sheet.
@@ -55,10 +57,6 @@ export default {
         position: {
             // The position of the Dot to draw.
             type: PixelCoordinate,
-            required: true,
-        },
-        scale: {
-            type: GrapherScale,
             required: true,
         },
         zoom: {
@@ -99,12 +97,6 @@ export default {
                             return "blue";
                     }
             }
-        },
-        /**
-         * @return {number} The radius of a dot in pixels.
-         */
-        dotRadius() {
-            return this.scale.toPixels(DOT_RADIUS);
         },
         /**
          * @return {Object}
