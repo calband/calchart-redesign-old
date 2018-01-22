@@ -88,7 +88,11 @@ The top menu in the editor application.
                 context="dot"
             />
             <EditorMenuItemDivider />
-            <EditorMenuItem label="Zoom" icon="search" context="graph">
+            <EditorMenuItem
+                label="Zoom"
+                icon="search"
+                context="graph"
+            >
                 <EditorMenuItem
                     label="Zoom in"
                     action="zoomBy(0.1)"

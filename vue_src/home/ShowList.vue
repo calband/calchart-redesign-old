@@ -44,9 +44,11 @@ export default {
         },
         isOwner: {
             type: Boolean,
+            required: true,
         },
         canPublish: {
             type: Boolean,
+            required: true,
         },
     },
     data() {

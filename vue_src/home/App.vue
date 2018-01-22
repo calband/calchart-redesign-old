@@ -27,8 +27,8 @@ The entry point for the home page.
                     >Unpublished</h2>
                     <ShowList
                         :shows="shows.unpublished"
-                        :isOwner="isOwner"
-                        :canPublish="true"
+                        :is-owner="isOwner"
+                        :can-publish="true"
                         @publish="togglePublished"
                     />
                     <h2
@@ -37,16 +37,16 @@ The entry point for the home page.
                     >Published</h2>
                     <ShowList
                         :shows="shows.published"
-                        :isOwner="isOwner"
-                        :canPublish="true"
+                        :is-owner="isOwner"
+                        :can-publish="true"
                         @publish="togglePublished"
                     />
                 </template>
                 <template v-else>
                     <ShowList
                         :shows="shows"
-                        :isOwner="isOwner"
-                        :canPublish="false"
+                        :is-owner="isOwner"
+                        :can-publish="false"
                         @publish="togglePublished"
                     />
                 </template>

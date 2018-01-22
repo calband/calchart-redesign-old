@@ -5,7 +5,7 @@ The base component for a form field.
 <template>
     <div class="field">
         <label :for="field.key">{{ label }}:</label>
-        <slot></slot>
+        <slot />
         <error-display :form="form" :field="field.key" />
     </div>
 </template>

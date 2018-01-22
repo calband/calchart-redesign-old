@@ -8,7 +8,7 @@ The base component for a generic popup.
         @click.self="clickOff"
     >
         <div class="popup">
-            <slot></slot>
+            <slot />
         </div>
     </div>
 </template>

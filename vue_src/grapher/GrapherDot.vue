@@ -75,21 +75,21 @@ export default {
         dotColor() {
             switch (this.format) {
                 case DotDisplay.NORMAL:
-                    return "white";
+                    return 'white';
                 case DotDisplay.DOT_TYPE:
                     if (DotType.isPlain(this.dotType)) {
-                        return "none";
+                        return 'none';
                     } else {
-                        return "white";
+                        return 'white';
                     }
                 case DotDisplay.ORIENTATION:
                     switch (this.direction) {
                         case CardinalDirection.EAST:
-                            return "white";
+                            return 'white';
                         case CardinalDirection.WEST:
-                            return "yellow";
+                            return 'yellow';
                         default:
-                            return "blue";
+                            return 'blue';
                     }
             }
         },

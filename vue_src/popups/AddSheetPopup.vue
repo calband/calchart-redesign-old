@@ -5,7 +5,7 @@ A popup for adding a Sheet to a Show.
 <template>
     <FormPopup
         title="Add Sheet"
-        :onSubmit="addSheet"
+        :on-submit="addSheet"
         :model="model"
         :fields="fields"
     />

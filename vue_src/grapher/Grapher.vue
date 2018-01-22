@@ -4,7 +4,11 @@ The component that can draw a field and dots based on the state of a Sheet.
 
 <template>
     <div :class="['grapher-container', { fill }]">
-        <svg v-if="sheet" :width="svgWidth" :height="svgHeight">
+        <svg
+            v-if="sheet"
+            :width="svgWidth"
+            :height="svgHeight"
+        >
             <component
                 :is="fieldGrapher"
                 :scale="scale"
@@ -58,6 +62,7 @@ export default {
         sheet: {
             // The currently active Sheet
             type: Sheet,
+            default: null,
         },
         beat: {
             // The beat to draw on the Sheet

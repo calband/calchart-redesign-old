@@ -5,7 +5,7 @@ A popup for creating a new show.
 <template>
     <FormPopup
         title="Create Show"
-        :onSubmit="createShow"
+        :on-submit="createShow"
         :model="model"
         :fields="fields"
     >

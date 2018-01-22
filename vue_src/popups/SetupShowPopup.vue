@@ -6,8 +6,8 @@ application.
 <template>
     <FormPopup
         title="Set Up Show"
-        :onSubmit="saveShow"
-        :allowHide="false"
+        :on-submit="saveShow"
+        :allow-hide="false"
         :model="model"
         :fields="fields"
     />

@@ -11,18 +11,16 @@ show in the editor application.
         />
         <Grapher
             :sheet="$store.state.editor.sheet"
-            :drawFourStep="true"
-            :drawYardlineNumbers="true"
+            :draw-four-step="true"
+            :draw-yardline-numbers="true"
             :zoom="$store.state.editor.zoom"
-            :style="{ width: this.workspaceWidth }"
+            :style="{ width: workspaceWidth }"
             class="workspace"
         />
     </div>
 </template>
 
 <script>
-import $ from 'jquery';
-
 import Grapher from 'grapher/Grapher';
 
 import SheetList from './SheetList';

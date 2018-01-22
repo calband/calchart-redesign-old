@@ -18,9 +18,9 @@ and manipulation.
             <span class="label">{{ sheet.getLabel() }}</span>
             <Grapher
                 :sheet="sheet"
-                :fieldPadding="5"
+                :field-padding="5"
                 :fill="true"
-                :drawYardlines="false"
+                :draw-yardlines="false"
             />
         </div>
     </div>

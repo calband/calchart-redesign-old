@@ -1,3 +1,5 @@
+import { isNumber } from 'lodash';
+
 import { PixelCoordinate, StepCoordinate } from 'calchart/Coordinate';
 
 /**
@@ -58,7 +60,7 @@ export default class GrapherScale {
      * @return {(number|PixelCoordinate)}
      */
     toPixels(steps) {
-        if (_.isNumber(steps)) {
+        if (isNumber(steps)) {
             return steps * this._ratio;
         } else {
             let x = this.toPixelsX(steps.x);
@@ -106,7 +108,7 @@ export default class GrapherScale {
      * @return {(number|StepCoordinate)}
      */
     toSteps(pixels) {
-        if (_.isNumber(pixels)) {
+        if (isNumber(pixels)) {
             return pixels / this._ratio;
         } else {
             let x = this.toStepsX(pixels.x);

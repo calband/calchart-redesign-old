@@ -51,7 +51,7 @@ export default class DotType {
         return {
             forward: suffix === 'forwardslash' || suffix === 'x',
             back: suffix === 'backslash' || suffix === 'x',
-        }
+        };
     }
 }
 

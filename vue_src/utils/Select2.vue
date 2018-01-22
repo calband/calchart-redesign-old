@@ -45,6 +45,7 @@ export default {
         options: {
             // Any additional options to pass to Select2
             type: Object,
+            default: () => ({}),
         },
     },
     mounted() {

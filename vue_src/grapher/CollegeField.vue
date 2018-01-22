@@ -3,6 +3,7 @@ The component that can draw a college field in a Grapher.
 </doc>
 
 <template>
+    <!-- eslint-disable vue/valid-v-for -->
     <g class="field-college">
         <rect
             width="100%"
