@@ -34,6 +34,8 @@ export default {
         tool: ToolType.SELECTION,
         // the current snap grid
         snap: 2,
+        // the current zoom
+        zoom: 1,
     },
     mutations: {
         ...editorMutations,

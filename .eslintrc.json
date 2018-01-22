@@ -30,9 +30,12 @@
         }],
         "quotes": ["error", "single"],
         "semi": "error",
-        // "vue/html-indent": "error",
+        "vue/html-indent": ["error", 4],
         "vue/html-quotes": "error",
         "vue/html-self-closing": "error",
+        "vue/max-attributes-per-line": ["error", {
+            "singleline": 2
+        }],
         "vue/no-async-in-computed-properties": "error",
         "vue/no-dupe-keys": "error",
         "vue/no-duplicate-attributes": "error",

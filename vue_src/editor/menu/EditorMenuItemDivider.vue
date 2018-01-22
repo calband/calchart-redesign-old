@@ -3,7 +3,7 @@ A divider between menu items in the Editor menu.
 </doc>
 
 <template>
-    <span class="menu-item-divider"></span>
+    <span class="menu-item-divider" />
 </template>
 
 <style lang="scss" scoped>

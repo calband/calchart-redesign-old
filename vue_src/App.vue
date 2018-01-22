@@ -22,7 +22,7 @@ page according to the URL.
                     v-if="!message.autohide"
                     @click="removeMessage(message.id)"
                     class="icon-times close-message"
-                ></i>
+                />
             </li>
         </ul>
         <router-view />
@@ -46,6 +46,7 @@ export default {
 <style lang="scss">
 body {
     padding: 0;
+    overflow: hidden;
 }
 
 .vue-context-menu {

@@ -6,15 +6,15 @@ show in the editor application.
 <template>
     <div class="music-content">
         <div class="top-panel">
-            <div class="song-list"></div>
-            <div class="sheet-list"></div>
+            <div class="song-list" />
+            <div class="sheet-list" />
         </div>
         <div class="workspace">
             <div class="show-audio">
                 <label>Audio file for show:</label>
                 <div class="icons">
-                    <i class="icon-pencil edit-link"></i>
-                    <i class="icon-times delete-link"></i>
+                    <i class="icon-pencil edit-link" />
+                    <i class="icon-times delete-link" />
                 </div>
             </div>
             <button class="upload-beats-audio">Upload Beats Audio</button>
@@ -24,9 +24,9 @@ show in the editor application.
                         <th>Beat</th>
                         <th>Milliseconds</th>
                     </thead>
-                    <tbody></tbody>
+                    <tbody />
                 </table>
-                <div class="viewer-preview"></div>
+                <div class="viewer-preview" />
             </div>
         </div>
     </div>

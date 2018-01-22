@@ -467,7 +467,7 @@ export default class Sheet {
     }
 
     /**
-     * @return {FieldType} The field type for the stuntsheet, resolving any
+     * @return {BaseFieldType} The field type for the stuntsheet, resolving any
      *   defaults.
      */
     getFieldType() {
@@ -555,8 +555,7 @@ export default class Sheet {
     }
 
     /**
-     * @return {string} The sheet's step type, resolving any defaults. (@see
-     *   CalchartUtils.STEP_TYPES)
+     * @return {BaseStepType} The sheet's step type, resolving any defaults.
      */
     getStepType() {
         return this._stepType === StepType.DEFAULT ?

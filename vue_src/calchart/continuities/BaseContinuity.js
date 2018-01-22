@@ -80,7 +80,7 @@ export default class BaseContinuity {
      *
      * @param {Continuity[]} continuities
      * @param {Dot} dot
-     * @param {Coordinate} start - The starting position of the dot.
+     * @param {StepCoordinate} start - The starting position of the dot.
      * @param {int} duration - The number of beats to use for the movements.
      */
     static buildMovements(continuities, dot, start, duration) {
@@ -177,7 +177,7 @@ export default class BaseContinuity {
      * @param {Dot} dot - The dot to get movements for.
      * @param {Object} data - Data about the Sheet at the beginning of the
      *   continuity. Includes:
-     *     - {Coordinate} position - The starting position of the dot.
+     *     - {StepCoordinate} position - The starting position of the dot.
      *     - {int} remaining - The number of beats left in the Sheet.
      * @return {MovementCommand[]}
      */
@@ -268,7 +268,7 @@ export default class BaseContinuity {
      * Get the position of the given dot in the next Sheet.
      *
      * @param {Dot} dot
-     * @return {?Coordinate} null if this continuity's sheet is the last sheet.
+     * @return {?StepCoordinate} null if continuity's sheet is the last sheet.
      */
     _getNextPosition(dot) {
         let nextSheet = this.sheet.getNextSheet();

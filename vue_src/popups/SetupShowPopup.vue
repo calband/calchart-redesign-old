@@ -6,8 +6,8 @@ application.
 <template>
     <FormPopup
         title="Set Up Show"
-        :onSubmit="saveShow"
-        :allowHide="false"
+        :on-submit="saveShow"
+        :allow-hide="false"
         :model="model"
         :fields="fields"
     />
@@ -15,7 +15,7 @@ application.
 
 <script>
 import store from 'store';
-import DotFormat from 'calchart/DotFormat';
+import DotLabelFormat from 'calchart/DotLabelFormat';
 import { BaseFieldType } from 'calchart/FieldType';
 import Show from 'calchart/Show';
 
@@ -29,7 +29,7 @@ export default {
         return {
             model: {
                 numDots: '',
-                dotFormat: DotFormat.COMBO,
+                labelFormat: DotLabelFormat.COMBO,
                 fieldType: BaseFieldType.COLLEGE,
             },
             fields: [
@@ -45,10 +45,10 @@ export default {
                     },
                 },
                 {
-                    key: 'dotFormat',
+                    key: 'labelFormat',
                     type: 'choice',
                     templateOptions: {
-                        enum: DotFormat,
+                        enum: DotLabelFormat,
                     },
                 },
                 {

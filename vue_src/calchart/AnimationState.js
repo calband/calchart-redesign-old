@@ -5,7 +5,7 @@
  */
 export default class AnimationState {
     /**
-     * @param {Coordinate} position - The position of the dot.
+     * @param {StepCoordinate} position - The position of the dot.
      * @param {number} orientation - The angle at which the dot is
      *   oriented, in Calchart degrees.
      */

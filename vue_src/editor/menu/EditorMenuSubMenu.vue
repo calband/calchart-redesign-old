@@ -3,8 +3,12 @@ A submenu in the Editor menu.
 </doc>
 
 <template>
-    <div class="submenu" v-show="active" :style="position">
-        <slot></slot>
+    <div
+        v-show="active"
+        :style="position"
+        class="submenu"
+    >
+        <slot />
     </div>
 </template>
 

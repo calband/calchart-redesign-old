@@ -5,11 +5,10 @@ import makeEnum from 'utils/enum';
 /**
  * An Enum containing all the possible dot label formats.
  */
-export default class DotFormat {
+export default class DotLabelFormat {
     /**
      * Return the dot labels for the given number of dots.
      *
-     * @param {string} dotFormat - The format of the label. @see DOT_FORMATS.
      * @param {int} numDots - The number of dots to make labels for.
      * @return {string[]} The labels of the dots.
      */
@@ -18,7 +17,7 @@ export default class DotFormat {
     }
 }
 
-makeEnum(DotFormat, [
+makeEnum(DotLabelFormat, [
     {
         value: 'combo',
         label: 'A0, A1, A2, ...',

@@ -27,10 +27,36 @@ export default class DotType {
     static isAll(dotType) {
         return includes([DotType.ALL_BEFORE, DotType.ALL_AFTER], dotType);
     }
+
+    /**
+     * Check whether the given dot type is a plain dot type.
+     *
+     * @param {DotType} dotType
+     * @return {boolean}
+     */
+    static isPlain(dotType) {
+        return dotType.value.startsWith('plain');
+    }
+
+    /**
+     * Get the slashes required to draw this dot type.
+     *
+     * @param {DotType} dotType
+     * @return {Object}
+     *   - {boolean} forward
+     *   - {boolean} back
+     */
+    static getSlashes(dotType) {
+        let suffix = dotType.value.split('-')[1];
+        return {
+            forward: suffix === 'forwardslash' || suffix === 'x',
+            back: suffix === 'backslash' || suffix === 'x',
+        };
+    }
 }
 
 makeEnum(DotType, [
-    'all-before',
+    'all-before', // TODO: separate into another enum
     'plain',
     'solid',
     'plain-forwardslash',
