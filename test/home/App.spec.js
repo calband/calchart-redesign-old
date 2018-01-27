@@ -1,6 +1,6 @@
 import $ from 'jquery';
 import sinon from 'sinon';
-import { shallow } from 'vue-test-utils';
+import { shallow } from '@vue/test-utils';
 
 import App from 'home/App';
 import { addStore, setStunt, stubAction } from 'test/utils';

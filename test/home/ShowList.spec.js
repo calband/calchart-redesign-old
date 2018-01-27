@@ -1,4 +1,4 @@
-import { shallow } from 'vue-test-utils';
+import { shallow } from '@vue/test-utils';
 
 import ShowList from 'home/ShowList';
 import { ContextMenuStub } from 'test/utils';
