@@ -44,10 +44,10 @@ $ npm test
 
 These tests test functionality between the backend and frontend; for example, testing that actions from the frontend being sent to the backend have the correct events occur. Think of these tests as automating user experiences, steps a developer might run manually to check that a given sequence of actions works (e.g. text in box, click button, click other button that appears, etc).
 
-We use the [`testcafe`](https://devexpress.github.io/testcafe/) library to write tests. Tests should be written in the `e2e/` directory.
+We use the [`cypress`](https://www.cypress.io) library to write tests. Tests should be written in the `cypress/` directory.
 
 ```
-$ npm run e2e
+$ npm run cypress
 ```
 
 You should also be running `npm run dev` when running end-to-end tests.

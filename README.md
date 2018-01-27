@@ -73,6 +73,6 @@ This project contains four testing facilities:
 1. Linting (`npm run lint` and `flake8 calchart/`): Checks code style
 2. Server-side tests (`python manage.py test`): These are Django tests that test functionality within the back-end; e.g. testing Django models
 3. Unit tests (`npm test`): These are Javascript tests (using the Mocha library) that test functionality within the front-end; e.g. testing Component methods
-4. End-to-end tests (`npm run e2e`): These are tests that test functionality between the back-end and front-end; e.g. testing `sendAction` calls.
+4. End-to-end tests (`npm run cypress`): These are tests that test functionality between the back-end and front-end; e.g. testing `sendAction` calls.
 
 More detailed information and examples of these tests can be found in `docs/Testing.md`.
