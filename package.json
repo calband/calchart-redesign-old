@@ -3,10 +3,6 @@
     "author": "Cal Band Computer Committee",
     "version": "0.0.1",
     "private": true,
-    "engines": {
-        "node": "6.11.4",
-        "npm": "5.5.1"
-    },
     "scripts": {
         "build": "webpack --progress",
         "dev": "webpack-dev-server",

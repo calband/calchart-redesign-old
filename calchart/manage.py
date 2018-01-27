@@ -10,8 +10,7 @@ if __name__ == "__main__":
     from django.core.management import execute_from_command_line
 
     if len(sys.argv) > 1:
-        # by default, runserver runs on port 5000. Also requires running
-        # on 0.0.0.0 since localhost is not exposed from the VM
+        # by default, runserver runs on port 5000
         if sys.argv[1] == 'runserver' and len(sys.argv) == 2:
             sys.argv.append('0.0.0.0:5000')
         elif sys.argv[1] == 'testserver':

@@ -50,9 +50,7 @@ def call_endpoint(endpoint, user, method='GET', **params):
     params['token'] = user.api_token
 
     if settings.IS_LOCAL:
-        # accessing a VM from another VM; need to go
-        # Calchart VM -> host -> Members Only VM
-        domain = 'http://10.0.2.2:8000'
+        domain = 'http://localhost:8000'
     else:
         domain = 'https://membersonly-prod.herokuapp.com'
 
