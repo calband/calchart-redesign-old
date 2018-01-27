@@ -1,4 +1,4 @@
-import { shallow } from 'vue-test-utils';
+import { shallow } from '@vue/test-utils';
 
 import App from 'App';
 import { addRouter, addStore } from 'test/utils';
