@@ -17,6 +17,6 @@ Cypress.Commands.add('loginRoot', () => {
                     password: 'calbandgreat',
                     csrfmiddlewaretoken: csrf,
                 },
-            })
-        })
+            });
+        });
 });

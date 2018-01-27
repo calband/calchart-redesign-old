@@ -3,7 +3,8 @@
         "amd": true,
         "browser": true,
         "jasmine": true,
-        "node": true
+        "node": true,
+        "cypress/globals": true
     },
     "extends": [
         "eslint:recommended",
@@ -12,6 +13,9 @@
     "parserOptions": {
         "sourceType": "module"
     },
+    "plugins": [
+        "cypress"
+    ],
     "rules": {
         "comma-dangle": ["error", "always-multiline"],
         "indent": ["error", 4, {
