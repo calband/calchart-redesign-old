@@ -6,9 +6,11 @@
     "scripts": {
         "build": "webpack --progress",
         "dev": "webpack-dev-server",
-        "lint": "eslint --ignore-pattern **/vendor/*.js --ext js,vue vue_src/ test/",
+        "lint": "eslint --ignore-pattern **/vendor/*.js --ext js,vue vue_src/ test/ cypress/",
         "test": "cross-env NODE_ENV=test mocha-webpack -r test/setup.js -i test/hooks.js 'test/**/*.spec.js'",
-        "e2e": "node scripts/npm_e2e.js"
+        "cypress": "npm run cypress:open",
+        "cypress:open": "node scripts/cypress_open.js",
+        "cypress:run": "node scripts/cypress_run.js"
     },
     "devDependencies": {
         "babel-core": "^6.24.1",
@@ -22,7 +24,9 @@
         "copy-webpack-plugin": "^4.2.0",
         "cross-env": "^5.1.1",
         "css-loader": "^0.28.7",
+        "cypress": "^1.4.1",
         "eslint": "^3.19.0",
+        "eslint-plugin-cypress": "^2.0.1",
         "eslint-plugin-vue": "^4.2.0",
         "expect": "^21.2.1",
         "extract-text-webpack-plugin": "^3.0.2",
@@ -39,7 +43,6 @@
         "sass-resources-loader": "^1.3.1",
         "select2": "^4.0.6-rc.0",
         "sinon": "^4.1.1",
-        "testcafe": "^0.18.5",
         "vue": "^2.5.2",
         "vue-ctxmenu": "0.0.6",
         "vue-formly": "^2.5.3",
@@ -50,6 +53,7 @@
         "vue-template-compiler": "^2.5.2",
         "vue-test-utils": "^1.0.0-beta.4",
         "vuex": "^3.0.1",
+        "wait-on": "^2.1.0",
         "webpack": "^3.8.1",
         "webpack-dev-server": "^2.9.3",
         "webpack-node-externals": "^1.6.0"

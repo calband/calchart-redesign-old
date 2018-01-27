@@ -12,9 +12,6 @@ if __name__ == "__main__":
     if len(sys.argv) > 1:
         # by default, runserver runs on port 5000
         if sys.argv[1] == 'runserver' and len(sys.argv) == 2:
-            sys.argv.append('0.0.0.0:5000')
-        elif sys.argv[1] == 'testserver':
-            sys.argv.insert(2, '--addrport')
-            sys.argv.insert(3, '0.0.0.0:5000')
+            sys.argv.append('5000')
 
     execute_from_command_line(sys.argv)

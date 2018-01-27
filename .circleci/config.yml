@@ -2,7 +2,7 @@ version: 2
 
 aliases:
   - &docker-image
-    image: calband/circleci-calchart:1.2.0
+    image: calband/circleci-calchart:1.2.1
   - &postgres-image
     image: circleci/postgres:9.6.2
     environment:
@@ -90,7 +90,7 @@ jobs:
             name: Run Django tests
             command: python manage.py test --verbosity 3 --noinput
             working_directory: calchart
-  test-e2e:
+  test-cypress:
       docker:
         - *docker-image
         - *postgres-image
@@ -103,9 +103,10 @@ jobs:
             name: Wait for PostgreSQL
             command: sleep 10
         - run:
-            name: Run end-to-end tests
-            # command: npm run e2e
-            command: echo 'TODO'
+            name: Run cypress tests
+            command: npm run cypress:run
+        - store_artifacts:
+            path: cypress/videos
 
 workflows:
   version: 2
@@ -120,7 +121,7 @@ workflows:
       - test-python:
           requires:
             - build-python
-      - test-e2e:
+      - test-cypress:
           requires:
             - build-node
             - build-python
