@@ -19,3 +19,4 @@ calchart/static/
 
 # Cypress
 cypress/videos
+cypress/logs
