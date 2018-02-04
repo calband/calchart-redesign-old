@@ -3,7 +3,7 @@ A popup that contains a form to be submitted or modified.
 </doc>
 
 <template>
-    <BasePopup v-bind="allProps">
+    <BasePopup v-bind="$attrs">
         <h1 class="title">{{ title }}</h1>
         <form class="form-popup" @submit.prevent="submit">
             <formly-form
@@ -31,7 +31,6 @@ A popup that contains a form to be submitted or modified.
 import { fromPairs, toPairs } from 'lodash';
 
 import store from 'store';
-import { allProps } from 'utils/vue';
 
 import BasePopup from './BasePopup';
 
@@ -66,9 +65,6 @@ export default {
         return {
             form: {},
         };
-    },
-    computed: {
-        allProps,
     },
     methods: {
         /**

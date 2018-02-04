@@ -10,7 +10,7 @@ Template Options:
 </doc>
 
 <template>
-    <Field v-bind="allProps">
+    <Field v-bind="$props">
         <Select2
             @input="handleInput"
             :value="model[field.key].value"
@@ -28,11 +28,11 @@ import { isUndefined } from 'lodash';
 
 import Select2 from 'utils/Select2';
 
-import BaseField from './BaseField';
+import Field from './Field';
 
 export default {
-    mixins: [ BaseField ],
-    components: { Select2 },
+    extends: Field,
+    components: { Field, Select2 },
     computed: {
         choices() {
             if (this.isEnum) {
