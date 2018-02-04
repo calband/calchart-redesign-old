@@ -3,7 +3,7 @@ A form field that renders a simple text input.
 </doc>
 
 <template>
-    <Field v-bind="allProps">
+    <Field v-bind="$props">
         <input
             v-model="model[field.key]"
             :id="field.key"
@@ -13,9 +13,10 @@ A form field that renders a simple text input.
 </template>
 
 <script>
-import BaseField from './BaseField';
+import Field from './Field';
 
 export default {
-    mixins: [BaseField],
+    extends: Field,
+    components: { Field },
 };
 </script>
