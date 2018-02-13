@@ -5,18 +5,18 @@
 # Python
 .DS_Store
 *.pyc
-venv
+/venv/
 
 # Node
-node_modules/
+/node_modules/
 
 # SASS
 .sass-cache
 
 # Django
-calchart/static/
+/calchart/static/
 /files/
 
 # Cypress
-cypress/videos
-cypress/logs
+/cypress/videos/
+/cypress/logs/
