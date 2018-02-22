@@ -16,6 +16,7 @@
 # Django
 /calchart/static/
 /files/
+*.sqlite3
 
 # Cypress
 /cypress/videos/

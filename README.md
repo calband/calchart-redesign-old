@@ -29,24 +29,6 @@ Install from source:
 1. Create a virtual environment: `python3 -m venv venv`
 1. Activate the environment (needs to be run in every shell): `source venv/bin/activate`
 
-### PostgreSQL
-
-The Django server uses a PostgreSQL database to save its data, which can either be run locally or using some virtualization software, like Docker. Due to the nature of this requirement, using Docker is highly recommended for development.
-
-"But why use Docker if the whole point was to move away from Vagrant?" Good question. Docker is a lot more lightweight than a full virtual machine, and spinning up a Docker container to start/stop a database is a bit less infrastructure than spinning up a VM that runs a database as well as the Django server. It's a nice separation of concerns, with the virtualization technology just focused on running a database cluster, instead of managing the entire Django backend.
-
-Recommended install (Docker):
-1. Install [Docker](https://www.docker.com/get-docker) (Community Edition)
-1. Create a PostgreSQL container: `docker create --name calchartdb -e POSTGRES_PASSWORD=calbandgreat -p 5432:5432 postgres`
-1. Start the PostgreSQL container: `docker start calchartdb`
-    - This can be stopped with `docker stop calchartdb` and started again with the same command.
-    - When stopped, the container still resides on your computer. To completely remove it, run `docker rm calchartdb`.
-1. See [documentation](https://docs.docker.com/) for more details.
-
-Manual install:
-1. Install from the [official site](https://www.postgresql.org/download)
-1. Set up the `postgres` database and the `postgres` superuser with the password `calbandgreat`.
-
 ### Node.js
 
 Most of the code in this project is written using Vue, a Javascript framework for building client-side applications. In order to run and build this code, developers need to install Node from the [official site](https://nodejs.org/en/download/). For MacOS developers who use Homebrew, `brew install node` should suffice.
