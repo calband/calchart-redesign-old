@@ -13,7 +13,6 @@
         "is_staff": true,
         "is_active": true,
         "date_joined": "2017-11-04T04:21:16.198Z",
-        "members_only_username": null,
         "api_token": "",
         "api_token_expiry": null,
         "viewpsheet_settings": "{}",

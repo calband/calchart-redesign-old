@@ -1,15 +1,17 @@
-{% extends "base.html" %}
-{% load partials utils %}
-
-{% block head %}
-    <script>
-        window.env = {{ env|asjson|safe }};
-        window.tabs = {{ tabs|asjson|safe }};
-    </script>
-    {% add_style "calchart.css" %}
-{% endblock %}
-
-{% block body %}
-    <div id="app"></div>
-    {% add_script "calchart.js" %}
-{% endblock %}
+{% load static partials utils %}
+<html>
+    <head lang="en">
+        <meta charset="utf-8">
+        <title>Calchart</title>
+        <link rel="icon" type="image/png" href="{% static 'img/favicon.png' %}">
+        {% add_style "vendor/reset.css" "vendor/icons.css" "base.css" "calchart.css" %}
+        <script>
+            window.env = {{ env|asjson|safe }};
+            window.tabs = {{ tabs|asjson|safe }};
+        </script>
+    </head>
+    <body>
+        <div id="app"></div>
+        {% add_script "calchart.js" %}
+    </body>
+</html>

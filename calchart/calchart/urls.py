@@ -1,9 +1,7 @@
 """URL patterns for Calchart."""
 
 from base.views import (
-    AuthMembersOnlyView,
     CalchartView,
-    CreateUserView,
     LoginView,
     export,
 )
@@ -22,12 +20,6 @@ urlpatterns = [
 
     # authentication
     url(r'^login/$', LoginView.as_view(), name='login'),
-    url(
-        r'^auth/members-only/$',
-        AuthMembersOnlyView.as_view(),
-        name='login-members-only',
-    ),
-    url(r'^create-user/$', CreateUserView.as_view(), name='create-user'),
     url(r'^logout/$', LogoutView.as_view(), name='logout'),
 
     # endpoints for server-side processing
