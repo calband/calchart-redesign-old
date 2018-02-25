@@ -1,6 +1,5 @@
 """Actions for the home page."""
 
-from django.core.exceptions import PermissionDenied
 from django.utils import timezone
 
 from .utils import retrieve_show
@@ -13,8 +12,6 @@ def get_tab(data, **kwargs):
     tab = data['tab']
 
     if tab == 'band':
-        if not user.is_members_only_user():
-            raise PermissionDenied
         kwargs = {
             'is_band': True,
             'date_added__year': timezone.now().year,
@@ -63,6 +60,7 @@ def create_show(data, **kwargs):
 
 def publish_show(data, **kwargs):
     """Publish or unpublish a show."""
+    # TODO: check if stunt
     published = data['publish']
     show = retrieve_show(data['slug'], kwargs['user'])
 

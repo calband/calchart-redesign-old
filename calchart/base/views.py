@@ -3,19 +3,16 @@
 import json
 
 from base import actions
-from base.forms import CreateUserForm
 from base.mixins import LoginRequiredMixin
 from base.models import Show, User
 
 from django.conf import settings
-from django.contrib import messages
 from django.contrib.auth import login
-from django.contrib.auth.views import LoginView as DjangoLoginView
 from django.http.response import Http404, HttpResponse, JsonResponse
 from django.middleware.csrf import get_token
 from django.shortcuts import redirect
 from django.utils import timezone
-from django.views.generic import CreateView, RedirectView, TemplateView
+from django.views.generic import RedirectView, TemplateView
 
 from utils.api import get_login_url
 
@@ -34,19 +31,7 @@ def export(request, slug):
 """ AUTH PAGES """
 
 
-class LoginView(DjangoLoginView):
-    """
-    The login page for a user.
-
-    The page allows a user to login with their Calchart credentials, or click
-    a link to login with their Members Only account.
-    """
-
-    template_name = 'login.html'
-    redirect_authenticated_user = True
-
-
-class AuthMembersOnlyView(RedirectView):
+class LoginView(RedirectView):
     """
     Redirects the user to Members Only for authentication.
 
@@ -55,16 +40,25 @@ class AuthMembersOnlyView(RedirectView):
 
     def dispatch(self, request, *args, **kwargs):
         """Login the given user, or redirect to the Members Only API."""
+        next_url = request.GET.get('next', 'home')
         if 'username' in request.GET:
             self.login_user()
-            return redirect(request.GET['next'])
+            return redirect(next_url)
+        elif settings.DISABLE_AUTH:
+            superuser, _ = User.objects.get_or_create(
+                is_superuser=True,
+                defaults={
+                    'username': 'member',
+                },
+            )
+            login(self.request, superuser)
+            return redirect(next_url)
         else:
             return super().dispatch(request, *args, **kwargs)
 
     def get_redirect_url(self, *args, **kwargs):
         """Get the redirect URL for the Members Only API."""
-        redirect_url = self.request.GET['next']
-        return get_login_url(self.request, redirect_url)
+        return get_login_url(self.request, self.request.GET.get('next'))
 
     def login_user(self):
         """Login the user after authenticating from Members Only."""
@@ -72,32 +66,12 @@ class AuthMembersOnlyView(RedirectView):
         api_token = self.request.GET['api_token']
         ttl_days = int(self.request.GET['ttl_days'])
 
-        user = User.objects.filter(members_only_username=username).first()
-        if user is None:
-            user = User.objects.create_members_only_user(
-                username=username,
-                api_token=api_token,
-                ttl_days=ttl_days,
-            )
-        else:
-            user.api_token = api_token
-            user.set_expiry(ttl_days)
-            user.save()
+        user, _ = User.objects.get_or_create(username=username)
+        user.api_token = api_token
+        user.set_expiry(ttl_days)
+        user.save()
 
         login(self.request, user)
-
-
-class CreateUserView(CreateView):
-    """Create a new Calchart user."""
-
-    template_name = 'create_user.html'
-    form_class = CreateUserForm
-
-    def form_valid(self, form):
-        """Save the form and redirect to the login page."""
-        form.save()
-        messages.success(self.request, 'User successfully created.')
-        return redirect('login')
 
 
 """ CALCHART PAGE """
@@ -185,16 +159,12 @@ class CalchartView(LoginRequiredMixin, TemplateView):
 
         Returns tabs in a tuple of the form (id, display_name).
         """
-        if self.request.user.is_members_only_user():
-            year = timezone.now().year
-            return [
-                ('band', f'{year} Shows'),
-                ('owned', 'My Shows'),
-            ]
-        else:
-            return [
-                ('owned', 'My Shows'),
-            ]
+        # TODO: move to Vue
+        year = timezone.now().year
+        return [
+            ('band', f'{year} Shows'),
+            ('owned', 'My Shows'),
+        ]
 
 # class EditorView(CalchartMixin, TemplateView):
 #     """

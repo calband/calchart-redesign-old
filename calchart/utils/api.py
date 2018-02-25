@@ -17,7 +17,7 @@ def get_login_url(request, redirect_url=None):
     After authenticating, the user is redirected to the given URL (defaults
     to the path of the request).
     """
-    base_url = request.build_absolute_uri(reverse('login-members-only'))
+    base_url = request.build_absolute_uri(reverse('login'))
     if redirect_url is None:
         redirect_url = request.path
     redirect_uri = quote(f'{base_url}?next={redirect_url}')

@@ -173,6 +173,9 @@ else:
 
 AUTH_USER_MODEL = 'base.User'
 
+# False to disable authentication
+DISABLE_AUTH = not IS_HEROKU
+
 LOGIN_REDIRECT_URL = 'home'
 LOGIN_URL = 'login'
 LOGOUT_REDIRECT_URL = 'login'
