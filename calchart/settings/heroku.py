@@ -1,8 +1,11 @@
 """Django settings for Heroku."""
 
+import os
+
 import dj_database_url
 
-from .base import *
+from . import base as settings
+from .base import *  # noqa: F401, F403
 
 HEROKU_APP = os.environ['HEROKU_APP_NAME']
 IS_REVIEW = HEROKU_APP.startswith('calchart-staging-pr-')
@@ -12,7 +15,7 @@ SECRET_KEY = os.environ['SECRET_KEY']
 DEBUG = False
 ALLOWED_HOSTS = ['.herokuapp.com']
 
-INSTALLED_APPS.insert(0, 'collectfast')
+INSTALLED_APPS = ['collectfast'] + settings.INSTALLED_APPS
 
 DATABASES = {
     'default': dj_database_url.config(),

@@ -1,6 +1,7 @@
 """Django settings for CI."""
 
-from .dev import *
+from . import dev as settings
+from .dev import *  # noqa: F401, F403
 
 DATABASES = {
     'default': {
@@ -15,4 +16,4 @@ STATIC_URL = '/static/'
 
 # if MEMBERS_ONLY_DOMAIN was uncommented for development,
 # it should be commented out again in testing.
-assert MEMBERS_ONLY_DOMAIN is None
+assert settings.MEMBERS_ONLY_DOMAIN is None
