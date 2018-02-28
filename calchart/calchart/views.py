@@ -2,9 +2,9 @@
 
 import json
 
-from base import actions
-from base.mixins import LoginRequiredMixin
-from base.models import Show, User
+from calchart import actions
+from calchart.mixins import LoginRequiredMixin
+from calchart.models import Show, User
 
 from django.conf import settings
 from django.contrib.auth import login

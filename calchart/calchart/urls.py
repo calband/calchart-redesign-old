@@ -1,6 +1,6 @@
 """URL patterns for Calchart."""
 
-from base.views import (
+from calchart.views import (
     CalchartView,
     LoginView,
     export,
@@ -16,7 +16,7 @@ urlpatterns = [
     url(r'^editor', CalchartView.as_view()),
     url(r'^viewer', CalchartView.as_view()),
     url(r'^viewpsheet', CalchartView.as_view()),
-    url(r'^help/', include('wiki.urls', namespace='wiki')),
+    # url(r'^help/', include('wiki.urls', namespace='wiki')),
 
     # authentication
     url(r'^login/$', LoginView.as_view(), name='login'),

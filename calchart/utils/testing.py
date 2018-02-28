@@ -3,8 +3,8 @@
 import json
 from unittest import mock
 
-from base.models import User
-from base.views import CalchartView
+from calchart.models import User
+from calchart.views import CalchartView
 
 from django.test import RequestFactory as DjangoRequestFactory, TestCase
 

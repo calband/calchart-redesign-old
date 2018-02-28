@@ -1,4 +1,4 @@
-from base.models import User
+from calchart.models import User
 
 if not User.objects.exists():
     print('Creating user...')
