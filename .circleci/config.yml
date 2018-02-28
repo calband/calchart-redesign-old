@@ -14,9 +14,13 @@ aliases:
     run:
       name: Activate virtual environment
       command: echo 'export PATH="$HOME/project/venv/bin:$PATH"' >> $BASH_ENV
+  - &ci-env
+    environment:
+      DJANGO_SETTINGS_MODULE: settings.ci
 
 jobs:
   build-node:
+      <<: *ci-env
       docker:
         - *docker-image
       steps:
@@ -41,6 +45,7 @@ jobs:
               - calchart/static/
               - node_modules/
   build-python:
+      <<: *ci-env
       docker:
         - *docker-image
       steps:
@@ -59,6 +64,7 @@ jobs:
             paths:
               - venv
   test-node:
+      <<: *ci-env
       docker:
         - *docker-image
       steps:
@@ -72,6 +78,7 @@ jobs:
             name: Run Javascript unit tests
             command: npm test
   test-python:
+      <<: *ci-env
       docker:
         - *docker-image
         - *postgres-image
@@ -91,6 +98,7 @@ jobs:
             command: python manage.py test --verbosity 3 --noinput
             working_directory: calchart
   test-cypress:
+      <<: *ci-env
       docker:
         - *docker-image
         - *postgres-image

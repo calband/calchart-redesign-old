@@ -44,7 +44,7 @@ class LoginView(RedirectView):
         if 'username' in request.GET:
             self.login_user()
             return redirect(next_url)
-        elif settings.DISABLE_AUTH:
+        elif settings.MEMBERS_ONLY_DOMAIN is None:
             superuser, _ = User.objects.get_or_create(
                 is_superuser=True,
                 defaults={
@@ -142,7 +142,6 @@ class CalchartView(LoginRequiredMixin, TemplateView):
             'csrf_token': get_token(self.request),
             'static_path': settings.STATIC_URL[:-1],
             'is_stunt': self.request.user.has_committee('STUNT'),
-            'is_local': settings.IS_LOCAL,
         }
 
         context['tabs'] = self.get_tabs()

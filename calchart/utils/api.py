@@ -22,13 +22,13 @@ def get_login_url(request, redirect_url=None):
         redirect_url = request.path
     redirect_uri = quote(f'{base_url}?next={redirect_url}')
 
-    if settings.IS_LOCAL:
-        domain = 'http://localhost:8000'
-    else:
-        domain = 'https://membersonly-prod.herokuapp.com'
+    if settings.MEMBERS_ONLY_DOMAIN is None:
+        raise ValueError(
+            'Cannot access API if MEMBERS_ONLY_DOMAIN is set to None.'
+        )
 
     return (
-        f'{domain}/api/auth-login/' +
+        f'{settings.MEMBERS_ONLY_DOMAIN}/api/auth-login/' +
         f'?redirect_uri={redirect_uri}&app_name={APP_NAME}'
     )
 
@@ -49,12 +49,15 @@ def call_endpoint(endpoint, user, method='GET', **params):
 
     params['token'] = user.api_token
 
-    if settings.IS_LOCAL:
-        domain = 'http://localhost:8000'
-    else:
-        domain = 'https://membersonly-prod.herokuapp.com'
+    if settings.MEMBERS_ONLY_DOMAIN is None:
+        raise ValueError(
+            'Cannot access API if MEMBERS_ONLY_DOMAIN is set to None.'
+        )
 
-    r = call(f'{domain}/api/{endpoint}/', params=params, timeout=1)
+    r = call(
+        f'{settings.MEMBERS_ONLY_DOMAIN}/api/{endpoint}/',
+        params=params, timeout=1,
+    )
     # error if bad status code
     r.raise_for_status()
 
