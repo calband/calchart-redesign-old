@@ -1,6 +1,6 @@
 [
 {
-    "model": "base.user",
+    "model": "calchart.user",
     "pk": 1,
     "fields": {
         "password": "pbkdf2_sha256$36000$f7NjiMXarKpY$p3637YX9tQ6C2tBJ4u4/naRncSlNPqpzN2LWBGieIdQ=",

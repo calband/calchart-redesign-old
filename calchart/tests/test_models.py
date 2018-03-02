@@ -1,6 +1,6 @@
 """Tests for models in the base app."""
 
-from base.models import Show, User
+from calchart.models import Show, User
 
 from django.test import TestCase
 

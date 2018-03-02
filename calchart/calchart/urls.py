@@ -1,13 +1,13 @@
 """URL patterns for Calchart."""
 
-from base.views import (
+from calchart.views import (
     CalchartView,
     LoginView,
     export,
 )
 
 from django.conf import settings
-from django.conf.urls import include, url
+from django.conf.urls import url
 from django.conf.urls.static import static
 from django.contrib.auth.views import LogoutView
 
@@ -16,7 +16,7 @@ urlpatterns = [
     url(r'^editor', CalchartView.as_view()),
     url(r'^viewer', CalchartView.as_view()),
     url(r'^viewpsheet', CalchartView.as_view()),
-    url(r'^help/', include('wiki.urls', namespace='wiki')),
+    # url(r'^help/', include('wiki.urls', namespace='wiki')),
 
     # authentication
     url(r'^login/$', LoginView.as_view(), name='login'),
