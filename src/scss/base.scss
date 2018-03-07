@@ -1,0 +1,221 @@
+/**
+ * This file is organized in the following sections:
+ *
+ * - Fonts
+ * - HTML elements
+ * - Menu and toolbar elements
+ * - Other UI components
+ */
+
+/**** FONTS ****/
+
+@font-face {
+    font-family: "DIN Next";
+    src: url("fonts/DINNextLTPro-Regular.otf") format("opentype");
+}
+
+@font-face {
+    font-family: "DIN Next";
+    src: url("fonts/DINNextLTPro-Bold.otf") format("opentype");
+    font-weight: bold;
+}
+
+@font-face {
+    font-family: "DIN Next";
+    src: url("fonts/DINNextLTPro-Italic.otf") format("opentype");
+    font-style: italic;
+}
+
+@font-face {
+    font-family: "DIN Next";
+    src: url("fonts/DINNextLTPro-BoldItalic.otf") format("opentype");
+    font-weight: bold;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: "DIN Next Medium";
+    src: url("fonts/DINNextLTPro-Medium.otf") format("opentype");
+}
+
+/**** HTML ELEMENTS ****/
+
+html, body, div, span, h1, h2, h3, h4, h5, h6,
+p, a, ul, li, label, form, input, textarea,
+header, footer, td, th {
+    position: relative;
+    font-size: $font-size;
+    box-sizing: border-box; // padding included in width
+}
+
+html, body {
+    height: 100%;
+    overflow: hidden;
+}
+
+body {
+    font-size: 0; // eliminate space between HTML elements
+    color: $blue;
+    font-family: sans-serif("DIN Next");
+}
+
+h1, h2, h3 {
+    margin: 0.5em 0;
+    font-family: sans-serif("DIN Next Medium");
+    * {
+        font: inherit;
+    }
+}
+
+h1 {
+    font-size: 1.5em;
+}
+
+h2 {
+    font-size: 1.3em;
+}
+
+h3 {
+    font-size: 1.1em;
+}
+
+a {
+    color: $blue;
+    font-size: 1em;
+    &:hover {
+        color: $gold;
+    }
+}
+
+// icons
+i {
+    display: inline-block;
+    &.disabled {
+        color: $medium-gray;
+    }
+}
+
+span {
+    font-size: 1em;
+}
+
+label {
+    display: inline-block;
+    margin-right: 5px;
+    vertical-align: middle;
+}
+
+input {
+    width: 200px;
+    font-size: $font-size;
+    padding-top: 4px;
+    padding-left: 4px;
+    outline: none;
+    box-shadow: 0 0 5px $light-gray;
+    border: 1px solid $medium-gray;
+    border-radius: 2px;
+    &:focus {
+        box-shadow: 0 0 5px $gold;
+        border-color: $semilight-gray;
+    }
+    &:disabled {
+        background-color: $light-gray;
+    }
+    &[type=number] {
+        width: 75px;
+        text-align: center;
+    }
+    &[type=checkbox] {
+        width: initial;
+    }
+    &[type=file] {
+        display: block;
+        margin: 5px auto;
+        padding: 0;
+        box-shadow: none;
+        border: 0;
+        border-radius: 0;
+    }
+}
+
+input, textarea {
+    color: $blue;
+    font-family: sans-serif("DIN Next");
+}
+
+select {
+    width: 200px;
+}
+
+button {
+    @include display-button;
+}
+
+table {
+    display: inline-block;
+    td, th {
+        padding: 5px 10px;
+        border: 1px solid $dark-gray;
+        vertical-align: middle;
+        text-align: center;
+    }
+}
+
+header {
+    position: relative;
+    margin-bottom: 20px;
+    height: 50px;
+    h1 {
+        margin: 0;
+        font-size: 3em;
+        font-weight: bold;
+        text-transform: uppercase;
+        a {
+            text-decoration: none;
+            &:hover {
+                color: $blue;
+            }
+        }
+    }
+    .logout-link {
+        position: absolute;
+        top: 0;
+        right: 0;
+        font-size: 1.1em;
+        a {
+            text-decoration: none;
+        }
+    }
+}
+
+form .field {
+    margin: 10px 0;
+}
+
+ul.messages {
+    @include hover-messages;
+    li.error {
+        color: $red;
+    }
+}
+
+.vue-context-menu {
+    @include hover-menu;
+}
+
+.tooltip {
+    position: absolute;
+    background: $black;
+    color: $white;
+    padding: 5px 7px;
+    font-size: 14px;
+    z-index: z-index(tooltip);
+    .tooltip-arrow {
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        margin-left: -5px;
+        border: 5px solid transparent;
+        border-top-color: $black;
+    }
+}

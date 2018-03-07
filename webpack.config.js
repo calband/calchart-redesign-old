@@ -4,23 +4,8 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const nodeExternals = require('webpack-node-externals');
 
-const src = path.resolve(__dirname, 'vue_src');
+const src = path.resolve(__dirname, 'src');
 const static = path.resolve(__dirname, 'calchart', 'static');
-
-/**** ENTRYPOINTS ****/
-
-var entryPoints = {
-    calchart: path.resolve(src, 'calchart.js'),
-};
-
-fs.readdirSync(path.resolve(src, 'scss'))
-    .filter(function(s) {
-        return s.endsWith('.scss');
-    })
-    .forEach(function(file) {
-        var name = path.basename(file, path.extname(file));
-        entryPoints[name] = path.resolve(src, 'scss', file);
-    });
 
 /**** LOADER OPTIONS ****/
 
@@ -38,13 +23,11 @@ const cssLoader = {
     },
 };
 
-const partials = path.resolve(src, 'scss', 'partials');
+let resourcesDir = path.resolve(src, 'scss')
+let resources = fs.readdirSync(resourcesDir)
+    .filter(s => s.startsWith('_') && s.endsWith('.scss'));
 const sassResourcesLoaderOptions = {
-    resources: [
-        path.resolve(partials, '_vars.scss'),
-        path.resolve(partials, '_mixins.scss'),
-        path.resolve(partials, '_functions.scss'),
-    ],
+    resources: resources.map(s => path.resolve(resourcesDir, s)),
 };
 
 // https://vue-loader.vuejs.org/en/configurations/advanced.html
@@ -73,7 +56,9 @@ const vueLoaderOptions = {
 
 webpackConfig = {
     context: src,
-    entry: entryPoints,
+    entry: {
+        calchart: path.resolve(src, 'calchart.js'),
+    },
     output: {
         path: static,
         filename: '[name].js',
@@ -109,13 +94,6 @@ webpackConfig = {
                 test: /\.css$/,
                 use: ExtractTextPlugin.extract([
                     cssLoader,
-                ]),
-            },
-            {
-                test: /\.scss$/,
-                use: ExtractTextPlugin.extract([
-                    cssLoader,
-                    'sass-loader',
                 ]),
             },
         ],
