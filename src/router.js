@@ -21,25 +21,22 @@ let router = new VueRouter({
             path: '/',
             name: 'home',
             component: Home,
-            props: {
-                allTabs: window.tabs,
-            },
         },
-        {
-            path: '/editor/:slug',
-            name: 'editor',
-            component: Home, // TODO
-        },
-        {
-            path: '/viewer/:slug',
-            name: 'viewer',
-            component: Home, // TODO
-        },
-        {
-            path: '/viewpsheet/:slug',
-            name: 'viewpsheet',
-            component: Home, // TODO
-        },
+        // {
+        //     path: '/editor/:slug',
+        //     name: 'editor',
+        //     component: Editor,
+        // },
+        // {
+        //     path: '/viewer/:slug',
+        //     name: 'viewer',
+        //     component: Home,
+        // },
+        // {
+        //     path: '/viewpsheet/:slug',
+        //     name: 'viewpsheet',
+        //     component: Home,
+        // },
     ],
 });
 
@@ -51,30 +48,30 @@ router.beforeEach((to, from, next) => {
 
     store.commit('setShow', null);
 
-    // let slug = to.params.slug;
-    // if (slug) {
-    //     sendAction('get_show', { slug }, {
-    //         success: data => {
-    //             if (data.isInitialized) {
-    //                 store.commit('setShow', Show.deserialize(data.show));
-    //                 next();
-    //             } else {
-    //                 if (to.name === 'editor') {
-    //                     store.commit('editor/setNewShowData', data);
-    //                 } else {
-    //                     alert('The show is not set up yet!');
-    //                 }
-    //                 next();
-    //             }
-    //         },
-    //         error: xhr => {
-    //             handleError(xhr);
-    //             next('/');
-    //         },
-    //     });
-    // } else {
-    //     next();
-    // }
+    let slug = to.params.slug;
+    if (slug) {
+        sendAction('get_show', { slug }, {
+            success: data => {
+                if (data.isInitialized) {
+                    store.commit('setShow', Show.deserialize(data.show));
+                    next();
+                } else {
+                    if (to.name === 'editor') {
+                        store.commit('editor/setNewShowData', data);
+                    } else {
+                        alert('The show is not set up yet!');
+                    }
+                    next();
+                }
+            },
+            error: xhr => {
+                handleError(xhr);
+                next('/');
+            },
+        });
+    } else {
+        next();
+    }
 });
 
 export default router;

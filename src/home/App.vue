@@ -4,6 +4,10 @@ The entry point for the home page.
 
 <template>
     <div class="home-view">
+        <header>
+            <h1>Calchart</h1>
+            <p class="logout-link"><a href="/logout">Logout</a></p>
+        </header>
         <div class="home-buttons">
             <button @click="showCreateShowPopup">New Show</button>
         </div>
@@ -67,22 +71,18 @@ import { findAndRemove } from 'utils/array';
 
 import ShowList from './ShowList';
 
-// TODO: move tabs to above home-content (rename home-buttons)
-// TODO: have shows display as a box preview
+// See `calchart.actions.home.get_tab`
+const ALL_TABS = [
+    ['band', `${new Date().getFullYear()} Shows`],
+    ['owned', 'My Shows'],
+];
 
 export default {
     name: 'Home',
-    props: {
-        allTabs: {
-            type: Array,
-            required: true,
-            validator: obj => obj.length === 2,
-        },
-    },
     components: { ShowList },
     data() {
         let tabs = {};
-        this.allTabs.forEach(([name, label]) => {
+        ALL_TABS.forEach(([name, label]) => {
             tabs[name] = {
                 label,
                 shows: null, // to be set with loadTab
@@ -92,7 +92,7 @@ export default {
         return {
             isLoading: true,
             tabs,
-            activeTab: this.allTabs[0][0],
+            activeTab: ALL_TABS[0][0],
         };
     },
     mounted() {

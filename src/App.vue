@@ -5,10 +5,6 @@ page according to the URL.
 
 <template>
     <div id="app" :class="$route.name">
-        <header>
-            <h1><router-link :to="{ name: 'home' }">Calchart</router-link></h1>
-            <p class="logout-link"><a href="/logout">Logout</a></p>
-        </header>
         <ul
             v-if="messages.length > 0"
             class="messages"
