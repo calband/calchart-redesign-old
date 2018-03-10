@@ -11,7 +11,6 @@ from django.contrib.auth import login
 from django.http.response import Http404, HttpResponse, JsonResponse
 from django.middleware.csrf import get_token
 from django.shortcuts import redirect
-from django.utils import timezone
 from django.views.generic import RedirectView, TemplateView
 
 from utils.api import get_login_url
@@ -144,26 +143,7 @@ class CalchartView(LoginRequiredMixin, TemplateView):
             'is_stunt': self.request.user.has_committee('STUNT'),
         }
 
-        context['tabs'] = self.get_tabs()
-
         return context
-
-    def get_tabs(self):
-        """
-        Get all available tabs for the current user.
-
-        Available tabs are:
-        - band: Shows created by STUNT for this year
-        - created: Shows created by the current user
-
-        Returns tabs in a tuple of the form (id, display_name).
-        """
-        # TODO: move to Vue
-        year = timezone.now().year
-        return [
-            ('band', f'{year} Shows'),
-            ('owned', 'My Shows'),
-        ]
 
 # class EditorView(CalchartMixin, TemplateView):
 #     """

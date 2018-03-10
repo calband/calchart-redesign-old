@@ -5,12 +5,6 @@ import { shallow } from '@vue/test-utils';
 import App from 'home/App';
 import { addStore, setStunt, stubAction } from 'test/utils';
 
-function withTabs(allTabs) {
-    return addStore(shallow)(App, {
-        propsData: { allTabs },
-    });
-}
-
 function mockAjaxTab(tab) {
     let show = { published: undefined };
     stubAction('get_tab', data => {
@@ -22,35 +16,35 @@ function mockAjaxTab(tab) {
     return show;
 }
 
-const FOO_TABS = [
-    ['foo', 'My Foo Shows'],
-    ['bar', 'My Bar Shows'],
-];
+/**
+ * Stubbing store for `isStunt` value.
+ */
+function initHome() {
+    return addStore(shallow)(App);
+}
 
 describe('home/App', () => {
     it('is loading', () => {
-        let wrapper = withTabs(FOO_TABS);
+        let wrapper = initHome();
         expect(wrapper.vm.isLoading).toBe(true);
         expect(wrapper.contains('p.loading')).toBe(true);
     });
 
     it('renders tabs', () => {
-        let wrapper = withTabs(FOO_TABS);
+        let wrapper = initHome();
         let tabs = wrapper.findAll('ul.tabs li');
         expect(tabs).toHaveLength(2);
-        expect(tabs.at(0).text()).toBe('My Foo Shows');
-        expect(tabs.at(1).text()).toBe('My Bar Shows');
     });
 
     it('loads the first tab', () => {
-        let show = mockAjaxTab('foo');
+        let show = mockAjaxTab('band');
 
-        let wrapper = withTabs(FOO_TABS);
-        expect(wrapper.vm.activeTab).toBe('foo');
+        let wrapper = initHome();
+        expect(wrapper.vm.activeTab).toBe('band');
 
         expect($.ajax.calledOnce).toBe(true);
-        expect(wrapper.vm.tabs.foo.shows).toHaveLength(1);
-        expect(wrapper.vm.tabs.foo.shows[0]).toBe(show);
+        expect(wrapper.vm.tabs.band.shows).toHaveLength(1);
+        expect(wrapper.vm.tabs.band.shows[0]).toBe(show);
     });
 
     describe('band tab not stunt', () => {
@@ -58,7 +52,7 @@ describe('home/App', () => {
 
         it('is not showing shows as published/unpublished', () => {
             mockAjaxTab('band');
-            let wrapper = withTabs([['band', 'Band']]);
+            let wrapper = initHome();
             let shows = wrapper.vm.tabs.band.shows;
             expect(shows).not.toHaveProperty('published');
             expect(shows).not.toHaveProperty('unpublished');
@@ -78,7 +72,7 @@ describe('home/App', () => {
                 let show = mockAjaxTab('band');
                 sinon.stub(show, 'published').value(published);
 
-                let wrapper = withTabs([['band', 'Band']]);
+                let wrapper = initHome();
                 let shows = wrapper.vm.tabs.band.shows;
                 expect(shows).toHaveProperty('published');
                 expect(shows).toHaveProperty('unpublished');

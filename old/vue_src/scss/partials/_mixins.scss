@@ -1,0 +1,146 @@
+// create a nice visual button
+@mixin display-button($primary-color: $blue) {
+    $secondary-color: #fff;
+
+    margin: 5px 10px;
+    padding: 0.75em 2.5em 0.65em;
+    line-height: 1em;
+    font-family: sans-serif("DIN Next");
+    font-size: inherit;
+    text-transform: uppercase;
+    cursor: pointer;
+    background: $primary-color;
+    color: $secondary-color;
+    border: 0;
+    outline: 0;
+    &:hover {
+        background: lighten($primary-color, 5);
+    }
+    &.disabled {
+        background: $medium-gray;
+    }
+}
+
+// any menu that hovers over content
+@mixin hover-menu {
+    @include unselectable;
+    position: absolute;
+    padding: 5px 0;
+    background: $light-gray;
+    border: 1px solid rgba($black, 0.2);
+    li {
+        padding: 5px 25px;
+        padding-left: 35px;
+        cursor: pointer;
+        color: $blue;
+        &:hover, &.active {
+            background: $blue;
+            color: $light-gray;
+            span.hint {
+                color: $semilight-gray;
+            }
+        }
+        &.has-submenu:after {
+            @include vertically-center-self;
+            position: absolute;
+            content: "\5c";
+            font-family: "icons";
+            font-size: 0.9em;
+            vertical-align: middle;
+            right: 5px;
+        }
+        i {
+            position: absolute;
+            left: 7px;
+        }
+        span.hint {
+            float: right;
+            margin-left: 5px;
+            right: -15px; // align with .has-submenu arrow
+            color: lighten($blue, 10);
+        }
+    }
+}
+
+// messages that should hover at the top
+@mixin hover-messages {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 10px;
+    z-index: z-index(messages);
+    li.message {
+        background: $light-gray;
+        padding: 10px 30px;
+        border-radius: 4px;
+        text-align: center;
+        color: $blue;
+        &:not(:last-child) {
+            margin-bottom: 5px;
+        }
+        &:hover {
+            background: $light-gray;
+        }
+        &.error {
+            color: $red;
+        }
+        .close-message {
+            @include vertically-center-self;
+            position: absolute;
+            right: 10px;
+            color: $gold;
+            cursor: pointer;
+        }
+    }
+}
+
+// Set the max width for a span element, with any overflow ending in ellipses
+@mixin max-text-width($width) {
+    display: inline-block;
+    white-space: nowrap;
+    max-width: $width;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+// Remove the small space between children caused by whitespace
+@mixin remove-children-space {
+    font-size: 0;
+    & > * {
+        font-size: $font-size;
+    }
+}
+
+// make user unable to highlight text in element
+@mixin unselectable {
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+// make children vertically centered within the element
+@mixin vertically-center($expand: true) {
+    // expand to fill entire height
+    @if $expand {
+        font-size: 0;
+        &:before {
+            @include unselectable;
+            content: "";
+            display: inline-block;
+            height: 100%;
+            vertical-align: middle;
+        }
+    }
+    > * {
+        display: inline-block;
+        vertical-align: middle;
+    }
+}
+
+// make this element vertically centered
+@mixin vertically-center-self {
+    top: 50%;
+    transform: translateY(-50%);
+}

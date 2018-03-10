@@ -24,8 +24,7 @@ export class NotImplementedError extends Error {
      *   override the abstract method
      */
     constructor(obj) {
-        let name = obj.constructor.name;
-        let message = 'Abstract super method was not implemented in ' + name;
+        let message = "Abstract super method was not implemented in " + obj.constructor.name;
         super(message);
     }
 }

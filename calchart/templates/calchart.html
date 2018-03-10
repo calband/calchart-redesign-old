@@ -4,10 +4,9 @@
         <meta charset="utf-8">
         <title>Calchart</title>
         <link rel="icon" type="image/png" href="{% static 'img/favicon.png' %}">
-        {% add_style "vendor/reset.css" "vendor/icons.css" "base.css" "calchart.css" %}
+        {% add_style "vendor/reset.css" "vendor/calchart-icons.css" "calchart.css" %}
         <script>
             window.env = {{ env|asjson|safe }};
-            window.tabs = {{ tabs|asjson|safe }};
         </script>
     </head>
     <body>

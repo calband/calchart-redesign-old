@@ -1,19 +1,42 @@
 /**
  * @file A collection of Javascript utility/helper functions.
  */
-import $ from 'jquery';
-import {
-    defaultTo,
-    each,
-    flatMap,
-    fromPairs,
-    mapKeys,
-    includes,
-    isNaN,
-    isNull,
-    isPlainObject,
-    isUndefined,
-} from 'lodash';
+
+import { IS_MAC } from "utils/env";
+
+let shortcutMap, shortcutSep;
+if (IS_MAC) {
+    // HTML codes: http://apple.stackexchange.com/a/55729
+    shortcutMap = {
+        ctrl: "&#8984;",
+        alt: "&#8997;",
+        shift: "&#8679;",
+        backspace: "&#9003;",
+        tab: "&#8677;",
+        enter: "&crarr;",
+        left: "&larr;",
+        up: "&uarr;",
+        right: "&rarr;",
+        down: "&darr;",
+        delete: "&#8998;",
+    };
+    shortcutSep = "";
+} else {
+    shortcutMap = {
+        ctrl: "Ctrl",
+        alt: "Alt",
+        shift: "Shift",
+        backspace: "Backspace",
+        tab: "Tab",
+        enter: "Enter",
+        left: "Left",
+        up: "Up",
+        right: "Right",
+        down: "Down",
+        delete: "Del",
+    };
+    shortcutSep = "+";
+}
 
 /**
  * Attempt to run the given function. If any errors are thrown, check
@@ -41,13 +64,13 @@ export function attempt(func, errors=null) {
     try {
         return func();
     } catch (ex) {
-        if (!isNull(errors)) {
+        if (!_.isNull(errors)) {
             let found = false;
-            if (isPlainObject(errors)) {
+            if (_.isPlainObject(errors)) {
                 errors = [errors];
             }
 
-            each(errors, error => {
+            _.each(errors, error => {
                 if (ex instanceof error.class) {
                     error.callback(ex);
                     found = true;
@@ -61,6 +84,18 @@ export function attempt(func, errors=null) {
         }
         return null;
     }
+}
+
+/**
+ * Convert the given shortcut key binding to a human readable hint.
+ *
+ * @param {string} shortcut - The shortcut key binding, e.g. "ctrl+s".
+ * @return {string} The human readable shortcut hint.
+ */
+export function convertShortcut(shortcut) {
+    return shortcut.split("+").map(key => {
+        return _.defaultTo(shortcutMap[key], key.toUpperCase());
+    }).join(shortcutSep);
 }
 
 /**
@@ -81,8 +116,8 @@ export function empty(array) {
  * @return {Array}
  */
 export function mapSome(array, callback) {
-    return flatMap(array, function(val, key) {
-        return defaultTo(callback(val, key), []);
+    return _.flatMap(array, function(val, key) {
+        return _.defaultTo(callback(val, key), []);
     });
 }
 
@@ -115,15 +150,6 @@ export function newCall(Cls) {
 }
 
 /**
- * Generate a unique 8-character hexadecimal ID.
- *
- * @return {String}
- */
-export function uniqueId() {
-    return Math.random().toString(16).substring(2, 10);
-}
-
-/**
  * Update the given object with the given data, returning an object mapping
  * any keys that have been changed to the old value.
  *
@@ -134,7 +160,7 @@ export function uniqueId() {
 export function update(obj, data) {
     let changed = {};
 
-    each(data, function(value, key) {
+    _.each(data, function(value, key) {
         let old = obj[key];
         if (old !== value) {
             changed[key] = old;
@@ -157,10 +183,10 @@ export function update(obj, data) {
  *   labels and the values either undefined or the parsed argument.
  */
 export function parseArgs(args, labels) {
-    if (args.length === 1 && !isNull(args[0])) {
+    if (args.length === 1 && !_.isNull(args[0])) {
         let kwargs = args[0];
         for (let key in kwargs) {
-            if (!includes(labels, key)) {
+            if (!_.includes(labels, key)) {
                 kwargs = null;
                 break;
             }
@@ -170,7 +196,7 @@ export function parseArgs(args, labels) {
         }
     }
 
-    return fromPairs(labels.map(
+    return _.fromPairs(labels.map(
         (label, i) => [label, args[i]]
     ));
 }
@@ -183,7 +209,7 @@ export function parseArgs(args, labels) {
  */
 export function parseNumber(value) {
     let float = parseFloat(value);
-    return isNaN(float) ? value : float;
+    return _.isNaN(float) ? value : float;
 }
 
 /**
@@ -194,7 +220,7 @@ export function parseNumber(value) {
  */
 let queue; // the Deferred object that will be collecting asynchronous functions
 export function runAsync(callback) {
-    if (isUndefined(queue)) {
+    if (_.isUndefined(queue)) {
         queue = $.Deferred();
         queue.resolve(); // automatically triggers any subsequent callbacks
     }
@@ -210,7 +236,7 @@ export function runAsync(callback) {
  * @return {Object}
  */
 export function underscoreKeys(data) {
-    return mapKeys(data, (val, key) => `_${key}`);
+    return _.mapKeys(data, (val, key) => `_${key}`);
 }
 
 /**
