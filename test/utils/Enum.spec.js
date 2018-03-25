@@ -1,6 +1,11 @@
-import makeEnum from 'utils/enum';
+/**
+ * @file Tests the Enum class.
+ */
 
-class Color {
+import { isSubClass } from 'utils/classes';
+import Enum from 'utils/Enum';
+
+class Color extends Enum {
     static get foo() {
         return 1;
     }
@@ -15,10 +20,11 @@ class Color {
     }
 }
 
-makeEnum(Color, ['red', 'blue', { value: 'green', label: 'Greeny' }]);
+Color.initEnum(['red', 'blue', { value: 'green', label: 'Greeny' }]);
 
 describe('Enum', () => {
     it('satisfies basic enum properties', () => {
+        expect(isSubClass(Color, Enum)).toBe(true);
         expect(Color.RED).toBe(Color.RED);
         expect(Color.RED).toBeInstanceOf(Color);
         expect(Color.RED.value).toBe('red');
@@ -56,5 +62,13 @@ describe('Enum', () => {
                 Color.fromValue('foo');
             }).toThrow();
         });
+    });
+
+    it('serializes', () => {
+        expect(Color.RED.serialize().value).toBe('red');
+    });
+
+    it('deserializes', () => {
+        expect(Color.deserialize(Color.RED.serialize())).toBe(Color.RED);
     });
 });
