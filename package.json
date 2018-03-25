@@ -7,7 +7,7 @@
         "build": "webpack --progress",
         "build:svg": "node scripts/build_svg.js",
         "dev": "webpack-dev-server",
-        "lint": "eslint --ignore-pattern **/vendor/*.js --ext js,vue vue_src/ test/ cypress/",
+        "lint": "eslint --ext js,vue src/ test/ cypress/",
         "test": "cross-env NODE_ENV=test mocha-webpack --require test/setup.js --include test/hooks.js 'test/**/*.spec.js'",
         "cypress": "npm run cypress:open",
         "cypress:open": "node scripts/cypress_open.js",

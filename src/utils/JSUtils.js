@@ -7,9 +7,7 @@ import {
     defaultTo,
     each,
     flatMap,
-    fromPairs,
     mapKeys,
-    includes,
     isNaN,
     isNull,
     isPlainObject,
@@ -115,76 +113,12 @@ export function moveElem(array, from, to) {
 }
 
 /**
- * Call a constructor for a class with dynamic arguments. Source:
- * https://stackoverflow.com/a/8843181/4966649
- *
- * @param {class} Cls
- * @param {...*} any arguments to pass to the constructor.
- * @return {Cls}
- */
-export function newCall(Cls) {
-    return new (Function.prototype.bind.apply(Cls, arguments));
-}
-
-/**
  * Generate a unique 8-character hexadecimal ID.
  *
  * @return {string}
  */
 export function uniqueId() {
     return Math.random().toString(16).substring(2, 10);
-}
-
-/**
- * Update the given object with the given data, returning an object mapping
- * any keys that have been changed to the old value.
- *
- * @param {Object} obj - The object to be updated.
- * @param {Object} data - The data to update the object with.
- * @return {Object}
- */
-export function update(obj, data) {
-    let changed = {};
-
-    each(data, function(value, key) {
-        let old = obj[key];
-        if (old !== value) {
-            changed[key] = old;
-            obj[key] = parseNumber(value);
-        }
-    });
-
-    return changed;
-}
-
-/**
- * Parse the arguments passed to a function as either positional arguments
- * or as keyword arguments, passed as an object.
- *
- * @param {Array} args - The arguments passed to the original function, with
- *   either an object passed as the only argument (to be used as all the
- *   arguments), or the arguments in order as defined by labels.
- * @param {string[]} labels - The names of each argument, in order.
- * @return {Object} The arguments passed in, with the keys specified by
- *   labels and the values either undefined or the parsed argument.
- */
-export function parseArgs(args, labels) {
-    if (args.length === 1 && !isNull(args[0])) {
-        let kwargs = args[0];
-        for (let key in kwargs) {
-            if (!includes(labels, key)) {
-                kwargs = null;
-                break;
-            }
-        }
-        if (kwargs) {
-            return kwargs;
-        }
-    }
-
-    return fromPairs(labels.map(
-        (label, i) => [label, args[i]]
-    ));
 }
 
 /**
@@ -223,21 +157,4 @@ export function runAsync(callback) {
  */
 export function underscoreKeys(data) {
     return mapKeys(data, (_, key) => `_${key}`);
-}
-
-/**
- * Validate that the given input is a positive value, setting the input
- * to 0 if negative
- *
- * @param {jQuery} input
- * @return {int}
- */
-export function validatePositive(input) {
-    let value = parseInt($(input).val());
-    if (value < 0) {
-        $(input).val(0);
-        return 0;
-    } else {
-        return value;
-    }
 }

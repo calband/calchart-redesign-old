@@ -9,6 +9,7 @@ import Vue from 'vue';
 import VueRouter from 'vue-router';
 
 import store from 'store';
+import Show from 'calchart/Show';
 import Home from 'home/App';
 import sendAction, { handleError } from 'utils/ajax';
 
