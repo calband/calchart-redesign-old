@@ -12,12 +12,12 @@ import { defaults, range } from 'lodash';
 import Serializable from 'utils/Serializable';
 
 import Dot from './Dot';
-// import DotLabelFormat from './DotLabelFormat';
-// import FieldType from './FieldType';
-// import Formation from './Formation';
-// import Orientation from './Orientation';
-// import Song from './Song';
-// import StepType from './StepType';
+import DotLabelFormat from './DotLabelFormat';
+import FieldType from './FieldType';
+import Formation from './Formation';
+import Orientation from './Orientation';
+import Song from './Song';
+import StepType from './StepType';
 
 /**
  * Increment this variable whenever an edit was made to any serializable
@@ -57,7 +57,46 @@ export default class Show extends Serializable {
      *  | {Orientation} orientation
      */
     constructor(data) {
-        super(data);
+        super(data, {
+            // properties of the show
+            version: 'number',
+            name: 'string',
+            slug: 'string',
+            isBand: 'boolean',
+            published: 'boolean',
+            numDots: 'number',
+            dotGroups: {
+                _type: 'mapping',
+                _wraps: 'number',
+            },
+            labelFormat: DotLabelFormat,
+            // data contained in the show
+            beats: {
+                _type: 'array',
+                _wraps: 'number',
+            },
+            audioUrl: [null, 'string'],
+            dots: {
+                _type: 'array',
+                _wraps: Dot,
+            },
+            formations: {
+                _type: 'array',
+                _wraps: Formation,
+            },
+            songs: {
+                _type: 'array',
+                _wraps: Song,
+            },
+            // defaults for entire show
+            fieldType: FieldType,
+            beatsPerStep: {
+                _type: 'tuple',
+                _wraps: ['number', 'number'],
+            },
+            stepType: StepType,
+            orientation: Orientation,
+        });
 
         if (this._version < VERSION) {
             alert(

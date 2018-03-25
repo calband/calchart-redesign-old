@@ -11,9 +11,10 @@ import { assign } from 'lodash';
 import { mapExist, uniqueId } from 'utils/JSUtils';
 import Serializable from 'utils/Serializable';
 
-// import FieldType from './FieldType';
-// import Orientation from './Orientation';
-// import StepType from './StepType';
+import FieldType from './FieldType';
+import Flow from './Flow';
+import Orientation from './Orientation';
+import StepType from './StepType';
 
 export default class Song extends Serializable {
     /**
@@ -28,7 +29,18 @@ export default class Song extends Serializable {
      *  | {?Orientation} orientation
      */
     constructor(data) {
-        super(data);
+        super(data, {
+            id: 'string',
+            name: 'string',
+            firstFlow: [null, Flow],
+            fieldType: [null, FieldType],
+            beatsPerStep: [null, {
+                _type: 'tuple',
+                _wraps: ['number', 'number'],
+            }],
+            stepType: [null, StepType],
+            orientation: [null, Orientation],
+        });
     }
 
     /**

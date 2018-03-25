@@ -23,7 +23,9 @@ export default class StopMovement extends BaseMovement {
      *  | {number} beatsPerStep
      */
     constructor(data) {
-        super(data);
+        super(data, {
+            isMarkTime: 'boolean',
+        });
     }
 
     /**

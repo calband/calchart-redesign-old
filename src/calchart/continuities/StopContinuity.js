@@ -21,6 +21,9 @@ export default class StopContinuity extends BaseContinuity {
      *  | {?Orientation} orientation
      */
     constructor(data) {
-        super(data);
+        super(data, {
+            isMarkTime: 'boolean',
+            duration: [null, 'number'],
+        });
     }
 }
