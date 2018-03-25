@@ -10,19 +10,17 @@ import {
 } from 'lodash';
 
 /**
- * Return a validator for a list whose elements satisfy the provided
- * validator.
+ * Validate a list whose elements satisfy the provided validator.
  *
- * @param {function(Any): boolean} validator
- * @return {function(Array): boolean}
+ * @param {function(A): boolean} validator
+ * @return {function(A[]): boolean}
  */
 export function validateList(validator) {
     return arr => every(arr, validator);
 }
 
 /**
- * Return a function that checks that its argument is an object containing
- * at least the given keys.
+ * Validate that an object contains at least the given keys.
  *
  * @param {string[]} ...keys
  * @return {function(Object): boolean}
@@ -38,7 +36,7 @@ export function validateObject(...keys) {
  * Return a validator for a string that must be one in an Enum.
  *
  * @param {Enum} cls
- * @return {function(String): boolean}
+ * @return {function(string): boolean}
  */
 export function validateInEnum(cls) {
     return s => {

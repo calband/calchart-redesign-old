@@ -4,11 +4,13 @@
 import { findIndex } from 'lodash';
 
 /**
- * Find the element in the given array using the given
- * arguments and remove from the array. Useful for Vue
- * data Arrays that can't use lodash's `pullAt`.
+ * Find an element in the given array and remove it from the array.
  *
- * See `findIndex` for usage.
+ * Any arguments passed are passed to `_.findIndex`. This function is useful
+ * for Vue data Arrays that can't use `_.pullAt`.
+ *
+ * @param {Array} array
+ * @param {...A} args - Additional arguments to pass to `_.findIndex`
  */
 export function findAndRemove(array) {
     let index = findIndex.apply(null, arguments);

@@ -30,8 +30,8 @@ export function handleError(xhr) {
 /**
  * Send a POST action to the server.
  *
- * @param {String} action - The name of the action to send
- * @param {Object} data - The data to send to the server
+ * @param {string} action
+ * @param {Object} data
  * @param {Object} [options] - AJAX options to override defaults
  */
 export default function sendAction(action, data, options) {

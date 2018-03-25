@@ -32,13 +32,13 @@ export const CONTINUITIES = {
     },
 };
 
-/** @const {Object.<string, string>} */
+/** @const {Object<string: string>} */
 export const DEFAULT_CUSTOM = {
     default: 'Default',
     custom: 'Custom',
 };
 
-/** @const {Object.<string, string>} */
+/** @const {Object<string: string>} */
 export const ENDINGS = {
     MT: 'Mark Time',
     CL: 'Close',
@@ -46,7 +46,7 @@ export const ENDINGS = {
 
 /**
  * Multipliers for converting steps into standard step sizes
- * @const {Object.<string, number>}
+ * @const {Object<string: number>}
  */
 export const STEP_SIZES = {
     STANDARD: 8/8,

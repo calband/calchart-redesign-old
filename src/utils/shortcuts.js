@@ -42,8 +42,8 @@ if (store.state.env.IS_MAC) {
 /**
  * Convert the given shortcut key binding to a human readable hint.
  *
- * @param {string} shortcut - The shortcut key binding, e.g. 'ctrl+s'.
- * @return {string} The human readable shortcut hint.
+ * @param {string} shortcut - The shortcut key binding, e.g. 'ctrl+s'
+ * @return {string} The human readable shortcut hint
  */
 export function convertShortcut(shortcut) {
     return shortcut.split('+').map(key => {

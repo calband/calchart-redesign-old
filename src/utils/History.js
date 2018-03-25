@@ -19,21 +19,21 @@ class BaseHistory {
     }
 
     /**
-     * @return {Boolean} true if the history has an undo state.
+     * @return {boolean} true if the history has an undo state.
      */
     get hasUndo() {
         return this._index > 0;
     }
 
     /**
-     * @return {Boolean} true if the history has a redo state.
+     * @return {boolean} true if the history has a redo state.
      */
     get hasRedo() {
         return this._index + 1 < this._history.length;
     }
 
     /**
-     * @return {String} the label of the latest action.
+     * @return {string} the label of the latest action.
      */
     get undoLabel() {
         if (this.hasUndo) {
@@ -44,7 +44,7 @@ class BaseHistory {
     }
 
     /**
-     * @return {String} the label of the most recent undone action.
+     * @return {string} the label of the most recent undone action.
      */
     get redoLabel() {
         if (this.hasRedo) {
@@ -57,7 +57,7 @@ class BaseHistory {
     /**
      * Add a state to the history.
      *
-     * @param {String} name - The name of the action
+     * @param {string} name - The name of the action
      * @param {Object} state
      */
     addState(action, state) {
@@ -74,7 +74,7 @@ class BaseHistory {
     /**
      * Get a state from history to replace the current state.
      *
-     * @param {int} index
+     * @param {number} index
      */
     getState(index) {
         let state = this._history[index];

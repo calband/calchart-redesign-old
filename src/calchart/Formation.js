@@ -1,0 +1,70 @@
+/**
+ * @file Defines the Formation class.
+ *
+ * A Formation is an image or shape in a show, with no relationship to another
+ * image or shape in the show. Formations contain Flows that describe how to
+ * animate the image or shape through intermediate formations. Formations also
+ * contain the FormationDots that make up the formation and the FormationDot
+ * in the next Formation each FormationDot corresponds to (if applicable).
+ *
+ * For example, a face might be a Formation, where you have flows that animate
+ * the face from smiling to frowning. Since you care about the movements of the
+ * dots (e.g. dots in the mouth should stay in the mouth), that would be within
+ * one Formmation.
+ *
+ * On the other hand, if the next Formation is a couple stars on the field and
+ * you don't care how the dots move from the previous formation, this is a
+ * separate Formation.
+ */
+
+import { defaults } from 'lodash';
+
+import { uniqueId } from 'utils/JSUtils';
+import Serializable from 'utils/Serializable';
+
+// import FieldType from './FieldType';
+// import Flow from './Flow';
+// import FormationDot from './FormationDot';
+// import Orientation from './Orientation';
+// import StepType from './StepType';
+
+export default class Formation extends Serializable {
+    /**
+     * @param {Object} data
+     *  | {string} id
+     *  | {FormationDot[]} dots
+     *  | {Flow[]} flows
+     *  | {?Object<FormationDot: FormationDot>} nextDots
+     *  // defaults for entire formation
+     *  | {?FieldType} fieldType
+     *  | {?[number, number]} beatsPerStep
+     *  | {?StepType} stepType
+     *  | {?Orientation} orientation
+     */
+    constructor(data) {
+        super(data);
+    }
+
+    /**
+     * @param {Object} data
+     * @return {Formation}
+     */
+    static create(data) {
+        defaults(data, {
+            id: uniqueId(),
+            fieldType: null,
+            beatsPerStep: null,
+            stepType: null,
+            orientation: null,
+        });
+
+        return new this(data);
+    }
+
+    /**
+     * @return {string}
+     */
+    get id() {
+        return this._id;
+    }
+}

@@ -1,14 +1,13 @@
 /**
  * @file A collection of Javascript utility/helper functions.
  */
+
 import $ from 'jquery';
 import {
     defaultTo,
     each,
     flatMap,
-    fromPairs,
     mapKeys,
-    includes,
     isNaN,
     isNull,
     isPlainObject,
@@ -16,26 +15,20 @@ import {
 } from 'lodash';
 
 /**
- * Attempt to run the given function. If any errors are thrown, check
- * if the error class is an instance of an error class in the given
- * errors object. If so, run that callback function. Otherwise, re-throw
- * the error.
+ * Attempt to run the given function.
  *
- * If no errors object is given, ignores any errors thrown by the func.
+ * If any errors are thrown, check if the error class is an instance of an error
+ * class in the given `errors` object(s). If so, run that callback function.
+ * Otherwise, re-throw the error.
  *
- * @param {function} func - The function to attempt to run.
- * @param {?(object[]|object)} [errors=null] - An optional array of objects that
- *   list, in order, the errors to catch. If null, ignores any errors thrown
- *   (which is different from passing an empty array, which re-throws any errors
- *   thrown). Can also pass in a single object instead of an array with one
- *   element. Each object is of the form:
- *   {
- *       class: Error,
- *       callback: function,
- *   }
+ * If no `errors` object(s) is given, ignores any errors thrown by the func. The
+ * `errors` object(s) is of the form:
+ *      { class: Error, callback: function(Error): void }
  *
- * @return {?*} The result of running the function, or null if an error was
- *   caught.
+ * @param {function(): A} func - The function to attempt to run.
+ * @param {?(Object[]|Object)} [errors=null]
+ *
+ * @return {?A} The result of the function, or null if an error was caught.
  */
 export function attempt(func, errors=null) {
     try {
@@ -64,7 +57,9 @@ export function attempt(func, errors=null) {
 }
 
 /**
- * Empty the given array. Source: http://stackoverflow.com/a/1232046/4966649
+ * Empty the given array.
+ *
+ * Source: http://stackoverflow.com/a/1232046/4966649.
  *
  * @param {Array} array
  */
@@ -73,12 +68,23 @@ export function empty(array) {
 }
 
 /**
+ * Call the given function if the parameter is not null.
+ *
+ * @param {?A} param
+ * @param {function(A): B} f
+ * @param {?B}
+ */
+export function mapExist(param, f) {
+    return isNull(param) ? null : f(param);
+}
+
+/**
  * Map a function to each element in an array, getting rid of any undefined
  * values that are returned.
  *
- * @param {Array} array
- * @param {function} callback
- * @return {Array}
+ * @param {A[]} array
+ * @param {function(A): (undefined|B)} callback
+ * @return {B[]}
  */
 export function mapSome(array, callback) {
     return flatMap(array, function(val, key) {
@@ -87,15 +93,19 @@ export function mapSome(array, callback) {
 }
 
 /**
- * Move the element from the given index to the specified index. Ex.
+ * Move the element from the given index to the specified index.
  *
+ * The move is in place. For example:
+ *
+ * ```
  * x = [1,2,3,4]
  * moveElem(x, 0, 2);
  * x // [2,3,1,4]
+ * ```
  *
  * @param {Array} array
- * @param {int} from - The index to remove the element from.
- * @param {int} to - The index to put the element.
+ * @param {number} from
+ * @param {number} to
  */
 export function moveElem(array, from, to) {
     let elem = array.splice(from, 1)[0];
@@ -103,93 +113,29 @@ export function moveElem(array, from, to) {
 }
 
 /**
- * Call a constructor for a class with dynamic arguments. Source:
- * https://stackoverflow.com/a/8843181/4966649
- *
- * @param {class} Cls
- * @param {...*} any arguments to pass to the constructor.
- * @return {Cls}
- */
-export function newCall(Cls) {
-    return new (Function.prototype.bind.apply(Cls, arguments));
-}
-
-/**
  * Generate a unique 8-character hexadecimal ID.
  *
- * @return {String}
+ * @return {string}
  */
 export function uniqueId() {
     return Math.random().toString(16).substring(2, 10);
 }
 
 /**
- * Update the given object with the given data, returning an object mapping
- * any keys that have been changed to the old value.
- *
- * @param {Object} obj - The object to be updated.
- * @param {Object} data - The data to update the object with.
- * @return {Object}
- */
-export function update(obj, data) {
-    let changed = {};
-
-    each(data, function(value, key) {
-        let old = obj[key];
-        if (old !== value) {
-            changed[key] = old;
-            obj[key] = parseNumber(value);
-        }
-    });
-
-    return changed;
-}
-
-/**
- * Parse the arguments passed to a function as either positional arguments
- * or as keyword arguments, passed as an object.
- *
- * @param {Array} args - The arguments passed to the original function, with
- *   either an object passed as the only argument (to be used as all the
- *   arguments), or the arguments in order as defined by labels.
- * @param {string[]} labels - The names of each argument, in order.
- * @return {Object} The arguments passed in, with the keys specified by
- *   labels and the values either undefined or the parsed argument.
- */
-export function parseArgs(args, labels) {
-    if (args.length === 1 && !isNull(args[0])) {
-        let kwargs = args[0];
-        for (let key in kwargs) {
-            if (!includes(labels, key)) {
-                kwargs = null;
-                break;
-            }
-        }
-        if (kwargs) {
-            return kwargs;
-        }
-    }
-
-    return fromPairs(labels.map(
-        (label, i) => [label, args[i]]
-    ));
-}
-
-/**
- * Parse the given value as a number if possible
+ * Parse the given value as a number if possible.
  *
  * @param {string} value
- * @return {(string|number)}
+ * @return {?number}
  */
 export function parseNumber(value) {
     let float = parseFloat(value);
-    return isNaN(float) ? value : float;
+    return isNaN(float) ? null : float;
 }
 
 /**
  * Run the given function asynchronously, using jQuery deferred objects.
  *
- * @param {function} callback
+ * @param {function(): void} callback
  * @return {Promise}
  */
 let queue; // the Deferred object that will be collecting asynchronous functions
@@ -210,22 +156,5 @@ export function runAsync(callback) {
  * @return {Object}
  */
 export function underscoreKeys(data) {
-    return mapKeys(data, (val, key) => `_${key}`);
-}
-
-/**
- * Validate that the given input is a positive value, setting the input
- * to 0 if negative
- *
- * @param {jQuery} input
- * @return {int}
- */
-export function validatePositive(input) {
-    let value = parseInt($(input).val());
-    if (value < 0) {
-        $(input).val(0);
-        return 0;
-    } else {
-        return value;
-    }
+    return mapKeys(data, (_, key) => `_${key}`);
 }
