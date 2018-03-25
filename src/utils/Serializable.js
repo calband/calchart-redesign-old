@@ -1,48 +1,39 @@
 /**
  * @file Defines the Serializable class.
  *
- * Classes that can be serialized to JSON should extend this class.
+ * Calchart classes that can be serialized to JSON should extend this class. The
+ * constructor will already be provided to set the instance's properties based
+ * on the data.
+ *
+ * The constructor (called with `super(data, ..)`) should also be passed an
+ * object containing information about the types expected in the data. See
+ * `utils/types.checkTypes` for more information.
  */
 
 import {
     assign,
     forIn,
     has,
+    hasIn,
     isArray,
     isPlainObject,
     isNull,
     mapValues,
 } from 'lodash';
 
-import { isSubClass } from 'utils/classes';
 import { underscoreKeys } from 'utils/JSUtils';
+import { checkTypeError, isSubClass } from 'utils/types';
 
-/**
- * Get the Class for the given name of the Class.
- *
- * @param {string} name
- * @return {Class}
- */
-let _classes = null;
-function getClass(name) {
-    if (isNull(_classes)) {
-        // Dynamically import all serialized classes
-        let req = require.context('../calchart/', true, /\.js$/);
-        _classes = {};
-        req.keys().forEach(f => {
-            forIn(req(f), cls => {
-                if (isSubClass(cls, Serializable)) {
-                    _classes[cls.name] = cls;
-                }
-            });
+export class BaseSerializable {
+    /**
+     * @param {Object} data
+     * @param {Object} types
+     */
+    constructor(data, types) {
+        checkTypeError(data, {
+            _type: 'object',
+            _wraps: types,
         });
-    }
-    return _classes[name];
-}
-window.getClass = getClass;
-
-export default class Serializable {
-    constructor(data) {
         assign(this, underscoreKeys(data));
     }
 
@@ -63,6 +54,16 @@ export default class Serializable {
     }
 
     /**
+     * Get the Class for the given name of the Class.
+     *
+     * @param {string} name
+     * @return {Class}
+     */
+    static getClass(name) {
+        return undefined;
+    }
+
+    /**
      * Deserialize the given object.
      *
      * @param {Object} data
@@ -70,9 +71,9 @@ export default class Serializable {
      * @return {Serializable}
      */
     static _deserialize(data, show) {
-        function _doDeserialize(v) {
+        let _doDeserialize = v => {
             if (has(v, '__type__')) {
-                return getClass(v.__type__).deserialize(v, show);
+                return this.getClass(v.__type__).deserialize(v, show);
             } else if (isArray(v)) {
                 return v.map(_doDeserialize);
             } else if (isPlainObject(v)) {
@@ -80,7 +81,7 @@ export default class Serializable {
             } else {
                 return v;
             }
-        }
+        };
 
         data = mapValues(data, (v, k) => {
             let newV = _doDeserialize(v);
@@ -139,7 +140,7 @@ export default class Serializable {
      */
     _serialize() {
         function _doSerialize(v) {
-            if (has(v, 'serialize')) {
+            if (hasIn(v, 'serialize')) {
                 return v.serialize();
             } else if (isArray(v)) {
                 return v.map(_doSerialize);
@@ -157,5 +158,33 @@ export default class Serializable {
             data[newK] = _doSerialize(newV);
         });
         return data;
+    }
+}
+
+/**
+ * A mapping of Calchart classes, to be dynamically imported.
+ *
+ * @type {?Object<string: Class>}
+ */
+let CALCHART_CLASSES = null;
+
+export default class Serializable extends BaseSerializable {
+    /**
+     * @param {string} name
+     * @param {Class}
+     */
+    static getClass(name) {
+        if (isNull(CALCHART_CLASSES)) {
+            let req = require.context('../calchart/', true, /\.js$/);
+            CALCHART_CLASSES = {};
+            req.keys().forEach(f => {
+                forIn(req(f), cls => {
+                    if (isSubClass(cls, Serializable)) {
+                        CALCHART_CLASSES[cls.name] = cls;
+                    }
+                });
+            });
+        }
+        return CALCHART_CLASSES[name];
     }
 }

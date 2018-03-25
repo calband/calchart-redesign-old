@@ -31,7 +31,7 @@ Install from source:
 
 ### Node.js
 
-Most of the code in this project is written using Vue, a Javascript framework for building client-side applications. In order to run and build this code, developers need to install Node from the [official site](https://nodejs.org/en/download/). For MacOS developers who use Homebrew, `brew install node` should suffice.
+Most of the code in this project is written using Vue, a Javascript framework for building client-side applications. In order to run and build this code, developers need to install Node from the [official site](https://nodejs.org/en/download/). For MacOS developers who use Homebrew, `brew install node@8` and `brew link node@8` should suffice.
 
 After installing Node, run `npm install` to install the dependencies.
 

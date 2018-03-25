@@ -2,8 +2,8 @@
  * @file Tests the Enum class.
  */
 
-import { isSubClass } from 'utils/classes';
 import Enum from 'utils/Enum';
+import { isSubClass } from 'utils/types';
 
 class Color extends Enum {
     static get foo() {
