@@ -22,11 +22,11 @@ import { defaults } from 'lodash';
 import { uniqueId } from 'utils/JSUtils';
 import Serializable from 'utils/Serializable';
 
-// import FieldType from './FieldType';
-// import Flow from './Flow';
-// import FormationDot from './FormationDot';
-// import Orientation from './Orientation';
-// import StepType from './StepType';
+import FieldType from './FieldType';
+import Flow from './Flow';
+import FormationDot from './FormationDot';
+import Orientation from './Orientation';
+import StepType from './StepType';
 
 export default class Formation extends Serializable {
     /**
@@ -42,7 +42,28 @@ export default class Formation extends Serializable {
      *  | {?Orientation} orientation
      */
     constructor(data) {
-        super(data);
+        super(data, {
+            id: 'string',
+            dots: {
+                _type: 'array',
+                _wraps: FormationDot,
+            },
+            flows: {
+                _type: 'array',
+                _wraps: Flow,
+            },
+            nextDots: [null, {
+                _type: 'mapping',
+                _wraps: FormationDot,
+            }],
+            fieldType: [null, FieldType],
+            beatsPerStep: [null, {
+                _type: 'tuple',
+                _wraps: ['number', 'number'],
+            }],
+            stepType: [null, StepType],
+            orientation: [null, Orientation],
+        });
     }
 
     /**

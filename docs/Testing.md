@@ -17,7 +17,7 @@ $ flake8 calchart/
 We use [`eslint`](https://eslint.org/) and [`eslint-plugin-vue`](https://github.com/vuejs/eslint-plugin-vue) for linting the Javascript/Vue code. `eslint` is super configurable; everything we're checking is listed in `.eslintrc.json`. Anything not on the list is checked, so if you want something else to be linted, add it to `.eslintrc.json`.
 
 ```
-$ npm run lint
+$ yarn lint
 ```
 
 ## Server-Side Tests
@@ -37,8 +37,8 @@ These tests are Javascript tests that test functionality within the front-end; f
 These tests should be written in the `test/` directory, following the same layout as the `vue_src` directory. For example, testing the `vue_src/home/ShowList.vue` component should be done in the file `test/home/ShowList.spec.js`.
 
 ```
-$ npm test
-$ npm test -- -g Enum  # run all tests matching `Enum`
+$ yarn test
+$ yarn test -- -g Enum  # run all tests matching `Enum`
 ```
 
 ## End-to-End Tests
@@ -48,7 +48,7 @@ These tests test functionality between the backend and frontend; for example, te
 We use the [`cypress`](https://www.cypress.io) library to write tests. Tests should be written in the `cypress/` directory.
 
 ```
-$ npm run cypress
+$ yarn cypress
 ```
 
-You should also be running `npm run dev` when running end-to-end tests.
+You should also be in the correct Python environment and running `yarn start` when running end-to-end tests.

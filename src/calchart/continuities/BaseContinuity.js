@@ -7,8 +7,11 @@
  * EWNS to SS 2).
  */
 
-import { defaults } from 'lodash';
+import { assign, defaults } from 'lodash';
 
+import FieldType from 'calchart/FieldType';
+import Orientation from 'calchart/Orientation';
+import StepType from 'calchart/StepType';
 import { uniqueId } from 'utils/JSUtils';
 import Serializable from 'utils/Serializable';
 
@@ -21,9 +24,19 @@ export default class BaseContinuity extends Serializable {
      *  | {?[number, number]} beatsPerStep
      *  | {?StepType} stepType
      *  | {?Orientation} orientation
+     * @param {Object} types
      */
-    constructor(data) {
-        super(data);
+    constructor(data, types) {
+        super(data, assign(types, {
+            id: 'string',
+            fieldType: [null, FieldType],
+            beatsPerStep: [null, {
+                _type: 'tuple',
+                _wraps: ['number', 'number'],
+            }],
+            stepType: [null, StepType],
+            orientation: [null, Orientation],
+        }));
     }
 
     /**

@@ -31,9 +31,9 @@ Install from source:
 
 ### Node.js
 
-Most of the code in this project is written using Vue, a Javascript framework for building client-side applications. In order to run and build this code, developers need to install Node from the [official site](https://nodejs.org/en/download/). For MacOS developers who use Homebrew, `brew install node` should suffice.
+Most of the code in this project is written using Vue, a Javascript framework for building client-side applications. In order to run and build this code, developers need to install [Node 9](https://nodejs.org/en/download/) and [Yarn](https://yarnpkg.com/lang/en/docs/install/). For MacOS developers who use Homebrew, `brew install yarn` should install both dependencies.
 
-After installing Node, run `npm install` to install the dependencies.
+After installing Node, run `yarn install` to install the dependencies.
 
 ### Django
 
@@ -44,7 +44,7 @@ After finishing all the above installation steps, do the following:
 
 ## Development
 
-First, get the Django server running: `python calchart/manage.py runserver`. Then, in another tab, run `npm run dev`.
+First, get the Django server running: `python calchart/manage.py runserver`. Then, in another tab, run `yarn start`.
 
 You should now be able to connect to `http://localhost:5000`.
 
@@ -52,9 +52,9 @@ You should now be able to connect to `http://localhost:5000`.
 
 This project contains four testing facilities:
 
-1. Linting (`npm run lint` and `flake8 calchart/`): Checks code style
+1. Linting (`yarn lint` and `flake8 calchart/`): Checks code style
 2. Server-side tests (`python manage.py test`): These are Django tests that test functionality within the back-end; e.g. testing Django models
-3. Unit tests (`npm test`): These are Javascript tests (using the Mocha library) that test functionality within the front-end; e.g. testing Component methods
-4. End-to-end tests (`npm run cypress`): These are tests that test functionality between the back-end and front-end; e.g. testing `sendAction` calls.
+3. Unit tests (`yarn test`): These are Javascript tests (using the Mocha library) that test functionality within the front-end; e.g. testing Component methods
+4. End-to-end tests (`yarn cypress`): These are tests that test functionality between the back-end and front-end; e.g. testing `sendAction` calls.
 
 More detailed information and examples of these tests can be found in `docs/Testing.md`.

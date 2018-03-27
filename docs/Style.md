@@ -167,3 +167,5 @@ const FOO = 1;
 ### Documenting class methods
 
 Class methods should be documented with the same rules as functions. Class getter methods (`static get foo() {}` or `get foo() {}`) should be documented like constants.
+
+Inherited classes can just list the types of the parameters and return value, without the descriptions.

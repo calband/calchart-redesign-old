@@ -4,7 +4,7 @@
  * Represents an individual movement for a dot in a flow.
  */
 
-import { defaults } from 'lodash';
+import { assign, defaults } from 'lodash';
 
 import { StepCoordinate } from 'calchart/Coordinate';
 import { uniqueId } from 'utils/JSUtils';
@@ -21,9 +21,19 @@ export default class BaseMovement extends Serializable {
      *  | {number} duration
      *  | {number} orientation
      *  | {number} beatsPerStep
+     * @param {Object} types
      */
-    constructor(data) {
-        super(data);
+    constructor(data, types) {
+        super(data, assign(types, {
+            id: 'string',
+            startX: 'number',
+            startY: 'number',
+            endX: 'number',
+            endY: 'number',
+            duration: 'number',
+            orientation: 'number',
+            beatsPerStep: 'number',
+        }));
     }
 
     /**

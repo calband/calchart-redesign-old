@@ -10,8 +10,10 @@ import { defaults } from 'lodash';
 import { uniqueId } from 'utils/JSUtils';
 import Serializable from 'utils/Serializable';
 
-// import { StepCoordinate } from './Coordinate';
-// import DotType from './DotType';
+import BaseContinuity from './continuities/BaseContinuity';
+import { StepCoordinate } from './Coordinate';
+import DotType from './DotType';
+import BaseMovement from './movements/BaseMovement';
 
 export default class Flow extends Serializable {
     /**
@@ -26,7 +28,30 @@ export default class Flow extends Serializable {
      *      | {boolean} hasNextPoint
      */
     constructor(data) {
-        super(data);
+        super(data, {
+            id: 'string',
+            dots: {
+                _type: 'mapping',
+                _wraps: {
+                    nextPoint: StepCoordinate,
+                    dotType: DotType,
+                    movements: {
+                        _type: 'array',
+                        _wraps: BaseMovement,
+                    },
+                },
+            },
+            dotTypeInfo: {
+                _type: 'mapping',
+                _wraps: {
+                    continuities: {
+                        _type: 'array',
+                        _wraps: BaseContinuity,
+                    },
+                    hasNextPoint: 'boolean',
+                },
+            },
+        });
     }
 
     /**

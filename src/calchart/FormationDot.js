@@ -11,7 +11,8 @@ import { defaults } from 'lodash';
 import { mapExist, uniqueId } from 'utils/JSUtils';
 import Serializable from 'utils/Serializable';
 
-// import { PixelCoordinate } from './Coordinate';
+import { StepCoordinate } from './Coordinate';
+import Dot from './Dot';
 
 export default class FormationDot extends Serializable {
     /**
@@ -22,7 +23,12 @@ export default class FormationDot extends Serializable {
      *  | {?Dot} dot
      */
     constructor(data) {
-        super(data);
+        super(data, {
+            id: 'string',
+            position: StepCoordinate,
+            dotGroup: [null, 'string'],
+            dot: [null, Dot],
+        });
     }
 
     /**

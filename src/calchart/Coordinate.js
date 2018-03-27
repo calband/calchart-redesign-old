@@ -10,7 +10,7 @@ class Coordinate extends Serializable {
      * @param {number} y
      */
     constructor(x, y) {
-        super({});
+        super({}, {});
 
         this.x = x;
         this.y = y;

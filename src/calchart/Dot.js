@@ -21,7 +21,10 @@ export default class Dot extends Serializable {
      *  | {string} label
      */
     constructor(data) {
-        super(data);
+        super(data, {
+            id: 'string',
+            label: 'string',
+        });
     }
 
     /**

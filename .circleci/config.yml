@@ -2,14 +2,17 @@ version: 2
 
 aliases:
   - &docker-image
-    image: calband/circleci-calchart:1.2.1
+    image: calband/circleci-calchart:1.2.3
   - &postgres-image
     image: circleci/postgres:9.6.2
     environment:
       POSTGRES_USER: root
       POSTGRES_DB: circle_test
   - &cache-key
-    v2-calchart-{{ arch }}-{{ checksum "package-lock.json" }}
+    v3-calchart-{{ arch }}-{{ checksum "yarn.lock" }}
+  - &restore-cache
+    restore_cache:
+      key: *cache-key
   - &activate-venv
     run:
       name: Activate virtual environment
@@ -25,25 +28,23 @@ jobs:
         - *docker-image
       steps:
         - checkout
-        - restore_cache:
-            key: *cache-key
+        - *restore-cache
         - run:
             name: Install Node requirements
             command: |
-              npm --version
-              npm install
+              yarn --version
+              yarn install --frozen-lockfile
         - save_cache:
             key: *cache-key
             paths:
               - node_modules
         - run:
             name: Build Javascript files
-            command: npm run build
+            command: yarn build
         - persist_to_workspace:
-            root: "."
+            root: .
             paths:
               - calchart/static/
-              - node_modules/
   build-python:
       <<: *ci-env
       docker:
@@ -60,7 +61,7 @@ jobs:
               pip --version
               pip install -r requirements/dev.txt
         - persist_to_workspace:
-            root: "."
+            root: .
             paths:
               - venv
   test-node:
@@ -69,14 +70,17 @@ jobs:
         - *docker-image
       steps:
         - checkout
+        - *restore-cache
         - attach_workspace:
-            at: "."
+            at: .
         - run:
             name: Lint Javascript files
-            command: npm run lint
+            command: |
+              yarn list | grep eslint
+              yarn lint
         - run:
             name: Run Javascript unit tests
-            command: npm test
+            command: yarn test
   test-python:
       <<: *ci-env
       docker:
@@ -84,12 +88,15 @@ jobs:
         - *postgres-image
       steps:
         - checkout
+        - *restore-cache
         - attach_workspace:
-            at: "."
+            at: .
         - *activate-venv
         - run:
             name: Lint Python files
-            command: flake8 calchart/
+            command: |
+              flake8 --version
+              flake8 calchart/
         - run:
             name: Wait for PostgreSQL
             command: sleep 10
@@ -104,15 +111,16 @@ jobs:
         - *postgres-image
       steps:
         - checkout
+        - *restore-cache
         - attach_workspace:
-            at: "."
+            at: .
         - *activate-venv
         - run:
             name: Wait for PostgreSQL
             command: sleep 10
         - run:
             name: Run cypress tests
-            command: npm run cypress:run
+            command: yarn cypress:run
         - store_artifacts:
             path: cypress/videos
         - store_artifacts:
