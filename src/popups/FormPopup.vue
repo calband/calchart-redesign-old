@@ -17,9 +17,9 @@ A popup that contains a form to be submitted or modified.
                     <button>Save</button>
                     <button
                         v-if="allowHide"
-                        @click="hide"
                         class="cancel"
                         type="button"
+                        @click="hide"
                     >Cancel</button>
                 </slot>
             </div>

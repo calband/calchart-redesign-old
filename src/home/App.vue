@@ -12,7 +12,7 @@ The entry point for the home page.
             <button @click="showCreateShowPopup">New Show</button>
         </div>
         <div class="home-content">
-            <ul class="tabs" ref="tabs">
+            <ul ref="tabs" class="tabs">
                 <li
                     v-for="(tab, name) in tabs"
                     :class="getActiveClass(name)"
