@@ -65,11 +65,4 @@ export default class Flow extends Serializable {
 
         return new this(data);
     }
-
-    /**
-     * @return {string}
-     */
-    get id() {
-        return this._id;
-    }
 }

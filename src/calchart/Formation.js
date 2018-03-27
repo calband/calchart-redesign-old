@@ -81,11 +81,4 @@ export default class Formation extends Serializable {
 
         return new this(data);
     }
-
-    /**
-     * @return {string}
-     */
-    get id() {
-        return this._id;
-    }
 }

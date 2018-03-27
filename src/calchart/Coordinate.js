@@ -6,33 +6,24 @@ import Serializable from 'utils/Serializable';
 
 class Coordinate extends Serializable {
     /**
-     * @param {number} x
-     * @param {number} y
-     */
-    constructor(x, y) {
-        super({}, {});
-
-        this.x = x;
-        this.y = y;
-    }
-
-    /**
+     * Can either initialize as a data object or as the coordinate pair.
+     *
      * @param {Object} data
-     * @param {Show} show
-     * @return {Coordinate}
+     *  | {number} x
+     *  | {number} y
      */
-    static deserialize(data, show) {
-        return new this(data.x, data.y);
-    }
+    constructor(data) {
+        if (arguments.length == 2) {
+            data = {
+                x: arguments[0],
+                y: arguments[1],
+            };
+        }
 
-    /**
-     * @return {Object}
-     */
-    _serialize() {
-        return {
-            x: this.x,
-            y: this.y,
-        };
+        super(data, {
+            x: 'number',
+            y: 'number',
+        });
     }
 }
 

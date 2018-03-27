@@ -58,13 +58,6 @@ export default class FormationDot extends Serializable {
     }
 
     /**
-     * @return {string}
-     */
-    get id() {
-        return this._id;
-    }
-
-    /**
      * @param {string} k
      * @param {Any} v
      * @return {Any}
