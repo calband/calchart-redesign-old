@@ -16,8 +16,8 @@ page according to the URL.
             >{{ message.text }}
                 <i
                     v-if="!message.autohide"
-                    @click="removeMessage(message.id)"
                     class="icon-times close-message"
+                    @click="removeMessage(message.id)"
                 />
             </li>
         </ul>

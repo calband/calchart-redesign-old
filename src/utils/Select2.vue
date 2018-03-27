@@ -4,8 +4,8 @@ A component that renders a Select2 element.
 
 <template>
     <select
-        @input="$emit('input', $event.target.value)"
         :value="value"
+        @input="$emit('input', $event.target.value)"
     >
         <option
             v-for="choice in choices"

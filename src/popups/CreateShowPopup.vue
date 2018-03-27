@@ -4,12 +4,12 @@ A popup for creating a new show.
 
 <template>
     <FormPopup
-        title="Create Show"
         :on-submit="createShow"
         :model="model"
         :fields="fields"
+        title="Create Show"
     >
-        <template slot="buttons" v-if="isSaving">
+        <template v-if="isSaving" slot="buttons">
             <p>Saving...</p>
         </template>
     </FormPopup>

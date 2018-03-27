@@ -12,13 +12,13 @@ Template Options:
 <template>
     <Field v-bind="$props">
         <Select2
-            @input="handleInput"
             :value="model[field.key].value"
             :id="field.key"
             :name="field.key"
             :choices="choices"
             :multiple="to.multiple"
             :options="{ width: '200px' }"
+            @input="handleInput"
         />
     </Field>
 </template>
