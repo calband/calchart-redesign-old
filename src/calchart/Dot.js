@@ -40,11 +40,4 @@ export default class Dot extends Serializable {
 
         return new this(data);
     }
-
-    /**
-     * @return {string}
-     */
-    get id() {
-        return this._id;
-    }
 }
