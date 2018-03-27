@@ -70,6 +70,13 @@ describe('BaseSerializable', () => {
         expect(foo._bar).toBeNull();
     });
 
+    it('adds getters to instance', () => {
+        expect(foo.x).toBe(1);
+        expect(foo.y).toBe(2);
+        expect(foo.bar).toBeNull();
+        expect(() => { foo.x = 2; }).toThrow();
+    });
+
     it('serializes', () => {
         expect(foo.serialize().x).toBe(1);
         expect(foo.serialize().y).toBe(2);

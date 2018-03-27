@@ -12,6 +12,7 @@
 
 import {
     assign,
+    forEach,
     forIn,
     has,
     hasIn,
@@ -35,6 +36,11 @@ export class BaseSerializable {
             _wraps: types,
         });
         assign(this, underscoreKeys(data));
+        forEach(data, (v, k) => {
+            Object.defineProperty(this, k, {
+                get: () => this[`_${k}`],
+            });
+        });
     }
 
     /**
