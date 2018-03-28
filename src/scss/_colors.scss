@@ -1,0 +1,24 @@
+// Grayscale
+$black: #424242;
+$dark-gray: #767775;
+$medium-gray: #AAA;
+$light-gray: #EDEEEE;
+$light-gray-darker: darken($light-gray, 5);
+$white: #FFF;
+
+// Theme colors
+$blue: #2E739B;
+$gold: #FDB515;
+$light-blue: lighten(saturate($blue, 35), 35);
+$light-gold: lighten($gold, 35);
+
+// UI colors
+$red: #C82020;
+$green: #269C2E;
+
+// graph colors
+$field-green: #CFE7AD;
+$uniform-white: #F9FBF6; // scraped from image of uniform front
+$uniform-yellow: #FFEA59; // scraped from image of cape
+$uniform-blue: #38363B; // scraped from image of uniform side
+$highlight-purple: #F19DF5;
