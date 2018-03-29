@@ -144,7 +144,7 @@ export default {
     li {
         padding: 15px 20px 10px;
         cursor: pointer;
-        border-bottom: 1px solid darken($semilight-gray, 10);
+        border-bottom: 1px solid $light-gray-darker;
         &:hover, &.active {
             color: lighten($blue, 20);
             background: $white;
