@@ -6,7 +6,11 @@ import App from 'home/App';
 import { addStore, setStunt, stubAction } from 'test/utils';
 
 function mockAjaxTab(tab) {
-    let show = { published: undefined };
+    let show = {
+        slug: 'test',
+        name: 'Test',
+        published: true,
+    };
     stubAction('get_tab', data => {
         expect(data.tab).toBe(tab);
         return {

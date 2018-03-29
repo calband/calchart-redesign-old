@@ -38,7 +38,7 @@ These tests should be written in the `test/` directory, following the same layou
 
 ```
 $ yarn test
-$ yarn test -- -g Enum  # run all tests matching `Enum`
+$ yarn test -g Enum  # run all tests matching `Enum`
 ```
 
 ## End-to-End Tests
