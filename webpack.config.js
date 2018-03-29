@@ -12,8 +12,19 @@ const static = path.resolve(__dirname, 'calchart', 'static');
 const babelLoaderOptions = {
     minified: true,
     comments: false,
-    // faster compilation
-    cacheDirectory: true,
+    cacheDirectory: true, // faster compilation
+    presets: [
+        // general transpiler for general browser compatability
+        ['env', {
+            targets: {
+                browsers: ['last 2 versions'],
+            },
+        }],
+    ],
+    plugins: [
+        // allow spread operator
+        'transform-object-rest-spread',
+    ],
 };
 
 const cssLoader = {
