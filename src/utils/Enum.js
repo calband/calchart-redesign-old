@@ -41,6 +41,8 @@ import Serializable from 'utils/Serializable';
 
 export default class Enum extends Serializable {
     constructor() {
+        // https://github.com/babel/babel/issues/6370
+        super({}, {});
         throw new Error('Cannot instantiate an Enum class');
     }
 
