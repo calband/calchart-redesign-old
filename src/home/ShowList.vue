@@ -31,15 +31,20 @@ A list of shows for a tab.
 <script>
 import { defaultTo } from 'lodash';
 
-import { validateList, validateObject } from 'utils/validators';
+import { validateType } from 'utils/types';
 
 export default {
     props: {
         shows: {
             type: Array,
-            validator: validateList(
-                validateObject('slug', 'name', 'published')
-            ),
+            validator: validateType({
+                _type: 'array',
+                _wraps: {
+                    slug: 'string',
+                    name: 'string',
+                    published: 'boolean',
+                },
+            }),
             required: true,
         },
         isOwner: {

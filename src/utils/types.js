@@ -142,3 +142,13 @@ export function checkTypeError(object, typeDef) {
 export function isSubClass(child, parent) {
     return child.prototype instanceof parent || child === parent;
 }
+
+/**
+ * Validate that a given object has the given type definition.
+ *
+ * @param {Object} typeDef
+ * @return {function(Object): boolean}
+ */
+export function validateType(typeDef) {
+    return object => checkType(object, typeDef);
+}
