@@ -21,7 +21,7 @@ import { defaults } from 'lodash';
 import 'select2/dist/js/select2.min.js';
 import 'select2/dist/css/select2.min.css';
 
-import { validateList, validateObject } from 'utils/validators';
+import { validateType } from 'utils/types';
 
 export default {
     props: {
@@ -35,7 +35,13 @@ export default {
             // containing `value` and `label` properties
             type: Array,
             required: true,
-            validator: validateList(validateObject('value', 'label')),
+            validator: validateType({
+                _type: 'array',
+                _wraps: {
+                    value: 'string',
+                    label: 'string',
+                },
+            }),
         },
         multiple: {
             // true if this should be a multiple select
