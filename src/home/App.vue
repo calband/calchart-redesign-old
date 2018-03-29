@@ -251,11 +251,8 @@ $height-offset: $header-height + $buttons-height;
     li {
         padding: 15px 20px 10px;
         cursor: pointer;
-        &.active {
-            background: darken($light-gray, 10);
-        }
-        &:hover:not(.active) {
-            background: $semilight-gray;
+        &.active, &:hover {
+            background: $light-gray-darker;
         }
     }
 }
