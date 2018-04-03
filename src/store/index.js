@@ -5,15 +5,16 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 
-import env from 'store/env';
-import messages from 'store/messages';
+import editor from './editor';
+import env from './env';
+import messages from './messages';
 
 Vue.use(Vuex);
 
 export default new Vuex.Store({
-    // plugins: [
-    //     store => editor.$init(store),
-    // ],
+    plugins: [
+        store => editor.$init(store),
+    ],
     state: {
         // the Show loaded in the current page (or null if none loaded)
         show: null,
@@ -44,7 +45,7 @@ export default new Vuex.Store({
         },
     },
     modules: {
-        // editor,
+        editor,
         env,
         messages,
     },

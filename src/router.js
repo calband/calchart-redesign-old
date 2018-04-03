@@ -11,6 +11,7 @@ import VueRouter from 'vue-router';
 import store from 'store';
 import Show from 'calchart/Show';
 import Home from 'home/App';
+import Editor from 'editor/App';
 import sendAction, { handleError } from 'utils/ajax';
 
 Vue.use(VueRouter);
@@ -23,11 +24,11 @@ let router = new VueRouter({
             name: 'home',
             component: Home,
         },
-        // {
-        //     path: '/editor/:slug',
-        //     name: 'editor',
-        //     component: Editor,
-        // },
+        {
+            path: '/editor/:slug',
+            name: 'editor',
+            component: Editor,
+        },
         // {
         //     path: '/viewer/:slug',
         //     name: 'viewer',
