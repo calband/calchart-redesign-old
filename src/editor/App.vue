@@ -10,8 +10,6 @@ The entry point for the editor page.
             </router-link>
             <h1>{{ show.name }}</h1>
         </div>
-        <div class="content">
-        </div>
     </div>
 </template>
 
