@@ -32,3 +32,7 @@
 [data-icon="x-circle"]:before {
     content: '\e001';
 }
+
+[data-icon="x"]:before {
+    content: '\e002';
+}
