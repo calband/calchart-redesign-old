@@ -1,3 +1,20 @@
+// higher index = higher z-index
+$z-layers: (
+    'header',
+    'popup',
+    'messages',
+    'tooltip',
+    'context-menu',
+);
+@function z-index($key) {
+    $index: index($z-layers, $key);
+    @if $index == null {
+        @error "Unknown z-layer: #{$key}";
+    } @else {
+        @return $index;
+    }
+}
+
 /**
  * Add a series of sans-serif fonts as backups for the given font. Usage:
  *      font-family: sans-serif("DIN Next");

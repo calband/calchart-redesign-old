@@ -8,13 +8,13 @@ const ttf2eot = require('ttf2eot');
 const ttf2woff = require('ttf2woff');
 
 const ROOT = path.resolve(__dirname, '..');
-const SVG_SRC = path.resolve(ROOT, 'vue_src', 'static', 'svg');
+const SVG_SRC = path.resolve(ROOT, 'src', 'svg');
 
 const FONT_NAME = 'calchart-icons';
 
 function font(ext) {
     return path.resolve(
-        ROOT, 'vue_src', 'static', 'fonts', `${FONT_NAME}.${ext}`
+        ROOT, 'src', 'static', 'fonts', `${FONT_NAME}.${ext}`
     );
 }
 
@@ -108,7 +108,7 @@ function createCSSFile() {
     });
 
     fs.writeFileSync(
-        path.resolve(ROOT, 'vue_src', 'static', 'vendor', `${FONT_NAME}.css`),
+        path.resolve(ROOT, 'src', 'static', 'vendor', `${FONT_NAME}.css`),
         cssFile,
     );
 }
