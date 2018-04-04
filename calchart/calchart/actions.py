@@ -1,9 +1,24 @@
-"""Actions for the home page."""
+"""
+All actions that can be sent from sendAction.
 
+Each action needs to have the following declaration:
+
+def action_name(data, **kwargs):
+    # action
+
+`data` will contain the values from `request.POST`.
+
+`kwargs` will contain the `request` object and the `user` making
+the request.
+"""
+
+from django.core.exceptions import PermissionDenied
+from django.shortcuts import get_object_or_404
 from django.utils import timezone
 
-from .utils import retrieve_show
-from ..models import Show
+from .models import Show
+
+""" Home page """
 
 
 def get_tab(data, **kwargs):
@@ -37,8 +52,30 @@ def get_tab(data, **kwargs):
     }
 
 
+""" Show actions """
+
+
+def _retrieve_show(slug, user):
+    """
+    Helper to retrieve the Show with the given slug.
+
+    Checks if the user has adequate permissions to view the show.
+    """
+    show = get_object_or_404(Show, slug=slug)
+    if (show.is_band and not user.has_committee('STUNT')):
+        raise PermissionDenied
+    else:
+        return show
+
+
+def get_show(data, **kwargs):
+    """Get the show with the given slug."""
+    show = _retrieve_show(data['slug'], kwargs['user'])
+    return show.get_data()
+
+
 def create_show(data, **kwargs):
-    """Create a show with the given name."""
+    """Create a show with the given data."""
     user = kwargs['user']
     name = data['name']
     is_band = data['isBand'] and user.has_committee('STUNT')
@@ -52,6 +89,9 @@ def create_show(data, **kwargs):
         'is_band': is_band,
     }
     show = Show.objects.create(**kwargs)
+    data['slug'] = show.slug
+    data['published'] = False
+    show.save_data(data)
 
     return {
         'slug': show.slug,
@@ -64,11 +104,12 @@ def publish_show(data, **kwargs):
     published = data['publish']
     show = retrieve_show(data['slug'], kwargs['user'])
 
-    if not show.data_file:
-        # Should only apply to publishing, since a show without data
-        # cannot be published in the first place to be "unpublished"
-        raise Exception('Cannot publish show before setting it up')
-
     show_data = show.get_data()
     show_data['published'] = published
     show.save_data(show_data)
+
+
+def save_show(data, **kwargs):
+    """Get the show with the given slug."""
+    show = _retrieve_show(data['slug'], kwargs['user'])
+    show.save_data(data)

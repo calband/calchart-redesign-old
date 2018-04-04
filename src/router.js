@@ -25,9 +25,20 @@ let router = new VueRouter({
             component: Home,
         },
         {
+            path: '/create-show',
+            name: 'create-show',
+            component: Editor,
+            props: {
+                create: true,
+            },
+        },
+        {
             path: '/editor/:slug',
             name: 'editor',
             component: Editor,
+            props: {
+                create: false,
+            },
         },
         // {
         //     path: '/viewer/:slug',
@@ -43,28 +54,12 @@ let router = new VueRouter({
 });
 
 router.beforeEach((to, from, next) => {
-    // close any open popups
-    $('.popup-wrapper').each(function() {
-        this.__vue__.hide();
-    });
-
-    store.commit('setShow', null);
-
     let slug = to.params.slug;
     if (slug) {
         sendAction('get_show', { slug }, {
             success: data => {
-                if (data.isInitialized) {
-                    store.commit('setShow', Show.deserialize(data.show));
-                    next();
-                } else {
-                    if (to.name === 'editor') {
-                        store.commit('editor/setNewShowData', data);
-                    } else {
-                        alert('The show is not set up yet!');
-                    }
-                    next();
-                }
+                store.commit('setShow', Show.deserialize(data));
+                next();
             },
             error: xhr => {
                 handleError(xhr);

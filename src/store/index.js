@@ -5,7 +5,7 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 
-import editor from './editor';
+// import editor from './editor';
 import env from './env';
 import messages from './messages';
 
@@ -13,7 +13,7 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
     plugins: [
-        store => editor.$init(store),
+        // store => editor.$init(store),
     ],
     state: {
         // the Show loaded in the current page (or null if none loaded)
@@ -23,13 +23,15 @@ export default new Vuex.Store({
         /**
          * Modify the Show with the given arguments.
          *
+         * Takes in an object in the Show to be updated (defaults to the Show
+         * itself). This target should have been freshly retrieved from the Show
+         * in the store, since `modifyShow` is supposed to actually change the
+         * state, but this is not checked.
+         *
          * @param {Object}
-         *   - {*} target - An object in the Show object to be updated (defaults
-         *     to the Show itself). This target should have been freshly
-         *     retrieved from the Show in the state, since `modifyShow` is
-         *     supposed to actually change the state, but this is not checked.
-         *   - {String} func - The name of the function to call.
-         *   - {[*]} args - Arguments to pass to the function.
+         *  | {Any} target
+         *  | {string} func - The name of the function to call on the target.
+         *  | {Array} args - Arguments to pass to the function.
          */
         modifyShow(state, { target, func, args }) {
             target = target || state.show;
@@ -45,7 +47,7 @@ export default new Vuex.Store({
         },
     },
     modules: {
-        editor,
+        // editor,
         env,
         messages,
     },

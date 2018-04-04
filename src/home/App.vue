@@ -9,7 +9,7 @@ The entry point for the home page.
             <p class="logout-link"><a href="/logout">Logout</a></p>
         </header>
         <div class="home-buttons">
-            <button @click="showCreateShowPopup">New Show</button>
+            <router-link to="/create-show" tag="button">New Show</router-link>
         </div>
         <div class="home-content">
             <ul ref="tabs" class="tabs">
@@ -64,8 +64,6 @@ import $ from 'jquery';
 import { isNull } from 'lodash';
 import { mapState } from 'vuex';
 
-import CreateShowPopup from 'popups/CreateShowPopup';
-import { showPopup } from 'popups/lib';
 import sendAction from 'utils/ajax';
 import { findAndRemove } from 'utils/array';
 
@@ -168,12 +166,6 @@ export default {
             } else {
                 this.activeTab = tab;
             }
-        },
-        /**
-         * Display the CreateShowPopup.
-         */
-        showCreateShowPopup() {
-            showPopup(CreateShowPopup);
         },
         /**
          * Toggle the published status of the given show. Should only
