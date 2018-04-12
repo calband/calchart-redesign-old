@@ -1,7 +1,7 @@
 import $ from 'jquery';
 import { each, defaults } from 'lodash';
 
-import store from 'store';
+import { getStore } from 'store';
 
 /**
  * The default callback for handling an error returned by the server.
@@ -24,7 +24,7 @@ export function handleError(xhr) {
         }
     }
 
-    store.dispatch('messages/showError', message);
+    getStore().dispatch('messages/showError', message);
 }
 
 /**
@@ -37,7 +37,7 @@ export function handleError(xhr) {
 export default function sendAction(action, data, options) {
     // http://www.mattlunn.me.uk/blog/2012/05/sending-formdata-with-jquery-ajax/
     let formData = new FormData();
-    formData.append('csrfmiddlewaretoken', store.state.env.csrfToken);
+    formData.append('csrfmiddlewaretoken', getStore().state.env.csrfToken);
     formData.append('action', action);
 
     let nonFileData = {};

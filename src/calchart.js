@@ -3,8 +3,8 @@ import VueContextMenu from 'vue-ctxmenu';
 
 import App from 'App';
 import FormsPlugin from 'forms';
-import router from 'router';
-import store from 'store';
+import initRouter from 'router';
+import initStore from 'store';
 import { ConstantsPlugin } from 'utils/vue';
 
 Vue.use(ConstantsPlugin);
@@ -14,6 +14,6 @@ Vue.use(VueContextMenu);
 let CalchartApp = Vue.extend(App);
 new CalchartApp({
     el: '#app',
-    router,
-    store,
+    router: initRouter(Vue),
+    store: initStore(Vue),
 });

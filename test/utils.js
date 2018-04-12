@@ -2,54 +2,42 @@
  * @file Utilities for unit testing. Needs to be imported in every test file
  *   to include the global setup/teardown hooks.
  */
+import { createLocalVue, shallow } from '@vue/test-utils';
 import $ from 'jquery';
-import { extend, isUndefined } from 'lodash';
+import { defaultTo, each } from 'lodash';
 import sinon from 'sinon';
 
-import router from 'router';
-import store from 'store';
+import initStore from 'store';
+
+export const LOCAL_VUE = createLocalVue();
+export const TEST_STORE = sinon.stub(initStore(LOCAL_VUE));
+
+// stub components of plugins not used in tests
+each(['formly-form', 'router-view', 'router-link'], c => {
+    LOCAL_VUE.component(c, { render: h => h('div') });
+});
 
 /**
- * A stubbed Vuex store.
- */
-const TEST_STORE = sinon.stub(store);
-
-/**
- * Wrap a `shallow` call to add mocks.
+ * Create a wrapper of a component with child components stubbed out.
  *
- * @param {Function} f - The possibly-wrapped shallow function.
- * @param {Object} mocks - The mocks to add to the options.
- * @return {Function}
- */
-function _addMocks(f, mocks) {
-    return (App, options={}) => {
-        if (isUndefined(options.mocks)) {
-            options.mocks = mocks;
-        } else {
-            extend(options.mocks, mocks);
-        }
-        return f(App, options);
-    };
-}
-
-/**
- * Wrap a `shallow` call to mock the vue-router router.
+ * See `@vue/test-utils.shallow` for description of available options. Other
+ * options are also available to render Calchart components.
  *
- * @param {Function} f - The possibly-wrapped shallow function
- * @return {Function}
+ * @param {Component} component
+ * @param {object} options
+ *  | {boolean} stubRouter
+ *  | {boolean} stubStore
  */
-export function addRouter(f) {
-    return _addMocks(f, { _route: router });
-}
+export function shallowCalchart(component, options={}) {
+    options.localVue = LOCAL_VUE;
+    options.mocks = defaultTo(options.mocks, {});
 
-/**
- * Wrap a `shallow` call to mock the Vuex store.
- *
- * @param {Function} f - The possibly-wrapped shallow function
- * @return {Function}
- */
-export function addStore(f) {
-    return _addMocks(f, { $store: TEST_STORE });
+    if (options.stubStore) {
+        options.mocks.$store = TEST_STORE;
+        delete options.stubStore;
+    }
+
+    return shallow(component, options);
 }
 
 /**
@@ -80,17 +68,24 @@ export function setStunt(value) {
 /**
  * Stub a POST action sent to the server.
  *
- * @param {String} action - Validates that the POST action matches this value.
- * @param {Function} callback - The callback to run instead of the AJAX call.
- *   Will receive the data passed to the action. Should return the result of
- *   the AJAX call.
+ * The given callback will receive the data passed to the action and should
+ * return data the server would send back.
+ *
+ * @param {string} action
+ * @param {function(object): object} callback
  */
+const STUBBED_ACTIONS = {};
 export function stubAction(action, callback) {
+    STUBBED_ACTIONS[action] = callback;
     $.ajax.callsFake(options => {
-        expect(options.data.get('action')).toBe(action);
         expect(options.data.has('csrfmiddlewaretoken')).toBe(true);
-        let data = options.data.get('data');
-        let result = callback(JSON.parse(data));
-        options.success(result);
+        let action = options.data.get('action');
+        let callback = STUBBED_ACTIONS[action];
+
+        if (callback) {
+            let data = options.data.get('data');
+            let result = callback(JSON.parse(data));
+            options.success(result);
+        }
     });
 }

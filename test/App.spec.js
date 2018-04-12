@@ -1,11 +1,14 @@
-import { shallow } from '@vue/test-utils';
-
 import App from 'App';
-import { addRouter, addStore } from 'test/utils';
+import { shallowCalchart } from 'test/utils';
 
 describe('App', () => {
     it('does not show messages on init', () => {
-        let wrapper = addRouter(addStore(shallow))(App);
+        let wrapper = shallowCalchart(App, {
+            stubStore: true,
+            mocks: {
+                $route: { path: '/' },
+            },
+        });
         expect(wrapper.contains('ul.messages')).toBe(false);
     });
 });

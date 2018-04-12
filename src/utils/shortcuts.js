@@ -3,10 +3,10 @@
  */
 
 import { defaultTo } from 'lodash';
-import store from 'store';
+import { getStore } from 'store';
 
 let shortcutMap, shortcutSep;
-if (store.state.env.IS_MAC) {
+if (getStore().state.env.IS_MAC) {
     // HTML codes: http://apple.stackexchange.com/a/55729
     shortcutMap = {
         ctrl: '&#8984;',

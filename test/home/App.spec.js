@@ -1,9 +1,8 @@
 import $ from 'jquery';
 import sinon from 'sinon';
-import { shallow } from '@vue/test-utils';
 
 import App from 'home/App';
-import { addStore, setStunt, stubAction } from 'test/utils';
+import { setStunt, shallowCalchart, stubAction } from 'test/utils';
 
 function mockAjaxTab(tab) {
     let show = {
@@ -24,7 +23,9 @@ function mockAjaxTab(tab) {
  * Stubbing store for `isStunt` value.
  */
 function initHome() {
-    return addStore(shallow)(App);
+    return shallowCalchart(App, {
+        stubStore: true,
+    });
 }
 
 describe('home/App', () => {
