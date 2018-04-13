@@ -10,7 +10,7 @@ class CreateShowTestCase(ActionsTestCase):
     """Test the create_show action."""
 
     SHOW_DATA = {
-        'slug': '',  # empty when sent from form; make sure slug is properly set
+        'slug': '',  # empty when sent from form; check slug is properly set
         'name': 'Foo',
         'isBand': False,
         'numDots': 10,
@@ -43,7 +43,6 @@ class CreateShowTestCase(ActionsTestCase):
         data['slug'] = slug
         data['published'] = False
         self.assertEqual(show.get_data(), data)
-
 
     def test_create_show_twice(self):
         """Test that a show cannot be created twice."""

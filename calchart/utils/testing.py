@@ -22,6 +22,7 @@ def get_user():
             email='',
         )
 
+
 class _RequestFactory(object):
     """A new RequestFactory that augments Django's built-in RequestFactory."""
 

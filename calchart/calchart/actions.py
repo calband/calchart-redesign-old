@@ -57,7 +57,7 @@ def get_tab(data, **kwargs):
 
 def _retrieve_show(slug, user):
     """
-    Helper to retrieve the Show with the given slug.
+    Retrieve the Show with the given slug.
 
     Checks if the user has adequate permissions to view the show.
     """
@@ -102,7 +102,7 @@ def publish_show(data, **kwargs):
     """Publish or unpublish a show."""
     # TODO: check if stunt
     published = data['publish']
-    show = retrieve_show(data['slug'], kwargs['user'])
+    show = _retrieve_show(data['slug'], kwargs['user'])
 
     show_data = show.get_data()
     show_data['published'] = published
