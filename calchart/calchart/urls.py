@@ -2,6 +2,7 @@
 
 from calchart.views import (
     CalchartView,
+    DevView,
     LoginView,
     export,
 )
@@ -28,9 +29,9 @@ urlpatterns = [
 ]
 
 # for development
-# https://docs.djangoproject.com/en/1.10/howto/static-files/#serving-files-uploaded-by-a-user-during-development
 if settings.DEBUG:
-    urlpatterns += static(
-        settings.MEDIA_URL,
-        document_root=settings.MEDIA_ROOT,
-    )
+    # https://docs.djangoproject.com/en/1.10/howto/static-files/#serving-files-uploaded-by-a-user-during-development
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+    # cypress testing
+    urlpatterns += [url(r'^dev/(?P<action>\w+)/$', DevView.as_view())]

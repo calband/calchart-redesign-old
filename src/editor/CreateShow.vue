@@ -12,7 +12,7 @@ The page that lets the user create a new show in the editor.
                 :model="model"
                 :fields="fields"
             />
-            <button>Finish</button>
+            <button data-cy="submit">Finish</button>
         </form>
     </div>
 </template>

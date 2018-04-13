@@ -9,7 +9,11 @@ The entry point for the home page.
             <p class="logout-link"><a href="/logout">Logout</a></p>
         </header>
         <div class="home-buttons">
-            <router-link to="/create-show" tag="button">New Show</router-link>
+            <router-link
+                to="/create-show"
+                tag="button"
+                data-cy="new-show"
+            >New Show</router-link>
         </div>
         <div class="home-content">
             <ul ref="tabs" class="tabs">
