@@ -9,37 +9,39 @@ from calchart.views import CalchartView
 from django.test import RequestFactory as DjangoRequestFactory, TestCase
 
 
+def get_user():
+    """Get a superuser for testing."""
+    # use superuser to avoid API call to check-committee
+    superuser = User.objects.filter(is_superuser=True)
+    if superuser.exists():
+        return superuser.get()
+    else:
+        return User.objects.create_superuser(
+            username='foo',
+            password='foo',
+            email='',
+        )
+
+
 class _RequestFactory(object):
     """A new RequestFactory that augments Django's built-in RequestFactory."""
 
     _factory = DjangoRequestFactory()
 
-    def get_user(self, members_only):
-        """Get a Members Only or Calchart-only user for a request."""
-        if members_only:
-            # use superuser to avoid API call to check-committee
-            return User.objects.create_superuser(
-                username='foo',
-                password='foo',
-                email='',
-            )
-        else:
-            return User.objects.create(username='bar')
-
-    def GET(self, data=None, members_only=False):
+    def GET(self, data=None):
         if data is None:
             data = {}
 
         request = self._factory.get('/', data)
-        request.user = self.get_user(members_only=members_only)
+        request.user = get_user()
         return request
 
-    def POST(self, data=None, members_only=False):
+    def POST(self, data=None):
         if data is None:
             data = {}
 
         request = self._factory.post('/', data)
-        request.user = self.get_user(members_only=members_only)
+        request.user = get_user()
         return request
 
 
@@ -49,15 +51,18 @@ RequestFactory = _RequestFactory()
 class ActionsTestCase(TestCase):
     """A TestCase for testing POST actions."""
 
-    def do_action(self, action, data, **kwargs):
+    def do_action(self, action, data, *, raw=False, **kwargs):
         """Run the given action and return the data sent back."""
         request = RequestFactory.POST({
             'action': action,
             'data': json.dumps(data),
         }, **kwargs)
         response = CalchartView.as_view()(request)
-        self.assertEqual(response.status_code, 200)
-        return json.loads(response.content)
+        if raw:
+            return response
+        else:
+            self.assertEqual(response.status_code, 200)
+            return json.loads(response.content)
 
 
 def mock_endpoint(endpoint, data):

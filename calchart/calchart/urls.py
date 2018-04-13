@@ -2,6 +2,7 @@
 
 from calchart.views import (
     CalchartView,
+    DevView,
     LoginView,
     export,
 )
@@ -13,6 +14,7 @@ from django.contrib.auth.views import LogoutView
 
 urlpatterns = [
     url(r'^$', CalchartView.as_view(), name='home'),
+    url(r'^create-show', CalchartView.as_view()),
     url(r'^editor', CalchartView.as_view()),
     url(r'^viewer', CalchartView.as_view()),
     url(r'^viewpsheet', CalchartView.as_view()),
@@ -27,9 +29,11 @@ urlpatterns = [
 ]
 
 # for development
-# https://docs.djangoproject.com/en/1.10/howto/static-files/#serving-files-uploaded-by-a-user-during-development
 if settings.DEBUG:
+    # https://docs.djangoproject.com/en/1.10/howto/static-files/#serving-files-uploaded-by-a-user-during-development
     urlpatterns += static(
-        settings.MEDIA_URL,
-        document_root=settings.MEDIA_ROOT,
+        settings.MEDIA_URL, document_root=settings.MEDIA_ROOT,
     )
+
+    # cypress testing
+    urlpatterns += [url(r'^dev/(?P<action>\w+)/$', DevView.as_view())]

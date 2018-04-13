@@ -22,7 +22,7 @@ let MESSAGES = {
     positive: 'This field needs to be positive.',
 };
 
-let FormsPlugin = {
+const FormsPlugin = {
     install: Vue => {
         Vue.use(VueFormly);
 
@@ -34,5 +34,4 @@ let FormsPlugin = {
         });
     },
 };
-
 export default FormsPlugin;

@@ -11,7 +11,9 @@ from django.contrib.auth import login
 from django.http.response import Http404, HttpResponse, JsonResponse
 from django.middleware.csrf import get_token
 from django.shortcuts import redirect
-from django.views.generic import RedirectView, TemplateView
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
+from django.views.generic import RedirectView, TemplateView, View
 
 from utils.api import get_login_url
 
@@ -27,7 +29,7 @@ def export(request, slug):
     return response
 
 
-""" AUTH PAGES """
+""" VIEWS """
 
 
 class LoginView(RedirectView):
@@ -71,9 +73,6 @@ class LoginView(RedirectView):
         user.save()
 
         login(self.request, user)
-
-
-""" CALCHART PAGE """
 
 
 class CalchartView(LoginRequiredMixin, TemplateView):
@@ -144,6 +143,24 @@ class CalchartView(LoginRequiredMixin, TemplateView):
         }
 
         return context
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class DevView(View):
+    """View for developer actions when testing."""
+
+    def post(self, request, *args, **kwargs):
+        """Run the action specified in the URL."""
+        getattr(self, kwargs['action'])()
+        return HttpResponse()
+
+    def reset(self):
+        """Reset the database of everything except the root user."""
+        Show.objects.all().delete()
+        User.objects.exclude(is_superuser=True).delete()
+
+
+""" For future reference; delete later. """
 
 # class EditorView(CalchartMixin, TemplateView):
 #     """

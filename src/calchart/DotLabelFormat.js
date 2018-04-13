@@ -25,13 +25,13 @@ export default class DotLabelFormat extends Enum {
      */
     getLabel(n) {
         switch (this) {
-            case this.COMBO: {
+            case this.constructor.COMBO: {
                 // 65 = 'A'
                 let charCode = 65 + (n / 10);
                 let num = n % 10;
                 return String.fromCharCode(charCode) + num;
             }
-            case this.NUMBER: {
+            case this.constructor.NUMBER: {
                 return String(n);
             }
         }

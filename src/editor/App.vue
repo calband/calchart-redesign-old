@@ -8,16 +8,28 @@ The entry point for the editor page.
             <router-link class="icon-link" to="/">
                 <img :src="iconPath">
             </router-link>
-            <h1>{{ show.name }}</h1>
+            <h1 v-if="!create">{{ show.name }}</h1>
         </div>
+        <CreateShow v-if="create" />
+        <div v-else>TODO</div>
     </div>
 </template>
 
 <script>
-import { isNull } from 'lodash';
+import CreateShow from './CreateShow';
 
 export default {
     name: 'Editor',
+    props: {
+        create: {
+            // If true, a show is being created.
+            type: Boolean,
+            required: true,
+        },
+    },
+    components: {
+        CreateShow,
+    },
     computed: {
         /**
          * @return {string} The path to the highstepper icon.
@@ -27,28 +39,18 @@ export default {
             return `${staticPath}/img/highstepper.png`;
         },
         /**
-         * @return {boolean}
-         */
-        isInitialized() {
-            return !isNull(this.$store.state.show);
-        },
-        /**
          * Get either the loaded Show or the data for creating a new show.
          *
          * @return {Show|object}
          */
         show() {
-            if (this.isInitialized) {
-                return this.$store.state.show;
-            } else {
-                return this.$store.state.editor.newShowData;
-            }
+            return this.$store.state.show;
         },
     },
 };
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .editor-header {
     $header-font-size: 24px;
     padding: 5px 10px;

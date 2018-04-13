@@ -4,6 +4,8 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const nodeExternals = require('webpack-node-externals');
 
+const IS_TEST = process.env.NODE_ENV === 'test';
+
 const src = path.resolve(__dirname, 'src');
 const static = path.resolve(__dirname, 'calchart', 'static');
 
@@ -65,6 +67,12 @@ const vueLoaderOptions = {
 
 /**** WEBPACK CONFIG ****/
 
+const aliases = {};
+
+if (IS_TEST) {
+    aliases['vue$'] = 'vue/dist/vue.esm.js';
+}
+
 webpackConfig = {
     context: src,
     entry: {
@@ -76,9 +84,7 @@ webpackConfig = {
     },
     resolve: {
         extensions: ['.js', '.vue'],
-        alias: {
-            'vue': 'vue/dist/vue.esm.js',
-        },
+        alias: aliases,
         modules: [
             src,
             path.resolve(__dirname, 'node_modules'),
@@ -133,7 +139,7 @@ webpackConfig = {
     },
 };
 
-if (process.env.NODE_ENV === 'test') {
+if (IS_TEST) {
     webpackConfig.externals = [nodeExternals({
         whitelist: [/\.css/],
     })];
