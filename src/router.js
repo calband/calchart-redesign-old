@@ -10,6 +10,8 @@ import { getStore } from 'store';
 import Show from 'calchart/Show';
 import Home from 'home/App';
 import Editor from 'editor/App';
+import CreateShow from 'editor/CreateShow';
+import EditShow from 'editor/EditShow';
 import sendAction, { handleError } from 'utils/ajax';
 
 /**
@@ -34,7 +36,7 @@ export default function initRouter(Vue) {
                 name: 'create-show',
                 component: Editor,
                 props: {
-                    create: true,
+                    component: CreateShow,
                 },
             },
             {
@@ -42,7 +44,7 @@ export default function initRouter(Vue) {
                 name: 'editor',
                 component: Editor,
                 props: {
-                    create: false,
+                    component: EditShow,
                 },
             },
             // {
