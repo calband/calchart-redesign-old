@@ -1,21 +1,19 @@
 /**
- * @file Defines the class that tracks undo/redo history in the editor.
+ * @file Defines the class that tracks undo/redo history in a store.
  */
 
 import { capitalize, cloneDeep, lowerCase } from 'lodash';
 
-class BaseHistory {
+export default class History {
     /**
-     * Initialize the history in a store.
-     *
      * @param {Store} store
      */
-    init(store) {
+    constructor(store) {
         this._store = store;
         this._history = [];
         this._index = -1;
 
-        this.addState(store.rootState);
+        this.addState('', store.rootState);
     }
 
     /**
@@ -37,14 +35,14 @@ class BaseHistory {
      */
     get undoLabel() {
         if (this.hasUndo) {
-            return this._history[this._index - 1].label;
+            return this._history[this._index].label;
         } else {
             return '';
         }
     }
 
     /**
-     * @return {string} the label of the most recent undone action.
+     * @return {string} the label of the most recently undone action.
      */
     get redoLabel() {
         if (this.hasRedo) {
@@ -57,29 +55,18 @@ class BaseHistory {
     /**
      * Add a state to the history.
      *
-     * @param {string} name - The name of the action
+     * @param {string} label
      * @param {Object} state
      */
-    addState(action, state) {
+    addState(label, state) {
         if (this.hasRedo) {
             this._history.splice(this._index + 1);
         }
         this._history.push({
-            label: capitalize(lowerCase(action)),
+            label: capitalize(lowerCase(label)),
             state: cloneDeep(state),
         });
         this._index++;
-    }
-
-    /**
-     * Get a state from history to replace the current state.
-     *
-     * @param {number} index
-     */
-    getState(index) {
-        let state = this._history[index];
-        state.state = cloneDeep(state.state);
-        return state;
     }
 
     /**
@@ -87,7 +74,7 @@ class BaseHistory {
      */
     undo() {
         if (this.hasUndo) {
-            let prevState = this.getState(this._index - 1);
+            let prevState = this._getState(this._index - 1);
             this._store.replaceState(prevState.state);
             this._index--;
         }
@@ -98,11 +85,20 @@ class BaseHistory {
      */
     redo() {
         if (this.hasRedo) {
-            let nextState = this.getState(this._index + 1);
+            let nextState = this._getState(this._index + 1);
             this._store.replaceState(nextState.state);
             this._index++;
         }
     }
-}
 
-export default new BaseHistory();
+    /**
+     * Get a state from history to replace the current state.
+     *
+     * @param {number} index
+     */
+    _getState(index) {
+        let state = this._history[index];
+        state.state = cloneDeep(state.state);
+        return state;
+    }
+}
