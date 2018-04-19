@@ -22,6 +22,7 @@ export default {
     props: {
         component: {
             // The component to render
+            type: null,
             required: true,
         },
     },
@@ -30,7 +31,7 @@ export default {
          * @return {boolean} Whether a show is loaded.
          */
         hasShow() {
-            return isNull(this.show);
+            return !isNull(this.show);
         },
         /**
          * @return {string} The path to the highstepper icon.
