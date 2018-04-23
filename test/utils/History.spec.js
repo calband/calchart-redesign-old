@@ -22,7 +22,8 @@ function newStore() {
 
 describe('History', () => {
     it('initializes', () => {
-        let history = new History(newStore());
+        let store = newStore();
+        let history = new History(store, store.state);
         expect(history.hasUndo).toBe(false);
         expect(history.hasRedo).toBe(false);
         expect(history.undoLabel).toBe('');
@@ -31,24 +32,64 @@ describe('History', () => {
         expect(() => history.redo()).not.toThrow();
     });
 
-    it('undoes', () => {
+    it('can undo and redo', () => {
         let store = newStore();
-        let history = new History(store);
+        let history = new History(store, store.state);
+        expect(store.state.foo).toBe(1);
         store.commit('setFoo', 2);
 
         // hasn't committed to history yet
         expect(store.state.foo).toBe(2);
         expect(history.hasUndo).toBe(false);
 
-        history.addState('Increment foo', store.state);
+        let label = 'Increment foo';
+
+        history.addState(label, store.state);
         expect(history.hasUndo).toBe(true);
         expect(history.hasRedo).toBe(false);
-        expect(history.undoLabel).toBe('Increment foo');
+        expect(history.undoLabel).toBe(label);
         expect(history.redoLabel).toBe('');
 
-        // TODO: undo has redo
+        history.undo();
+        expect(history.hasUndo).toBe(false);
+        expect(history.hasRedo).toBe(true);
+        expect(history.undoLabel).toBe('');
+        expect(history.redoLabel).toBe(label);
+        expect(store.state.foo).toBe(1);
+
+        history.redo();
+        expect(history.hasUndo).toBe(true);
+        expect(history.hasRedo).toBe(false);
+        expect(history.undoLabel).toBe(label);
+        expect(history.redoLabel).toBe('');
+        expect(store.state.foo).toBe(2);
     });
 
-    // TODO: test redo
-    // TODO: test action after redo clears redo
+    it('clears redo after undo-do', () => {
+        let store = newStore();
+        let history = new History(store, store.state);
+
+        store.commit('setFoo', 2);
+        history.addState('First', store.state);
+        expect(store.state.foo).toBe(2);
+        expect(history.undoLabel).toBe('First');
+        expect(history.redoLabel).toBe('');
+
+        history.undo();
+        expect(store.state.foo).toBe(1);
+        expect(history.undoLabel).toBe('');
+        expect(history.redoLabel).toBe('First');
+
+        store.commit('setFoo', 3);
+        history.addState('Second', store.state);
+        expect(store.state.foo).toBe(3);
+        expect(history.undoLabel).toBe('Second');
+        expect(history.redoLabel).toBe('');
+
+        history.undo();
+        // TODO: fix
+        expect(store.state.foo).toBe(1);
+        expect(history.undoLabel).toBe('');
+        expect(history.redoLabel).toBe('Second');
+    });
 });

@@ -7,13 +7,14 @@ import { capitalize, cloneDeep, lowerCase } from 'lodash';
 export default class History {
     /**
      * @param {Store} store
+     * @param {Object} initialState
      */
-    constructor(store) {
+    constructor(store, initialState) {
         this._store = store;
         this._history = [];
         this._index = -1;
 
-        this.addState('', store.rootState);
+        this.addState('', initialState);
     }
 
     /**
@@ -75,7 +76,7 @@ export default class History {
     undo() {
         if (this.hasUndo) {
             let prevState = this._getState(this._index - 1);
-            this._store.replaceState(prevState.state);
+            this._store.replaceState(prevState);
             this._index--;
         }
     }
@@ -86,7 +87,7 @@ export default class History {
     redo() {
         if (this.hasRedo) {
             let nextState = this._getState(this._index + 1);
-            this._store.replaceState(nextState.state);
+            this._store.replaceState(nextState);
             this._index++;
         }
     }
@@ -95,10 +96,9 @@ export default class History {
      * Get a state from history to replace the current state.
      *
      * @param {number} index
+     * @return {Object}
      */
     _getState(index) {
-        let state = this._history[index];
-        state.state = cloneDeep(state.state);
-        return state;
+        return cloneDeep(this._history[index].state);
     }
 }
