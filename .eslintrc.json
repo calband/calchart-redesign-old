@@ -37,8 +37,10 @@
         "vue/html-indent": ["error", 4],
         "vue/html-quotes": "error",
         "vue/html-self-closing": "error",
+        // if it fits within max-len, it's fine, but if it's multiline,
+        // check that it's max one per line.
         "vue/max-attributes-per-line": ["error", {
-            "singleline": 2
+            "singleline": 1000
         }],
         "vue/no-async-in-computed-properties": "error",
         "vue/no-dupe-keys": "error",
