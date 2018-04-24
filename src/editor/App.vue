@@ -8,7 +8,10 @@ The entry point for the editor page.
             <router-link class="icon-link" to="/">
                 <img :src="iconPath">
             </router-link>
-            <h1 v-if="hasShow">{{ show.name }}</h1>
+            <template v-if="hasShow">
+                <h1>{{ show.name }}</h1>
+                <EditorMenu />
+            </template>
         </div>
         <component :is="component" />
     </div>
@@ -16,6 +19,8 @@ The entry point for the editor page.
 
 <script>
 import { isNull } from 'lodash';
+
+import EditorMenu from 'editor/menu/EditorMenu';
 
 export default {
     name: 'Editor',
@@ -26,6 +31,7 @@ export default {
             required: true,
         },
     },
+    components: { EditorMenu },
     computed: {
         /**
          * @return {boolean} Whether a show is loaded.
@@ -60,6 +66,7 @@ export default {
     .icon-link {
         display: inline-block;
         margin-right: 15px;
+        vertical-align: middle;
         img {
             height: $header-font-size * 1.25;
         }
