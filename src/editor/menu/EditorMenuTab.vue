@@ -4,9 +4,9 @@ A menu tab in the Editor menu.
 
 <template>
     <div
+        :class="['menu-tab', { active }]"
         @mousedown.stop="$emit('mousedown', $event)"
         @mouseover="$emit('mouseover')"
-        :class="['menu-tab', { active }]"
     >
         <span>{{ label }}</span>
         <EditorSubMenu ref="submenu">

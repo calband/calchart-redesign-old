@@ -50,7 +50,7 @@ describe('parseAction', () => {
     it('parses a name and a JSON string arg', () => {
         expect(parseAction('foo("bar")')).toEqual({
             name: 'foo',
-            data: "bar",
+            data: 'bar',
         });
     });
 

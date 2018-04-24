@@ -1,8 +1,6 @@
 /**
  * @file Tests the History class.
  */
-
-import { createLocalVue } from '@vue/test-utils';
 import Vuex from 'vuex';
 
 import History from 'utils/History';
