@@ -8,7 +8,7 @@ The top menu in the editor application.
             <EditorMenuItem
                 label="Save"
                 action="saveShow"
-                icon="floppy-o"
+                icon="save"
             />
         </EditorMenuTab>
         <EditorMenuTab label="Edit">
@@ -22,7 +22,7 @@ The top menu in the editor application.
                 :label="`Redo ${redoLabel}`"
                 :disabled="!hasRedo"
                 action="redo"
-                icon="repeat"
+                icon="redo"
             />
         </EditorMenuTab>
     </div>

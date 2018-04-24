@@ -8,7 +8,7 @@ A menu item in the Editor menu.
         @click="doAction"
         @mouseover="$emit('mouseover')"
     >
-        <i v-if="icon" :class="`icon icon-${icon}`" />
+        <i v-if="icon" class="icon" :data-icon="icon" />
         <span>{{ label }}</span>
         <!-- TODO: hint -->
         <EditorSubMenu
