@@ -8,13 +8,10 @@ A menu item in the Editor menu.
         @click="doAction"
         @mouseover="$emit('mouseover')"
     >
-        <i v-if="icon" class="icon" :data-icon="icon" />
+        <i v-if="icon" :data-icon="icon" class="icon" />
         <span>{{ label }}</span>
         <!-- TODO: hint -->
-        <EditorSubMenu
-            v-if="hasSubmenu"
-            ref="submenu"
-        >
+        <EditorSubMenu v-if="hasSubmenu" ref="submenu">
             <slot />
         </EditorSubMenu>
     </div>
