@@ -1,13 +1,16 @@
-import makeEnum from 'utils/enum';
-
 /**
- * An Enum containing all the possible ways to display a dot in a Grapher.
+ * @file Defines the DotDisplay enum.
+ *
+ * The enum contains all the possible ways to display a dot in a Grapher.
  */
-export default class DotDisplay {
+
+import Enum from 'utils/Enum';
+
+export default class DotDisplay extends Enum {
 }
 
-makeEnum(DotDisplay, [
-    'normal',
+DotDisplay.initEnum([
+    'plain',
     'orientation',
     'dot-type',
 ]);

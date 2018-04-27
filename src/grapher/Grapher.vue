@@ -1,34 +1,30 @@
 <doc>
-The component that can draw a field and dots based on the state of a Sheet.
+The component that can draw a field and dots on the field.
 </doc>
 
 <template>
     <div :class="['grapher-container', { fill }]">
-        <svg
-            v-if="sheet"
-            :width="svgWidth"
-            :height="svgHeight"
-        >
+        <svg :width="svgWidth" :height="svgHeight">
             <component
                 :is="fieldGrapher"
                 :scale="scale"
                 v-bind="$attrs"
             />
-            <g class="dots">
+            <g v-if="formation" class="dots">
                 <GrapherDot
-                    v-for="dot in sheet.show.getDots()"
+                    v-for="dot in formation.dots"
                     :key="dot.id"
                     :dotRadius="dotRadius"
-                    :dotType="sheet.getDotInfo(dot).type"
+                    :dotType="getDotType(dot)"
                     :position="getPosition(dot)"
                     :scale="scale"
                     v-bind="$attrs"
                 />
             </g>
             <!-- separate to keep labels in another layer -->
-            <g class="dot-labels">
+            <g v-if="formation" class="dot-labels">
                 <GrapherDotLabel
-                    v-for="dot in sheet.show.getDots()"
+                    v-for="dot in formation.dots"
                     :key="dot.id"
                     :dotRadius="dotRadius"
                     :position="getPosition(dot)"
@@ -42,9 +38,12 @@ The component that can draw a field and dots based on the state of a Sheet.
 </template>
 
 <script>
-import { BaseFieldType } from 'calchart/FieldType';
+import { isUndefined } from 'lodash';
+
+import FieldType from 'calchart/FieldType';
+import Flow from 'calchart/Flow';
+import Formation from 'calchart/Formation';
 import { PixelCoordinate } from 'calchart/Coordinate';
-import Sheet from 'calchart/Sheet';
 
 import CollegeField from './CollegeField';
 import GrapherDot from './GrapherDot';
@@ -59,15 +58,20 @@ const DOT_RADIUS = 0.75; // in steps
 
 export default {
     props: {
-        sheet: {
-            // The currently active Sheet
-            type: Sheet,
+        fieldType: {
+            // The type of the field to draw
+            type: FieldType,
+            default: () => FieldType.COLLEGE,
+        },
+        flow: {
+            // The flow being edited, if applicable
+            type: Flow,
             default: null,
         },
-        beat: {
-            // The beat to draw on the Sheet
-            type: Number,
-            default: 0,
+        formation: {
+            // The formation being displayed
+            type: Formation,
+            default: null,
         },
 
         // Options to customize aspects of the Grapher
@@ -126,15 +130,9 @@ export default {
          */
         fieldGrapher() {
             switch (this.fieldType) {
-                case BaseFieldType.COLLEGE:
+                case FieldType.COLLEGE:
                     return CollegeField;
             }
-        },
-        /**
-         * @return {BaseFieldType} The field type being drawn for the Sheet.
-         */
-        fieldType() {
-            return this.sheet.getFieldType();
         },
         /**
          * @return {GrapherScale} The scale information of the Grapher.
@@ -168,18 +166,34 @@ export default {
     },
     methods: {
         /**
-         * @param {Dot} dot
-         * @return {PixelCoordinate} The position of the dot in the Sheet.
+         * @param {FormationDot} dot
+         * @return {DotType}
+         */
+        getDotType(dot) {
+            if (this.flow) {
+                return this.flow.dots[dot.id].dotType;
+            }
+        },
+        /**
+         * @param {FormationDot} dot
+         * @return {PixelCoordinate}
          */
         getPosition(dot) {
-            if (this.$el) {
-                // TODO: add beat
-                let info = this.sheet.getDotInfo(dot);
-                return this.scale.toPixels(info.position);
-            } else {
+            if (isUndefined(this.$el)) {
                 // component not mounted yet
                 return new PixelCoordinate(0, 0);
             }
+
+            let position = dot.position;
+            if (this.flow) {
+                let movements = this.flow.dots[dot.id].movements;
+                if (movements.length > 0) {
+                    // TODO: add beats
+                    position = movements[0].getStart();
+                }
+            }
+
+            return this.scale.toPixels(position);
         },
     },
 };
