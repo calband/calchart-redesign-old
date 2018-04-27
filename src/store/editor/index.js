@@ -8,6 +8,7 @@
 
 import { has, isString } from 'lodash';
 
+import ContextType from 'editor/ContextType';
 import parseAction from 'utils/actions';
 import History from 'utils/History';
 
@@ -33,11 +34,19 @@ export default {
         history = new History(store, store.rootState);
     },
     state: {
+        // The currently active context
+        context: ContextType.FORMATION,
     },
-    // mutations: {
-    //     ...editorMutations,
-    //     ...historyMutations,
-    // },
+    mutations: {
+        /**
+         * @param {ContextType} context
+         */
+        setContext(state, context) {
+            state.context = context;
+        },
+        // ...editorMutations,
+        // ...historyMutations,
+    },
     actions: {
         /**
          * Do the given action, which is either a String that contains the

@@ -13,7 +13,7 @@ The entry point for the editor page.
                 <EditorMenu />
             </template>
         </div>
-        <component :is="component" />
+        <component :is="component" class="editor-component" />
     </div>
 </template>
 
@@ -59,9 +59,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+$header-font-size: 24px;
+$header-height: 40px;
+
 .editor-header {
-    $header-font-size: 24px;
     padding: 5px 10px;
+    height: $header-height;
     background: $light-gray;
     .icon-link {
         display: inline-block;
@@ -77,5 +80,9 @@ export default {
         font-size: $header-font-size;
         vertical-align: bottom;
     }
+}
+
+.editor-component {
+    height: calc(100% - #{$header-height});
 }
 </style>
