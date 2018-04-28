@@ -31,6 +31,8 @@ The component that can draw a Dot within a Grapher.
 </template>
 
 <script>
+import { extend } from 'lodash';
+
 import { PixelCoordinate } from 'calchart/Coordinate';
 import { CardinalDirection } from 'calchart/Direction';
 import DotType from 'calchart/DotType';
@@ -50,9 +52,9 @@ export default {
             required: true,
         },
         dotType: {
-            // The dot type of the Dot in the Sheet.
+            // The dot type of the Dot.
             type: DotType,
-            required: true,
+            default: null,
         },
         position: {
             // The position of the Dot to draw.
@@ -65,7 +67,7 @@ export default {
         format: {
             // The way to display a dot.
             type: DotDisplay,
-            default: () => DotDisplay.NORMAL,
+            default: () => DotDisplay.PLAIN,
         },
     },
     computed: {
@@ -102,15 +104,15 @@ export default {
          */
         slashInfo() {
             if (this.format === DotDisplay.DOT_TYPE) {
+                let dotSlashes = DotType.getSlashes(this.dotType);
+                return extend({}, dotSlashes, {
+                    start: -1.1 * this.dotRadius,
+                    end: 1.1 * this.dotRadius,
+                });
+            } else {
                 return {
                     forward: false,
                     back: false,
-                };
-            } else {
-                return {
-                    ...DotType.getSlashes(this.dotType),
-                    start: -1.1 * this.dotRadius,
-                    end: 1.1 * this.dotRadius,
                 };
             }
         },
@@ -144,7 +146,7 @@ circle.dot-marker {
         fill: $highlight-purple;
     }
     &.color-red {
-        fill: $collision;
+        fill: $red;
     }
 }
 </style>

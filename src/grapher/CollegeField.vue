@@ -196,29 +196,33 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+$line-color: $black;
+$stroke-width: 3px;
+
 .field-background {
     fill: $field-green;
 }
 .field-border {
     fill: none;
-    stroke: $white;
+    stroke: $line-color;
     &.bold {
-        stroke-width: 2px;
+        stroke-width: $stroke-width;
     }
 }
 .yardline {
-    stroke: $white;
-    stroke-width: 2px;
+    stroke: $line-color;
+    stroke-width: $stroke-width;
 }
 .yardline-label {
-    fill: $white;
+    fill: $line-color;
 }
 .hash {
-    stroke: $white;
-    stroke-width: 2px;
+    stroke: $line-color;
+    stroke-width: $stroke-width;
 }
 .four-step {
-    stroke: $white;
-    stroke-dasharray: 5;
+    stroke: $line-color;
+    stroke-dasharray: 12;
+    stroke-width: $stroke-width / 2;
 }
 </style>
