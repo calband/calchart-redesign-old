@@ -25,46 +25,53 @@ import FieldType from 'calchart/FieldType';
 import Orientation from 'calchart/Orientation';
 import Show from 'calchart/Show';
 import StepType from 'calchart/StepType';
+import { extractInitial } from 'forms/fields';
 import { positive } from 'forms/validators';
 import sendAction from 'utils/ajax';
 
+/**
+ * @param {boolean} isStunt
+ * @return {Object[]} The formly field definitions for the form.
+ */
+function getFields(isStunt) {
+    return [
+        {
+            key: 'name',
+            initial: '',
+            type: 'text',
+            required: true,
+        },
+        {
+            key: 'isBand',
+            initial: isStunt,
+            type: 'checkbox',
+            display: () => isStunt,
+            templateOptions: {
+                label: 'For Cal Band',
+            },
+        },
+        {
+            key: 'numDots',
+            initial: '',
+            type: 'number',
+            required: true,
+            validators: {
+                positive,
+            },
+            templateOptions: {
+                label: 'How many dots in the show?',
+            },
+        },
+    ];
+}
+
 export default {
     data() {
-        const IS_STUNT = this.$store.state.env.isStunt;
+        let fields = getFields(this.$store.state.env.isStunt);
         return {
             form: {},
-            model: {
-                name: '',
-                isBand: IS_STUNT,
-                numDots: '',
-                // TODO: add rest of form
-            },
-            fields: [
-                {
-                    key: 'name',
-                    type: 'text',
-                    required: true,
-                },
-                {
-                    key: 'isBand',
-                    type: 'checkbox',
-                    display: () => IS_STUNT,
-                    templateOptions: {
-                        label: 'For Cal Band',
-                    },
-                },
-                {
-                    key: 'numDots',
-                    type: 'number',
-                    required: true,
-                    validators: {
-                        positive,
-                    },
-                    templateOptions: {
-                        label: 'How many dots in the show?',
-                    },
-                },
-            ],
+            model: extractInitial(fields),
+            fields,
         };
     },
     methods: {
