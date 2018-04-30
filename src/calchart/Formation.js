@@ -32,6 +32,7 @@ export default class Formation extends Serializable {
     /**
      * @param {Object} data
      *  | {string} id
+     *  | {string} name
      *  | {FormationDot[]} dots
      *  | {Flow[]} flows
      *  | {?Object<FormationDot: FormationDot>} nextDots
@@ -44,6 +45,7 @@ export default class Formation extends Serializable {
     constructor(data) {
         super(data, {
             id: 'string',
+            name: 'string',
             dots: {
                 _type: 'array',
                 _wraps: FormationDot,
