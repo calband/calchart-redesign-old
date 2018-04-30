@@ -16,6 +16,8 @@ The base component for a generic popup.
 <script>
 import $ from 'jquery';
 
+import { getStore } from 'store';
+
 export default {
     props: {
         allowHide: {
@@ -43,6 +45,14 @@ export default {
             if (this.allowHide) {
                 this.hide();
             }
+        },
+    },
+    computed: {
+        /**
+         * @return {Store}
+         */
+        store() {
+            return getStore();
         },
     },
 };

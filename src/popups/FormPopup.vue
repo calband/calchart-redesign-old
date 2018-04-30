@@ -30,8 +30,6 @@ A popup that contains a form to be submitted or modified.
 <script>
 import { fromPairs, toPairs } from 'lodash';
 
-import store from 'store';
-
 import BasePopup from './BasePopup';
 
 export default {
@@ -86,8 +84,7 @@ export default {
                     }
                 })
                 .catch(e => {
-                    // BUG: closing error message should not close popup
-                    store.dispatch('messages/showError', e.message);
+                    this.store.dispatch('messages/showError', e.message);
                 });
         },
     },

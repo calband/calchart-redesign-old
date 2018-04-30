@@ -5,14 +5,22 @@ The sidebar containing a list of formations for the editor.
 <template>
     <div>
         <div class="scrollable">
-            TODO
+            <div v-for="formation in formations" class="formation">
+                <span>{{ formation.name }}</span>
+                <Grapher />
+            </div>
         </div>
-        <button :click="null" class="add-formation">Add</button>
+        <button
+            @click="showPopup(AddFormationPopup)"
+            class="add-formation"
+        >Add</button>
     </div>
 </template>
 
 <script>
 import Formation from 'calchart/Formation';
+import Grapher from 'grapher/Grapher';
+import AddFormationPopup from 'popups/AddFormationPopup';
 import { validateType } from 'utils/types';
 
 export default {
@@ -26,6 +34,12 @@ export default {
                 _wraps: Formation,
             }),
         },
+    },
+    components: {
+        Grapher,
+    },
+    constants: {
+        AddFormationPopup,
     },
 };
 </script>
