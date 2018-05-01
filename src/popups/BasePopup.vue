@@ -4,8 +4,8 @@ The base component for a generic popup.
 
 <template>
     <div
-        @click.self="clickOff"
         class="popup-wrapper"
+        @click.self="clickOff"
     >
         <div class="popup">
             <slot />
@@ -24,6 +24,14 @@ export default {
             // Allow user to hide the popup without submitting
             type: Boolean,
             default: true,
+        },
+    },
+    computed: {
+        /**
+         * @return {Store}
+         */
+        store() {
+            return getStore();
         },
     },
     methods: {
@@ -45,14 +53,6 @@ export default {
             if (this.allowHide) {
                 this.hide();
             }
-        },
-    },
-    computed: {
-        /**
-         * @return {Store}
-         */
-        store() {
-            return getStore();
         },
     },
 };

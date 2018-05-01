@@ -38,7 +38,7 @@ The component that can draw a field and dots on the field.
 </template>
 
 <script>
-import { isNull, isUndefined } from 'lodash';
+import { isUndefined } from 'lodash';
 
 import FieldType from 'calchart/FieldType';
 import Flow from 'calchart/Flow';

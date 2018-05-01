@@ -5,21 +5,21 @@ A popup that contains a form to be submitted or modified.
 <template>
     <BasePopup v-bind="$attrs">
         <h1 class="title">{{ title }}</h1>
-        <form @submit.prevent="submit" class="form-popup">
+        <form class="form-popup" @submit.prevent="submit">
             <formly-form
+                ref="form"
                 :fields="fields"
                 :form="form"
                 :model="model"
-                ref="form"
             />
             <div class="buttons">
                 <slot name="buttons">
                     <button>Save</button>
                     <button
                         v-if="allowHide"
-                        @click="hide"
                         class="cancel"
                         type="button"
+                        @click="hide"
                     >Cancel</button>
                 </slot>
             </div>

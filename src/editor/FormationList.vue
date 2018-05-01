@@ -5,15 +5,19 @@ The sidebar containing a list of formations for the editor.
 <template>
     <div>
         <div class="scrollable">
-            <div v-for="formation in formations" class="formation">
+            <div
+                v-for="formation in formations"
+                :key="formation.id"
+                class="formation"
+            >
                 <div class="formation-name">
                     <span>{{ formation.name }}</span>
                     <i :data-icon="getFormationIcon(formation)" />
                 </div>
                 <div class="formation-graph">
                     <Grapher
-                        :drawYardlines="false"
-                        :fieldPadding="15"
+                        :draw-yardlines="false"
+                        :field-padding="15"
                         :fill="true"
                         :formation="formation"
                     />
@@ -21,8 +25,8 @@ The sidebar containing a list of formations for the editor.
             </div>
         </div>
         <button
-            @click="showPopup(AddFormationPopup)"
             class="add-formation"
+            @click="showPopup(AddFormationPopup)"
         >Add</button>
     </div>
 </template>

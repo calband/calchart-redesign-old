@@ -4,16 +4,15 @@ A popup for adding a Formation to a Show.
 
 <template>
     <FormPopup
-        title="Add Formation"
         :on-submit="addFormation"
         :model="model"
         :fields="fields"
+        title="Add Formation"
     />
 </template>
 
 <script>
 import Formation from 'calchart/Formation';
-import { positive } from 'forms/validators';
 
 import BasePopup from './BasePopup';
 import FormPopup from './FormPopup';
