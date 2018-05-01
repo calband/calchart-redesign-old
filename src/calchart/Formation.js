@@ -75,6 +75,9 @@ export default class Formation extends Serializable {
     static create(data) {
         defaults(data, {
             id: uniqueId(),
+            dots: [],
+            flows: [],
+            nextDots: {},
             fieldType: null,
             beatsPerStep: null,
             stepType: null,

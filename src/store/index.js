@@ -28,23 +28,6 @@ export default function initStore(Vue) {
         },
         mutations: {
             /**
-             * Modify the Show with the given arguments.
-             *
-             * Takes in an object in the Show to be updated (defaults to the
-             * Show itself). This target should have been freshly retrieved from
-             * the Show in the store, since `modifyShow` is supposed to actually
-             * change the state, but this is not checked.
-             *
-             * @param {Object}
-             *  | {Any} target
-             *  | {string} func - The function to call on the target.
-             *  | {Array} args - Arguments to pass to the function.
-             */
-            modifyShow(state, { target, func, args }) {
-                target = target || state.show;
-                target[func].apply(target, args);
-            },
-            /**
              * Set the show from the given show data.
              *
              * @param {?Show} show
