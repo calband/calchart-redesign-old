@@ -9,6 +9,7 @@ The sidebar containing a list of formations for the editor.
                 v-for="formation in formations"
                 :key="formation.id"
                 class="formation"
+                data-cy="formation"
             >
                 <div class="formation-name">
                     <span>{{ formation.name }}</span>
@@ -26,6 +27,7 @@ The sidebar containing a list of formations for the editor.
         </div>
         <button
             class="add-formation"
+            data-cy="add-formation"
             @click="showPopup(AddFormationPopup)"
         >Add</button>
     </div>

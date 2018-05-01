@@ -14,7 +14,7 @@ A popup that contains a form to be submitted or modified.
             />
             <div class="buttons">
                 <slot name="buttons">
-                    <button>Save</button>
+                    <button data-cy="popup-submit">Save</button>
                     <button
                         v-if="allowHide"
                         class="cancel"
