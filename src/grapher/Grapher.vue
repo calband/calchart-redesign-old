@@ -38,7 +38,7 @@ The component that can draw a field and dots on the field.
 </template>
 
 <script>
-import { isUndefined } from 'lodash';
+import { isNull, isUndefined } from 'lodash';
 
 import FieldType from 'calchart/FieldType';
 import Flow from 'calchart/Flow';
@@ -58,11 +58,6 @@ const DOT_RADIUS = 0.75; // in steps
 
 export default {
     props: {
-        fieldType: {
-            // The type of the field to draw
-            type: FieldType,
-            default: () => FieldType.COLLEGE,
-        },
         flow: {
             // The flow being edited, if applicable
             type: Flow,
@@ -132,6 +127,19 @@ export default {
             switch (this.fieldType) {
                 case FieldType.COLLEGE:
                     return CollegeField;
+            }
+        },
+        /**
+         * @return {FieldType} The field type to display.
+         */
+        fieldType() {
+            let show = this.$store.state.show;
+            if (this.flow) {
+                return this.flow.getFieldType(show, this.formation);
+            } else if (this.formation) {
+                return this.formation.getFieldType(show);
+            } else {
+                return FieldType.COLLEGE;
             }
         },
         /**
