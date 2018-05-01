@@ -88,6 +88,6 @@ export default {
             history.undo();
         },
         ...editorActions,
-        // ...historyActions,
+        ...historyActions,
     },
 };

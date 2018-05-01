@@ -4,13 +4,12 @@ The page that lets the user edit a show in the editor.
 
 <template>
     <div>
-        <div
+        <FormationList
             v-if="isFormationContext"
+            :formations="show.formations"
             :style="{ width: leftSidebarWidth }"
             class="formation-list"
-        >
-            TODO: Formations
-        </div>
+        />
         <div :style="{ width: workspaceWidth }" class="workspace">
             <Grapher
                 :draw-four-step="true"
@@ -24,12 +23,16 @@ The page that lets the user edit a show in the editor.
 </template>
 
 <script>
+import { mapState } from 'vuex';
+
 import Grapher from 'grapher/Grapher';
 
 import ContextType from './ContextType';
+import FormationList from './FormationList';
 
 export default {
     components: {
+        FormationList,
         Grapher,
     },
     data() {
@@ -68,13 +71,13 @@ export default {
             }
             return this.contentWidth - sides;
         },
+        ...mapState(['show']),
     },
 };
 </script>
 
 <style lang="scss" scoped>
 $formation-list-width: 200px;
-$toolbar-height: 50px;
 
 .formation-list {
     display: inline-block;

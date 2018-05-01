@@ -4,6 +4,7 @@
  * to the URL goes to the proper place.
  */
 
+import $ from 'jquery';
 import VueRouter from 'vue-router';
 
 import { getStore } from 'store';
@@ -61,6 +62,12 @@ export default function initRouter(Vue) {
     });
 
     router.beforeEach((to, from, next) => {
+        // close any open popups
+        $('.popup-wrapper').each(function() {
+            this.__vue__.hide();
+        });
+
+        // get show for slug
         let slug = to.params.slug;
         if (slug) {
             sendAction('get_show', { slug }, {

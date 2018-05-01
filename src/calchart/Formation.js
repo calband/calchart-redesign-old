@@ -10,14 +10,14 @@
  * For example, a face might be a Formation, where you have flows that animate
  * the face from smiling to frowning. Since you care about the movements of the
  * dots (e.g. dots in the mouth should stay in the mouth), that would be within
- * one Formmation.
+ * one Formation.
  *
  * On the other hand, if the next Formation is a couple stars on the field and
  * you don't care how the dots move from the previous formation, this is a
  * separate Formation.
  */
 
-import { defaults } from 'lodash';
+import { defaults, defaultTo } from 'lodash';
 
 import { uniqueId } from 'utils/JSUtils';
 import Serializable from 'utils/Serializable';
@@ -32,6 +32,7 @@ export default class Formation extends Serializable {
     /**
      * @param {Object} data
      *  | {string} id
+     *  | {string} name
      *  | {FormationDot[]} dots
      *  | {Flow[]} flows
      *  | {?Object<FormationDot: FormationDot>} nextDots
@@ -44,6 +45,7 @@ export default class Formation extends Serializable {
     constructor(data) {
         super(data, {
             id: 'string',
+            name: 'string',
             dots: {
                 _type: 'array',
                 _wraps: FormationDot,
@@ -73,6 +75,9 @@ export default class Formation extends Serializable {
     static create(data) {
         defaults(data, {
             id: uniqueId(),
+            dots: [],
+            flows: [],
+            nextDots: {},
             fieldType: null,
             beatsPerStep: null,
             stepType: null,
@@ -80,5 +85,13 @@ export default class Formation extends Serializable {
         });
 
         return new this(data);
+    }
+
+    /**
+     * @param {Show} show
+     * @return {FieldType} The field type, or the Show's field type if null.
+     */
+    getFieldType(show) {
+        return defaultTo(this.fieldType, show.fieldType);
     }
 }

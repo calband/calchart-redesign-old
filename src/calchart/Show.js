@@ -125,4 +125,13 @@ export default class Show extends Serializable {
 
         return new this(data);
     }
+
+    /**
+     * Add a Formation to the Show.
+     *
+     * @param {Formation} formation
+     */
+    addFormation(formation) {
+        this._formations.push(formation);
+    }
 }
