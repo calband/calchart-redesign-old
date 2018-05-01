@@ -42,12 +42,9 @@ export default {
          */
         addFormation(data) {
             let formation = Formation.create(data);
-            this.store.dispatch('editor/doAction', {
-                name: 'modifyShow',
-                data: {
-                    func: 'addFormation',
-                    args: [formation],
-                },
+            this.store.dispatch('editor/modifyShow', {
+                func: 'addFormation',
+                args: [formation],
             });
         },
     },

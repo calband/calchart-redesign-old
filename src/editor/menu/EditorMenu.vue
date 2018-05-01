@@ -13,14 +13,14 @@ The top menu in the editor application.
         </EditorMenuTab>
         <EditorMenuTab label="Edit">
             <EditorMenuItem
-                :label="`Undo ${undoLabel}`"
-                :disabled="!hasUndo"
+                :label="`Undo ${history.undoLabel}`"
+                :disabled="!history.hasUndo"
                 action="undo"
                 icon="undo"
             />
             <EditorMenuItem
-                :label="`Redo ${redoLabel}`"
-                :disabled="!hasRedo"
+                :label="`Redo ${history.redoLabel}`"
+                :disabled="!history.hasRedo"
                 action="redo"
                 icon="redo"
             />
@@ -30,7 +30,7 @@ The top menu in the editor application.
 
 <script>
 import $ from 'jquery';
-import { isNull } from 'lodash';
+import { includes, isNull } from 'lodash';
 
 import { getHistory } from 'store/editor';
 
@@ -55,6 +55,19 @@ export default {
             activeTab: null,
         };
     },
+    created() {
+        // force re-render for History
+        let historyActions = [
+            'editor/modifyShow',
+            'editor/undo',
+            'editor/redo',
+        ];
+        this.$store.subscribeAction(action => {
+            if (includes(historyActions, action.type)) {
+                this.$forceUpdate();
+            }
+        });
+    },
     mounted() {
         $('body').append(this.$refs.background);
 
@@ -75,28 +88,10 @@ export default {
     },
     computed: {
         /**
-         * @return {Boolean} true if the history has a redo action.
+         * @return {History}
          */
-        hasRedo() {
-            return getHistory().hasRedo;
-        },
-        /**
-         * @return {Boolean} true if the history has an undo action.
-         */
-        hasUndo() {
-            return getHistory().hasUndo;
-        },
-        /**
-         * @return {String} The label for the redo action.
-         */
-        redoLabel() {
-            return getHistory().redoLabel;
-        },
-        /**
-         * @return {String} The label for the undo action.
-         */
-        undoLabel() {
-            return getHistory().undoLabel;
+        history() {
+            return getHistory();
         },
     },
     methods: {

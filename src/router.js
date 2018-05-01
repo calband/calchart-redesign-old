@@ -72,7 +72,9 @@ export default function initRouter(Vue) {
         if (slug) {
             sendAction('get_show', { slug }, {
                 success: data => {
-                    getStore().commit('setShow', Show.deserialize(data));
+                    let store = getStore();
+                    store.commit('setShow', Show.deserialize(data));
+                    store.dispatch('editor/resetHistory');
                     next();
                 },
                 error: xhr => {
