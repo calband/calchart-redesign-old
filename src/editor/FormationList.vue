@@ -15,12 +15,13 @@ The sidebar containing a list of formations for the editor.
                     <span>{{ formation.name }}</span>
                     <i :data-icon="getFormationIcon(formation)" />
                 </div>
-                <div class="formation-graph">
+                <div :class="['formation-graph', getActive(formation)]">
                     <Grapher
                         :draw-yardlines="false"
                         :field-padding="15"
                         :fill="true"
                         :formation="formation"
+                        @click-graph="chooseFormation(formation)"
                     />
                 </div>
             </div>
@@ -57,7 +58,31 @@ export default {
     constants: {
         AddFormationPopup,
     },
+    created() {
+        if (this.formations.length > 0) {
+            this.chooseFormation(this.formations[0]);
+        }
+    },
     methods: {
+        /**
+         * Make the given Formation active.
+         *
+         * @param {Formation} formation
+         */
+        chooseFormation(formation) {
+            this.$store.commit('editor/setFormation', formation);
+        },
+        /**
+         * Get an object containing the `active` class.
+         *
+         * @param {Formation} formation
+         * @return {object}
+         */
+        getActive(formation) {
+            return {
+                active: formation === this.$store.state.editor.formation,
+            };
+        },
         /**
          * Get the icon for the given Formation that indicates its dot count.
          *
@@ -76,6 +101,12 @@ export default {
 .scrollable {
     height: calc(100% - #{$toolbar-height});
     padding: 10px;
+    .formation {
+        margin-bottom: 10px;
+        &:last-child {
+            margin-bottom: 0;
+        }
+    }
     .formation-name {
         margin-bottom: 5px;
         font-size: $font-size * 1.1;
@@ -93,6 +124,10 @@ export default {
     .formation-graph {
         width: 100%;
         height: 120px;
+        border: 3px solid $blue;
+        &.active {
+            border-color: $gold;
+        }
     }
 }
 

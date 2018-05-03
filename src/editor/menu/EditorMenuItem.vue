@@ -5,7 +5,7 @@ A menu item in the Editor menu.
 <template>
     <div
         :class="['menu-item', itemClasses]"
-        @click="doAction"
+        @click="doVuex"
         @mouseover="$emit('mouseover')"
     >
         <i v-if="icon" :data-icon="icon" class="icon" />
@@ -30,9 +30,24 @@ export default {
             type: String,
             required: true,
         },
-        action: {
-            // See editor/actions.js
+        mutation: {
+            // A Vuex mutation to run when clicked
             type: String,
+            default: null,
+        },
+        mutationArgs: {
+            // Any argument(s) to pass to the Vuex mutation
+            type: null,
+            default: null,
+        },
+        action: {
+            // A Vuex action to run when clicked
+            type: String,
+            default: null,
+        },
+        actionArgs: {
+            // Any argument(s) to pass to the Vuex action
+            type: null,
             default: null,
         },
         icon: {
@@ -102,11 +117,19 @@ export default {
             }
         },
         /**
-         * Do the action for the menu item.
+         * Do the Vuex mutation/action for the menu item.
          */
-        doAction() {
-            if (!this.isDisabled && this.action) {
-                this.$store.dispatch('editor/doAction', this.action);
+        doVuex() {
+            if (!this.isDisabled) {
+                if (this.mutation) {
+                    this.$store.commit(
+                        `editor/${this.mutation}`, this.mutationArgs
+                    );
+                } else if (this.action) {
+                    this.$store.dispatch(
+                        `editor/${this.action}`, this.actionArgs
+                    );
+                }
             }
         },
     },

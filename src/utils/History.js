@@ -6,11 +6,9 @@ import { capitalize, cloneDeep, lowerCase } from 'lodash';
 
 export default class History {
     /**
-     * @param {Store} store
      * @param {Object} initialState
      */
-    constructor(store, initialState) {
-        this._store = store;
+    constructor(initialState) {
         this._history = [];
         this._index = -1;
 
@@ -72,23 +70,25 @@ export default class History {
 
     /**
      * Undo the latest action.
+     *
+     * @return {object}
      */
     undo() {
         if (this.hasUndo) {
-            let prevState = this._getState(this._index - 1);
-            this._store.replaceState(prevState);
             this._index--;
+            return this._getState(this._index);
         }
     }
 
     /**
      * Redo the latest undone action.
+     *
+     * @return {object}
      */
     redo() {
         if (this.hasRedo) {
-            let nextState = this._getState(this._index + 1);
-            this._store.replaceState(nextState);
             this._index++;
+            return this._getState(this._index);
         }
     }
 

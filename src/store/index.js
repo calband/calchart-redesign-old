@@ -19,9 +19,6 @@ let STORE = null;
 export default function initStore(Vue) {
     Vue.use(Vuex);
     STORE = new Vuex.Store({
-        plugins: [
-            store => editor.$init(store),
-        ],
         state: {
             // the Show loaded in the current page (or null if none loaded)
             show: null,
