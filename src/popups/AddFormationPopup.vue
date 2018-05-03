@@ -45,6 +45,8 @@ export default {
             this.store.dispatch('editor/modifyShow', {
                 func: 'addFormation',
                 args: [formation],
+            }).then(() => {
+                this.store.commit('editor/setFormation', formation);
             });
         },
     },

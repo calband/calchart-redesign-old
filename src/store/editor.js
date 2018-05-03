@@ -29,6 +29,8 @@ export default {
     state: {
         // The currently active context
         context: ContextType.FORMATION,
+        // The currently active formation
+        formation: null,
     },
     mutations: {
         /**
@@ -55,6 +57,12 @@ export default {
          */
         setContext(state, context) {
             state.context = context;
+        },
+        /**
+         * @param {Formation} formation
+         */
+        setFormation(state, formation) {
+            state.formation = formation;
         },
     },
     actions: {

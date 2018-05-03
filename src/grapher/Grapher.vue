@@ -4,7 +4,11 @@ The component that can draw a field and dots on the field.
 
 <template>
     <div :class="['grapher-container', { fill }]">
-        <svg :width="svgWidth" :height="svgHeight">
+        <svg
+            :width="svgWidth"
+            :height="svgHeight"
+            @click="$emit('click-graph')"
+        >
             <component
                 :is="fieldGrapher"
                 :scale="scale"

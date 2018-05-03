@@ -15,6 +15,7 @@ The page that lets the user edit a show in the editor.
                 :draw-four-step="true"
                 :draw-yardline-numbers="true"
                 :dot-positions="dotPositions"
+                :formation="$store.state.editor.formation"
                 class="grapher"
             />
             <div class="toolbar">TODO: Toolbar</div>
