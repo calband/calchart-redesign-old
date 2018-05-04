@@ -1,5 +1,7 @@
 // higher index = higher z-index
 $z-layers: (
+    'toolbar',
+    'sidebar',
     'header',
     'popup',
     'messages',

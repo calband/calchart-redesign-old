@@ -29,22 +29,26 @@
     content: '\e000';
 }
 
-[data-icon="redo"]:before {
+[data-icon="plus-minus"]:before {
     content: '\e001';
 }
 
-[data-icon="save"]:before {
+[data-icon="redo"]:before {
     content: '\e002';
 }
 
-[data-icon="undo"]:before {
+[data-icon="save"]:before {
     content: '\e003';
 }
 
-[data-icon="x-circle"]:before {
+[data-icon="undo"]:before {
     content: '\e004';
 }
 
-[data-icon="x"]:before {
+[data-icon="x-circle"]:before {
     content: '\e005';
+}
+
+[data-icon="x"]:before {
+    content: '\e006';
 }

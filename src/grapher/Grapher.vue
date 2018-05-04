@@ -7,7 +7,10 @@ The component that can draw a field and dots on the field.
         <svg
             :width="svgWidth"
             :height="svgHeight"
-            @click="$emit('click-graph')"
+            @click="$emit('click', $event)"
+            @mousedown="$emit('mousedown', $event)"
+            @mouseover="$emit('mouseover', $event)"
+            @mouseup="$emit('mouseup', $event)"
         >
             <component
                 :is="fieldGrapher"

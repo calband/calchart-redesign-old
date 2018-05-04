@@ -21,16 +21,17 @@ The sidebar containing a list of formations for the editor.
                         :field-padding="15"
                         :fill="true"
                         :formation="formation"
-                        @click-graph="chooseFormation(formation)"
+                        @click="chooseFormation(formation)"
                     />
                 </div>
             </div>
         </div>
-        <button
-            class="add-formation"
-            data-cy="add-formation"
-            @click="showPopup(AddFormationPopup)"
-        >Add</button>
+        <div class="add-formation">
+            <button
+                data-cy="add-formation"
+                @click="showPopup(AddFormationPopup)"
+            >Add</button>
+        </div>
     </div>
 </template>
 
@@ -131,8 +132,10 @@ export default {
     }
 }
 
-button.add-formation {
-    margin: 5px auto;
-    display: block;
+.add-formation {
+    @include vertically-center;
+    height: $toolbar-height;
+    font-size: $font-size;
+    text-align: center;
 }
 </style>
