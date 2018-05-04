@@ -59,11 +59,6 @@ export default {
     constants: {
         AddFormationPopup,
     },
-    created() {
-        if (this.formations.length > 0) {
-            this.chooseFormation(this.formations[0]);
-        }
-    },
     methods: {
         /**
          * Make the given Formation active.

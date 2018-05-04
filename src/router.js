@@ -74,7 +74,6 @@ export default function initRouter(Vue) {
                 success: data => {
                     let store = getStore();
                     store.commit('setShow', Show.deserialize(data));
-                    store.dispatch('editor/resetHistory');
                     next();
                 },
                 error: xhr => {

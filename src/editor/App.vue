@@ -35,6 +35,9 @@ export default {
         },
     },
     components: { EditorMenu },
+    created() {
+        this.$store.dispatch('editor/reset');
+    },
     computed: {
         /**
          * @return {boolean} Whether a show is loaded.
