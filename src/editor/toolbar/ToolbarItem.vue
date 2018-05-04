@@ -3,7 +3,7 @@ A basic toolbar item for selecting a tool.
 </doc>
 
 <template>
-    <ToolbarItemCustom :class="{ active: isActive }">
+    <ToolbarItemCustom :class="{ active: isActive }" @click.native="setTool">
         <i :data-icon="tool.toolInfo.icon" />
     </ToolbarItemCustom>
 </template>
@@ -32,7 +32,15 @@ export default {
          * @return {boolean} true if this tool is currently active.
          */
         isActive() {
-            return false;
+            return this.$store.state.editor.tool === this.tool;
+        },
+    },
+    methods: {
+        /**
+         * Set the active tool to this tool.
+         */
+        setTool() {
+            this.$store.commit('editor/setTool', this.tool);
         },
     },
 };

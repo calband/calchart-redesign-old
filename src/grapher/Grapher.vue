@@ -9,7 +9,7 @@ The component that can draw a field and dots on the field.
             :height="svgHeight"
             @click="$emit('click', $event)"
             @mousedown="$emit('mousedown', $event)"
-            @mouseover="$emit('mouseover', $event)"
+            @mousemove="$emit('mousemove', $event)"
             @mouseup="$emit('mouseup', $event)"
         >
             <component
@@ -40,6 +40,7 @@ The component that can draw a field and dots on the field.
                     :scale="scale"
                 />
             </g>
+            <slot :grapher="grapher" :scale="scale" />
         </svg>
     </div>
 </template>
@@ -109,6 +110,7 @@ export default {
         return {
             height: 0,
             width: 0,
+            grapher: this, // to pass to slot
         };
     },
     mounted() {

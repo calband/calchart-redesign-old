@@ -13,6 +13,10 @@ Event object.
 </doc>
 
 <script>
+import Vue from 'vue';
+
+import GrapherScale from 'grapher/GrapherScale';
+
 export default {
     // Required of every EditTool
     toolInfo: {
@@ -20,6 +24,24 @@ export default {
         label: null,
         // {string} The icon to display in the toolbar
         icon: null,
+    },
+    props: {
+        grapher: {
+            // {Vue} The Grapher instance that contains the tool
+            type: Vue,
+        },
+        scale: {
+            // {GrapherScale} The scale of the Grapher
+            type: GrapherScale,
+            required: true,
+        },
+    },
+    data() {
+        return {
+            // coordinates of the cursor relative to the Grapher
+            cursorX: 0,
+            cursorY: 0,
+        };
     },
     methods: {
         /**
@@ -33,7 +55,12 @@ export default {
          *
          * @param {Event} e
          */
-        mouseover(e) {},
+        mousemove(e) {
+            let grapher = this.grapher.$el;
+            let bounds = grapher.getBoundingClientRect();
+            this.cursorX = e.clientX - bounds.left + grapher.scrollLeft;
+            this.cursorY = e.clientY - bounds.top + grapher.scrollTop;
+        },
         /**
          * Called when a mouseup event is detected in the Grapher.
          *

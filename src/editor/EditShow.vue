@@ -17,7 +17,17 @@ The page that lets the user edit a show in the editor.
                 :dot-positions="dotPositions"
                 :formation="$store.state.editor.formation"
                 class="grapher"
-            />
+                @mousedown="$refs.editTool.mousedown($event)"
+                @mousemove="$refs.editTool.mousemove($event)"
+                @mouseup="$refs.editTool.mouseup($event)"
+            >
+                <component
+                    slot-scope="grapher"
+                    :is="$store.state.editor.tool"
+                    v-bind="grapher"
+                    ref="editTool"
+                />
+            </Grapher>
             <component :is="toolbar" class="toolbar" />
         </div>
     </div>
