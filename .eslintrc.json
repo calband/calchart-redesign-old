@@ -58,6 +58,7 @@
                 ["el", "template", "render", "renderError"],
                 "components",
                 "data",
+                "constants",
                 "LIFECYCLE_HOOKS",
                 ["directives", "filters"],
                 "computed",

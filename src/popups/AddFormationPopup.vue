@@ -6,34 +6,36 @@ A popup for adding a Formation to a Show.
     <FormPopup
         :on-submit="addFormation"
         :model="model"
-        :fields="fields"
+        :fields="FIELDS"
         title="Add Formation"
     />
 </template>
 
 <script>
 import Formation from 'calchart/Formation';
+import { extractInitial } from 'forms/fields';
 
 import BasePopup from './BasePopup';
 import FormPopup from './FormPopup';
+
+const FIELDS = [
+    {
+        key: 'name',
+        initial: '',
+        type: 'text',
+        required: true,
+    },
+];
 
 export default {
     extends: BasePopup,
     components: { FormPopup },
     data() {
         return {
-            model: {
-                name: '',
-            },
-            fields: [
-                {
-                    key: 'name',
-                    type: 'text',
-                    required: true,
-                },
-            ],
+            model: extractInitial(FIELDS),
         };
     },
+    constants: { FIELDS },
     methods: {
         /**
          * Add a Formation to the Show with the given form values.
