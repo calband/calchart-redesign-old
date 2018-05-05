@@ -76,7 +76,7 @@ export default {
          */
         dotColor() {
             switch (this.format) {
-                case DotDisplay.NORMAL:
+                case DotDisplay.PLAIN:
                     return 'white';
                 case DotDisplay.DOT_TYPE:
                     if (DotType.isPlain(this.dotType)) {

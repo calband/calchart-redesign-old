@@ -6,10 +6,11 @@
  * the History.
  */
 
-import { defaultTo } from 'lodash';
+import { clone, defaultTo } from 'lodash';
 
 import Show from 'calchart/Show';
 import ContextType from 'editor/ContextType';
+import EditDotTool from 'editor/tools/EditDotTool';
 import sendAction from 'utils/ajax';
 import History from 'utils/History';
 
@@ -24,14 +25,18 @@ export function getHistory() {
     return history;
 }
 
+const initialState = {
+    // {ContextType} The currently active context
+    context: ContextType.FORMATION,
+    // {?Formation} The currently active formation
+    formation: null,
+    // {EditTool} The currently active edit tool
+    tool: EditDotTool,
+};
+
 export default {
     namespaced: true,
-    state: {
-        // The currently active context
-        context: ContextType.FORMATION,
-        // The currently active formation
-        formation: null,
-    },
+    state: clone(initialState),
     mutations: {
         /**
          * Modify the Show with the given arguments.
@@ -64,6 +69,12 @@ export default {
         setFormation(state, formation) {
             state.formation = formation;
         },
+        /**
+         * @param {EditTool} tool
+         */
+        setTool(state, tool) {
+            state.tool = tool;
+        },
     },
     actions: {
         /**
@@ -86,10 +97,21 @@ export default {
             });
         },
         /**
-         * Reset the history for the editor.
+         * Reset the state for the editor.
          */
-        resetHistory(context) {
-            history = new History(context.rootState.show.serialize());
+        reset(context) {
+            let show = context.rootState.show;
+
+            history = new History(show.serialize());
+            context.commit('setContext', initialState.context);
+
+            if (show.formations.length > 0) {
+                context.commit('setFormation', show.formations[0]);
+            } else {
+                context.commit('setFormation', initialState.formation);
+            }
+
+            context.commit('setTool', initialState.tool);
         },
         /**
          * Save the current show to the server.

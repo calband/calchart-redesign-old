@@ -17,7 +17,7 @@
  * separate Formation.
  */
 
-import { defaults, defaultTo } from 'lodash';
+import { concat, defaults, defaultTo } from 'lodash';
 
 import { uniqueId } from 'utils/JSUtils';
 import Serializable from 'utils/Serializable';
@@ -85,6 +85,15 @@ export default class Formation extends Serializable {
         });
 
         return new this(data);
+    }
+
+    /**
+     * Add the given dots to the Formation.
+     *
+     * @param {FormationDot[]} dots
+     */
+    addFormationDots(dots) {
+        this._dots = concat(this.dots, dots);
     }
 
     /**

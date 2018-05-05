@@ -17,8 +17,18 @@ The page that lets the user edit a show in the editor.
                 :dot-positions="dotPositions"
                 :formation="$store.state.editor.formation"
                 class="grapher"
-            />
-            <div class="toolbar">TODO: Toolbar</div>
+                @mousedown="$refs.editTool.mousedown($event)"
+                @mousemove="$refs.editTool.mousemove($event)"
+                @mouseup="$refs.editTool.mouseup($event)"
+            >
+                <component
+                    ref="editTool"
+                    :is="$store.state.editor.tool"
+                    v-bind="grapher"
+                    slot-scope="grapher"
+                />
+            </Grapher>
+            <component :is="toolbar" class="toolbar" />
         </div>
     </div>
 </template>
@@ -30,6 +40,7 @@ import Grapher from 'grapher/Grapher';
 
 import ContextType from './ContextType';
 import FormationList from './FormationList';
+import FormationToolbar from './toolbar/FormationToolbar';
 
 export default {
     components: {
@@ -63,6 +74,15 @@ export default {
             return this.$store.state.editor.context === ContextType.FORMATION;
         },
         /**
+         * @return {Component} The toolbar to load.
+         */
+        toolbar() {
+            switch (this.$store.state.editor.context) {
+                case ContextType.FORMATION:
+                    return FormationToolbar;
+            }
+        },
+        /**
          * @return {number}
          */
         workspaceWidth() {
@@ -84,6 +104,8 @@ $formation-list-width: 200px;
     display: inline-block;
     width: $formation-list-width;
     vertical-align: top;
+    box-shadow: 0 0 5px $dark-gray;
+    z-index: z-index(sidebar);
 }
 
 .workspace {
@@ -96,6 +118,10 @@ $formation-list-width: 200px;
     }
     .toolbar {
         height: $toolbar-height;
+        background: $light-gray;
+        z-index: z-index(toolbar);
+        box-shadow: 1px -1px 3px $dark-gray;
+        padding: 10px;
     }
 }
 </style>

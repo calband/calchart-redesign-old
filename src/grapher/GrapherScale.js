@@ -1,6 +1,7 @@
 import { isNumber } from 'lodash';
 
 import { PixelCoordinate, StepCoordinate } from 'calchart/Coordinate';
+import { round } from 'utils/math';
 
 /**
  * An object containing dimension and scale information for a Grapher.
@@ -37,7 +38,7 @@ export default class GrapherScale {
         this._maxY = this._minY + this._height;
 
         // conversion ratio pixels per step; ratio same for x and y axes
-        this._ratio = (this._maxX - this._minX) / fieldWidth;
+        this._ratio = Math.max((this._maxX - this._minX) / fieldWidth, 1);
 
         // true if east up
         this._eastUp = options.eastUp;
@@ -50,6 +51,8 @@ export default class GrapherScale {
     get maxX() { return this._maxX; }
     get minY() { return this._minY; }
     get maxY() { return this._maxY; }
+
+    /**** Conversions ****/
 
     /**
      * Convert the input into pixels. If the input is a number, return the
@@ -145,5 +148,33 @@ export default class GrapherScale {
             pixels = pixels - this.minY;
         }
         return this.toSteps(pixels);
+    }
+
+    /**** Grid ****/
+
+    /**
+     * Snap the given step coordinates to the given grid.
+     *
+     * @param {StepCoordinate} steps
+     * @param {number} grid
+     * @return {StepCoordinate}
+     */
+    snapSteps(steps, grid) {
+        let x = round(steps.x, grid);
+        let y = round(steps.y, grid);
+        return new StepCoordinate(x, y);
+    }
+
+    /**
+     * Snap the given pixel coordinates to the given grid.
+     *
+     * @param {PixelCoordinate} pixels
+     * @param {number} grid
+     * @return {PixelCoordinate}
+     */
+    snapPixels(pixels, grid) {
+        let steps = this.toSteps(pixels);
+        let snapped = this.snapSteps(steps, grid);
+        return this.toPixels(snapped);
     }
 }

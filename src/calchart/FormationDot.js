@@ -38,6 +38,8 @@ export default class FormationDot extends Serializable {
     static create(data) {
         defaults(data, {
             id: uniqueId(),
+            dotGroup: null,
+            dot: null,
         });
 
         return new this(data);

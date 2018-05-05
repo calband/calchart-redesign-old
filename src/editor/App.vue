@@ -20,18 +20,24 @@ The entry point for the editor page.
 <script>
 import { isNull } from 'lodash';
 
-import EditorMenu from 'editor/menu/EditorMenu';
+import { isVue } from 'utils/vue';
+
+import EditorMenu from './menu/EditorMenu';
 
 export default {
     name: 'Editor',
     props: {
         component: {
             // The component to render
-            type: null,
+            type: Object,
             required: true,
+            validator: isVue,
         },
     },
     components: { EditorMenu },
+    created() {
+        this.$store.dispatch('editor/reset');
+    },
     computed: {
         /**
          * @return {boolean} Whether a show is loaded.
@@ -66,6 +72,8 @@ $header-height: 40px;
     padding: 5px 10px;
     height: $header-height;
     background: $light-gray;
+    box-shadow: 1px 0 3px $dark-gray;
+    z-index: z-index(header);
     .icon-link {
         display: inline-block;
         margin-right: 15px;
@@ -83,6 +91,7 @@ $header-height: 40px;
 }
 
 .editor-component {
+    @include unselectable;
     height: calc(100% - #{$header-height});
 }
 </style>
