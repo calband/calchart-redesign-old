@@ -1,12 +1,15 @@
 /**
  * @file Defines the Vuex module containing state relating to the editor.
  *
+ * Also keeps a copy of the Show so that the Show in the root store is kept
+ * read-only.
+ *
  * The mutations and actions are broken up into submodules in this directory
  * to distinguish between mutations and actions that should be recorded in
  * the History.
  */
 
-import { clone, defaultTo } from 'lodash';
+import { clone, defaultTo, each } from 'lodash';
 
 import Show from 'calchart/Show';
 import ContextType from 'editor/ContextType';
@@ -26,10 +29,12 @@ export function getHistory() {
 }
 
 const initialState = {
+    // {Show} The show being edited
+    show: null,
     // {ContextType} The currently active context
     context: ContextType.FORMATION,
-    // {?Formation} The currently active formation
-    formation: null,
+    // {?String} The ID of the currently active formation
+    formationId: null,
     // {EditTool} The currently active edit tool
     tool: EditDotTool,
 };
@@ -50,68 +55,44 @@ export default {
          *  | {Any} [target=show]
          *  | {string} func
          *  | {Array} args
-         *  | {Show} show
          */
-        modifyShow(state, { target, func, args, show }) {
-            target = target || show;
+        modifyShow(state, { target, func, args }) {
+            target = target || state.show;
             target[func].apply(target, args);
-            history.addState(func, show.serialize());
+            history.addState(func, state);
         },
         /**
-         * @param {ContextType} context
+         * Set the state from the given object.
+         *
+         * @param {Object} newState
          */
-        setContext(state, context) {
-            state.context = context;
-        },
-        /**
-         * @param {Formation} formation
-         */
-        setFormation(state, formation) {
-            state.formation = formation;
-        },
-        /**
-         * @param {EditTool} tool
-         */
-        setTool(state, tool) {
-            state.tool = tool;
+        setState(state, newState) {
+            each(newState, (val, key) => {
+                state[key] = val;
+            });
         },
     },
     actions: {
-        /**
-         * Modify the Show with the given args. See the `modifyShow` mutation.
-         *
-         * @param {Object} args
-         */
-        modifyShow(context, args) {
-            args.show = context.rootState.show;
-            context.commit('modifyShow', args);
-        },
         /**
          * Redo an action.
          */
         redo(context) {
             let state = history.redo();
-            let show = Show.deserialize(state);
-            context.commit('setShow', show, {
-                root: true,
-            });
+            context.commit('setState', state);
         },
         /**
          * Reset the state for the editor.
          */
         reset(context) {
-            let show = context.rootState.show;
+            let state = clone(initialState);
 
-            history = new History(show.serialize());
-            context.commit('setContext', initialState.context);
-
-            if (show.formations.length > 0) {
-                context.commit('setFormation', show.formations[0]);
-            } else {
-                context.commit('setFormation', initialState.formation);
+            state.show = context.rootState.show;
+            if (state.show.formations.length > 0) {
+                state.formationId = state.show.formations[0].id;
             }
+            context.commit('setState', state);
 
-            context.commit('setTool', initialState.tool);
+            history = new History(state);
         },
         /**
          * Save the current show to the server.
@@ -140,10 +121,7 @@ export default {
          */
         undo(context) {
             let state = history.undo();
-            let show = Show.deserialize(state);
-            context.commit('setShow', show, {
-                root: true,
-            });
+            context.commit('setState', state);
         },
     },
 };

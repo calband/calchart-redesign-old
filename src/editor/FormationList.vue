@@ -66,7 +66,7 @@ export default {
          * @param {Formation} formation
          */
         chooseFormation(formation) {
-            this.$store.commit('editor/setFormation', formation);
+            this.$store.commit('editor/setState', { formation });
         },
         /**
          * Get an object containing the `active` class.
@@ -76,7 +76,7 @@ export default {
          */
         getActive(formation) {
             return {
-                active: formation === this.$store.state.editor.formation,
+                active: formation.id === this.$store.state.editor.formationId,
             };
         },
         /**
@@ -86,7 +86,8 @@ export default {
          * @return {string}
          */
         getFormationIcon(formation) {
-            return formation.dots.length === this.$store.state.show.dots.length
+            let show = this.$store.state.editor.show;
+            return formation.dots.length === show.dots.length
                 ? 'check-circle' : 'x-circle';
         },
     },

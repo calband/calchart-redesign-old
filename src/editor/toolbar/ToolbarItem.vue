@@ -38,7 +38,7 @@ export default {
          * Set the active tool to this tool.
          */
         setTool() {
-            this.$store.commit('editor/setTool', this.tool);
+            this.$store.commit('editor/setState', { tool: this.tool });
         },
     },
 };

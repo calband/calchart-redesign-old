@@ -12,7 +12,7 @@
 
 import {
     assign,
-    forEach,
+    clone,
     forIn,
     has,
     hasIn,
@@ -25,6 +25,21 @@ import {
 import { underscoreKeys } from 'utils/JSUtils';
 import { checkTypeError, isSubClass } from 'utils/types';
 
+/**
+ * For every underscored property in the object, add a getter without the
+ * underscore.
+ *
+ * @param {object} object
+ */
+function addGetters(object) {
+    forIn(object, (v, k) => {
+        let newK = k.replace(/^_/, '');
+        Object.defineProperty(object, newK, {
+            get: () => object[k],
+        });
+    });
+}
+
 export class BaseSerializable {
     /**
      * @param {Object} data
@@ -36,11 +51,7 @@ export class BaseSerializable {
             _wraps: types,
         });
         assign(this, underscoreKeys(data));
-        forEach(data, (v, k) => {
-            Object.defineProperty(this, k, {
-                get: () => this[`_${k}`],
-            });
-        });
+        addGetters(this);
     }
 
     /**
@@ -108,6 +119,15 @@ export class BaseSerializable {
      */
     static _postDeserialize(k, v, show) {
         return v;
+    }
+
+    /**
+     * @return {Serializable}
+     */
+    clone() {
+        let cloned = clone(this);
+        addGetters(cloned);
+        return cloned;
     }
 
     /**

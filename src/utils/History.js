@@ -1,8 +1,29 @@
 /**
  * @file Defines the class that tracks undo/redo history in a store.
+ *
+ * When state is stored in history, it will be a deep clone, meaning that
+ * anything in the state that is meant to be a reference should instead be an
+ * ID.
  */
 
-import { capitalize, cloneDeep, lowerCase } from 'lodash';
+import { capitalize, cloneDeepWith, lowerCase } from 'lodash';
+
+import Serializable from 'utils/Serializable';
+
+/**
+ * Perform a deep clone over the given state, calling .clone() on Serializable
+ * objects.
+ *
+ * @param {object} state
+ * @return {object}
+ */
+function cloneState(state) {
+    return cloneDeepWith(state, value => {
+        if (value instanceof Serializable) {
+            return value.clone();
+        }
+    })
+}
 
 export default class History {
     /**
@@ -63,7 +84,7 @@ export default class History {
         }
         this._history.push({
             label: capitalize(lowerCase(label)),
-            state: cloneDeep(state),
+            state: cloneState(state),
         });
         this._index++;
     }
@@ -99,6 +120,6 @@ export default class History {
      * @return {Object}
      */
     _getState(index) {
-        return cloneDeep(this._history[index].state);
+        return cloneState(this._history[index].state);
     }
 }
