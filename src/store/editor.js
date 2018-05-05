@@ -6,7 +6,7 @@
  * the History.
  */
 
-import { clone, defaultTo, each } from 'lodash';
+import { clone, defaultTo } from 'lodash';
 
 import Show from 'calchart/Show';
 import ContextType from 'editor/ContextType';

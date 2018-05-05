@@ -13,7 +13,7 @@ describe('findAndRemove', () => {
         ];
         findAndRemove(vals, ['x', 1]);
         expect(vals).toHaveLength(2);
-        expect(vals).not.toContainEqual({ x: 1 })
+        expect(vals).not.toContainEqual({ x: 1 });
     });
 });
 

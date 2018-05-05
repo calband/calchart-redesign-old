@@ -9,8 +9,6 @@ A basic toolbar item for selecting a tool.
 </template>
 
 <script>
-import { isUndefined } from 'lodash';
-
 import { isVue } from 'utils/vue';
 
 import ToolbarItemCustom from './ToolbarItemCustom';

@@ -30,6 +30,7 @@ export default {
         grapher: {
             // {Vue} The Grapher instance that contains the tool
             type: Vue,
+            default: null,
         },
         scale: {
             // {GrapherScale} The scale of the Grapher

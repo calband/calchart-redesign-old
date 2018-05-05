@@ -32,7 +32,7 @@ describe('round', () => {
                     message: () =>
                         `round(${x}, ${interval}) ` +
                         (pass ? 'is' : 'is not') +
-                        ` a multiple of the interval`,
+                        ' a multiple of the interval',
                     pass,
                 };
             },

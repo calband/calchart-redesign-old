@@ -24,7 +24,6 @@ A basic toolbar item for selecting a tool.
 </template>
 
 <script>
-import { StepCoordinate } from 'calchart/Coordinate';
 import FormationDot from 'calchart/FormationDot';
 import { unique } from 'utils/array';
 

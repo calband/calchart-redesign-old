@@ -22,10 +22,10 @@ The page that lets the user edit a show in the editor.
                 @mouseup="$refs.editTool.mouseup($event)"
             >
                 <component
-                    slot-scope="grapher"
+                    ref="editTool"
                     :is="$store.state.editor.tool"
                     v-bind="grapher"
-                    ref="editTool"
+                    slot-scope="grapher"
                 />
             </Grapher>
             <component :is="toolbar" class="toolbar" />
