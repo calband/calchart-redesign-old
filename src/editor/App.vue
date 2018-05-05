@@ -91,6 +91,7 @@ $header-height: 40px;
 }
 
 .editor-component {
+    @include unselectable;
     height: calc(100% - #{$header-height});
 }
 </style>

@@ -32,10 +32,11 @@ The component that can draw a field and dots on the field.
             <g v-if="formation" class="dot-labels">
                 <GrapherDotLabel
                     v-for="dot in formation.dots"
+                    v-if="dot.dot"
                     :key="dot.id"
                     :dotRadius="dotRadius"
                     :position="getPosition(dot)"
-                    :label="dot.label"
+                    :label="dot.dot.label"
                     :labelLeft="labelLeft"
                     :scale="scale"
                 />

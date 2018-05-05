@@ -4,16 +4,30 @@ A basic toolbar item for selecting a tool.
 
 <template>
     <g>
+        <!-- Helper dot that follows the cursor -->
         <circle
-            :cx="helperPosition.x"
-            :cy="helperPosition.y"
-            :r="helperRadius"
+            :cx="snapX"
+            :cy="snapY"
+            :r="grapher.dotRadius"
+            class="helper-cursor"
+        />
+        <!-- Dots that have been placed by drag -->
+        <circle
+            v-for="(dot, i) in dotsToAdd"
+            :key="i"
+            :cx="dot.x"
+            :cy="dot.y"
+            :r="grapher.dotRadius"
             class="helper"
         />
     </g>
 </template>
 
 <script>
+import { StepCoordinate } from 'calchart/Coordinate';
+import FormationDot from 'calchart/FormationDot';
+import { unique } from 'utils/array';
+
 import EditTool from './EditTool';
 
 export default {
@@ -22,36 +36,40 @@ export default {
         label: 'Add/Remove Dots',
         icon: 'plus-minus',
     },
-    computed: {
-        /**
-         * The radius of the helper dot in pixels.
-         *
-         * The helper dot shall have a radius of 1 step.
-         *
-         * @return {number}
-         */
-        helperRadius() {
-            return this.scale.toPixels(1);
+    data() {
+        return {
+            dotsToAdd: [],
+        };
+    },
+    methods: {
+        onMousemove(e) {
+            if (this.isMousedown) {
+                this.dotsToAdd.push({
+                    x: this.snapX,
+                    y: this.snapY,
+                });
+            }
         },
-        /**
-         * The coordinates of the helper dot, snapped to the grid.
-         *
-         * @return {PixelCoordinate}
-         */
-        helperPosition() {
-            // TODO: make grid settable
-            let grid = 2;
-            return this.scale.snapPixels({
-                x: this.cursorX,
-                y: this.cursorY,
-            }, grid);
+        onMouseup(e) {
+            let dotsToAdd = unique(this.dotsToAdd).map(dot =>
+                FormationDot.create({
+                    position: this.scale.toSteps(dot),
+                })
+            );
+            this.$store.dispatch('editor/modifyShow', {
+                target: this.$store.state.editor.formation,
+                func: 'addFormationDots',
+                args: [dotsToAdd],
+            });
+
+            this.dotsToAdd = [];
         },
     },
 };
 </script>
 
 <style lang="scss" scoped>
-.helper {
+.helper-cursor, .helper {
     fill: rgba($gold, 0.75);
 }
 </style>

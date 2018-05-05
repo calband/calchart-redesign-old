@@ -13,6 +13,7 @@ Event object.
 </doc>
 
 <script>
+import $ from 'jquery';
 import Vue from 'vue';
 
 import GrapherScale from 'grapher/GrapherScale';
@@ -38,35 +39,78 @@ export default {
     },
     data() {
         return {
+            // whether the mouse is being pressed
+            isMousedown: false,
             // coordinates of the cursor relative to the Grapher
             cursorX: 0,
             cursorY: 0,
+            // coordinates of the cursor, snapped to the grid
+            snapX: 0,
+            snapY: 0,
         };
     },
     methods: {
+        /**** Event handlers shared by most edit tools ****/
+        /* Defining these methods will overwrite them; use the below methods */
+
         /**
-         * Called when a mousedown event is detected in the Grapher.
+         * Called when a mousedown event is detected.
          *
          * @param {Event} e
          */
-        mousedown(e) {},
+        mousedown(e) {
+            this.isMousedown = true;
+            $(document).on('mouseup.edit-tool', e => {
+                this.mouseup(e);
+            });
+            this.mousemove(e);
+            this.onMousedown(e);
+        },
         /**
-         * Called when a mouseover event is detected in the Grapher.
+         * Called when a mousedown or mousemove event is detected.
          *
          * @param {Event} e
          */
         mousemove(e) {
             let grapher = this.grapher.$el;
             let bounds = grapher.getBoundingClientRect();
+
             this.cursorX = e.clientX - bounds.left + grapher.scrollLeft;
             this.cursorY = e.clientY - bounds.top + grapher.scrollTop;
+
+            // TODO: make grid settable
+            let grid = 2;
+            if (grid) {
+                let snapped = this.scale.snapPixels({
+                    x: this.cursorX,
+                    y: this.cursorY,
+                }, grid);
+                this.snapX = snapped.x;
+                this.snapY = snapped.y;
+            } else {
+                this.snapX = this.cursorX;
+                this.snapY = this.cursorY;
+            }
+
+            this.onMousemove(e);
         },
         /**
-         * Called when a mouseup event is detected in the Grapher.
+         * Called when a mouseup event is detected.
          *
          * @param {Event} e
          */
-        mouseup(e) {},
+        mouseup(e) {
+            e.stopPropagation();
+            $(document).off('mouseup.edit-tool');
+            this.isMousedown = false;
+
+            this.onMouseup(e);
+        },
+
+        /**** Event hooks for subclasses ****/
+        onMousedown(e) {},
+        onMousemove(e) {},
+        onMouseup(e) {},
     },
 };
 </script>
