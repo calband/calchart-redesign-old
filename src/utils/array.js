@@ -1,7 +1,7 @@
 /**
  * @file Utility functions on Arrays.
  */
-import { findIndex } from 'lodash';
+import { findIndex, isEqual, uniqWith } from 'lodash';
 
 /**
  * Find an element in the given array and remove it from the array.
@@ -15,4 +15,14 @@ import { findIndex } from 'lodash';
 export function findAndRemove(array) {
     let index = findIndex.apply(null, arguments);
     array.splice(index, 1);
+}
+
+/**
+ * Return a new duplicate-free array, doing a deep equality to check objects.
+ *
+ * @param {Array} array
+ * @return {Array}
+ */
+export function unique(array) {
+    return uniqWith(array, isEqual);
 }
