@@ -14,6 +14,7 @@ describe('Formation', () => {
         cy.get('.popup input[name=name]').type(formationName);
         cy.get('.popup [data-cy=popup-submit]').click();
 
-        cy.get('[data-cy=formation]').should('exist');
+        cy.get('[data-cy=formation]').should('exist')
+            .get('[data-cy=formation-graph]').should('have.class', 'active');
     });
 });

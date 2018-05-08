@@ -134,15 +134,4 @@ export default class Show extends Serializable {
     addFormation(formation) {
         this._formations.push(formation);
     }
-
-    /**
-     * Get a Formation with the given ID.
-     *
-     * @param {String} id
-     * @return {?Formation}
-     */
-    getFormation(id) {
-        let formation = find(this.formations, ['id', id]);
-        return defaultTo(formation, null);
-    }
 }

@@ -43,7 +43,7 @@ export default {
         };
     },
     computed: {
-        ...mapState('editor', ['show', 'formationId'])
+        ...mapState('editor', ['show', 'formation'])
     },
     methods: {
         onMousemove(e) {
@@ -61,7 +61,7 @@ export default {
                 })
             );
             this.$store.commit('editor/modifyShow', {
-                target: this.show.getFormation(this.formationId),
+                target: this.formation,
                 func: 'addFormationDots',
                 args: [dotsToAdd],
             });

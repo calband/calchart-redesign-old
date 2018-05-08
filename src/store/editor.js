@@ -33,8 +33,8 @@ const initialState = {
     show: null,
     // {ContextType} The currently active context
     context: ContextType.FORMATION,
-    // {?String} The ID of the currently active formation
-    formationId: null,
+    // {?Formation} The currently active formation
+    formation: null,
     // {EditTool} The currently active edit tool
     tool: EditDotTool,
 };
@@ -88,7 +88,7 @@ export default {
 
             state.show = context.rootState.show;
             if (state.show.formations.length > 0) {
-                state.formationId = state.show.formations[0].id;
+                state.formation = state.show.formations[0];
             }
             context.commit('setState', state);
 

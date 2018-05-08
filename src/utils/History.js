@@ -11,8 +11,7 @@ import { capitalize, cloneDeepWith, lowerCase } from 'lodash';
 import Serializable from 'utils/Serializable';
 
 /**
- * Perform a deep clone over the given state, calling .clone() on Serializable
- * objects.
+ * Clone the given state, calling .clone() on Serializable objects.
  *
  * @param {object} state
  * @return {object}
@@ -22,7 +21,7 @@ function cloneState(state) {
         if (value instanceof Serializable) {
             return value.clone();
         }
-    })
+    });
 }
 
 export default class History {

@@ -54,6 +54,9 @@ export default {
             rightSidebarWidth: 200,
         };
     },
+    created() {
+        this.$store.dispatch('editor/reset');
+    },
     mounted() {
         this.contentWidth = this.$el.offsetWidth;
     },
@@ -62,7 +65,7 @@ export default {
          * @return {Formation} The currently active Formation.
          */
         activeFormation() {
-            return this.show.getFormation(this.$store.state.editor.formationId);
+            return this.$store.state.editor.formation;
         },
         /**
          * @return {Object<Dot: PixelCoordinate>}

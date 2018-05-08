@@ -15,7 +15,10 @@ The sidebar containing a list of formations for the editor.
                     <span>{{ formation.name }}</span>
                     <i :data-icon="getFormationIcon(formation)" />
                 </div>
-                <div :class="['formation-graph', getActive(formation)]">
+                <div
+                    :class="['formation-graph', getActive(formation)]"
+                    data-cy="formation-graph"
+                >
                     <Grapher
                         :draw-yardlines="false"
                         :field-padding="15"
@@ -76,7 +79,7 @@ export default {
          */
         getActive(formation) {
             return {
-                active: formation.id === this.$store.state.editor.formationId,
+                active: formation === this.$store.state.editor.formation,
             };
         },
         /**
