@@ -3,7 +3,7 @@ The component that can draw a field and dots on the field.
 </doc>
 
 <template>
-    <div :class="['grapher-container', { fill }]">
+    <div :class="['grapher-container', { fill }]" data-cy="grapher">
         <svg
             :width="svgWidth"
             :height="svgHeight"

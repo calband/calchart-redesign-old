@@ -6,6 +6,7 @@ The component that can draw a Dot within a Grapher.
     <g
         :transform="`translate(${position.x}, ${position.y})`"
         class="dot"
+        data-cy="dot"
     >
         <line
             v-if="slashInfo.forward"

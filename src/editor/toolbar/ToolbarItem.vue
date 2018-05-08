@@ -30,7 +30,8 @@ export default {
          * @return {boolean} true if this tool is currently active.
          */
         isActive() {
-            return this.$store.state.editor.tool === this.tool;
+            let activeTool = this.$store.state.editor.tool.constructor.name;
+            return this.tool.constructor.name === activeTool;
         },
     },
     methods: {
@@ -38,7 +39,9 @@ export default {
          * Set the active tool to this tool.
          */
         setTool() {
-            this.$store.commit('editor/setState', { tool: this.tool });
+            this.$store.commit('editor/setState', {
+                tool: this.tool,
+            });
         },
     },
 };

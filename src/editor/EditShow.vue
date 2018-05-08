@@ -10,7 +10,11 @@ The page that lets the user edit a show in the editor.
             :style="{ width: leftSidebarWidth }"
             class="formation-list"
         />
-        <div :style="{ width: workspaceWidth }" class="workspace">
+        <div
+            :style="{ width: workspaceWidth }"
+            class="workspace"
+            data-cy="edit-show-workspace"
+        >
             <Grapher
                 :draw-four-step="true"
                 :draw-yardline-numbers="true"

@@ -3,8 +3,8 @@ The toolbar for the Formation context.
 </doc>
 
 <template>
-    <div>
-        <ToolbarItem :tool="EditDotTool" />
+    <div data-cy="formation-toolbar">
+        <ToolbarItem :tool="EditDotTool" data-cy="edit-dot" />
     </div>
 </template>
 
