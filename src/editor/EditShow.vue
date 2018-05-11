@@ -18,7 +18,6 @@ The page that lets the user edit a show in the editor.
             <Grapher
                 :draw-four-step="true"
                 :draw-yardline-numbers="true"
-                :dot-positions="dotPositions"
                 :formation="activeFormation"
                 class="grapher"
                 @mousedown="$refs.editTool.mousedown($event)"
@@ -70,15 +69,6 @@ export default {
          */
         activeFormation() {
             return this.$store.state.editor.formation;
-        },
-        /**
-         * @return {Object<Dot: PixelCoordinate>}
-         */
-        dotPositions() {
-            switch (this.$store.state.editor.context) {
-                case ContextType.FORMATION:
-                    return {};
-            }
         },
         /**
          * @return {boolean}

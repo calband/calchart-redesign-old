@@ -16,6 +16,7 @@ import ContextType from 'editor/ContextType';
 import EditDotTool from 'editor/tools/EditDotTool';
 import sendAction from 'utils/ajax';
 import History from 'utils/History';
+import { mapExist } from 'utils/JSUtils';
 
 let history = null;
 
@@ -39,6 +40,42 @@ const initialState = {
     tool: EditDotTool,
 };
 
+/**
+ * Clone and modify the given state to be saved in History.
+ *
+ * Since state is deep-cloned in History, any references within the state need
+ * to be converted into a unique identifier.
+ *
+ * @param {Object} state
+ * @return {Object}
+ */
+function dereferenceState(state) {
+    let newState = clone(state);
+
+    newState.formationId = mapExist(state.formation, f => f.id);
+    delete newState.formation
+
+    return newState;
+}
+
+/**
+ * Undo the effects of dereferenceState.
+ *
+ * @param {Object} state
+ * @return {Object}
+ */
+function rereferenceState(state) {
+    let newState = clone(state);
+
+    newState.formation = mapExist(
+        state.formationId,
+        id => state.show.getFormation(id),
+    );
+    delete newState.formationId
+
+    return newState;
+}
+
 export default {
     namespaced: true,
     state: clone(initialState),
@@ -59,7 +96,8 @@ export default {
         modifyShow(state, { target, func, args }) {
             target = target || state.show;
             target[func].apply(target, args);
-            history.addState(func, state);
+
+            history.addState(func, dereferenceState(state));
         },
         /**
          * Set the state from the given object.
@@ -78,7 +116,7 @@ export default {
          */
         redo(context) {
             let state = history.redo();
-            context.commit('setState', state);
+            context.commit('setState', rereferenceState(state));
         },
         /**
          * Reset the state for the editor.
@@ -87,12 +125,13 @@ export default {
             let state = clone(initialState);
 
             state.show = context.rootState.show;
-            if (state.show.formations.length > 0) {
+            if (state.show && state.show.formations.length > 0) {
                 state.formation = state.show.formations[0];
             }
+
             context.commit('setState', state);
 
-            history = new History(state);
+            history = new History(dereferenceState(state));
         },
         /**
          * Save the current show to the server.
@@ -121,7 +160,7 @@ export default {
          */
         undo(context) {
             let state = history.undo();
-            context.commit('setState', state);
+            context.commit('setState', rereferenceState(state));
         },
     },
 };
