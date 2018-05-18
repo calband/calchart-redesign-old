@@ -18,7 +18,7 @@ The page that lets the user edit a show in the editor.
             <Grapher
                 :draw-four-step="true"
                 :draw-yardline-numbers="true"
-                :formation="activeFormation"
+                :formation="formation"
                 class="grapher"
                 @mousedown="$refs.editTool.mousedown($event)"
                 @mousemove="$refs.editTool.mousemove($event)"
@@ -65,22 +65,16 @@ export default {
     },
     computed: {
         /**
-         * @return {Formation} The currently active Formation.
-         */
-        activeFormation() {
-            return this.$store.state.editor.formation;
-        },
-        /**
          * @return {boolean}
          */
         isFormationContext() {
-            return this.$store.state.editor.context === ContextType.FORMATION;
+            return this.context === ContextType.FORMATION;
         },
         /**
          * @return {Component} The toolbar to load.
          */
         toolbar() {
-            switch (this.$store.state.editor.context) {
+            switch (this.context) {
                 case ContextType.FORMATION:
                     return FormationToolbar;
             }
@@ -90,12 +84,12 @@ export default {
          */
         workspaceWidth() {
             let sides = this.leftSidebarWidth;
-            if (this.$store.state.editor.context === ContextType.FLOW) {
+            if (this.context === ContextType.FLOW) {
                 sides += this.rightSidebarWidth;
             }
             return this.contentWidth - sides;
         },
-        ...mapState('editor', ['show']),
+        ...mapState('editor', ['show', 'formation', 'context']),
     },
 };
 </script>

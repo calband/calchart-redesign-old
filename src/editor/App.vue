@@ -19,7 +19,7 @@ The entry point for the editor page.
 
 <script>
 import { isNull } from 'lodash';
-import { mapState } from 'vuex';
+import { mapGetters, mapState } from 'vuex';
 
 import { isVue } from 'utils/vue';
 
@@ -47,9 +47,9 @@ export default {
          * @return {string} The path to the highstepper icon.
          */
         iconPath() {
-            let staticPath = this.$store.state.env.staticPath;
-            return `${staticPath}/img/highstepper.png`;
+            return this.getStatic('img/highstepper.png');
         },
+        ...mapGetters('env', ['getStatic']),
         ...mapState('editor', ['show']),
     },
 };

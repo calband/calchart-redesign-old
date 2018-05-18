@@ -17,12 +17,14 @@ The top menu in the editor application.
                 :disabled="!history.hasUndo"
                 action="undo"
                 icon="undo"
+                data-cy="undo"
             />
             <EditorMenuItem
                 :label="`Redo ${history.redoLabel}`"
                 :disabled="!history.hasRedo"
                 action="redo"
                 icon="redo"
+                data-cy="redo"
             />
         </EditorMenuTab>
     </div>
@@ -31,8 +33,7 @@ The top menu in the editor application.
 <script>
 import $ from 'jquery';
 import { includes, isNull } from 'lodash';
-
-import { getHistory } from 'store/editor';
+import { mapGetters } from 'vuex';
 
 import EditorMenuTab from './EditorMenuTab';
 import EditorMenuItem from './EditorMenuItem';
@@ -91,12 +92,7 @@ export default {
         });
     },
     computed: {
-        /**
-         * @return {History}
-         */
-        history() {
-            return getHistory();
-        },
+        ...mapGetters('editor', ['history']),
     },
     methods: {
         /**

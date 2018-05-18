@@ -3,12 +3,14 @@ A basic toolbar item for selecting a tool.
 </doc>
 
 <template>
-    <ToolbarItemCustom :class="{ active: isActive }" @click.native="setTool">
+    <ToolbarItemCustom :class="isActive" @click.native="setTool">
         <i :data-icon="tool.toolInfo.icon" />
     </ToolbarItemCustom>
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
+
 import { isVue } from 'utils/vue';
 
 import ToolbarItemCustom from './ToolbarItemCustom';
@@ -30,9 +32,11 @@ export default {
          * @return {boolean} true if this tool is currently active.
          */
         isActive() {
-            let activeTool = this.$store.state.editor.tool.constructor.name;
-            return this.tool.constructor.name === activeTool;
+            return {
+                active: this.isActiveTool(this.tool),
+            };
         },
+        ...mapGetters('editor', ['isActiveTool']),
     },
     methods: {
         /**

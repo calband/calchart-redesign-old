@@ -19,15 +19,6 @@ import { mapExist } from 'utils/JSUtils';
 
 let history = null;
 
-/**
- * Get the History currently in use by the editor.
- *
- * @return {History}
- */
-export function getHistory() {
-    return history;
-}
-
 const initialState = {
     // {Show} The show being edited
     show: null,
@@ -78,6 +69,34 @@ function rereferenceState(state) {
 export default {
     namespaced: true,
     state: clone(initialState),
+    getters: {
+        /**
+         * @return {History}
+         */
+        history: state => {
+            return history;
+        },
+        /**
+         * Return true if the given Formation is active.
+         *
+         * @param {Formation} formation
+         * @return {boolean}
+         */
+        isActiveFormation: state => (formation) => {
+            return state.formation === formation;
+        },
+        /**
+         * Return true if the given EditTool is active.
+         *
+         * @param {EditTool} tool
+         * @return {boolean}
+         */
+        isActiveTool: state => (tool) => {
+            // because of the cloning in the history, the EditTool in the state
+            // is most likely not referring to the same object as the given tool
+            return state.tool.constructor.name === tool.constructor.name;
+        },
+    },
     mutations: {
         /**
          * Modify the Show with the given arguments.
