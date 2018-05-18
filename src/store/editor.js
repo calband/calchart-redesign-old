@@ -19,15 +19,6 @@ import { mapExist } from 'utils/JSUtils';
 
 let history = null;
 
-/**
- * Get the History currently in use by the editor.
- *
- * @return {History}
- */
-export function getHistory() {
-    return history;
-}
-
 const initialState = {
     // {Show} The show being edited
     show: null,
@@ -79,6 +70,12 @@ export default {
     namespaced: true,
     state: clone(initialState),
     getters: {
+        /**
+         * @return {History}
+         */
+        history: state => {
+            return history;
+        },
         /**
          * Return true if the given Formation is active.
          *

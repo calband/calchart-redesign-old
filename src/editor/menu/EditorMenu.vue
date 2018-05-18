@@ -31,8 +31,7 @@ The top menu in the editor application.
 <script>
 import $ from 'jquery';
 import { includes, isNull } from 'lodash';
-
-import { getHistory } from 'store/editor';
+import { mapGetters } from 'vuex';
 
 import EditorMenuTab from './EditorMenuTab';
 import EditorMenuItem from './EditorMenuItem';
@@ -91,12 +90,7 @@ export default {
         });
     },
     computed: {
-        /**
-         * @return {History}
-         */
-        history() {
-            return getHistory();
-        },
+        ...mapGetters('editor', ['history']),
     },
     methods: {
         /**
