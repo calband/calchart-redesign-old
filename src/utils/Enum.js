@@ -149,7 +149,7 @@ export default class Enum extends Serializable {
      *
      * @return {Object}
      */
-    clone() {
+    cloneDeep() {
         return this;
     }
 

@@ -8,20 +8,16 @@
 
 import { capitalize, cloneDeepWith, lowerCase } from 'lodash';
 
-import Serializable from 'utils/Serializable';
+import { BaseSerializable, cloneSerializable } from 'utils/Serializable';
 
 /**
- * Clone the given state, calling .clone() on Serializable objects.
+ * Clone the given state, handling cloning Serializable objects.
  *
- * @param {object} state
- * @return {object}
+ * @param {Object} state
+ * @return {Object}
  */
 function cloneState(state) {
-    return cloneDeepWith(state, value => {
-        if (value instanceof Serializable) {
-            return value.clone();
-        }
-    });
+    return cloneDeepWith(state, cloneSerializable);
 }
 
 export default class History {

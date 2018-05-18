@@ -12,7 +12,7 @@
 
 import {
     assign,
-    clone,
+    cloneDeepWith,
     forIn,
     has,
     hasIn,
@@ -38,6 +38,18 @@ function addGetters(object) {
             get: () => object[k],
         });
     });
+}
+
+/**
+ * A customizer for `cloneDeepWith` that handles Serializable objects.
+ *
+ * @param {Object} obj
+ * @return {undefined|Object}
+ */
+export function cloneSerializable(obj) {
+    if (obj instanceof BaseSerializable) {
+        return obj.cloneDeep();
+    }
 }
 
 export class BaseSerializable {
@@ -122,10 +134,16 @@ export class BaseSerializable {
     }
 
     /**
+     * Deep clone this object.
+     *
      * @return {Serializable}
      */
-    clone() {
-        let cloned = clone(this);
+    cloneDeep() {
+        let cloned = cloneDeepWith(this, value => {
+            if (value !== this) {
+                return cloneSerializable(value);
+            }
+        });
         addGetters(cloned);
         return cloned;
     }

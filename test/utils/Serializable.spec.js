@@ -100,7 +100,7 @@ describe('BaseSerializable', () => {
     });
 
     it('clones', () => {
-        let clone = foo.clone();
+        let clone = foo.cloneDeep();
         expect(clone).not.toBe(foo);
         expect(clone).toEqual(foo);
         expect(clone.x).toBe(foo.x);
