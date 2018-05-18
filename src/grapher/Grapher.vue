@@ -3,7 +3,7 @@ The component that can draw a field and dots on the field.
 </doc>
 
 <template>
-    <div :class="['grapher-container', { fill }]">
+    <div :class="['grapher-container', { fill }]" data-cy="grapher">
         <svg
             :width="svgWidth"
             :height="svgHeight"
@@ -143,7 +143,7 @@ export default {
          * @return {FieldType} The field type to display.
          */
         fieldType() {
-            let show = this.$store.state.show;
+            let show = this.$store.state.editor.show;
             if (this.flow) {
                 return this.flow.getFieldType(show, this.formation);
             } else if (this.formation) {

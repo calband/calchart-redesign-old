@@ -1,18 +1,21 @@
 /**
  * @file Defines the Vuex module containing state relating to the editor.
  *
+ * Also keeps a copy of the Show so that the Show in the root store is kept
+ * read-only.
+ *
  * The mutations and actions are broken up into submodules in this directory
  * to distinguish between mutations and actions that should be recorded in
  * the History.
  */
 
-import { clone, defaultTo } from 'lodash';
+import { clone, defaultTo, each } from 'lodash';
 
-import Show from 'calchart/Show';
 import ContextType from 'editor/ContextType';
 import EditDotTool from 'editor/tools/EditDotTool';
 import sendAction from 'utils/ajax';
 import History from 'utils/History';
+import { mapExist } from 'utils/JSUtils';
 
 let history = null;
 
@@ -26,6 +29,8 @@ export function getHistory() {
 }
 
 const initialState = {
+    // {Show} The show being edited
+    show: null,
     // {ContextType} The currently active context
     context: ContextType.FORMATION,
     // {?Formation} The currently active formation
@@ -33,6 +38,42 @@ const initialState = {
     // {EditTool} The currently active edit tool
     tool: EditDotTool,
 };
+
+/**
+ * Clone and modify the given state to be saved in History.
+ *
+ * Since state is deep-cloned in History, any references within the state need
+ * to be converted into a unique identifier.
+ *
+ * @param {Object} state
+ * @return {Object}
+ */
+function dereferenceState(state) {
+    let newState = clone(state);
+
+    newState.formationId = mapExist(state.formation, f => f.id);
+    delete newState.formation;
+
+    return newState;
+}
+
+/**
+ * Undo the effects of dereferenceState.
+ *
+ * @param {Object} state
+ * @return {Object}
+ */
+function rereferenceState(state) {
+    let newState = clone(state);
+
+    newState.formation = mapExist(
+        state.formationId,
+        id => state.show.getFormation(id)
+    );
+    delete newState.formationId;
+
+    return newState;
+}
 
 export default {
     namespaced: true,
@@ -50,68 +91,46 @@ export default {
          *  | {Any} [target=show]
          *  | {string} func
          *  | {Array} args
-         *  | {Show} show
          */
-        modifyShow(state, { target, func, args, show }) {
-            target = target || show;
+        modifyShow(state, { target, func, args }) {
+            target = target || state.show;
             target[func].apply(target, args);
-            history.addState(func, show.serialize());
+
+            history.addState(func, dereferenceState(state));
         },
         /**
-         * @param {ContextType} context
+         * Set the state from the given object.
+         *
+         * @param {Object} newState
          */
-        setContext(state, context) {
-            state.context = context;
-        },
-        /**
-         * @param {Formation} formation
-         */
-        setFormation(state, formation) {
-            state.formation = formation;
-        },
-        /**
-         * @param {EditTool} tool
-         */
-        setTool(state, tool) {
-            state.tool = tool;
+        setState(state, newState) {
+            each(newState, (val, key) => {
+                state[key] = val;
+            });
         },
     },
     actions: {
-        /**
-         * Modify the Show with the given args. See the `modifyShow` mutation.
-         *
-         * @param {Object} args
-         */
-        modifyShow(context, args) {
-            args.show = context.rootState.show;
-            context.commit('modifyShow', args);
-        },
         /**
          * Redo an action.
          */
         redo(context) {
             let state = history.redo();
-            let show = Show.deserialize(state);
-            context.commit('setShow', show, {
-                root: true,
-            });
+            context.commit('setState', rereferenceState(state));
         },
         /**
          * Reset the state for the editor.
          */
         reset(context) {
-            let show = context.rootState.show;
+            let state = clone(initialState);
 
-            history = new History(show.serialize());
-            context.commit('setContext', initialState.context);
-
-            if (show.formations.length > 0) {
-                context.commit('setFormation', show.formations[0]);
-            } else {
-                context.commit('setFormation', initialState.formation);
+            state.show = context.rootState.show;
+            if (state.show && state.show.formations.length > 0) {
+                state.formation = state.show.formations[0];
             }
 
-            context.commit('setTool', initialState.tool);
+            context.commit('setState', state);
+
+            history = new History(dereferenceState(state));
         },
         /**
          * Save the current show to the server.
@@ -140,10 +159,7 @@ export default {
          */
         undo(context) {
             let state = history.undo();
-            let show = Show.deserialize(state);
-            context.commit('setShow', show, {
-                root: true,
-            });
+            context.commit('setState', rereferenceState(state));
         },
     },
 };

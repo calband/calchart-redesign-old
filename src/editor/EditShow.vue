@@ -10,12 +10,15 @@ The page that lets the user edit a show in the editor.
             :style="{ width: leftSidebarWidth }"
             class="formation-list"
         />
-        <div :style="{ width: workspaceWidth }" class="workspace">
+        <div
+            :style="{ width: workspaceWidth }"
+            class="workspace"
+            data-cy="edit-show-workspace"
+        >
             <Grapher
                 :draw-four-step="true"
                 :draw-yardline-numbers="true"
-                :dot-positions="dotPositions"
-                :formation="$store.state.editor.formation"
+                :formation="activeFormation"
                 class="grapher"
                 @mousedown="$refs.editTool.mousedown($event)"
                 @mousemove="$refs.editTool.mousemove($event)"
@@ -54,18 +57,18 @@ export default {
             rightSidebarWidth: 200,
         };
     },
+    created() {
+        this.$store.dispatch('editor/reset');
+    },
     mounted() {
         this.contentWidth = this.$el.offsetWidth;
     },
     computed: {
         /**
-         * @return {Object<Dot: PixelCoordinate>}
+         * @return {Formation} The currently active Formation.
          */
-        dotPositions() {
-            switch (this.$store.state.editor.context) {
-                case ContextType.FORMATION:
-                    return {};
-            }
+        activeFormation() {
+            return this.$store.state.editor.formation;
         },
         /**
          * @return {boolean}
@@ -92,7 +95,7 @@ export default {
             }
             return this.contentWidth - sides;
         },
-        ...mapState(['show']),
+        ...mapState('editor', ['show']),
     },
 };
 </script>

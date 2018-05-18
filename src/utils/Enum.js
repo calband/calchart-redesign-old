@@ -145,6 +145,15 @@ export default class Enum extends Serializable {
     }
 
     /**
+     * Overriding the default clone, because Enums shouldn't be cloned.
+     *
+     * @return {Object}
+     */
+    cloneDeep() {
+        return this;
+    }
+
+    /**
      * @return {Object}
      */
     _serialize() {

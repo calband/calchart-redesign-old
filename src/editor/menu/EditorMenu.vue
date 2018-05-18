@@ -62,11 +62,15 @@ export default {
             'editor/undo',
             'editor/redo',
         ];
-        this.$store.subscribeAction(action => {
+
+        let forceUpdate = action => {
             if (includes(historyActions, action.type)) {
                 this.$forceUpdate();
             }
-        });
+        };
+
+        this.$store.subscribe(forceUpdate);
+        this.$store.subscribeAction(forceUpdate);
     },
     mounted() {
         $('body').append(this.$refs.background);

@@ -19,6 +19,7 @@ The entry point for the editor page.
 
 <script>
 import { isNull } from 'lodash';
+import { mapState } from 'vuex';
 
 import { isVue } from 'utils/vue';
 
@@ -35,9 +36,6 @@ export default {
         },
     },
     components: { EditorMenu },
-    created() {
-        this.$store.dispatch('editor/reset');
-    },
     computed: {
         /**
          * @return {boolean} Whether a show is loaded.
@@ -52,14 +50,7 @@ export default {
             let staticPath = this.$store.state.env.staticPath;
             return `${staticPath}/img/highstepper.png`;
         },
-        /**
-         * Get the loaded Show.
-         *
-         * @return {?Show}
-         */
-        show() {
-            return this.$store.state.show;
-        },
+        ...mapState('editor', ['show']),
     },
 };
 </script>

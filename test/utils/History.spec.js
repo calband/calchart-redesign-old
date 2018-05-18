@@ -3,6 +3,7 @@
  */
 
 import History from 'utils/History';
+import { BaseSerializable } from 'utils/Serializable';
 
 describe('History', () => {
     it('initializes', () => {
@@ -71,5 +72,51 @@ describe('History', () => {
         expect(state.foo).toBe(1);
         expect(history.undoLabel).toBe('');
         expect(history.redoLabel).toBe('Second');
+    });
+
+    it('clones old states', () => {
+        let state = { foo: { bar: 1 } };
+        let history = new History(state);
+
+        state.foo.bar = 2;
+        history.addState('change', state);
+
+        state = history.undo();
+        expect(state.foo.bar).toBe(1);
+
+        state = history.redo();
+        expect(state.foo.bar).toBe(2);
+    });
+
+    it('clones states with Serializable objects', () => {
+        class Foo extends BaseSerializable {
+            constructor(data) {
+                super(data, {
+                    bar: Bar,
+                });
+            }
+        }
+
+        class Bar extends BaseSerializable {
+            constructor(data) {
+                super(data, {
+                    x: 'number',
+                });
+            }
+        }
+
+        let bar = new Bar({ x: 1 });
+        let foo = new Foo({ bar });
+        let state = { foo };
+        let history = new History(state);
+
+        state.foo.bar._x = 2;
+        history.addState('change', state);
+
+        state = history.undo();
+        expect(state.foo.bar.x).toBe(1);
+
+        state = history.redo();
+        expect(state.foo.bar.x).toBe(2);
     });
 });

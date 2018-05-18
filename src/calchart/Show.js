@@ -7,7 +7,7 @@
  * be sent to the server and saved in the database.
  */
 
-import { defaults, range } from 'lodash';
+import { defaults, defaultTo, find, range } from 'lodash';
 
 import Serializable from 'utils/Serializable';
 
@@ -133,5 +133,16 @@ export default class Show extends Serializable {
      */
     addFormation(formation) {
         this._formations.push(formation);
+    }
+
+    /**
+     * Get a Formation with the given ID.
+     *
+     * @param {String} id
+     * @return {?Formation}
+     */
+    getFormation(id) {
+        let formation = find(this.formations, ['id', id]);
+        return defaultTo(formation, null);
     }
 }

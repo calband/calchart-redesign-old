@@ -98,4 +98,11 @@ describe('BaseSerializable', () => {
         expect(newFoo).toEqual(foo1);
         expect(newFoo._bar).toEqual(bar1);
     });
+
+    it('clones', () => {
+        let clone = foo.cloneDeep();
+        expect(clone).not.toBe(foo);
+        expect(clone).toEqual(foo);
+        expect(clone.x).toBe(foo.x);
+    });
 });

@@ -15,7 +15,10 @@ The sidebar containing a list of formations for the editor.
                     <span>{{ formation.name }}</span>
                     <i :data-icon="getFormationIcon(formation)" />
                 </div>
-                <div :class="['formation-graph', getActive(formation)]">
+                <div
+                    :class="['formation-graph', getActive(formation)]"
+                    data-cy="formation-graph"
+                >
                     <Grapher
                         :draw-yardlines="false"
                         :field-padding="15"
@@ -66,7 +69,7 @@ export default {
          * @param {Formation} formation
          */
         chooseFormation(formation) {
-            this.$store.commit('editor/setFormation', formation);
+            this.$store.commit('editor/setState', { formation });
         },
         /**
          * Get an object containing the `active` class.
@@ -86,7 +89,8 @@ export default {
          * @return {string}
          */
         getFormationIcon(formation) {
-            return formation.dots.length === this.$store.state.show.dots.length
+            let show = this.$store.state.editor.show;
+            return formation.dots.length === show.dots.length
                 ? 'check-circle' : 'x-circle';
         },
     },

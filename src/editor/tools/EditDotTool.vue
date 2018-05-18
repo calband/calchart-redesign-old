@@ -24,6 +24,8 @@ A basic toolbar item for selecting a tool.
 </template>
 
 <script>
+import { mapState } from 'vuex';
+
 import FormationDot from 'calchart/FormationDot';
 import { unique } from 'utils/array';
 
@@ -40,6 +42,9 @@ export default {
             dotsToAdd: [],
         };
     },
+    computed: {
+        ...mapState('editor', ['show', 'formation']),
+    },
     methods: {
         onMousemove(e) {
             if (this.isMousedown) {
@@ -55,8 +60,8 @@ export default {
                     position: this.scale.toSteps(dot),
                 })
             );
-            this.$store.dispatch('editor/modifyShow', {
-                target: this.$store.state.editor.formation,
+            this.$store.commit('editor/modifyShow', {
+                target: this.formation,
                 func: 'addFormationDots',
                 args: [dotsToAdd],
             });
