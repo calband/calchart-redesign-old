@@ -16,7 +16,7 @@ The sidebar containing a list of formations for the editor.
                     <i :data-icon="getFormationIcon(formation)" />
                 </div>
                 <div
-                    :class="['formation-graph', getActive(formation)]"
+                    :class="['formation-graph', isActive(formation)]"
                     data-cy="formation-graph"
                 >
                     <Grapher
@@ -39,6 +39,8 @@ The sidebar containing a list of formations for the editor.
 </template>
 
 <script>
+import { mapGetters, mapState } from 'vuex';
+
 import Formation from 'calchart/Formation';
 import Grapher from 'grapher/Grapher';
 import AddFormationPopup from 'popups/AddFormationPopup';
@@ -62,6 +64,10 @@ export default {
     constants: {
         AddFormationPopup,
     },
+    computed: {
+        ...mapGetters('editor', ['isActiveFormation']),
+        ...mapState('editor', ['show']),
+    },
     methods: {
         /**
          * Make the given Formation active.
@@ -77,9 +83,9 @@ export default {
          * @param {Formation} formation
          * @return {object}
          */
-        getActive(formation) {
+        isActive(formation) {
             return {
-                active: formation === this.$store.state.editor.formation,
+                active: this.isActiveFormation(formation),
             };
         },
         /**
@@ -89,8 +95,7 @@ export default {
          * @return {string}
          */
         getFormationIcon(formation) {
-            let show = this.$store.state.editor.show;
-            return formation.dots.length === show.dots.length
+            return formation.dots.length === this.show.dots.length
                 ? 'check-circle' : 'x-circle';
         },
     },

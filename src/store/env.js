@@ -17,4 +17,15 @@ export default {
         // the path to static files, without a trailing slash
         staticPath: window.env.static_path,
     },
+    getters: {
+        /**
+         * Create a path to a static resource.
+         *
+         * @param {string} path
+         * @return {string}
+         */
+        getStatic: state => (path) => {
+            return `${state.staticPath}/${path}`;
+        },
+    },
 };
