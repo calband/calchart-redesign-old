@@ -69,7 +69,7 @@ export default {
             }
         };
 
-        this.$store.subscribe(forceUpdate)
+        this.$store.subscribe(forceUpdate);
         this.$store.subscribeAction(forceUpdate);
     },
     mounted() {

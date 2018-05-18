@@ -43,7 +43,7 @@ export default {
         };
     },
     computed: {
-        ...mapState('editor', ['show', 'formation'])
+        ...mapState('editor', ['show', 'formation']),
     },
     methods: {
         onMousemove(e) {

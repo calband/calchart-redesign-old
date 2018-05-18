@@ -8,7 +8,7 @@
 
 import { capitalize, cloneDeepWith, lowerCase } from 'lodash';
 
-import { BaseSerializable, cloneSerializable } from 'utils/Serializable';
+import { cloneSerializable } from 'utils/Serializable';
 
 /**
  * Clone the given state, handling cloning Serializable objects.

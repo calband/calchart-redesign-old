@@ -11,7 +11,6 @@
 
 import { clone, defaultTo, each } from 'lodash';
 
-import Show from 'calchart/Show';
 import ContextType from 'editor/ContextType';
 import EditDotTool from 'editor/tools/EditDotTool';
 import sendAction from 'utils/ajax';
@@ -53,7 +52,7 @@ function dereferenceState(state) {
     let newState = clone(state);
 
     newState.formationId = mapExist(state.formation, f => f.id);
-    delete newState.formation
+    delete newState.formation;
 
     return newState;
 }
@@ -69,9 +68,9 @@ function rereferenceState(state) {
 
     newState.formation = mapExist(
         state.formationId,
-        id => state.show.getFormation(id),
+        id => state.show.getFormation(id)
     );
-    delete newState.formationId
+    delete newState.formationId;
 
     return newState;
 }
