@@ -17,12 +17,14 @@ The top menu in the editor application.
                 :disabled="!history.hasUndo"
                 action="undo"
                 icon="undo"
+                data-cy="undo"
             />
             <EditorMenuItem
                 :label="`Redo ${history.redoLabel}`"
                 :disabled="!history.hasRedo"
                 action="redo"
                 icon="redo"
+                data-cy="redo"
             />
         </EditorMenuTab>
     </div>

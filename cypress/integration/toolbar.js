@@ -19,8 +19,11 @@ describe('Toolbars', () => {
         });
 
         it('adds dots', () => {
-            cy.get('[data-cy=edit-show-workspace] [data-cy=grapher]').click();
-            cy.get('[data-cy=grapher] [data-cy=dot]').should('exist');
+            cy.get('[data-cy=edit-show-workspace] [data-cy=grapher]')
+                .click()
+                .within(() => {
+                    cy.get('[data-cy=dot]').should('exist');
+                });
         });
     });
 });
