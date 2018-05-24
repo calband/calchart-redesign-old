@@ -6,4 +6,4 @@ The coordinate system used in Calchart maintains the origin on the top-left of t
 
 ## Angles
 
-Calchart measures angles from the east sideline, going clockwise. In documentation, these angle measurements may be referred to as "Calchart degrees". So 0 Calchart degrees is east, 90 Calchart degrees is south, 180 is west, and 270 is north. Calchart degrees are in the range [0, 360).
+Calchart measures angles from the east sideline, going clockwise. In documentation, these angle measurements may be referred to as "Calchart degrees". So 0 Calchart degrees is east, 90 Calchart degrees is north, 180 is west, and 270 is south (TODO: make code reflect this). Calchart degrees are in the range [0, 360).
