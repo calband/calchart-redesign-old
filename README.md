@@ -8,6 +8,8 @@ Goals:
 - Integrate Calchart Viewer
 - Integrate the individual continuity generator
 
+For a visualization of the design, see the [Figma](https://www.figma.com/file/XIkyioLzRlGlpmNiEu47glkQ/Calchart).
+
 ## Setup
 
 This project is different from other Comp-Comm projects in that developers will be running the Django server and building the static files locally instead of in a virtual machine (with Vagrant). Each of the steps below will list out the requirements needed to install on a developer's computer.
